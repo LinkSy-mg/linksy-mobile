@@ -1183,6 +1183,16 @@ class AppLocalizationsPt extends AppLocalizations {
       'Acesse seus computadores pela internet quando não estiver na mesma rede, por uma semana depois da última vez que esteve. Criptografado de ponta a ponta.';
 
   @override
+  String get settingsRelay => 'Servidor de relay';
+
+  @override
+  String get settingsRelayDefault => 'O do Linksy';
+
+  @override
+  String get settingsRelayCaption =>
+      'O endereço de um relay hospedado por você, como https://relay.example.com. Deixe vazio para usar o do Linksy. Defina o mesmo relay em todos os dispositivos.';
+
+  @override
   String get settingsWithYourComputers => 'Com seus computadores';
 
   @override

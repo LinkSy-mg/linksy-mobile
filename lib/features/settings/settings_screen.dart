@@ -115,6 +115,22 @@ class SettingsScreen extends StatelessWidget {
                           onChanged: (v) => update(st.copyWith(away: v)),
                         ),
                       ),
+                      // Self-hosting: a relay of the user's own (linksy-server).
+                      _Row(
+                        icon: Ph.network,
+                        title: context.l10n.settingsRelay,
+                        caption: st.relay ?? context.l10n.settingsRelayDefault,
+                        onTap: () async {
+                          final relay = await _askRelay(context, st.relay);
+                          // Null: dismissed. Empty: back to Linksy's own.
+                          if (relay == null || relay == (st.relay ?? '')) {
+                            return;
+                          }
+                          await update(
+                            st.copyWith(relay: relay.isEmpty ? null : relay),
+                          );
+                        },
+                      ),
                     ],
                   ),
                   SectionLabel(context.l10n.settingsWithYourComputers),
@@ -258,7 +274,36 @@ class SettingsScreen extends StatelessWidget {
     );
   }
 
-  static Future<String?> _askName(BuildContext context, String current) {
+  static Future<String?> _askName(BuildContext context, String current) =>
+      _askText(
+        context,
+        current: current,
+        title: (l) => l.settingsNameTitle,
+        caption: (l) => l.settingsNameCaption,
+        maxLength: 48,
+      );
+
+  /// The relay's address; empty means Linksy's own. The core checks it.
+  static Future<String?> _askRelay(BuildContext context, String? current) =>
+      _askText(
+        context,
+        current: current ?? '',
+        title: (l) => l.settingsRelay,
+        caption: (l) => l.settingsRelayCaption,
+        hint: 'https://relay.example.com',
+        keyboardType: TextInputType.url,
+      );
+
+  /// One line of text; null when dismissed.
+  static Future<String?> _askText(
+    BuildContext context, {
+    required String current,
+    required String Function(AppLocalizations) title,
+    required String Function(AppLocalizations) caption,
+    int? maxLength,
+    String? hint,
+    TextInputType? keyboardType,
+  }) {
     final text = TextEditingController(text: current);
     return showDialog<String>(
       context: context,
@@ -272,13 +317,13 @@ class SettingsScreen extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
                 Text(
-                  dialog.l10n.settingsNameTitle,
+                  title(dialog.l10n),
                   textAlign: TextAlign.center,
                   style: sora(21, color: s.ink),
                 ),
                 const SizedBox(height: 6),
                 Text(
-                  dialog.l10n.settingsNameCaption,
+                  caption(dialog.l10n),
                   textAlign: TextAlign.center,
                   style: TextStyle(color: s.muted),
                 ),
@@ -286,7 +331,12 @@ class SettingsScreen extends StatelessWidget {
                 TextField(
                   controller: text,
                   autofocus: true,
-                  maxLength: 48,
+                  maxLength: maxLength,
+                  keyboardType: keyboardType,
+                  autocorrect: keyboardType == null,
+                  decoration: hint == null
+                      ? null
+                      : InputDecoration(hintText: hint),
                   style: sora(18, weight: FontWeight.w500, color: s.ink),
                   onSubmitted: (v) => Navigator.of(dialog).pop(v.trim()),
                 ),

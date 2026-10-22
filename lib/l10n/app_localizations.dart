@@ -1968,6 +1968,24 @@ abstract class AppLocalizations {
   /// **'Reach your computers over the internet when you’re not on the same network, for a week after you last were. Encrypted end to end.'**
   String get settingsAwayFromHomeCaption;
 
+  /// Settings row: the relay used away from home; opens a dialog to change it
+  ///
+  /// In en, this message translates to:
+  /// **'Relay server'**
+  String get settingsRelay;
+
+  /// Caption of the Relay server row when no relay of the user's own is set
+  ///
+  /// In en, this message translates to:
+  /// **'Linksy’s own'**
+  String get settingsRelayDefault;
+
+  /// Caption of the dialog that asks for the relay's address
+  ///
+  /// In en, this message translates to:
+  /// **'The address of a relay you host yourself, like https://relay.example.com. Leave it empty for Linksy’s own. Set the same relay on every device.'**
+  String get settingsRelayCaption;
+
   /// Settings section label: features shared with paired computers
   ///
   /// In en, this message translates to:

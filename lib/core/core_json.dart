@@ -65,6 +65,7 @@ NodeSettings settingsFromJson(Json j) => NodeSettings(
   stayConnected: j['stay_connected'] as bool? ?? false,
   autoAccept: j['auto_accept'] as bool? ?? false,
   away: j['away'] as bool? ?? true,
+  relay: j['relay'] as String?,
 );
 
 Json settingsToJson(NodeSettings s) => {
@@ -73,6 +74,7 @@ Json settingsToJson(NodeSettings s) => {
   'stay_connected': s.stayConnected,
   'auto_accept': s.autoAccept,
   'away': s.away,
+  'relay': s.relay,
 };
 
 List<OfferedFile> _files(Object? list) => [

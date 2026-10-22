@@ -1186,6 +1186,16 @@ class AppLocalizationsFr extends AppLocalizations {
       'Accédez à vos ordinateurs par Internet quand vous n’êtes pas sur le même réseau, pendant une semaine après votre dernière connexion locale. Chiffré de bout en bout.';
 
   @override
+  String get settingsRelay => 'Serveur relais';
+
+  @override
+  String get settingsRelayDefault => 'Celui de Linksy';
+
+  @override
+  String get settingsRelayCaption =>
+      'L’adresse d’un relais que vous hébergez, comme https://relay.example.com. Laissez vide pour celui de Linksy. Réglez le même relais sur chaque appareil.';
+
+  @override
   String get settingsWithYourComputers => 'Avec vos ordinateurs';
 
   @override

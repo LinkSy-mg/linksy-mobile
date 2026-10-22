@@ -1145,6 +1145,16 @@ class AppLocalizationsZh extends AppLocalizations {
       '不在同一网络时，也能通过互联网连接你的电脑，有效期为最后一次同网后的一周。端到端加密。';
 
   @override
+  String get settingsRelay => '中继服务器';
+
+  @override
+  String get settingsRelayDefault => 'Linksy 自带';
+
+  @override
+  String get settingsRelayCaption =>
+      '你自己托管的中继地址，例如 https://relay.example.com。留空则使用 Linksy 的中继。请在每台设备上设置相同的中继。';
+
+  @override
   String get settingsWithYourComputers => '与你的电脑';
 
   @override

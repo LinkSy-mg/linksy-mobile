@@ -144,6 +144,7 @@ class NodeSettings {
     required this.stayConnected,
     required this.autoAccept,
     this.away = true,
+    this.relay,
   });
 
   final String name;
@@ -154,18 +155,27 @@ class NodeSettings {
   /// Reach paired computers away from home, over the internet (§4.13).
   final bool away;
 
+  /// A relay the user hosts (`https://relay.example.com`) instead of the one
+  /// the service lists (§4.12). Null: Linksy's own.
+  final String? relay;
+
+  static const _keep = Object();
+
+  /// [relay] may be set to null to go back to Linksy's own relay.
   NodeSettings copyWith({
     String? name,
     String? downloadDir,
     bool? stayConnected,
     bool? autoAccept,
     bool? away,
+    Object? relay = _keep,
   }) => NodeSettings(
     name: name ?? this.name,
     downloadDir: downloadDir ?? this.downloadDir,
     stayConnected: stayConnected ?? this.stayConnected,
     autoAccept: autoAccept ?? this.autoAccept,
     away: away ?? this.away,
+    relay: identical(relay, _keep) ? this.relay : relay as String?,
   );
 }
 

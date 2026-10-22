@@ -1177,6 +1177,16 @@ class AppLocalizationsEn extends AppLocalizations {
       'Reach your computers over the internet when you’re not on the same network, for a week after you last were. Encrypted end to end.';
 
   @override
+  String get settingsRelay => 'Relay server';
+
+  @override
+  String get settingsRelayDefault => 'Linksy’s own';
+
+  @override
+  String get settingsRelayCaption =>
+      'The address of a relay you host yourself, like https://relay.example.com. Leave it empty for Linksy’s own. Set the same relay on every device.';
+
+  @override
   String get settingsWithYourComputers => 'With your computers';
 
   @override

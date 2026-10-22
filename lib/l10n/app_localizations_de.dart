@@ -1183,6 +1183,16 @@ class AppLocalizationsDe extends AppLocalizations {
       'Erreiche deine Computer über das Internet, wenn ihr nicht im selben Netzwerk seid – bis eine Woche nach dem letzten Mal. Ende-zu-Ende-verschlüsselt.';
 
   @override
+  String get settingsRelay => 'Relay-Server';
+
+  @override
+  String get settingsRelayDefault => 'Linksys eigener';
+
+  @override
+  String get settingsRelayCaption =>
+      'Die Adresse eines Relays, das du selbst betreibst, etwa https://relay.example.com. Leer lassen für Linksys eigenes. Stelle auf jedem Gerät dasselbe Relay ein.';
+
+  @override
   String get settingsWithYourComputers => 'Mit deinen Computern';
 
   @override

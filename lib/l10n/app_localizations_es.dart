@@ -1184,6 +1184,16 @@ class AppLocalizationsEs extends AppLocalizations {
       'Conéctate a tus computadoras por internet cuando no estés en la misma red, durante una semana desde la última vez que lo estuviste. Cifrado de extremo a extremo.';
 
   @override
+  String get settingsRelay => 'Servidor de relé';
+
+  @override
+  String get settingsRelayDefault => 'El de Linksy';
+
+  @override
+  String get settingsRelayCaption =>
+      'La dirección de un relé alojado por ti, como https://relay.example.com. Déjalo vacío para usar el de Linksy. Configura el mismo relé en todos los dispositivos.';
+
+  @override
   String get settingsWithYourComputers => 'Con tus computadoras';
 
   @override

@@ -1157,6 +1157,16 @@ class AppLocalizationsJa extends AppLocalizations {
       '同じネットワークにいないときも、最後に同じネットワークにいてから 1 週間はインターネット経由でコンピュータにつながります。エンドツーエンドで暗号化されます。';
 
   @override
+  String get settingsRelay => 'リレーサーバー';
+
+  @override
+  String get settingsRelayDefault => 'Linksy のリレー';
+
+  @override
+  String get settingsRelayCaption =>
+      '自分で運用するリレーのアドレス（例: https://relay.example.com）。空のままなら Linksy のリレーを使います。すべてのデバイスに同じリレーを設定してください。';
+
+  @override
   String get settingsWithYourComputers => 'コンピュータとの連携';
 
   @override

@@ -1185,6 +1185,16 @@ class AppLocalizationsMg extends AppLocalizations {
       'Mifandraisa amin\'ny solosainao amin\'ny alalan\'ny internet rehefa tsy amin\'ny tambajotra iray ianareo, mandritra ny herinandro taorian\'ny fotoana farany nisy anareo niaraka. Voaaro tanteraka.';
 
   @override
+  String get settingsRelay => 'Mpampita (relay)';
+
+  @override
+  String get settingsRelayDefault => 'An\'i Linksy';
+
+  @override
+  String get settingsRelayCaption =>
+      'Ny adiresin\'ny mpampita ampiasainao manokana, toy ny https://relay.example.com. Avelao ho foana raha an\'i Linksy. Apetraho mitovy amin\'ny fitaovana rehetra ny mpampita.';
+
+  @override
   String get settingsWithYourComputers => 'Miaraka amin\'ny solosainao';
 
   @override

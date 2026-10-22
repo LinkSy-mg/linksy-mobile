@@ -113,4 +113,21 @@ void main() {
     expect(st.away, isFalse);
     expect(settingsToJson(st.copyWith(away: true))['away'], isTrue);
   });
+
+  test('a relay of one\'s own is kept, and cleared with null', () {
+    final st = settingsFromJson({'name': 'P', 'download_dir': '/d'});
+    expect(st.relay, isNull);
+    final own = st.copyWith(relay: 'https://relay.example.com');
+    expect(settingsToJson(own)['relay'], 'https://relay.example.com');
+    expect(own.copyWith(away: false).relay, 'https://relay.example.com');
+    expect(own.copyWith(relay: null).relay, isNull);
+    expect(
+      settingsFromJson({
+        'name': 'P',
+        'download_dir': '/d',
+        'relay': 'https://relay.example.com/',
+      }).relay,
+      'https://relay.example.com/',
+    );
+  });
 }

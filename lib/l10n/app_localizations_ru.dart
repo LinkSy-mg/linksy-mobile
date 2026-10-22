@@ -1205,6 +1205,16 @@ class AppLocalizationsRu extends AppLocalizations {
       'Доступ к вашим компьютерам через интернет, когда вы не в одной сети, — в течение недели после последней встречи в ней. Сквозное шифрование.';
 
   @override
+  String get settingsRelay => 'Релейный сервер';
+
+  @override
+  String get settingsRelayDefault => 'Релей Linksy';
+
+  @override
+  String get settingsRelayCaption =>
+      'Адрес релея, который вы разместили сами, например https://relay.example.com. Оставьте пустым, чтобы использовать релей Linksy. Задайте один и тот же релей на всех устройствах.';
+
+  @override
   String get settingsWithYourComputers => 'С вашими компьютерами';
 
   @override

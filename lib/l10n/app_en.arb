@@ -1575,6 +1575,18 @@
   "@settingsAwayFromHomeCaption": {
     "description": "Caption of the Away from home switch"
   },
+  "settingsRelay": "Relay server",
+  "@settingsRelay": {
+    "description": "Settings row: the relay used away from home; opens a dialog to change it"
+  },
+  "settingsRelayDefault": "Linksy’s own",
+  "@settingsRelayDefault": {
+    "description": "Caption of the Relay server row when no relay of the user's own is set"
+  },
+  "settingsRelayCaption": "The address of a relay you host yourself, like https://relay.example.com. Leave it empty for Linksy’s own. Set the same relay on every device.",
+  "@settingsRelayCaption": {
+    "description": "Caption of the dialog that asks for the relay's address"
+  },
   "settingsWithYourComputers": "With your computers",
   "@settingsWithYourComputers": {
     "description": "Settings section label: features shared with paired computers"

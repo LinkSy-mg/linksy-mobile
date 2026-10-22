@@ -2,6 +2,11 @@
 
 All notable changes to Linksy for Android. Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), versions follow [SemVer](https://semver.org/).
 
+## [Unreleased]
+
+### Added
+- **Your own relay**: Settings › Connection › Relay server takes the address of a relay you host (`linksy-server`), like `https://relay.example.com`; empty means Linksy's own. Set the same one on your computers.
+
 ## [0.2.2] - 2026-10-22
 
 ### Added
