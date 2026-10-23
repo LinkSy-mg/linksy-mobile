@@ -11,7 +11,7 @@ crate-type = ["cdylib", "staticlib"]
 [dependencies]
 flutter_rust_bridge = "=2.13.0"
 # The protocol lives in linksy-desktop; pin the commit the app was built against.
-linksy-core = { git = "ssh://git@github.com/LinkSy-mg/linksy-desktop.git", rev = "e6957b46cd179d7b86718d28e68dd8af3c5efbe9" }
+linksy-core = { git = "ssh://git@github.com/LinkSy-mg/linksy-desktop.git", rev = "293c7bc4c96f2d934e57c2b7040e03af15eef00d" }
 log = "0.4"
 serde = "1.0.229"
 serde_json = "1.0.154"
