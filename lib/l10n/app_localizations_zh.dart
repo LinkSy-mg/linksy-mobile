@@ -1181,6 +1181,18 @@ class AppLocalizationsZh extends AppLocalizations {
   String get settingsBrowseFiles => '允许电脑浏览文件';
 
   @override
+  String get settingsFilesFolder => '你选择的文件夹';
+
+  @override
+  String get settingsFilesAll => '所有文件';
+
+  @override
+  String get settingsFilesAllCaption => '你的电脑可以打开这部手机上的所有文件。';
+
+  @override
+  String get settingsFilesAllAllow => '在 Android 设置中允许 Linksy“访问所有文件”。';
+
+  @override
   String get settingsBrowseFilesChoose =>
       '选择一个电脑可以在“文件”应用中打开的文件夹，例如“文档”（Android 不允许选择“下载”）。';
 

@@ -1193,6 +1193,19 @@ class AppLocalizationsJa extends AppLocalizations {
   String get settingsBrowseFiles => 'コンピュータからファイルを閲覧';
 
   @override
+  String get settingsFilesFolder => '選んだフォルダ';
+
+  @override
+  String get settingsFilesAll => 'すべてのファイル';
+
+  @override
+  String get settingsFilesAllCaption => 'パソコンからこのスマホのすべてのファイルを開けます。';
+
+  @override
+  String get settingsFilesAllAllow =>
+      'Android の設定で Linksy に「すべてのファイルへのアクセス」を許可してください。';
+
+  @override
   String get settingsBrowseFilesChoose =>
       'コンピュータのファイルアプリから開けるフォルダ（Documents など）を選んでください（Android では Download は選べません）。';
 

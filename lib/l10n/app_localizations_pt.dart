@@ -1221,6 +1221,20 @@ class AppLocalizationsPt extends AppLocalizations {
       'Deixar computadores navegarem nos arquivos';
 
   @override
+  String get settingsFilesFolder => 'Uma pasta que você escolher';
+
+  @override
+  String get settingsFilesAll => 'Todos os arquivos';
+
+  @override
+  String get settingsFilesAllCaption =>
+      'Seus computadores podem abrir qualquer arquivo deste telefone.';
+
+  @override
+  String get settingsFilesAllAllow =>
+      'Permita “Acesso a todos os arquivos” para o Linksy nas configurações do Android.';
+
+  @override
   String get settingsBrowseFilesChoose =>
       'Escolha uma pasta que seus computadores podem abrir no app Arquivos deles, como Documentos (o Android não permite Download).';
 

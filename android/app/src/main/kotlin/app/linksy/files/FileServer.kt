@@ -7,16 +7,24 @@ import android.provider.DocumentsContract.Document
 import android.util.Log
 import android.webkit.MimeTypeMap
 import org.json.JSONArray
+import app.linksy.Lang
+import app.linksy.R
 import org.json.JSONObject
+import java.io.File
 import java.io.FileInputStream
 import java.io.FileOutputStream
 import java.nio.ByteBuffer
 
 /// Answers a computer browsing this phone (docs/protocol.md §4.9) from the one folder
-/// the user chose in Android's picker: `/` is that folder. No storage
-/// permission: the picker's grant is all it uses.
+/// the user chose in Android's picker: `/` is that folder, and the picker's grant
+/// is all it uses. Or, with All files access ([everything]), from the phone's
+/// whole shared storage, as plain files.
 class FileServer(private val context: Context) {
     @Volatile var root: Uri? = null
+
+    /// The phone's shared storage, when the user chose All files and Android
+    /// allows it (MANAGE_EXTERNAL_STORAGE); [root] is left aside meanwhile.
+    @Volatile var everything: File? = null
 
     private val resolver get() = context.contentResolver
 
@@ -39,6 +47,7 @@ class FileServer(private val context: Context) {
     }
 
     private fun handle(id: Long, r: JSONObject) {
+        everything?.let { return handlePlain(id, r, it) }
         val tree = root ?: return error(id, "No folder is shared.")
         val path = r.optString("path", "/")
         when (r.getString("op")) {
@@ -106,6 +115,72 @@ class FileServer(private val context: Context) {
                 }
                 forget(path)
                 ok(id)
+            }
+            else -> error(id, "This phone can't do that yet.")
+        }
+    }
+
+    // All files: the same answers from plain files under [base].
+
+    private fun handlePlain(id: Long, r: JSONObject, base: File) {
+        val top = base.canonicalFile
+        // Never above the shared storage, whatever the path says.
+        fun at(path: String): File? =
+            File(top, normalize(path).trimStart('/')).canonicalFile.takeIf { it == top || it.path.startsWith(top.path + "/") }
+        fun entry(f: File) = JSONObject().put("name", f.name).put("dir", f.isDirectory)
+            .put("size", if (f.isDirectory) 0 else f.length()).put("modified_ms", f.lastModified())
+        val path = r.optString("path", "/")
+        when (r.getString("op")) {
+            "info" -> reply(id, JSONObject().put("type", "fs_info").put("name", Lang.str(context, R.string.all_files)))
+            "list" -> {
+                val dir = at(path)?.takeIf { it.exists() } ?: return notFound(id, path)
+                if (!dir.isDirectory) return error(id, "That's a file, not a folder.")
+                val entries = JSONArray()
+                dir.listFiles().orEmpty().forEach { entries.put(entry(it)) }
+                reply(id, JSONObject().put("type", "fs_entries").put("entries", entries))
+            }
+            "stat" -> {
+                val f = at(path)?.takeIf { it.exists() } ?: return notFound(id, path)
+                reply(id, JSONObject().put("type", "fs_entry").put("entry", entry(f)))
+            }
+            "read" -> {
+                val f = at(path)?.takeIf { it.isFile } ?: return notFound(id, path)
+                val offset = r.getLong("offset")
+                val length = r.getLong("length").coerceAtMost(4L shl 20).toInt()
+                val bytes = java.io.RandomAccessFile(f, "r").use { file ->
+                    file.seek(offset)
+                    val buf = ByteArray(length)
+                    var got = 0
+                    while (got < length) {
+                        val n = file.read(buf, got, length - got)
+                        if (n <= 0) break
+                        got += n
+                    }
+                    buf.copyOf(got)
+                }
+                NativeFiles.reply(id, JSONObject().put("type", "fs_data").put("length", bytes.size).toString(), bytes)
+            }
+            "write" -> {
+                val body = NativeFiles.body(id) ?: return error(id, "The data didn't arrive.")
+                val f = at(path) ?: return error(id, "Couldn't create ${name(path)}.")
+                val offset = r.getLong("offset")
+                java.io.RandomAccessFile(f, "rw").use { file ->
+                    file.seek(offset)
+                    file.write(body)
+                    if (r.optBoolean("truncate")) file.setLength(offset + body.size)
+                }
+                ok(id)
+            }
+            "mkdir" -> if (at(path)?.let { it.isDirectory || it.mkdirs() } == true) ok(id) else error(id, "Couldn't create the folder.")
+            "delete" -> {
+                val f = at(path)?.takeIf { it.exists() } ?: return notFound(id, path)
+                if (f == top) return error(id, "The shared folder itself can't be deleted.")
+                if (f.deleteRecursively()) ok(id) else error(id, "Couldn't delete it.")
+            }
+            "rename" -> {
+                val f = at(path)?.takeIf { it.exists() } ?: return notFound(id, path)
+                val to = at(r.getString("to")) ?: return error(id, "Couldn't move it.")
+                if (f.renameTo(to)) ok(id) else error(id, "Couldn't move it.")
             }
             else -> error(id, "This phone can't do that yet.")
         }

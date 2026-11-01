@@ -1624,6 +1624,22 @@
   "@settingsBrowseFiles": {
     "description": "Settings switch: share a phone folder with computers"
   },
+  "settingsFilesFolder": "A folder you choose",
+  "settingsFilesAll": "All files",
+  "settingsFilesAllCaption": "Your computers can open every file on this phone.",
+  "settingsFilesAllAllow": "Allow “All files access” for Linksy in Android’s settings.",
+  "@settingsFilesFolder": {
+    "description": "Browse files: computers see one folder the user picks"
+  },
+  "@settingsFilesAll": {
+    "description": "Browse files: computers see all of the phone's files (Android's All files access)"
+  },
+  "@settingsFilesAllCaption": {
+    "description": "Under All files, once allowed"
+  },
+  "@settingsFilesAllAllow": {
+    "description": "Under All files, before Android allows it"
+  },
   "settingsBrowseFilesChoose": "Choose a folder your computers can open in their Files app, like Documents (Android doesn’t allow Download).",
   "@settingsBrowseFilesChoose": {
     "description": "Caption when no shared folder is chosen yet"

@@ -30,4 +30,5 @@
     <string name="media_next">下一首</string>
     <string name="media_back10">后退 10 秒</string>
     <string name="media_forward10">前进 10 秒</string>
+    <string name="all_files">所有文件</string>
 </resources>

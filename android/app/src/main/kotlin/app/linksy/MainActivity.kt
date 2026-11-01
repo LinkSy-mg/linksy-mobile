@@ -99,8 +99,20 @@ class MainActivity : FlutterActivity() {
                     "folder" -> result.success(folderName(call.argument<String>("kind")!!))
                     "shareFiles" -> {
                         val on = call.argument<Boolean>("on") == true
-                        fileServer(this@MainActivity).root = folder("files")
-                        NativeFiles.sharing(on && folder("files") != null)
+                        // All files: `/` is the phone's storage, once Android allows it.
+                        val all = call.argument<Boolean>("all") == true && allFilesState() == "allowed"
+                        val server = fileServer(this@MainActivity)
+                        server.root = folder("files")
+                        server.everything = if (all) android.os.Environment.getExternalStorageDirectory() else null
+                        NativeFiles.sharing(on && (all || folder("files") != null))
+                        result.success(null)
+                    }
+                    "allFilesState" -> result.success(allFilesState())
+                    "allowAllFiles" -> {
+                        // Android's own page for it; the app hears back on resume.
+                        runCatching {
+                            startActivity(Intent(Settings.ACTION_MANAGE_APP_ALL_FILES_ACCESS_PERMISSION, android.net.Uri.parse("package:$packageName")))
+                        }.onFailure { runCatching { startActivity(Intent(Settings.ACTION_MANAGE_ALL_FILES_ACCESS_PERMISSION)) } }
                         result.success(null)
                     }
                     "directHost" -> result.success(DirectHost.supported(this@MainActivity))
@@ -392,6 +404,14 @@ class MainActivity : FlutterActivity() {
             m.widthPixels to m.heightPixels
         }
         return mapOf("width" to maxOf(w, h), "height" to minOf(w, h))
+    }
+
+    /// All files access (Android 11+): `allowed`, `denied`, or `unsupported` before
+    /// Android 11, where it doesn't exist.
+    private fun allFilesState(): String = when {
+        Build.VERSION.SDK_INT < 30 -> "unsupported"
+        android.os.Environment.isExternalStorageManager() -> "allowed"
+        else -> "denied"
     }
 
     /// A Linksy computer on the USB cable (§4.11): opens the bridge and

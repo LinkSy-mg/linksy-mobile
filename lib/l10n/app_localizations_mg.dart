@@ -1222,6 +1222,20 @@ class AppLocalizationsMg extends AppLocalizations {
   String get settingsBrowseFiles => 'Avelao hijery rakitra ny solosaina';
 
   @override
+  String get settingsFilesFolder => 'Lahatahiry nofidinao';
+
+  @override
+  String get settingsFilesAll => 'Ny rakitra rehetra';
+
+  @override
+  String get settingsFilesAllCaption =>
+      'Afaka manokatra ny rakitra rehetra amin\'ity finday ity ny solosainanao.';
+
+  @override
+  String get settingsFilesAllAllow =>
+      'Avelao ny « Fidirana amin\'ny rakitra rehetra » ho an\'i Linksy ao amin\'ny fikirana Android.';
+
+  @override
   String get settingsBrowseFilesChoose =>
       'Safidio lahatahiry azon\'ny solosainao sokafana ao amin\'ny Files, toy ny Documents (tsy avelan\'i Android ny Download).';
 

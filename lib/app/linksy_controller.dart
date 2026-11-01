@@ -375,7 +375,8 @@ class LinksyController extends ChangeNotifier with WidgetsBindingObserver {
       ..remove(_self);
     filesFolder = await LinksyPlatform.folder('files');
     photosFolder = await LinksyPlatform.folder('photos');
-    await LinksyPlatform.shareFiles(sharingFiles && filesFolder != null);
+    allFiles = await LinksyPlatform.allFilesState();
+    await LinksyPlatform.shareFiles(sharingFiles && filesReady, all: filesAll);
     await LinksyPlatform.watchCalls(pauseOnCalls);
     _updateKeepAlive();
     notifyListeners();
@@ -948,13 +949,39 @@ class LinksyController extends ChangeNotifier with WidgetsBindingObserver {
     final name = await LinksyPlatform.pickFolder('files');
     if (name == null) return null;
     filesFolder = name;
+    await _setPref('files_mode', null);
     await setSharingFiles(true);
     return name;
   }
 
   Future<void> setSharingFiles(bool on) async {
     await _setPref('share_files', on ? 'on' : null);
-    await LinksyPlatform.shareFiles(on && filesFolder != null);
+    await LinksyPlatform.shareFiles(on && filesReady, all: filesAll);
+  }
+
+  /// Computers browse all of this phone's files instead of the picked
+  /// folder (All files access, Android 11+).
+  bool get filesAll => prefs['files_mode'] == 'all';
+
+  /// All files access: `allowed`, `denied` or `unsupported`.
+  String? allFiles;
+
+  /// There's something to browse: the picked folder, or all files allowed.
+  bool get filesReady => filesAll ? allFiles == 'allowed' : filesFolder != null;
+
+  /// Folder or all files; all files asks Android first when it isn't allowed.
+  Future<void> setFilesAll(bool all) async {
+    await _setPref('files_mode', all ? 'all' : null);
+    allFiles = await LinksyPlatform.allFilesState();
+    if (all && allFiles == 'denied') await LinksyPlatform.allowAllFiles();
+    await refreshFiles();
+  }
+
+  /// Again after Android's settings: whether All files access was given.
+  Future<void> refreshFiles() async {
+    allFiles = await LinksyPlatform.allFilesState();
+    await LinksyPlatform.shareFiles(sharingFiles && filesReady, all: filesAll);
+    notifyListeners();
   }
 
   // Media (§4.5): a computer's players, while a page or the media

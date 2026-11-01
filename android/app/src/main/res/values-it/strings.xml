@@ -30,4 +30,5 @@
     <string name="media_next">Successivo</string>
     <string name="media_back10">Indietro di 10 secondi</string>
     <string name="media_forward10">Avanti di 10 secondi</string>
+    <string name="all_files">Tutti i file</string>
 </resources>

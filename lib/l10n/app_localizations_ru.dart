@@ -1242,6 +1242,20 @@ class AppLocalizationsRu extends AppLocalizations {
   String get settingsBrowseFiles => 'Доступ компьютеров к файлам';
 
   @override
+  String get settingsFilesFolder => 'Выбранная папка';
+
+  @override
+  String get settingsFilesAll => 'Все файлы';
+
+  @override
+  String get settingsFilesAllCaption =>
+      'Ваши компьютеры могут открыть любой файл на этом телефоне.';
+
+  @override
+  String get settingsFilesAllAllow =>
+      'Разрешите Linksy «Доступ ко всем файлам» в настройках Android.';
+
+  @override
   String get settingsBrowseFilesChoose =>
       'Выберите папку, которую компьютеры смогут открыть в файловом менеджере, например «Документы» (Android не разрешает «Загрузки»).';
 

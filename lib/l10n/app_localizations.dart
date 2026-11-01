@@ -2034,6 +2034,30 @@ abstract class AppLocalizations {
   /// **'Let computers browse files'**
   String get settingsBrowseFiles;
 
+  /// Browse files: computers see one folder the user picks
+  ///
+  /// In en, this message translates to:
+  /// **'A folder you choose'**
+  String get settingsFilesFolder;
+
+  /// Browse files: computers see all of the phone's files (Android's All files access)
+  ///
+  /// In en, this message translates to:
+  /// **'All files'**
+  String get settingsFilesAll;
+
+  /// Under All files, once allowed
+  ///
+  /// In en, this message translates to:
+  /// **'Your computers can open every file on this phone.'**
+  String get settingsFilesAllCaption;
+
+  /// Under All files, before Android allows it
+  ///
+  /// In en, this message translates to:
+  /// **'Allow “All files access” for Linksy in Android’s settings.'**
+  String get settingsFilesAllAllow;
+
   /// Caption when no shared folder is chosen yet
   ///
   /// In en, this message translates to:
