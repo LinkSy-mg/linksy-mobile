@@ -6,7 +6,7 @@ offer those features to Android phones.
 
 - App: `app.linksy.mg` (since 0.1.8; 0.1.x up to 0.1.7 was `app.linksy`), Flutter + the
   real `linksy-core` through flutter_rust_bridge. Repo: LinkSy-mg/linksy-mobile.
-- Core pinned at `6282520` (desktop main with private discovery), as of phone 0.2.4. Builds for arm64-v8a, armeabi-v7a, x86_64.
+- Core pinned at `7e310dd` (desktop 0.11.2), as of phone 0.2.12. Builds for arm64-v8a, armeabi-v7a, x86_64.
 - Releases: LinkSy-mg/linksy-releases, titled "Android X", APKs named `linksy-X.apk` / `-arm64` / `-armv7` with a `SHA256SUMS` (the app's Update Now checks against it); the newest is always https://linksy.diary.mg/download/android.
 - Distributed as a sideloaded APK, not through the Play Store. That shapes everything in
   §3: Android's fraud protection blocks installing sideloaded apps that declare certain
@@ -39,7 +39,7 @@ offer those features to Android phones.
 | Clipboard watch (`clipboard_watch`) | Done (phone asks) | Per computer, "Get its clipboard" on its page, only when the computer announces `clipboard_watch`; sent again on every connect while on. The phone doesn't announce `clipboard_watch` itself (§3) |
 | Locate (`locate`) | Done | "Let computers locate this phone", off by default. On: one fix (one under a minute old, else `getCurrentLocation`, 20 s max), foreground location only. Else `location_refused` with a reason to show as is ("Locating is turned off in Linksy on this phone", "Location is off on this phone", "Open Linksy on the phone to share where it is"…) |
 | Away from home | Done | `Config.away` on, relay from the service file (§4.12, cached, fetched at most daily; default `https://linksy-relay.diary.mg`). Settings switch (`Settings.away`), "Relay server" (`Settings.relay`, the user's own, wins over the service file), per computer "Allow everything from away" (`set_away_all`), "Connected away from home", "Reachable from away until <day>" |
-| USB cable (AOA) | Built, untested on hardware | Accessory filter `Linksy`/`Linksy`; UDP bridge on 127.0.0.1, 2-byte BE length framing, batched writes; then `connect_address(127.0.0.1:P)`. "Connected by USB" from `DeviceView.usb` |
+| USB cable (AOA) | Built, untested on hardware | Accessory filter `Linksy`/`Linksy`; Kotlin opens the accessory and hands `detachFd()` and `accessory.version` to `linksy_core::cable::phone_bridge` (framing version 2 when the computer announces it); then `connect_address(127.0.0.1:P)`, up to 3 tries, and pairing over the cable only if the computer says `not_paired` or nobody answers. "Connected by USB" from `DeviceView.usb` |
 | Service file (§4.12) | Done | `android` notices on the home screen, each until dismissed; "Update Linksy to keep connecting" when `protocol.minimum` > 1 |
 | `features` | Announced | `files clipboard open_url battery ring media_remote call_state heartbeat import fs input screen display camera watch clipboard_file microphone picture locate` |
 | `fs` `info` | Done | `fs_info` with the picked folder's name |
@@ -104,7 +104,7 @@ desktop side with a real phone:
 | **Texting from the computer** (`sms_list_threads`, `sms_list_messages`, `sms_send`, `sms_message`) | Needs READ_SMS / RECEIVE_SMS / SEND_SMS. Android's fraud protection blocks installing sideloaded apps that declare SMS permissions; Play also restricts them to default SMS apps |
 | **Phone notifications on the computer**, reply, actions, dismiss (`notification_*`) | Needs a NotificationListenerService (`BIND_NOTIFICATION_LISTENER_SERVICE`), on the same install-block list, and "restricted settings" blocks enabling it for sideloaded apps |
 | **The phone's own music on the computer** (`media_state` from the phone, `media_command` to it) | `MediaSessionManager.getActiveSessions` requires notification-listener access (see above) |
-| **Controlling the phone from the computer** (`control` requested by the computer) | Injecting touch needs an AccessibilityService, also on the install-block list (it's what blocked v0.1.3/0.1.4). Answered with `decline_unsupported` |
+| **Controlling the phone from the computer** (`control` requested by the computer) | Injecting touch needs an AccessibilityService, also on the install-block list (it's what blocked v0.1.3/0.1.4). Answered with `decline_unsupported`. Over the cable, desktop 0.11 drives a plain `screen` share through AOA 2.0's virtual touchscreen and keyboard instead, which needs nothing from the app; the phone says "Controlled from <computer>" in the share's notification while that touchscreen is there (an external `SOURCE_TOUCHSCREEN` in `InputManager`), and Stop ends the share |
 | **Caller's name in `call_state`** | Would need READ_CONTACTS plus call permissions; the phone reads only the audio mode, which has no number. `contact` is always absent |
 | **Browsing the whole phone** in the Files sidebar | Needs MANAGE_EXTERNAL_STORAGE ("All files access"), an alarming special permission for a sideloaded app; Android's picker won't grant Download or the root. Only one chosen folder is shared |
 | **Watching the phone's clipboard** (auto sync phone → computer) | Android 10+ only lets the app on screen read the clipboard, so the phone doesn't announce `clipboard_watch` |
@@ -124,6 +124,13 @@ default SMS app.
 
 ## Changelog
 
+- **2026-11-01** — Phone 0.2.12 on core `7e310dd` (desktop 0.11.2): the cable through
+  `cable::phone_bridge` (framing version 2: hello, keepalives, close, 16 KB reads, padded
+  writes), the dial through it retried up to 3 times before pairing is offered (the Samsung
+  A05 case), and "Controlled from <computer>" while the computer drives the phone over the
+  cable. Not done: why the realme never got the accessory (needs a phone on a cable), the
+  rotation for control in landscape (waits for the protocol), and control without the cable
+  (an accessibility service, §3).
 - **2026-10-24** — Phone 0.2.5, same core: the computer's players as an Android media
   notification (it sends `media_watch {on: true}` to each connected computer, again after
   each reconnect, unless turned off), `seek` from the page and the notification, a number

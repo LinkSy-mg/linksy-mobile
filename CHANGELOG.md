@@ -2,6 +2,18 @@
 
 All notable changes to Linksy for Android. Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), versions follow [SemVer](https://semver.org/).
 
+## [Unreleased]
+
+### Changed
+- **USB cable**: the phone's end of the cable now runs on linksy-core's own bridge, which speaks the cable's new version (Linksy 0.11 on the computer): it reads the cable the way Android expects, answers the computer's checks and lets go cleanly when the cable goes quiet. Computers with an older Linksy keep working as before.
+- Names of other devices are tidied by linksy-core: no invisible or direction-changing characters, at most 48 characters.
+
+### Added
+- **Controlled over the cable**: when a computer with Linksy 0.11 takes control of this phone's screen over the USB cable, the screen sharing notification says "Controlled from" that computer, and Stop ends it.
+
+### Fixed
+- **USB cable on a phone that's already paired**: the phone tries the computer a few times before offering to pair over the cable, instead of offering pairing after one failed try.
+
 ## [0.2.11] - 2026-10-27
 
 ### Added
