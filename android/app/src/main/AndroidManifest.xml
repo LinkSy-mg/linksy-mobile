@@ -78,6 +78,11 @@
                 <category android:name="android.intent.category.BROWSABLE"/>
                 <data android:scheme="linksy" android:host="pair"/>
             </intent-filter>
+            <!-- The app reads those links itself (the "link" call to Dart); Flutter's own
+                 deep linking would also push each one as a route, which doesn't exist. -->
+            <meta-data
+                android:name="flutter_deeplinking_enabled"
+                android:value="false"/>
             <!-- A computer running Linksy on the USB cable (docs/protocol.md §4.11). -->
             <intent-filter>
                 <action android:name="android.hardware.usb.action.USB_ACCESSORY_ATTACHED"/>
