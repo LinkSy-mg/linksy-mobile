@@ -69,7 +69,7 @@ class HomeScreen extends StatelessWidget {
                 const SliverToBoxAdapter(child: _GetStarted())
               else ...[
                 SliverToBoxAdapter(
-                  child: SectionLabel(
+                  child: _Title(
                     context.l10n.homeYourDevices,
                     trailing: Text(
                       '${paired.length}',
@@ -92,7 +92,7 @@ class HomeScreen extends StatelessWidget {
               ],
               if (unpaired.isNotEmpty) ...[
                 SliverToBoxAdapter(
-                  child: SectionLabel(context.l10n.homeNearbyNotPaired),
+                  child: _Title(context.l10n.homeNearbyNotPaired),
                 ),
                 SliverList.separated(
                   itemCount: unpaired.length,
@@ -125,11 +125,18 @@ class _Visible extends StatelessWidget {
     final s = Sig.of(context);
     final name = controller.settings?.name ?? controller.node.info.name;
     return Padding(
-      padding: const EdgeInsets.fromLTRB(16, 0, 20, 0),
+      padding: const EdgeInsets.fromLTRB(22, 0, 20, 0),
       child: Row(
         children: [
-          const PulseDot(color: Sig.cyan, size: 7),
-          const SizedBox(width: 2),
+          Container(
+            width: 7,
+            height: 7,
+            decoration: const BoxDecoration(
+              color: Sig.cyan,
+              shape: BoxShape.circle,
+            ),
+          ),
+          const SizedBox(width: 9),
           Expanded(
             child: Text(
               context.l10n.homeVisible(name),
@@ -317,12 +324,24 @@ class _DeviceRow extends StatelessWidget {
                 const SizedBox(height: 3),
                 Row(
                   children: [
+                    Container(
+                      width: 6,
+                      height: 6,
+                      margin: const EdgeInsets.only(right: 6),
+                      decoration: BoxDecoration(
+                        color: away
+                            ? s.line
+                            : view.connected
+                            ? Sig.cyan
+                            : Sig.blue,
+                        shape: BoxShape.circle,
+                      ),
+                    ),
                     Text(
                       linkWords(view),
                       style: TextStyle(
                         fontSize: 13,
-                        fontWeight: FontWeight.w600,
-                        color: away ? s.faint : _linkColor(s),
+                        color: away ? s.faint : s.muted,
                       ),
                     ),
                     Expanded(
@@ -363,10 +382,6 @@ class _DeviceRow extends StatelessWidget {
   }
 }
 
-/// Cyan text that still reads on white (the brand cyan is too light).
-Color _linkColor(Sig s) =>
-    s.bg.computeLuminance() > 0.5 ? const Color(0xFF0E8FAE) : Sig.cyanLight;
-
 /// Send files without opening the device first.
 class _QuickSend extends StatelessWidget {
   const _QuickSend({required this.deviceId});
@@ -378,11 +393,15 @@ class _QuickSend extends StatelessWidget {
     onTap: () => pickAndSend(context, deviceId),
     scale: 0.88,
     semanticLabel: context.l10n.homeSendFiles,
+    // Soft, so a list of devices isn't a column of loud buttons.
     child: Container(
       width: 44,
       height: 44,
-      decoration: const BoxDecoration(shape: BoxShape.circle, color: Sig.blue),
-      child: const Icon(PhFill.paperPlaneTilt, color: Colors.white, size: 19),
+      decoration: BoxDecoration(
+        shape: BoxShape.circle,
+        color: Sig.blue.withValues(alpha: 0.12),
+      ),
+      child: const Icon(PhFill.paperPlaneTilt, color: Sig.blue, size: 19),
     ),
   );
 }
@@ -400,7 +419,7 @@ class _NearbyRow extends StatelessWidget {
       padding: const EdgeInsets.fromLTRB(14, 12, 12, 12),
       child: Row(
         children: [
-          IconCircle(icon: kindIcon(d.kind), color: Sig.cyan, size: 46),
+          IconCircle(icon: kindIcon(d.kind), color: Sig.cyan, size: 44),
           const SizedBox(width: 14),
           Expanded(
             child: Column(
@@ -414,11 +433,24 @@ class _NearbyRow extends StatelessWidget {
               ],
             ),
           ),
-          SigButton(
-            label: context.l10n.homePair,
-            height: 40,
-            kind: SigButtonKind.secondary,
+          Pressable(
             onTap: () => report(context, LinksyScope.read(context).pair(d.id)),
+            semanticLabel: context.l10n.homePair,
+            child: Container(
+              padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 9),
+              decoration: BoxDecoration(
+                color: Sig.blue.withValues(alpha: 0.12),
+                borderRadius: BorderRadius.circular(99),
+              ),
+              child: Text(
+                context.l10n.homePair,
+                style: const TextStyle(
+                  color: Sig.blue,
+                  fontSize: 14.5,
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+            ),
           ),
         ],
       ),
@@ -426,7 +458,7 @@ class _NearbyRow extends StatelessWidget {
   }
 }
 
-/// No devices yet: how pairing works, in three steps.
+/// No devices yet: how pairing works, in three steps, calm and centred.
 class _GetStarted extends StatelessWidget {
   const _GetStarted();
 
@@ -434,49 +466,53 @@ class _GetStarted extends StatelessWidget {
   Widget build(BuildContext context) {
     final s = Sig.of(context);
     final l10n = context.l10n;
-    final steps = [
-      (l10n.homeStepOpen, Ph.desktop),
-      (l10n.homeStepChoose, Ph.qrCode),
-      (l10n.homeStepScan, Ph.scan),
-    ];
+    final steps = [l10n.homeStepOpen, l10n.homeStepChoose, l10n.homeStepScan];
     return Padding(
-      padding: const EdgeInsets.fromLTRB(16, 24, 16, 0),
+      padding: const EdgeInsets.fromLTRB(16, 36, 16, 0),
       child: Column(
-        crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 8),
-            child: Text(
-              l10n.homeConnectTitle,
-              style: sora(
-                30,
-                weight: FontWeight.w700,
-                color: s.ink,
-                height: 1.1,
-              ),
+          Container(
+            width: 96,
+            height: 96,
+            alignment: Alignment.center,
+            decoration: BoxDecoration(color: s.card, shape: BoxShape.circle),
+            child: const LinksyMark(size: 50),
+          ),
+          const SizedBox(height: 22),
+          Text(
+            l10n.homeConnectTitle,
+            textAlign: TextAlign.center,
+            style: sora(
+              24,
+              weight: FontWeight.w700,
+              color: s.ink,
+              height: 1.15,
             ),
           ),
           const SizedBox(height: 8),
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 8),
-            child: Text(
-              l10n.homeConnectSubtitle,
-              style: TextStyle(fontSize: 15, color: s.muted),
-            ),
+          Text(
+            l10n.homeConnectSubtitle,
+            textAlign: TextAlign.center,
+            style: TextStyle(fontSize: 14.5, color: s.muted, height: 1.4),
           ),
-          const SizedBox(height: 20),
-          SigCard(
-            padding: const EdgeInsets.symmetric(vertical: 6, horizontal: 16),
+          const SizedBox(height: 26),
+          Container(
+            width: double.infinity,
+            padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 8),
+            decoration: BoxDecoration(
+              color: s.card,
+              borderRadius: BorderRadius.circular(28),
+            ),
             child: Column(
               children: [
                 for (var i = 0; i < steps.length; i++)
                   Padding(
-                    padding: const EdgeInsets.symmetric(vertical: 12),
+                    padding: const EdgeInsets.symmetric(vertical: 11),
                     child: Row(
                       children: [
                         Container(
-                          width: 30,
-                          height: 30,
+                          width: 28,
+                          height: 28,
                           alignment: Alignment.center,
                           decoration: BoxDecoration(
                             shape: BoxShape.circle,
@@ -485,7 +521,7 @@ class _GetStarted extends StatelessWidget {
                           child: Text(
                             '${i + 1}',
                             style: sora(
-                              14,
+                              13,
                               weight: FontWeight.w700,
                               color: Sig.blue,
                             ),
@@ -494,30 +530,25 @@ class _GetStarted extends StatelessWidget {
                         const SizedBox(width: 14),
                         Expanded(
                           child: Text(
-                            steps[i].$1,
-                            style: TextStyle(
-                              fontSize: 15,
-                              fontWeight: FontWeight.w500,
-                              color: s.ink,
-                            ),
+                            steps[i],
+                            style: TextStyle(fontSize: 15, color: s.ink),
                           ),
                         ),
-                        Icon(steps[i].$2, color: s.faint, size: 22),
                       ],
                     ),
                   ),
               ],
             ),
           ),
-          const SizedBox(height: 20),
+          const SizedBox(height: 22),
           SigButton(
             label: l10n.homeScanQr,
             icon: PhBold.scan,
             expand: true,
-            height: 58,
+            height: 54,
             onTap: () => scanAndPair(context),
           ),
-          const SizedBox(height: 4),
+          const SizedBox(height: 2),
           SigButton(
             label: l10n.homePairByAddress,
             kind: SigButtonKind.quiet,
@@ -528,4 +559,32 @@ class _GetStarted extends StatelessWidget {
       ),
     );
   }
+}
+
+/// A quiet heading over a list, as in Settings: sentence case, no shouting.
+class _Title extends StatelessWidget {
+  const _Title(this.text, {this.trailing});
+
+  final String text;
+  final Widget? trailing;
+
+  @override
+  Widget build(BuildContext context) => Padding(
+    padding: const EdgeInsets.fromLTRB(22, 26, 22, 10),
+    child: Row(
+      children: [
+        Expanded(
+          child: Text(
+            text,
+            style: sora(
+              16,
+              weight: FontWeight.w700,
+              color: Sig.of(context).ink,
+            ),
+          ),
+        ),
+        ?trailing,
+      ],
+    ),
+  );
 }
