@@ -1921,6 +1921,12 @@ class AppLocalizationsJa extends AppLocalizations {
   String get settingsThemeDark => 'ダーク';
 
   @override
+  String get settingsAnimations => 'アニメーション';
+
+  @override
+  String get settingsAnimationsOff => 'オフ';
+
+  @override
   String usbConnectedTo(String name) {
     return 'USB ケーブルで $name に接続しました';
   }

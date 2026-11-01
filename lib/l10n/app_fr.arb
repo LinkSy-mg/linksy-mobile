@@ -525,6 +525,8 @@
   "settingsThemeSystem": "Système",
   "settingsThemeLight": "Clair",
   "settingsThemeDark": "Sombre",
+  "settingsAnimations": "Animations",
+  "settingsAnimationsOff": "Non",
   "usbConnectedTo": "Connecté à {name} par câble USB",
   "usbConnecting": "Connexion par câble USB…",
   "usbPairTitle": "Un ordinateur est sur le câble",

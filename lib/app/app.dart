@@ -18,6 +18,7 @@ import '../features/transfer/incoming_sheet.dart';
 import '../ui/icons.dart';
 import '../ui/l10n.dart';
 import '../ui/sig.dart';
+import 'launch_intro.dart';
 import 'linksy_controller.dart';
 import 'platform.dart';
 import 'scope.dart';
@@ -271,6 +272,13 @@ class _LinksyAppState extends State<LinksyApp> {
         locale: widget.controller.locale.value,
         supportedLocales: [for (final l in languages) Locale(l.code)],
         localizationsDelegates: localizationsDelegates,
+        // The launch intro over everything, until the mark has landed.
+        builder: (context, child) => Stack(
+          children: [
+            child!,
+            LaunchIntro(plays: widget.controller.onboarded),
+          ],
+        ),
         home: const HomeScreen(),
       ),
     ),

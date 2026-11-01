@@ -1970,6 +1970,12 @@ class AppLocalizationsMg extends AppLocalizations {
   String get settingsThemeDark => 'Maizina';
 
   @override
+  String get settingsAnimations => 'Fihetsehana';
+
+  @override
+  String get settingsAnimationsOff => 'Tsia';
+
+  @override
   String usbConnectedTo(String name) {
     return 'Mifandray amin’i $name amin’ny tariby USB';
   }

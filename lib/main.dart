@@ -6,14 +6,13 @@ import 'package:intl/date_symbol_data_local.dart';
 
 import 'app/activity.dart';
 import 'app/app.dart';
-import 'app/app_update.dart';
 import 'app/linksy_controller.dart';
 import 'app/platform.dart';
 import 'core/demo_node.dart';
 import 'core/linksy_node.dart';
 import 'core/rust_node.dart';
 import 'core/service_info.dart';
-import 'core/updates.dart';
+import 'ui/motion.dart';
 import 'ui/l10n.dart';
 
 /// `--dart-define=LINKSY_DEMO=true` runs on made-up devices, for UI work.
@@ -98,15 +97,11 @@ Future<void> main() async {
     service: service,
     dir: support,
     // Motion test build: never offers the regular app's releases.
-    updates: _demo || true
-        ? null
-        : AppUpdate(
-            UpdateChecker(File('${support.path}/releases.json')),
-            Directory('${support.path}/updates'),
-          ),
+    updates: null,
   );
   // The language and whether setup was done, before the first frame.
   controller.prefs = prefs;
+  Motion.setSpeed(double.tryParse(controller.prefs['motion'] ?? '') ?? 1);
   controller.locale.value = resolveLocale(controller.languageCode);
   useLocale(controller.locale.value);
   controller.themeMode.value = LinksyController.themeFrom(

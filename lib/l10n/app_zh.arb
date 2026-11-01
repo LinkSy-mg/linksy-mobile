@@ -525,6 +525,8 @@
   "settingsThemeSystem": "跟随系统",
   "settingsThemeLight": "浅色",
   "settingsThemeDark": "深色",
+  "settingsAnimations": "动画",
+  "settingsAnimationsOff": "关",
   "usbConnectedTo": "已通过 USB 数据线连接到 {name}",
   "usbConnecting": "正在通过 USB 数据线连接…",
   "usbPairTitle": "数据线上有一台电脑",

@@ -1971,6 +1971,12 @@ class AppLocalizationsIt extends AppLocalizations {
   String get settingsThemeDark => 'Scuro';
 
   @override
+  String get settingsAnimations => 'Animazioni';
+
+  @override
+  String get settingsAnimationsOff => 'No';
+
+  @override
   String usbConnectedTo(String name) {
     return 'Connesso a $name via cavo USB';
   }

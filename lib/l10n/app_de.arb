@@ -525,6 +525,8 @@
   "settingsThemeSystem": "System",
   "settingsThemeLight": "Hell",
   "settingsThemeDark": "Dunkel",
+  "settingsAnimations": "Animationen",
+  "settingsAnimationsOff": "Aus",
   "usbConnectedTo": "Mit {name} per USB-Kabel verbunden",
   "usbConnecting": "Verbinde per USB-Kabel…",
   "usbPairTitle": "Ein Computer hängt am Kabel",
