@@ -1810,6 +1810,14 @@ class AppLocalizationsEs extends AppLocalizations {
   }
 
   @override
+  String get displayChooseScreen => 'Elegir pantalla';
+
+  @override
+  String displayChooseOn(String name) {
+    return 'Elige la pantalla en $name…';
+  }
+
+  @override
   String terminalTabClosed(String title) {
     return '“$title” cerrada';
   }

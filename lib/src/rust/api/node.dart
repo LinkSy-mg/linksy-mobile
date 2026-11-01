@@ -197,9 +197,13 @@ abstract class LinksyNode implements RustOpaqueInterface {
   Future<String> startInput({required String id});
 
   /// Watch a computer's screen (`control`: and use its mouse and keyboard).
-  /// Its user picks the screen there. Returns the session id; the video
-  /// arrives on it like a second display's.
-  Future<String> startView({required String id, required bool control});
+  /// Its user picks the screen there (`choose`: again, not the one picked last
+  /// time). Returns the session id; the video arrives on it like a second display's.
+  Future<String> startView({
+    required String id,
+    required bool control,
+    required bool choose,
+  });
 
   /// A terminal's output, chunk by chunk, until its stream ends (the shell
   /// exited, it was closed or ended on the computer, or the link dropped).

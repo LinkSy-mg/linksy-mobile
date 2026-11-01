@@ -481,6 +481,8 @@
   "displaySecondHint": "Segunda tela de {name} · volte para parar",
   "displayControlHint": "Tela de {name} · toque para clicar · volte para parar",
   "displayWatchHint": "Tela de {name} · volte para parar",
+  "displayChooseScreen": "Escolher tela",
+  "displayChooseOn": "Escolha a tela em {name}…",
   "terminalTabClosed": "“{title}” fechado",
   "terminalTabEnded": "“{title}” terminou em {name}",
   "terminalCloseTitle": "Fechar este terminal?",

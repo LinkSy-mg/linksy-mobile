@@ -3000,6 +3000,18 @@ abstract class AppLocalizations {
   /// **'{name}’s screen · go back to stop'**
   String displayWatchHint(String name);
 
+  /// Button on a computer's screen viewer: ask its user to pick another screen
+  ///
+  /// In en, this message translates to:
+  /// **'Choose screen'**
+  String get displayChooseScreen;
+
+  /// Shown after Choose screen, while the computer's user picks
+  ///
+  /// In en, this message translates to:
+  /// **'Pick the screen on {name}…'**
+  String displayChooseOn(String name);
+
   /// Message: a terminal tab was closed here
   ///
   /// In en, this message translates to:

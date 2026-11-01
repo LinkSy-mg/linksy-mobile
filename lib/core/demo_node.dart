@@ -325,7 +325,11 @@ class DemoNode implements LinksyNode {
   }
 
   @override
-  Future<String> startView(String id, {required bool control}) async {
+  Future<String> startView(
+    String id, {
+    required bool control,
+    bool choose = false,
+  }) async {
     _reachable(id);
     _setConnected(id, true);
     final session = _uuid();

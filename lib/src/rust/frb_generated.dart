@@ -307,6 +307,7 @@ abstract class RustLibApi extends BaseApi {
     required LinksyNode that,
     required String id,
     required bool control,
+    required bool choose,
   });
 
   Stream<Uint8List> crateApiNodeLinksyNodeTerminalOutput({
@@ -1938,6 +1939,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
     required LinksyNode that,
     required String id,
     required bool control,
+    required bool choose,
   }) {
     return handler.executeNormal(
       NormalTask(
@@ -1949,6 +1951,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
           );
           sse_encode_String(id, serializer);
           sse_encode_bool(control, serializer);
+          sse_encode_bool(choose, serializer);
           pdeCallFfi(
             generalizedFrbRustBinding,
             serializer,
@@ -1961,7 +1964,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
           decodeErrorData: sse_decode_String,
         ),
         constMeta: kCrateApiNodeLinksyNodeStartViewConstMeta,
-        argValues: [that, id, control],
+        argValues: [that, id, control, choose],
         apiImpl: this,
       ),
     );
@@ -1970,7 +1973,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   TaskConstMeta get kCrateApiNodeLinksyNodeStartViewConstMeta =>
       const TaskConstMeta(
         debugName: "LinksyNode_start_view",
-        argNames: ["that", "id", "control"],
+        argNames: ["that", "id", "control", "choose"],
       );
 
   @override
@@ -3155,14 +3158,18 @@ class LinksyNodeImpl extends RustOpaque implements LinksyNode {
       RustLib.instance.api.crateApiNodeLinksyNodeStartInput(that: this, id: id);
 
   /// Watch a computer's screen (`control`: and use its mouse and keyboard).
-  /// Its user picks the screen there. Returns the session id; the video
-  /// arrives on it like a second display's.
-  Future<String> startView({required String id, required bool control}) =>
-      RustLib.instance.api.crateApiNodeLinksyNodeStartView(
-        that: this,
-        id: id,
-        control: control,
-      );
+  /// Its user picks the screen there (`choose`: again, not the one picked last
+  /// time). Returns the session id; the video arrives on it like a second display's.
+  Future<String> startView({
+    required String id,
+    required bool control,
+    required bool choose,
+  }) => RustLib.instance.api.crateApiNodeLinksyNodeStartView(
+    that: this,
+    id: id,
+    control: control,
+    choose: choose,
+  );
 
   /// A terminal's output, chunk by chunk, until its stream ends (the shell
   /// exited, it was closed or ended on the computer, or the link dropped).

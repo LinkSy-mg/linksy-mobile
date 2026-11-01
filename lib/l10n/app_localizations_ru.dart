@@ -1827,6 +1827,14 @@ class AppLocalizationsRu extends AppLocalizations {
   }
 
   @override
+  String get displayChooseScreen => 'Выбрать экран';
+
+  @override
+  String displayChooseOn(String name) {
+    return 'Выберите экран на $name…';
+  }
+
+  @override
   String terminalTabClosed(String title) {
     return '«$title» закрыт';
   }

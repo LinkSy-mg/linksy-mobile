@@ -1742,6 +1742,14 @@ class AppLocalizationsZh extends AppLocalizations {
   }
 
   @override
+  String get displayChooseScreen => '选择屏幕';
+
+  @override
+  String displayChooseOn(String name) {
+    return '请在 $name 上选择屏幕…';
+  }
+
+  @override
   String terminalTabClosed(String title) {
     return '“$title”已关闭';
   }

@@ -56,8 +56,13 @@ abstract interface class LinksyNode {
   Future<String> startInput(String id);
 
   /// Watch [id]'s screen ([control]: and drive it). Its user picks the
-  /// screen there. Returns the session id.
-  Future<String> startView(String id, {required bool control});
+  /// screen there ([choose]: again, not the one picked last time). Returns
+  /// the session id.
+  Future<String> startView(
+    String id, {
+    required bool control,
+    bool choose = false,
+  });
 
   /// Framed input messages into a session. False once it has ended.
   Future<bool> sessionWrite(String session, Uint8List bytes);

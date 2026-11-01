@@ -481,6 +481,8 @@
   "displaySecondHint": "Second écran de {name} · revenez en arrière pour arrêter",
   "displayControlHint": "Écran de {name} · touchez pour cliquer · revenez en arrière pour arrêter",
   "displayWatchHint": "Écran de {name} · revenez en arrière pour arrêter",
+  "displayChooseScreen": "Choisir l’écran",
+  "displayChooseOn": "Choisissez l’écran sur {name}…",
   "terminalTabClosed": "« {title} » fermé",
   "terminalTabEnded": "« {title} » s’est terminé sur {name}",
   "terminalCloseTitle": "Fermer ce terminal ?",

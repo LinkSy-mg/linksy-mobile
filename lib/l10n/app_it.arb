@@ -481,6 +481,8 @@
   "displaySecondHint": "Secondo schermo di {name} · torna indietro per interrompere",
   "displayControlHint": "Schermo di {name} · tocca per cliccare · torna indietro per interrompere",
   "displayWatchHint": "Schermo di {name} · torna indietro per interrompere",
+  "displayChooseScreen": "Scegli schermo",
+  "displayChooseOn": "Scegli lo schermo su {name}…",
   "terminalTabClosed": "“{title}” chiuso",
   "terminalTabEnded": "“{title}” terminato su {name}",
   "terminalCloseTitle": "Chiudere questo terminale?",

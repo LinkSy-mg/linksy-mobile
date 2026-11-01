@@ -228,8 +228,12 @@ class RustNode implements LinksyNode {
       _guard(() => _node.startInput(id: id), name: _nameOf(id));
 
   @override
-  Future<String> startView(String id, {required bool control}) => _guard(
-    () => _node.startView(id: id, control: control),
+  Future<String> startView(
+    String id, {
+    required bool control,
+    bool choose = false,
+  }) => _guard(
+    () => _node.startView(id: id, control: control, choose: choose),
     name: _nameOf(id),
   );
 

@@ -1823,6 +1823,17 @@ class LinksyController extends ChangeNotifier with WidgetsBindingObserver {
   Future<String?> watchScreen(String id, {required bool control}) =>
       _run(() => node.startView(id, control: control));
 
+  /// Choose Screen on a computer's screen viewer: ends [session] and asks
+  /// [id] again, its user picking the screen anew (docs/protocol.md §4.8).
+  Future<String?> chooseScreen(
+    String session,
+    String id, {
+    required bool control,
+  }) async {
+    await stopDisplay(session);
+    return _run(() => node.startView(id, control: control, choose: true));
+  }
+
   /// Front ↔ back camera while this phone is a webcam.
   Future<void> switchCamera(String session) =>
       LinksyPlatform.switchCamera(session);

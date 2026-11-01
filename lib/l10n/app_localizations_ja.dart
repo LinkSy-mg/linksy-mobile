@@ -1762,6 +1762,14 @@ class AppLocalizationsJa extends AppLocalizations {
   }
 
   @override
+  String get displayChooseScreen => '画面を選ぶ';
+
+  @override
+  String displayChooseOn(String name) {
+    return '$name で画面を選んでください…';
+  }
+
+  @override
   String terminalTabClosed(String title) {
     return '「$title」を閉じました';
   }

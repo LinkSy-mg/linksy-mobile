@@ -2471,6 +2471,7 @@ fn wire__crate__api__node__LinksyNode_start_view_impl(
             >>::sse_decode(&mut deserializer);
             let api_id = <String>::sse_decode(&mut deserializer);
             let api_control = <bool>::sse_decode(&mut deserializer);
+            let api_choose = <bool>::sse_decode(&mut deserializer);
             deserializer.end();
             move |context| async move {
                 transform_result_sse::<_, String>(
@@ -2496,6 +2497,7 @@ fn wire__crate__api__node__LinksyNode_start_view_impl(
                             &*api_that_guard,
                             api_id,
                             api_control,
+                            api_choose,
                         )
                         .await?;
                         std::result::Result::Ok(output_ok)

@@ -481,6 +481,8 @@
   "displaySecondHint": "{name} 的第二屏幕 · 返回即可停止",
   "displayControlHint": "{name} 的屏幕 · 触摸即可点击 · 返回即可停止",
   "displayWatchHint": "{name} 的屏幕 · 返回即可停止",
+  "displayChooseScreen": "选择屏幕",
+  "displayChooseOn": "请在 {name} 上选择屏幕…",
   "terminalTabClosed": "“{title}”已关闭",
   "terminalTabEnded": "“{title}”已在 {name} 上结束",
   "terminalCloseTitle": "关闭此终端？",

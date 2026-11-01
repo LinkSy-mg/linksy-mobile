@@ -481,6 +481,8 @@
   "displaySecondHint": "Efijery faharoan'i {name} · miverena hampitsahatra",
   "displayControlHint": "Efijerin'i {name} · kasiho hipihana · miverena hampitsahatra",
   "displayWatchHint": "Efijerin'i {name} · miverena hampitsahatra",
+  "displayChooseScreen": "Hifidy efijery",
+  "displayChooseOn": "Fidio ny efijery ao amin'i {name}…",
   "terminalTabClosed": "Nikatona “{title}”",
   "terminalTabEnded": "Tapitra tao amin'i {name} “{title}”",
   "terminalCloseTitle": "Hakatona ity terminal ity?",

@@ -1811,6 +1811,14 @@ class AppLocalizationsMg extends AppLocalizations {
   }
 
   @override
+  String get displayChooseScreen => 'Hifidy efijery';
+
+  @override
+  String displayChooseOn(String name) {
+    return 'Fidio ny efijery ao amin\'i $name…';
+  }
+
+  @override
   String terminalTabClosed(String title) {
     return 'Nikatona “$title”';
   }

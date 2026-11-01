@@ -481,6 +481,8 @@
   "displaySecondHint": "{name} のセカンドディスプレイ · 戻ると停止",
   "displayControlHint": "{name} の画面 · タッチでクリック · 戻ると停止",
   "displayWatchHint": "{name} の画面 · 戻ると停止",
+  "displayChooseScreen": "画面を選ぶ",
+  "displayChooseOn": "{name} で画面を選んでください…",
   "terminalTabClosed": "「{title}」を閉じました",
   "terminalTabEnded": "「{title}」が {name} で終了しました",
   "terminalCloseTitle": "このターミナルを閉じますか？",

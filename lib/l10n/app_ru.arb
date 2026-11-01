@@ -481,6 +481,8 @@
   "displaySecondHint": "Второй экран {name} · вернитесь назад, чтобы остановить",
   "displayControlHint": "Экран {name} · касание — щелчок · вернитесь назад, чтобы остановить",
   "displayWatchHint": "Экран {name} · вернитесь назад, чтобы остановить",
+  "displayChooseScreen": "Выбрать экран",
+  "displayChooseOn": "Выберите экран на {name}…",
   "terminalTabClosed": "«{title}» закрыт",
   "terminalTabEnded": "«{title}» завершён на {name}",
   "terminalCloseTitle": "Закрыть этот терминал?",

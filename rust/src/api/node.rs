@@ -283,13 +283,16 @@ impl LinksyNode {
     }
 
     /// Watch a computer's screen (`control`: and use its mouse and keyboard).
-    /// Its user picks the screen there. Returns the session id; the video
-    /// arrives on it like a second display's.
-    pub async fn start_view(&self, id: String, control: bool) -> Result<String, String> {
+    /// Its user picks the screen there (`choose`: again, not the one picked last
+    /// time). Returns the session id; the video arrives on it like a second display's.
+    pub async fn start_view(&self, id: String, control: bool, choose: bool) -> Result<String, String> {
         let id = fingerprint(&id)?;
         let kind = if control { SessionKind::Control } else { SessionKind::Screen };
         let node = self.node.clone();
-        let session = run(async move { node.request_session(&id, kind).await }).await?;
+        let session = run(async move {
+            if choose { node.request_session_choosing(&id, kind).await } else { node.request_session(&id, kind).await }
+        })
+        .await?;
         let session_id = session.id.to_string();
         crate::sessions::run(session);
         Ok(session_id)

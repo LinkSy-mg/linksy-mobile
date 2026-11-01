@@ -481,6 +481,8 @@
   "displaySecondHint": "Zweiter Bildschirm von {name} · zurück zum Beenden",
   "displayControlHint": "Bildschirm von {name} · tippen zum Klicken · zurück zum Beenden",
   "displayWatchHint": "Bildschirm von {name} · zurück zum Beenden",
+  "displayChooseScreen": "Bildschirm wählen",
+  "displayChooseOn": "Wähle den Bildschirm auf {name}…",
   "terminalTabClosed": "„{title}“ geschlossen",
   "terminalTabEnded": "„{title}“ auf {name} beendet",
   "terminalCloseTitle": "Dieses Terminal schließen?",

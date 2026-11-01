@@ -2449,6 +2449,19 @@
       }
     }
   },
+  "displayChooseScreen": "Choose screen",
+  "@displayChooseScreen": {
+    "description": "Button on a computer's screen viewer: ask its user to pick another screen"
+  },
+  "displayChooseOn": "Pick the screen on {name}…",
+  "@displayChooseOn": {
+    "description": "Shown after Choose screen, while the computer's user picks",
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
   "terminalTabClosed": "“{title}” closed",
   "@terminalTabClosed": {
     "description": "Message: a terminal tab was closed here",

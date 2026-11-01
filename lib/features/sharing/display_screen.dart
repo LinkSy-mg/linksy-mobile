@@ -8,6 +8,7 @@ import 'package:flutter/services.dart';
 import '../../app/platform.dart';
 import '../../app/scope.dart';
 import '../../core/models.dart';
+import '../../ui/components.dart';
 import '../../ui/l10n.dart';
 import '../../ui/sig.dart';
 
@@ -92,6 +93,24 @@ class _DisplayScreenState extends State<DisplayScreen> {
     if (_closing || !mounted) return;
     _closing = true;
     LinksyScope.read(context).stopDisplay(_id);
+    Navigator.of(context).maybePop();
+  }
+
+  /// Another of the computer's screens: this one closes, and its user picks
+  /// again there; the new one opens like this one did.
+  void _choose() {
+    if (_closing) return;
+    _closing = true;
+    final peer = widget.session.peer;
+    showMessage(context, context.l10n.displayChooseOn(peer.name));
+    report(
+      context,
+      LinksyScope.read(context).chooseScreen(
+        _id,
+        peer.id,
+        control: widget.session.kind == SessionKind.control,
+      ),
+    );
     Navigator.of(context).maybePop();
   }
 
@@ -244,7 +263,66 @@ class _DisplayScreenState extends State<DisplayScreen> {
                 ),
               ),
             ),
+            if (widget.session.kind != SessionKind.display)
+              SafeArea(
+                child: Align(
+                  alignment: Alignment.topRight,
+                  child: Padding(
+                    padding: const EdgeInsets.all(12),
+                    child: _ChooseButton(label: _hint, onTap: _choose),
+                  ),
+                ),
+              ),
           ],
+        ),
+      ),
+    );
+  }
+}
+
+/// Choose Screen, in a corner: with its name at first, then just the icon,
+/// so it covers as little of the computer's screen as it can.
+class _ChooseButton extends StatelessWidget {
+  const _ChooseButton({required this.label, required this.onTap});
+
+  final bool label;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    final name = context.l10n.displayChooseScreen;
+    return Semantics(
+      button: true,
+      label: name,
+      excludeSemantics: true,
+      child: Material(
+        color: Sig.deep.withValues(alpha: 0.8),
+        shape: const StadiumBorder(),
+        clipBehavior: Clip.antiAlias,
+        child: InkWell(
+          onTap: onTap,
+          child: Padding(
+            padding: const EdgeInsets.all(10),
+            child: AnimatedSize(
+              duration: const Duration(milliseconds: 400),
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  const Icon(Ph.monitor, color: Colors.white, size: 20),
+                  if (label) ...[
+                    const SizedBox(width: 8),
+                    Text(
+                      name,
+                      style: const TextStyle(
+                        color: Colors.white,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                  ],
+                ],
+              ),
+            ),
+          ),
         ),
       ),
     );
