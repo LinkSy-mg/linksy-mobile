@@ -124,6 +124,11 @@ default SMS app.
 
 ## Changelog
 
+- **2026-11-01** — Phone 0.2.13: `H264Encoder` fits the size to each encoder's
+  `VideoCapabilities` (same shape, width a multiple of 16) and, when `configure` refuses
+  anyway, falls back to `c2.android.avc.encoder` / `OMX.google.h264.encoder`; the screen's
+  virtual display and the webcam's renderer draw at the size that won (releases#6: the
+  A70's `OMX.qcom.video.encoder.avc` refused a portrait 864×1920 its capabilities allowed).
 - **2026-11-01** — Phone 0.2.12, more: Choose Screen on the screen viewer (`start_view(…,
   choose)` → `request_session_choosing`), a partial wake lock and a high-performance Wi-Fi
   lock held by the share service while anything is shared (the webcam froze when the phone

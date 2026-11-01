@@ -2,6 +2,11 @@
 
 All notable changes to Linksy for Android. Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), versions follow [SemVer](https://semver.org/).
 
+## [0.2.13] - 2026-11-01
+
+### Fixed
+- **Screen sharing on phones whose video encoder refuses the screen's size**: a Samsung Galaxy A70 on Android 11 refused its own portrait screen and sharing failed at once. Linksy now uses the largest size of the same shape the encoder takes, or Android's own encoder when it refuses anyway. The webcam does the same, and the Logs page says which encoder and size it uses ([releases#6](https://github.com/LinkSy-mg/linksy-releases/issues/6)).
+
 ## [0.2.12] - 2026-11-01
 
 ### Changed
