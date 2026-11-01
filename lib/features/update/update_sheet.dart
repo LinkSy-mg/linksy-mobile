@@ -337,6 +337,7 @@ class _Pill extends StatelessWidget {
       child: Opacity(
         opacity: onTap == null && p == null ? 0.6 : 1,
         child: Container(
+          width: double.infinity,
           height: 56,
           clipBehavior: Clip.antiAlias,
           decoration: BoxDecoration(
