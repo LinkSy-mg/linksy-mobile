@@ -15,7 +15,6 @@ import '../core/service_info.dart';
 import 'app_update.dart';
 import '../ui/format.dart';
 import '../ui/l10n.dart';
-import '../ui/motion.dart';
 import 'activity.dart';
 import 'platform.dart';
 import 'terminals.dart';
@@ -162,12 +161,6 @@ class LinksyController extends ChangeNotifier with WidgetsBindingObserver {
   Future<void> setThemeMode(ThemeMode mode) async {
     themeMode.value = mode;
     await _setPref('theme', mode == ThemeMode.system ? null : mode.name);
-  }
-
-  /// How fast Linksy's animations run ([Motion.speeds], 0 is off).
-  Future<void> setMotionSpeed(double speed) async {
-    Motion.setSpeed(speed);
-    await _setPref('motion', speed == 1 ? null : '$speed');
   }
 
   /// The first-run setup (language, then what Linksy may do) is done.

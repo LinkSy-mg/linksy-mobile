@@ -3264,18 +3264,6 @@ abstract class AppLocalizations {
   /// **'Dark'**
   String get settingsThemeDark;
 
-  /// Settings: how fast Linksy's animations run, or off
-  ///
-  /// In en, this message translates to:
-  /// **'Animations'**
-  String get settingsAnimations;
-
-  /// Animations setting: no animations (a short label in a segmented control)
-  ///
-  /// In en, this message translates to:
-  /// **'Off'**
-  String get settingsAnimationsOff;
-
   /// Brief message when a computer connects through the USB cable
   ///
   /// In en, this message translates to:

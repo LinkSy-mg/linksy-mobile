@@ -1964,12 +1964,6 @@ class AppLocalizationsPt extends AppLocalizations {
   String get settingsThemeDark => 'Escuro';
 
   @override
-  String get settingsAnimations => 'Animações';
-
-  @override
-  String get settingsAnimationsOff => 'Não';
-
-  @override
   String usbConnectedTo(String name) {
     return 'Conectado a $name por cabo USB';
   }

@@ -12,7 +12,6 @@ import 'core/demo_node.dart';
 import 'core/linksy_node.dart';
 import 'core/rust_node.dart';
 import 'core/service_info.dart';
-import 'ui/motion.dart';
 import 'ui/l10n.dart';
 
 /// `--dart-define=LINKSY_DEMO=true` runs on made-up devices, for UI work.
@@ -101,7 +100,6 @@ Future<void> main() async {
   );
   // The language and whether setup was done, before the first frame.
   controller.prefs = prefs;
-  Motion.setSpeed(double.tryParse(controller.prefs['motion'] ?? '') ?? 1);
   controller.locale.value = resolveLocale(controller.languageCode);
   useLocale(controller.locale.value);
   controller.themeMode.value = LinksyController.themeFrom(

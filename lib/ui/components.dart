@@ -3,20 +3,17 @@ import 'dart:math';
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/physics.dart';
 import 'package:flutter/services.dart';
 
 import '../core/models.dart';
 import 'format.dart';
 import 'icons.dart';
 import 'l10n.dart';
-import 'motion.dart';
 import 'sig.dart';
 
 export 'icons.dart';
 
-/// Sinks a little while pressed, tilting toward the finger, instead of an ink
-/// ripple; springs back on release.
+/// Shrinks a little while pressed, instead of an ink ripple.
 class Pressable extends StatefulWidget {
   const Pressable({
     super.key,
@@ -35,47 +32,11 @@ class Pressable extends StatefulWidget {
   State<Pressable> createState() => _PressableState();
 }
 
-class _PressableState extends State<Pressable>
-    with SingleTickerProviderStateMixin {
-  // 0 at rest, 1 pressed: on a spring with no bounce, both ways.
-  late final _press = AnimationController.unbounded(vsync: this);
-  static const _spring = SpringDescription(
-    mass: 1,
-    stiffness: 420,
-    damping: 41,
-  );
-  static const _maxTilt = 7 * pi / 180;
+class _PressableState extends State<Pressable> {
+  bool _down = false;
 
-  /// Where the finger went down, -1 to 1 across the box, and the box.
-  Offset _at = Offset.zero;
-  Size _size = Size.zero;
-
-  void _to(double target) {
-    if (Motion.off(context)) {
-      _press.value = target;
-      return;
-    }
-    _press.animateWith(
-      SpringSimulation(_spring, _press.value, target, _press.velocity),
-    );
-  }
-
-  void _down(TapDownDetails details) {
-    final size = context.size;
-    if (size != null && size.width > 0 && size.height > 0) {
-      _size = size;
-      _at = Offset(
-        (details.localPosition.dx / size.width * 2 - 1).clamp(-1.0, 1.0),
-        (details.localPosition.dy / size.height * 2 - 1).clamp(-1.0, 1.0),
-      );
-    }
-    _to(1);
-  }
-
-  @override
-  void dispose() {
-    _press.dispose();
-    super.dispose();
+  void _set(bool down) {
+    if (_down != down) setState(() => _down = down);
   }
 
   @override
@@ -86,34 +47,20 @@ class _PressableState extends State<Pressable>
       label: widget.semanticLabel,
       child: GestureDetector(
         behavior: HitTestBehavior.opaque,
-        onTapDown: enabled ? _down : null,
-        onTapUp: enabled ? (_) => _to(0) : null,
-        onTapCancel: enabled ? () => _to(0) : null,
+        onTapDown: enabled ? (_) => _set(true) : null,
+        onTapUp: enabled ? (_) => _set(false) : null,
+        onTapCancel: enabled ? () => _set(false) : null,
         onTap: enabled
             ? () {
                 HapticFeedback.selectionClick();
                 widget.onTap!();
               }
             : null,
-        child: AnimatedBuilder(
-          animation: _press,
+        child: AnimatedScale(
+          scale: _down ? widget.scale : 1,
+          duration: const Duration(milliseconds: 120),
+          curve: Curves.easeOut,
           child: widget.child,
-          builder: (context, child) {
-            final t = _press.value;
-            if (t <= 0.001) return child!;
-            final s = 1 - (1 - widget.scale) * t;
-            final depth = max(_size.width, _size.height);
-            final transform = Matrix4.identity()
-              ..setEntry(3, 2, depth > 0 ? 1 / (3 * depth) : 0)
-              ..rotateX(_at.dy * _maxTilt * t)
-              ..rotateY(-_at.dx * _maxTilt * t)
-              ..multiply(Matrix4.diagonal3Values(s, s, 1));
-            return Transform(
-              alignment: Alignment.center,
-              transform: transform,
-              child: child,
-            );
-          },
         ),
       ),
     );
@@ -660,47 +607,41 @@ class Wordmark extends StatelessWidget {
     this.onBlue = false,
     this.markKey,
     this.markShown,
-    this.rise = false,
   });
 
   final bool onBlue;
 
-  /// The launch intro's landing spot ([markKey]) and when the mark shows
-  /// ([markShown]: once it has landed); [rise]: the name rises in with the
-  /// rest of the screen.
+  /// The launch intro's landing spot ([markKey]), and when the mark shows
+  /// ([markShown]: once the intro's mark has landed in it).
   final Key? markKey;
   final ValueListenable<bool>? markShown;
-  final bool rise;
 
   @override
-  Widget build(BuildContext context) {
-    final mark = LinksyMark(key: markKey, size: 30, onBlue: onBlue);
-    final name = Text(
-      'Linksy',
-      style: sora(
-        24,
-        weight: FontWeight.w700,
-        color: onBlue ? Colors.white : Sig.of(context).ink,
-        spacing: -0.8,
-      ),
-    );
-    final shown = markShown;
-    return Row(
-      mainAxisSize: MainAxisSize.min,
-      children: [
-        if (shown == null)
-          mark
-        else
-          ValueListenableBuilder(
-            valueListenable: shown,
-            child: mark,
-            builder: (_, on, mark) => Opacity(opacity: on ? 1 : 0, child: mark),
+  Widget build(BuildContext context) => Row(
+    mainAxisSize: MainAxisSize.min,
+    children: [
+      if (markShown case final shown?)
+        ValueListenableBuilder(
+          valueListenable: shown,
+          builder: (_, on, _) => Opacity(
+            opacity: on ? 1 : 0,
+            child: LinksyMark(key: markKey, size: 30, onBlue: onBlue),
           ),
-        const SizedBox(width: 8),
-        if (rise) Rise(index: 0, child: name) else name,
-      ],
-    );
-  }
+        )
+      else
+        LinksyMark(key: markKey, size: 30, onBlue: onBlue),
+      const SizedBox(width: 8),
+      Text(
+        'Linksy',
+        style: sora(
+          24,
+          weight: FontWeight.w700,
+          color: onBlue ? Colors.white : Sig.of(context).ink,
+          spacing: -0.8,
+        ),
+      ),
+    ],
+  );
 }
 
 /// Loops [controller], or holds it still when the system asks for less

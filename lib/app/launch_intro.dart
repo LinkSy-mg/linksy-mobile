@@ -4,15 +4,14 @@ import 'dart:ui' as ui;
 import 'package:flutter/material.dart';
 
 import '../ui/components.dart';
-import '../ui/motion.dart';
 import '../ui/sig.dart';
 
 /// The launch, picked up from the system splash (res/drawable/ic_splash_mark.xml):
 /// the mark at 120 in the middle of the page colour, exactly where the splash
 /// drew it, holds while the home screen draws its first frames underneath,
 /// then flies into the home screen's logo with a blur through the middle of
-/// the flight, while the page colour clears and the home screen rises in
-/// ([Rise]). Without [plays] (first run, animations off) the cover just fades.
+/// the flight, while the page colour clears. Without [plays] (first run) or
+/// with the system's animations off, the cover just fades.
 class LaunchIntro extends StatefulWidget {
   const LaunchIntro({super.key, required this.plays});
 
@@ -23,6 +22,14 @@ class LaunchIntro extends StatefulWidget {
 
   /// The home screen's logo shows from here on: the mark has landed in it.
   static final landed = ValueNotifier<bool>(false);
+
+  /// False: no cover and no flight at all (widget tests).
+  static bool enabled = true;
+
+  /// The flight: still, a gentle start, a long settle. Its size leads the
+  /// move a little, so the mark has shrunk before it crosses the screen.
+  static const _move = Cubic(0.55, 0, 0.1, 1);
+  static const _size = Cubic(0.45, 0, 0.1, 1);
 
   @override
   State<LaunchIntro> createState() => _LaunchIntroState();
@@ -43,9 +50,7 @@ class _LaunchIntroState extends State<LaunchIntro>
   @override
   void initState() {
     super.initState();
-    // Animations off: nothing to cover or fly.
-    if (Motion.speed.value == 0) {
-      Rise.go();
+    if (!LaunchIntro.enabled) {
       LaunchIntro.landed.value = true;
       _done = true;
       return;
@@ -56,12 +61,15 @@ class _LaunchIntroState extends State<LaunchIntro>
   Future<void> _takeOff() async {
     await Future<void>.delayed(_hold);
     if (!mounted) return;
-    final logo = LaunchIntro.logoKey.currentContext;
-    _to = widget.plays && !Motion.off(context) && logo != null && logo.mounted
-        ? GrowRoute.rectOf(logo)
+    final logo = LaunchIntro.logoKey.currentContext?.findRenderObject();
+    _to =
+        widget.plays &&
+            !MediaQuery.disableAnimationsOf(context) &&
+            logo is RenderBox &&
+            logo.hasSize
+        ? logo.localToGlobal(Offset.zero) & logo.size
         : null;
     if (_to == null) _controller.duration = _fade;
-    Rise.go();
     await _controller.forward();
     LaunchIntro.landed.value = true;
     if (mounted) setState(() => _done = true);
@@ -98,12 +106,12 @@ class _LaunchIntroState extends State<LaunchIntro>
             final size = ui.lerpDouble(
               _splashMark,
               to.width,
-              Motion.flightSize.transform(t),
+              LaunchIntro._size.transform(t),
             )!;
             final center = Offset.lerp(
               from.center,
               to.center,
-              Motion.flight.transform(t),
+              LaunchIntro._move.transform(t),
             )!;
             mark = Rect.fromCenter(center: center, width: size, height: size);
             markOpacity = 1;

@@ -2689,14 +2689,6 @@
   },
   "@settingsThemeLight": {},
   "@settingsThemeDark": {},
-  "settingsAnimations": "Animations",
-  "@settingsAnimations": {
-    "description": "Settings: how fast Linksy's animations run, or off"
-  },
-  "settingsAnimationsOff": "Off",
-  "@settingsAnimationsOff": {
-    "description": "Animations setting: no animations (a short label in a segmented control)"
-  },
   "usbConnectedTo": "Connected to {name} by USB cable",
   "usbConnecting": "Connecting over the USB cable…",
   "@usbConnecting": {

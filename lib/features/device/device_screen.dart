@@ -13,7 +13,6 @@ import '../../core/models.dart';
 import '../../ui/components.dart';
 import '../../ui/format.dart';
 import '../../ui/l10n.dart';
-import '../../ui/motion.dart';
 import '../../ui/sig.dart';
 import '../remote/remote_screen.dart';
 import '../sharing/sharing.dart';
@@ -173,7 +172,7 @@ class _DeviceScreenState extends State<DeviceScreen> {
                       _Hero(view: view),
                       Transform.translate(
                         offset: const Offset(0, -34),
-                        child: Rise(index: 0, child: _Actions(view: view)),
+                        child: _Actions(view: view),
                       ),
                       // Its screen being shared from here, with Stop.
                       Transform.translate(
@@ -190,23 +189,17 @@ class _DeviceScreenState extends State<DeviceScreen> {
                       if (_isComputer(view.device)) ...[
                         Padding(
                           padding: const EdgeInsets.fromLTRB(16, 0, 16, 10),
-                          child: Rise(
-                            index: 1,
-                            child: _WatchScreen(view: view),
-                          ),
+                          child: _WatchScreen(view: view),
                         ),
                         // Only computers that announce it (desktop 0.7, §4.15).
                         if (view.device.features.contains('terminal'))
                           Padding(
                             padding: const EdgeInsets.fromLTRB(16, 0, 16, 10),
-                            child: Rise(
-                              index: 2,
-                              child: _TerminalCard(view: view),
-                            ),
+                            child: _TerminalCard(view: view),
                           ),
                         Padding(
                           padding: const EdgeInsets.fromLTRB(16, 0, 16, 10),
-                          child: Rise(index: 3, child: _PhoneAs(view: view)),
+                          child: _PhoneAs(view: view),
                         ),
                       ],
                       if (c.media[deviceId]?.players case final players?
@@ -214,23 +207,17 @@ class _DeviceScreenState extends State<DeviceScreen> {
                         for (final p in players)
                           Padding(
                             padding: const EdgeInsets.fromLTRB(16, 0, 16, 10),
-                            child: Rise(
-                              index: 4,
-                              child: _NowPlaying(deviceId: deviceId, player: p),
-                            ),
+                            child: _NowPlaying(deviceId: deviceId, player: p),
                           ),
                       if (volume != null)
                         Padding(
                           padding: const EdgeInsets.fromLTRB(16, 0, 16, 10),
-                          child: Rise(
-                            index: 5,
-                            child: _Volume(deviceId: deviceId, volume: volume),
-                          ),
+                          child: _Volume(deviceId: deviceId, volume: volume),
                         ),
                       if (_isComputer(view.device))
                         Padding(
                           padding: const EdgeInsets.fromLTRB(16, 0, 16, 10),
-                          child: Rise(index: 6, child: _Switches(view: view)),
+                          child: _Switches(view: view),
                         ),
                     ],
                   ),

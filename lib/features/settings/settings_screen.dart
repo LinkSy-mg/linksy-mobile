@@ -14,7 +14,6 @@ import '../news/whats_new.dart';
 import 'logs_screen.dart';
 import '../permissions/permissions_sheet.dart';
 import '../update/update_sheet.dart';
-import '../../ui/motion.dart';
 import '../../ui/sig.dart';
 
 class SettingsScreen extends StatelessWidget {
@@ -249,7 +248,6 @@ class SettingsScreen extends StatelessWidget {
                         onTap: () => showLanguagePicker(context),
                       ),
                       const _ThemeChoice(),
-                      const _MotionChoice(),
                       _Row(
                         icon: Ph.sparkle,
                         title: context.l10n.newsTitle,
@@ -753,87 +751,4 @@ class _PermissionsState extends State<_Permissions>
       await _read();
     },
   );
-}
-
-/// How fast Linksy moves: off, or half to twice as fast.
-class _MotionChoice extends StatelessWidget {
-  const _MotionChoice();
-
-  @override
-  Widget build(BuildContext context) {
-    final s = Sig.of(context);
-    final c = LinksyScope.of(context);
-    final t = context.l10n;
-    return ValueListenableBuilder(
-      valueListenable: Motion.speed,
-      builder: (context, speed, _) => Padding(
-        padding: const EdgeInsets.fromLTRB(16, 14, 14, 14),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Row(
-              children: [
-                const Icon(Ph.lightning, color: Sig.blue, size: 22),
-                const SizedBox(width: 14),
-                Text(
-                  t.settingsAnimations,
-                  style: TextStyle(
-                    fontSize: 15.5,
-                    fontWeight: FontWeight.w600,
-                    color: s.ink,
-                  ),
-                ),
-              ],
-            ),
-            const SizedBox(height: 12),
-            Container(
-              padding: const EdgeInsets.all(4),
-              decoration: BoxDecoration(
-                color: s.raised,
-                borderRadius: BorderRadius.circular(Radii.md),
-              ),
-              child: Row(
-                children: [
-                  for (final (v, label) in [
-                    for (final v in Motion.speeds)
-                      (
-                        v,
-                        v == 0
-                            ? t.settingsAnimationsOff
-                            : '${v == v.roundToDouble() ? v.toInt() : v}×',
-                      ),
-                  ])
-                    Expanded(
-                      child: Pressable(
-                        onTap: () => c.setMotionSpeed(v),
-                        semanticLabel: label,
-                        child: AnimatedContainer(
-                          duration: const Duration(milliseconds: 180),
-                          height: 44,
-                          alignment: Alignment.center,
-                          decoration: BoxDecoration(
-                            color: v == speed ? s.card : Colors.transparent,
-                            borderRadius: BorderRadius.circular(Radii.sm + 2),
-                          ),
-                          child: Text(
-                            label,
-                            maxLines: 1,
-                            overflow: TextOverflow.ellipsis,
-                            style: TextStyle(
-                              fontSize: 13.5,
-                              fontWeight: FontWeight.w600,
-                              color: v == speed ? s.ink : s.muted,
-                            ),
-                          ),
-                        ),
-                      ),
-                    ),
-                ],
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
 }

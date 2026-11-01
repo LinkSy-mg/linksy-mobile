@@ -1,8 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
-import 'motion.dart';
-
 /// "Signal", Linksy's own look. Blue is the sender, cyan the receiver
 /// (`brand/README.md` in linksy-desktop): outgoing things are blue, incoming
 /// things cyan, everywhere.
@@ -190,7 +188,9 @@ ThemeData buildTheme(Brightness brightness) {
       systemOverlayStyle: overlayFor(brightness),
     ),
     pageTransitionsTheme: const PageTransitionsTheme(
-      builders: {TargetPlatform.android: SlidePageTransitionsBuilder()},
+      builders: {
+        TargetPlatform.android: PredictiveBackPageTransitionsBuilder(),
+      },
     ),
     dialogTheme: DialogThemeData(
       elevation: 0,

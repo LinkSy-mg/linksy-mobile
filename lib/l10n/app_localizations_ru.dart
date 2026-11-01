@@ -1986,12 +1986,6 @@ class AppLocalizationsRu extends AppLocalizations {
   String get settingsThemeDark => 'Тёмное';
 
   @override
-  String get settingsAnimations => 'Анимация';
-
-  @override
-  String get settingsAnimationsOff => 'Выкл';
-
-  @override
   String usbConnectedTo(String name) {
     return 'Подключено к $name по USB-кабелю';
   }

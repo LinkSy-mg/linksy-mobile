@@ -1901,12 +1901,6 @@ class AppLocalizationsZh extends AppLocalizations {
   String get settingsThemeDark => '深色';
 
   @override
-  String get settingsAnimations => '动画';
-
-  @override
-  String get settingsAnimationsOff => '关';
-
-  @override
   String usbConnectedTo(String name) {
     return '已通过 USB 数据线连接到 $name';
   }

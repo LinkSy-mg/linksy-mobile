@@ -8,7 +8,6 @@ import '../../app/scope.dart';
 import '../../core/models.dart';
 import '../../ui/components.dart';
 import '../../ui/l10n.dart';
-import '../../ui/motion.dart';
 import '../../ui/sig.dart';
 import '../device/activity_tile.dart';
 import '../device/device_screen.dart';
@@ -28,16 +27,9 @@ class HomeScreen extends StatelessWidget {
     final paired = c.paired;
     final unpaired = c.unpaired;
 
-    // A device's page grows out of its card.
-    void open(DeviceView v, BuildContext card) {
-      Widget page(BuildContext _) => DeviceScreen(deviceId: v.device.id);
-      final from = GrowRoute.rectOf(card);
-      Navigator.of(context).push(
-        from == null
-            ? MaterialPageRoute<void>(builder: page)
-            : GrowRoute<void>(builder: page, from: from, color: s.card),
-      );
-    }
+    void open(DeviceView v) => Navigator.of(context).push(
+      MaterialPageRoute(builder: (_) => DeviceScreen(deviceId: v.device.id)),
+    );
 
     return Scaffold(
       body: Stack(
@@ -53,92 +45,61 @@ class HomeScreen extends StatelessWidget {
                 title: Wordmark(
                   markKey: LaunchIntro.logoKey,
                   markShown: LaunchIntro.landed,
-                  rise: true,
                 ),
                 actions: [
-                  Rise(
-                    index: 0,
-                    child: RoundButton(
-                      icon: Ph.gearSix,
-                      tooltip: context.l10n.homeSettings,
-                      onTap: () => Navigator.of(context).push(
-                        MaterialPageRoute(
-                          builder: (_) => const SettingsScreen(),
-                        ),
-                      ),
+                  RoundButton(
+                    icon: Ph.gearSix,
+                    tooltip: context.l10n.homeSettings,
+                    onTap: () => Navigator.of(context).push(
+                      MaterialPageRoute(builder: (_) => const SettingsScreen()),
                     ),
                   ),
                   const SizedBox(width: 16),
                 ],
               ),
+              SliverToBoxAdapter(child: _Visible(controller: c)),
               SliverToBoxAdapter(
-                child: Rise(index: 1, child: _Visible(controller: c)),
-              ),
-              SliverToBoxAdapter(
-                child: Rise(
-                  index: 2,
-                  child: ListenableBuilder(
-                    listenable: c.updates,
-                    builder: (_, _) => _Notices(controller: c),
-                  ),
+                child: ListenableBuilder(
+                  listenable: c.updates,
+                  builder: (_, _) => _Notices(controller: c),
                 ),
               ),
-              SliverToBoxAdapter(
-                child: Rise(index: 2, child: SharingBanners(controller: c)),
-              ),
+              SliverToBoxAdapter(child: SharingBanners(controller: c)),
               if (paired.isEmpty)
-                const SliverToBoxAdapter(
-                  child: Rise(index: 3, child: _GetStarted()),
-                )
+                const SliverToBoxAdapter(child: _GetStarted())
               else ...[
                 SliverToBoxAdapter(
-                  child: Rise(
-                    index: 3,
-                    child: SectionLabel(
-                      context.l10n.homeYourDevices,
-                      trailing: Text(
-                        '${paired.length}',
-                        style: sora(13, color: s.muted),
-                      ),
+                  child: SectionLabel(
+                    context.l10n.homeYourDevices,
+                    trailing: Text(
+                      '${paired.length}',
+                      style: sora(13, color: s.muted),
                     ),
                   ),
                 ),
                 SliverList.separated(
                   itemCount: paired.length,
                   separatorBuilder: (_, _) => const SizedBox(height: 10),
-                  itemBuilder: (context, i) => Rise(
-                    key: ValueKey(paired[i].device.id),
-                    index: 4 + i,
-                    child: Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 16),
-                      child: Builder(
-                        builder: (card) => _DeviceRow(
-                          view: paired[i],
-                          controller: c,
-                          onTap: () => open(paired[i], card),
-                        ),
-                      ),
+                  itemBuilder: (context, i) => Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 16),
+                    child: _DeviceRow(
+                      view: paired[i],
+                      controller: c,
+                      onTap: () => open(paired[i]),
                     ),
                   ),
                 ),
               ],
               if (unpaired.isNotEmpty) ...[
                 SliverToBoxAdapter(
-                  child: Rise(
-                    index: 4 + paired.length,
-                    child: SectionLabel(context.l10n.homeNearbyNotPaired),
-                  ),
+                  child: SectionLabel(context.l10n.homeNearbyNotPaired),
                 ),
                 SliverList.separated(
                   itemCount: unpaired.length,
                   separatorBuilder: (_, _) => const SizedBox(height: 10),
-                  itemBuilder: (context, i) => Rise(
-                    key: ValueKey(unpaired[i].device.id),
-                    index: 5 + paired.length + i,
-                    child: Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 16),
-                      child: _NearbyRow(view: unpaired[i]),
-                    ),
+                  itemBuilder: (context, i) => Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 16),
+                    child: _NearbyRow(view: unpaired[i]),
                   ),
                 ),
               ],
@@ -146,9 +107,7 @@ class HomeScreen extends StatelessWidget {
             ],
           ),
           // Transfers, Send files and Add a device, growing in place.
-          Positioned.fill(
-            child: Rise(index: 5, child: Island(paired: paired)),
-          ),
+          Positioned.fill(child: Island(paired: paired)),
         ],
       ),
     );

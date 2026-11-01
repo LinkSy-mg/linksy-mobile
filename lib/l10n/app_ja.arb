@@ -525,8 +525,6 @@
   "settingsThemeSystem": "システム",
   "settingsThemeLight": "ライト",
   "settingsThemeDark": "ダーク",
-  "settingsAnimations": "アニメーション",
-  "settingsAnimationsOff": "オフ",
   "usbConnectedTo": "USB ケーブルで {name} に接続しました",
   "usbConnecting": "USB ケーブルで接続中…",
   "usbPairTitle": "ケーブルの先にコンピュータがあります",

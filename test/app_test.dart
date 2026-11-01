@@ -3,12 +3,12 @@ import 'package:flutter/widgets.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:linksy/app/activity.dart';
 import 'package:linksy/app/app.dart';
+import 'package:linksy/app/launch_intro.dart';
 import 'package:linksy/app/linksy_controller.dart';
 import 'package:linksy/core/demo_node.dart';
 import 'package:linksy/core/updates.dart';
 import 'package:linksy/features/terminal/terminal_screen.dart';
 import 'package:linksy/features/transfer/transfer_bubble.dart';
-import 'package:linksy/ui/motion.dart';
 import 'package:xterm/xterm.dart';
 
 /// Pumps frames for half a second, for screens with something that never
@@ -37,8 +37,8 @@ void main() {
     await c.start();
     // Cancels its timers (photo backup checks) before the test ends.
     addTearDown(c.dispose);
-    // Motion off: the launch intro and rise-ins settle at once.
-    Motion.setSpeed(0);
+    // No launch intro: nothing to cover or fly.
+    LaunchIntro.enabled = false;
     await tester.pumpWidget(LinksyApp(controller: c));
     await tester.pumpAndSettle();
     return (c, node);

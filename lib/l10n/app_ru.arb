@@ -525,8 +525,6 @@
   "settingsThemeSystem": "Как в системе",
   "settingsThemeLight": "Светлое",
   "settingsThemeDark": "Тёмное",
-  "settingsAnimations": "Анимация",
-  "settingsAnimationsOff": "Выкл",
   "usbConnectedTo": "Подключено к {name} по USB-кабелю",
   "usbConnecting": "Подключение по USB-кабелю…",
   "usbPairTitle": "К кабелю подключён компьютер",
