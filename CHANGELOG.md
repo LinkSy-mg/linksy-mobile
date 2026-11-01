@@ -10,9 +10,16 @@ All notable changes to Linksy for Android. Format: [Keep a Changelog](https://ke
 
 ### Added
 - **Controlled over the cable**: when a computer with Linksy 0.11 takes control of this phone's screen over the USB cable, the screen sharing notification says "Controlled from" that computer, and Stop ends it.
+- **Choose Screen**: watching or controlling a computer's screen, a button in the corner asks the computer to pick another monitor ([desktop#15](https://github.com/LinkSy-mg/linksy-desktop/issues/15)). Someone picks it on the computer.
+- **USB cable**: the phone says it's connecting while it reaches the computer through the cable, then opens that computer's page.
+- **Logs**: what the video encoder and the camera do (which encoder, the first frame, or none after 3 seconds), and each step of the USB cable, so a shared log says why a webcam or screen share shows no picture, or why the cable didn't connect.
 
 ### Fixed
 - **USB cable on a phone that's already paired**: the phone tries the computer a few times before offering to pair over the cable, instead of offering pairing after one failed try.
+- **Webcam with the phone locked**: the phone keeps its processor and Wi-Fi awake while it shares its camera, microphone or screen, so the picture doesn't freeze when it locks.
+
+### Security
+- **Device keys stay on this phone**: Android backups and phone-to-phone transfers leave Linksy's data out, so the phone's identity can't be copied to another phone. After moving to a new phone, pair your computers again ([#18](https://github.com/LinkSy-mg/linksy-mobile/issues/18), [#19](https://github.com/LinkSy-mg/linksy-mobile/pull/19), thanks [@bearyjd](https://github.com/bearyjd)).
 
 ## [0.2.11] - 2026-10-27
 

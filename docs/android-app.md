@@ -39,11 +39,11 @@ offer those features to Android phones.
 | Clipboard watch (`clipboard_watch`) | Done (phone asks) | Per computer, "Get its clipboard" on its page, only when the computer announces `clipboard_watch`; sent again on every connect while on. The phone doesn't announce `clipboard_watch` itself (§3) |
 | Locate (`locate`) | Done | "Let computers locate this phone", off by default. On: one fix (one under a minute old, else `getCurrentLocation`, 20 s max), foreground location only. Else `location_refused` with a reason to show as is ("Locating is turned off in Linksy on this phone", "Location is off on this phone", "Open Linksy on the phone to share where it is"…) |
 | Away from home | Done | `Config.away` on, relay from the service file (§4.12, cached, fetched at most daily; default `https://linksy-relay.diary.mg`). Settings switch (`Settings.away`), "Relay server" (`Settings.relay`, the user's own, wins over the service file), per computer "Allow everything from away" (`set_away_all`), "Connected away from home", "Reachable from away until <day>" |
-| USB cable (AOA) | Built, untested on hardware | Accessory filter `Linksy`/`Linksy`; Kotlin opens the accessory and hands `detachFd()` and `accessory.version` to `linksy_core::cable::phone_bridge` (framing version 2 when the computer announces it); then `connect_address(127.0.0.1:P)`, up to 3 tries, and pairing over the cable only if the computer says `not_paired` or nobody answers. "Connected by USB" from `DeviceView.usb` |
+| USB cable (AOA) | Built, untested on hardware | Accessory filter `Linksy`/`Linksy`; Kotlin opens the accessory and hands `detachFd()` and `accessory.version` to `linksy_core::cable::phone_bridge` (framing version 2 when the computer announces it); then `connect_address(127.0.0.1:P)`, up to 3 tries, and pairing over the cable only if the computer says `not_paired` or nobody answers. "Connecting over the USB cable…" while it dials, then that computer's page (from the home screen). "Connected by USB" from `DeviceView.usb`. Each cable step (permission, open, bridge, unplugged) goes to the Logs page |
 | Service file (§4.12) | Done | `android` notices on the home screen, each until dismissed; "Update Linksy to keep connecting" when `protocol.minimum` > 1 |
 | `features` | Announced | `files clipboard open_url battery ring media_remote call_state heartbeat import fs input screen display camera watch clipboard_file microphone picture locate` |
 | `fs` `info` | Done | `fs_info` with the picked folder's name |
-| **Phone watches the computer's screen** (`screen`, and `control` with touch) | **New** | The phone *requests* `screen` or `control`. Touch in `control`: one finger = absolute `pointer` + left button held, two fingers = `scroll`. Uses the same receiver as `display` |
+| **Phone watches the computer's screen** (`screen`, and `control` with touch) | **New** | The phone *requests* `screen` or `control`. Touch in `control`: one finger = absolute `pointer` + left button held, two fingers = `scroll`. Uses the same receiver as `display`. **Choose Screen** in the corner ends the session and requests it again with `"choose": true` (§4.8, desktop#15) |
 | Remote control *of the phone* (`control` asked by the computer) | Not possible | Answered with `decline_unsupported` at once; see §3 |
 | Push notifications | Done | Firebase project `linksy-mg`, topic `all`. Nothing for the desktop to do |
 
@@ -124,6 +124,12 @@ default SMS app.
 
 ## Changelog
 
+- **2026-11-01** — Phone 0.2.12, more: Choose Screen on the screen viewer (`start_view(…,
+  choose)` → `request_session_choosing`), a partial wake lock and a high-performance Wi-Fi
+  lock held by the share service while anything is shared (the webcam froze when the phone
+  locked), the video encoder, camera and cable steps on the Logs page (releases#6: the
+  encoder's name, size, profile, first frame or none after 3 s, a summary at the end), and
+  no Android backup or device transfer of the app's data (mobile#18, PR #19).
 - **2026-11-01** — Phone 0.2.12 on core `7e310dd` (desktop 0.11.2): the cable through
   `cable::phone_bridge` (framing version 2: hello, keepalives, close, 16 KB reads, padded
   writes), the dial through it retried up to 3 times before pairing is offered (the Samsung
