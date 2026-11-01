@@ -17,9 +17,9 @@ import android.os.IBinder
 import android.os.Looper
 import android.os.PowerManager
 import android.view.InputDevice
-import android.util.Log
 import app.linksy.MainActivity
 import app.linksy.Lang
+import app.linksy.Logs
 import app.linksy.R
 
 /// Keeps a screen or camera share going while the user is in other apps,
@@ -80,7 +80,7 @@ class ShareService : Service() {
             holdAwake()
             if (screen) watchControl()
         } catch (e: Exception) {
-            Log.w("linksy", "couldn't start sharing", e)
+            Logs.add("Sharing ($kind) couldn't start: $e")
             stop(session)
         }
     }
@@ -188,7 +188,7 @@ class ShareService : Service() {
         val now = screen != null && touchFromOutside()
         if (now == controlled) return
         controlled = now
-        Log.i("linksy", if (now) "screen: controlled over the cable" else "screen: control over the cable ended")
+        Logs.add(if (now) "Screen: controlled over the cable" else "Screen: control over the cable ended")
         if (screen == null) return
         val peer = peers[screen] ?: Lang.str(this, R.string.your_computer)
         getSystemService(NotificationManager::class.java).notify(NOTIFICATION, notification(screenText(peer), screen))

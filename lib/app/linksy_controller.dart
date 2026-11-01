@@ -62,6 +62,7 @@ class LinksyController extends ChangeNotifier with WidgetsBindingObserver {
   /// Computers whose clipboard comes here as it changes, while connected.
   final _clipWatching = <String>{};
   StreamSubscription<int>? _usbSub;
+  StreamSubscription<String>? _logSub;
 
   List<DeviceView> devices = const [];
   NodeSettings? settings;
@@ -381,6 +382,7 @@ class LinksyController extends ChangeNotifier with WidgetsBindingObserver {
     addListener(_shareTargets);
     _shareTargets();
     _usbSub = LinksyPlatform.usbPorts.listen(_onUsb);
+    _logSub = LinksyPlatform.logs.listen(log.add);
     final usb = await LinksyPlatform.usbPort();
     if (usb != null) _onUsb(usb);
     for (final v in devices) {
@@ -1904,6 +1906,7 @@ class LinksyController extends ChangeNotifier with WidgetsBindingObserver {
     _mediaActionSub?.cancel();
     LinksyPlatform.mediaNotice(null);
     _usbSub?.cancel();
+    _logSub?.cancel();
     updates.dispose();
     _usbNews.close();
     WidgetsBinding.instance.removeObserver(this);

@@ -10,6 +10,7 @@ import android.os.Looper
 import android.util.DisplayMetrics
 import android.view.Display
 import android.view.WindowManager
+import app.linksy.Logs
 import kotlin.math.max
 import kotlin.math.min
 import kotlin.math.roundToInt
@@ -48,7 +49,10 @@ class ScreenShare(
         encoder = encoder(size)
         // Android 14 wants this before the virtual display exists.
         projection.registerCallback(object : MediaProjection.Callback() {
-            override fun onStop() = onEnded()
+            override fun onStop() {
+                if (!stopped) Logs.add("Screen: Android stopped the screen capture")
+                onEnded()
+            }
         }, main)
         display = projection.createVirtualDisplay(
             "linksy", size.first, size.second, density(),
@@ -58,7 +62,7 @@ class ScreenShare(
     }
 
     private fun encoder(size: Pair<Int, Int>) =
-        H264Encoder(size.first, size.second, bitrate = 6_000_000, fps = 30, session = session, onEnded = onEnded)
+        H264Encoder(size.first, size.second, bitrate = 6_000_000, fps = 30, label = "Screen", session = session, onEnded = onEnded)
 
     /// The old encoder stops before the new one starts, so the stream never
     /// mixes frames from the two.

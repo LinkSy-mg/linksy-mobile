@@ -5,18 +5,21 @@ import android.media.MediaCodecInfo.CodecCapabilities
 import android.media.MediaCodecInfo.CodecProfileLevel
 import android.media.MediaFormat
 import android.os.Build
-import android.util.Log
+import android.os.SystemClock
 import android.view.Surface
+import app.linksy.Logs
 
 /// Hardware H.264 the way linksy-desktop decodes it (docs/protocol.md §4.8): Annex-B,
 /// Constrained Baseline, a keyframe at least every 2 s, SPS/PPS before every
 /// keyframe. Frames come in through [inputSurface]; each encoded unit goes to
-/// the session. [onEnded] runs once if the session goes away.
+/// the session. [onEnded] runs once if the session goes away. What it does goes
+/// to the Logs page, under [label] ("Screen", "Webcam").
 class H264Encoder(
     width: Int,
     height: Int,
     bitrate: Int,
     fps: Int,
+    private val label: String,
     private val session: String,
     private val onEnded: () -> Unit,
 ) {
@@ -24,6 +27,12 @@ class H264Encoder(
     val inputSurface: Surface
     @Volatile private var running = true
     private val drain: Thread
+
+    // For the log: what came out, and since when.
+    private val began = SystemClock.elapsedRealtime()
+    private var frames = 0
+    private var keyframes = 0
+    private var sent = 0L
 
     init {
         configure(width, height, bitrate, fps)
@@ -58,23 +67,37 @@ class H264Encoder(
             add(CodecProfileLevel.AVCProfileBaseline)
         }
         for ((i, profile) in profiles.withIndex()) {
+            val name = if (profile == CodecProfileLevel.AVCProfileBaseline) "baseline" else "constrained baseline"
             try {
                 codec.configure(format(profile), null, null, MediaCodec.CONFIGURE_FLAG_ENCODE)
+                Logs.add("$label encoder: ${describe()}, $width×$height, ${bitrate / 1000} kbit/s, $fps fps, $name")
                 return
             } catch (e: Exception) {
+                Logs.add("$label encoder: ${describe()} refused $width×$height $name ($e)")
                 if (i == profiles.lastIndex) throw e
-                Log.w(TAG, "profile $profile not supported, trying the next", e)
                 codec.reset()
             }
         }
     }
 
+    /// The codec's name, and whether it's the phone's hardware.
+    private fun describe(): String {
+        val name = runCatching { codec.name }.getOrDefault("?")
+        if (Build.VERSION.SDK_INT < 29) return name
+        return name + if (codec.codecInfo.isHardwareAccelerated) " (hardware)" else " (software)"
+    }
+
     private fun drainLoop() {
         val info = MediaCodec.BufferInfo()
         var config = ByteArray(0)
+        var waited = false
         try {
             while (running) {
                 val index = codec.dequeueOutputBuffer(info, 10_000)
+                if (frames == 0 && !waited && SystemClock.elapsedRealtime() - began > 3_000) {
+                    waited = true
+                    Logs.add("$label encoder: no frame after 3 s, nothing reaches its input")
+                }
                 if (index < 0) continue
                 val buffer = codec.getOutputBuffer(index)
                 val bytes = ByteArray(info.size)
@@ -90,14 +113,20 @@ class H264Encoder(
                 // An access unit delimiter first: the computer can end each
                 // frame on it, without waiting for the next one (§4.8).
                 val out = if (frame.isEmpty() || startsWithAud(frame)) frame else AUD + frame
-                if (out.isNotEmpty() && !NativeSession.write(session, out)) {
+                if (out.isEmpty()) continue
+                if (frames == 0) Logs.add("$label encoder: first frame after ${SystemClock.elapsedRealtime() - began} ms")
+                frames++
+                if (key) keyframes++
+                sent += out.size
+                if (!NativeSession.write(session, out)) {
+                    Logs.add("$label encoder: the stream closed after $frames frames")
                     running = false
                     onEnded()
                 }
             }
         } catch (e: Exception) {
             if (running) {
-                Log.w(TAG, "encoder stopped", e)
+                Logs.add("$label encoder stopped after $frames frames: $e")
                 running = false
                 onEnded()
             }
@@ -121,14 +150,13 @@ class H264Encoder(
     fun stop() {
         running = false
         drain.join(500)
+        Logs.add("$label encoder: done, $frames frames ($keyframes keyframes), ${sent / 1024} KB")
         runCatching { codec.stop() }
         runCatching { codec.release() }
         inputSurface.release()
     }
 
     companion object {
-        private const val TAG = "linksy"
-
         /// What the phone's default H.264 encoder can do, for picking sizes.
         fun capabilities(): android.media.MediaCodecInfo.VideoCapabilities? = runCatching {
             val codec = MediaCodec.createEncoderByType(MediaFormat.MIMETYPE_VIDEO_AVC)

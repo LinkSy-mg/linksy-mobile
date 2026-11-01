@@ -60,6 +60,7 @@ class MainActivity : FlutterActivity() {
         pendingLink = linkFrom(intent)
         takeShared(intent)
         watchBattery()
+        Logs.sink = { line -> runOnUiThread { channel?.invokeMethod("log", line) } }
         ShareService.webcamListener = { session, state ->
             runOnUiThread { channel?.invokeMethod("webcamChanged", mapOf("session" to session, "state" to state.toString())) }
         }

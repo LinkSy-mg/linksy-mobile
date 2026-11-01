@@ -65,6 +65,8 @@ abstract final class LinksyPlatform {
       switch (call.method) {
         case 'link' when call.arguments is String:
           _links.add(call.arguments as String);
+        case 'log' when call.arguments is String:
+          _logs.add(call.arguments as String);
         case 'displaySize':
           final a = call.arguments as Map;
           _displaySizes.add((
@@ -491,6 +493,15 @@ abstract final class LinksyPlatform {
   static Stream<int> get usbPorts {
     _listen();
     return _usbPorts.stream;
+  }
+
+  static final _logs = StreamController<String>.broadcast();
+
+  /// Lines for the Logs page from Android's side: the video encoder, the
+  /// camera, the screen capture.
+  static Stream<String> get logs {
+    _listen();
+    return _logs.stream;
   }
 
   /// A cable plugged in before the app was listening.

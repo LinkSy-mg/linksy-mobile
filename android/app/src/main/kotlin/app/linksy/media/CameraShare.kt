@@ -18,6 +18,7 @@ import android.util.Log
 import android.util.Range
 import android.util.Size
 import android.view.Surface
+import app.linksy.Logs
 import org.json.JSONObject
 import kotlin.math.atan
 import kotlin.math.max
@@ -97,7 +98,7 @@ class CameraShare(
         // size, fitted into it without stretching.
         size = HD
         input = cameraSize(chars, fps, size)
-        encoder = H264Encoder(size.width, size.height, bitrate = bitrate(quality), fps = fps, session = session, onEnded = onEnded)
+        encoder = H264Encoder(size.width, size.height, bitrate = bitrate(quality), fps = fps, label = "Webcam", session = session, onEnded = onEnded)
         renderer = GlRenderer(input, encoder.inputSurface, size.width, size.height)
         orientation = object : android.view.OrientationEventListener(context) {
             override fun onOrientationChanged(degrees: Int) {
@@ -163,11 +164,15 @@ class CameraShare(
 
             // Closing it to switch reports a disconnect too: only the camera in use counts.
             override fun onDisconnected(camera: CameraDevice) {
-                if (device == camera) onEnded()
+                if (device != camera) return
+                Logs.add("Webcam: Android took the camera away")
+                onEnded()
             }
 
             override fun onError(camera: CameraDevice, error: Int) {
-                if (device == camera || device == null) onEnded()
+                if (device != camera && device != null) return
+                Logs.add("Webcam: camera error $error")
+                onEnded()
             }
         }, handler)
     }
@@ -193,7 +198,7 @@ class CameraShare(
             }
 
             override fun onConfigureFailed(s: CameraCaptureSession) {
-                Log.w("linksy", "camera session didn't configure")
+                Logs.add("Webcam: the camera refused ${input.width}×${input.height}")
                 onEnded()
             }
         }, handler)
@@ -364,7 +369,7 @@ class CameraShare(
     /// before the old one stops, so the stream goes on (with a keyframe).
     private fun restartEncoder() {
         val old = encoder
-        encoder = H264Encoder(size.width, size.height, bitrate = bitrate(quality), fps = fps, session = session, onEnded = onEnded)
+        encoder = H264Encoder(size.width, size.height, bitrate = bitrate(quality), fps = fps, label = "Webcam", session = session, onEnded = onEnded)
         renderer.setOutput(encoder.inputSurface, size.width, size.height)
         old.stop()
     }
