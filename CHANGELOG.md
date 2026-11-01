@@ -2,7 +2,7 @@
 
 All notable changes to Linksy for Android. Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), versions follow [SemVer](https://semver.org/).
 
-## [Unreleased]
+## [0.2.12] - 2026-11-01
 
 ### Changed
 - **USB cable**: the phone's end of the cable now runs on linksy-core's own bridge, which speaks the cable's new version (Linksy 0.11 on the computer): it reads the cable the way Android expects, answers the computer's checks and lets go cleanly when the cable goes quiet. Computers with an older Linksy keep working as before.
