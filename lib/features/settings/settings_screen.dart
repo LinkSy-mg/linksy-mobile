@@ -767,7 +767,7 @@ class _MotionChoice extends StatelessWidget {
     return ValueListenableBuilder(
       valueListenable: Motion.speed,
       builder: (context, speed, _) => Padding(
-        padding: const EdgeInsets.fromLTRB(16, 4, 14, 14),
+        padding: const EdgeInsets.fromLTRB(16, 14, 14, 14),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -794,13 +794,19 @@ class _MotionChoice extends StatelessWidget {
               ),
               child: Row(
                 children: [
-                  for (final v in Motion.speeds)
+                  for (final (v, label) in [
+                    for (final v in Motion.speeds)
+                      (
+                        v,
+                        v == 0
+                            ? t.settingsAnimationsOff
+                            : '${v == v.roundToDouble() ? v.toInt() : v}×',
+                      ),
+                  ])
                     Expanded(
                       child: Pressable(
                         onTap: () => c.setMotionSpeed(v),
-                        semanticLabel: v == 0
-                            ? t.settingsAnimationsOff
-                            : '${v}x',
+                        semanticLabel: label,
                         child: AnimatedContainer(
                           duration: const Duration(milliseconds: 180),
                           height: 44,
@@ -810,9 +816,7 @@ class _MotionChoice extends StatelessWidget {
                             borderRadius: BorderRadius.circular(Radii.sm + 2),
                           ),
                           child: Text(
-                            v == 0
-                                ? t.settingsAnimationsOff
-                                : '${v == v.roundToDouble() ? v.toInt() : v}×',
+                            label,
                             maxLines: 1,
                             overflow: TextOverflow.ellipsis,
                             style: TextStyle(
