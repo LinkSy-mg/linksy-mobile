@@ -175,8 +175,12 @@ const maxClipboardBytes = 256 * 1024;
 
 /// A failure worth showing to the user as is, naming the device in plain words.
 class LinksyException implements Exception {
-  const LinksyException(this.message);
+  const LinksyException(this.message, {this.kind = ''});
   final String message;
+
+  /// The core's error kind (`not_paired`, `timeout`, …), when it came from
+  /// the core.
+  final String kind;
 
   @override
   String toString() => message;

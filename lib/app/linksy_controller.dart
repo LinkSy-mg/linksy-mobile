@@ -648,23 +648,38 @@ class LinksyController extends ChangeNotifier with WidgetsBindingObserver {
   void _onUsb(int port) {
     if (port == _usbPort) return;
     _usbPort = port;
+    unawaited(_dialCable(port));
+  }
+
+  /// Dials the computer on the cable, a few times: a cable can take a moment
+  /// to carry anything. Pairing is offered only once a computer says it
+  /// doesn't know this phone, or nobody answers at all (a phone already
+  /// paired over Wi-Fi used to be offered pairing after one failed try).
+  Future<void> _dialCable(int port, {int tries = 3}) async {
     final address = '127.0.0.1:$port';
-    debugPrint('usb cable: dialing $address');
-    node
-        .connectAddress(address)
-        .timeout(const Duration(seconds: 6))
-        .then((_) async {
-          debugPrint('usb cable: connected');
-          await refresh();
-          final view = devices.where((v) => v.connected && v.usb).firstOrNull;
-          _usbNews.add(UsbConnected(view?.device.name ?? tr.ctlYourComputer));
-        })
-        .catchError((Object e) {
-          debugPrint('usb cable: dial failed ($e)');
+    log.add('USB cable: dialing the computer');
+    for (var attempt = 1; ; attempt++) {
+      try {
+        await node.connectAddress(address).timeout(const Duration(seconds: 6));
+        log.add('USB cable: connected');
+        await refresh();
+        final view = devices.where((v) => v.connected && v.usb).firstOrNull;
+        _usbNews.add(UsbConnected(view?.device.name ?? tr.ctlYourComputer));
+        return;
+      } on Object catch (e) {
+        if (_usbPort != port) return;
+        final notPaired = e is LinksyException && e.kind == 'not_paired';
+        log.add('USB cable: try $attempt failed ($e)');
+        if (notPaired || attempt >= tries) {
           // No paired computer answers: maybe one to pair (desktop 0.8.0
           // switches phones that aren't paired yet).
-          if (_usbPort == port) _usbNews.add(UsbPairOffer(address));
-        });
+          _usbNews.add(UsbPairOffer(address));
+          return;
+        }
+      }
+      await Future<void>.delayed(const Duration(seconds: 2));
+      if (_usbPort != port) return;
+    }
   }
 
   /// Pair with the computer on the cable, then connect through it.

@@ -389,8 +389,10 @@ class RustNode implements LinksyNode {
     } on LinksyException {
       rethrow;
     } on Object catch (e) {
+      final error = e is String ? e : '$e';
       throw LinksyException(
-        describeCoreError(e is String ? e : '$e', name ?? tr.errorOtherDevice),
+        describeCoreError(error, name ?? tr.errorOtherDevice),
+        kind: error.split(':').first,
       );
     }
   }
