@@ -526,6 +526,7 @@
   "settingsThemeLight": "Claro",
   "settingsThemeDark": "Oscuro",
   "usbConnectedTo": "Conectado a {name} por cable USB",
+  "usbConnecting": "Conectando por cable USB…",
   "usbPairTitle": "Hay una computadora en el cable",
   "usbPairBody": "Aún no está vinculada con este teléfono. ¿Vincularla por el cable? Ambas pantallas muestran un código para comparar.",
   "usbPairAction": "Vincular",

@@ -2690,6 +2690,10 @@
   "@settingsThemeLight": {},
   "@settingsThemeDark": {},
   "usbConnectedTo": "Connected to {name} by USB cable",
+  "usbConnecting": "Connecting over the USB cable…",
+  "@usbConnecting": {
+    "description": "While the phone dials the computer through the USB cable"
+  },
   "usbPairTitle": "A computer is on the cable",
   "usbPairBody": "It isn’t paired with this phone yet. Pair with it over the cable? Both screens show a code to compare.",
   "usbPairAction": "Pair",

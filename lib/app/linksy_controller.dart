@@ -643,8 +643,8 @@ class LinksyController extends ChangeNotifier with WidgetsBindingObserver {
   int? _usbPort;
   final _usbNews = StreamController<UsbNews>.broadcast();
 
-  /// What the cable did: a computer connected through it, or one that
-  /// isn't paired to offer pairing with.
+  /// What the cable did: dialing, a computer connected through it, or one
+  /// that isn't paired to offer pairing with.
   Stream<UsbNews> get usbNews => _usbNews.stream;
 
   void _onUsb(int port) {
@@ -660,13 +660,19 @@ class LinksyController extends ChangeNotifier with WidgetsBindingObserver {
   Future<void> _dialCable(int port, {int tries = 3}) async {
     final address = '127.0.0.1:$port';
     log.add('USB cable: dialing the computer');
+    _usbNews.add(const UsbDialing());
     for (var attempt = 1; ; attempt++) {
       try {
         await node.connectAddress(address).timeout(const Duration(seconds: 6));
         log.add('USB cable: connected');
         await refresh();
         final view = devices.where((v) => v.connected && v.usb).firstOrNull;
-        _usbNews.add(UsbConnected(view?.device.name ?? tr.ctlYourComputer));
+        _usbNews.add(
+          UsbConnected(
+            view?.device.name ?? tr.ctlYourComputer,
+            view?.device.id,
+          ),
+        );
         return;
       } on Object catch (e) {
         if (_usbPort != port) return;
@@ -1937,10 +1943,16 @@ sealed class UsbNews {
   const UsbNews();
 }
 
-/// Connected to [name] through the cable.
+/// The bridge is up: dialing the computer through the cable.
+class UsbDialing extends UsbNews {
+  const UsbDialing();
+}
+
+/// Connected to [name] ([id], when it's listed) through the cable.
 class UsbConnected extends UsbNews {
-  const UsbConnected(this.name);
+  const UsbConnected(this.name, this.id);
   final String name;
+  final String? id;
 }
 
 /// Nothing paired answered at [address]: offer to pair through it.

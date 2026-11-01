@@ -1975,6 +1975,9 @@ class AppLocalizationsMg extends AppLocalizations {
   }
 
   @override
+  String get usbConnecting => 'Mampifandray amin’ny tariby USB…';
+
+  @override
   String get usbPairTitle => 'Misy solosaina amin’ny tariby';
 
   @override

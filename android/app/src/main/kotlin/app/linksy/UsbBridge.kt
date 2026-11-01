@@ -3,7 +3,6 @@ package app.linksy
 import android.content.Context
 import android.hardware.usb.UsbAccessory
 import android.hardware.usb.UsbManager
-import android.util.Log
 
 /// The USB cable to a computer (docs/protocol.md §4.11): the computer switched the
 /// phone into accessory mode, and Linksy's own QUIC packets cross the cable.
@@ -33,6 +32,15 @@ class UsbBridge private constructor(
 
         const val ACTION_PERMISSION = "app.linksy.USB_PERMISSION"
 
+        /// Each step once on the Logs page, though the app checks every 1.5 s.
+        @Volatile private var said: String? = null
+
+        fun say(line: String) {
+            if (line == said) return
+            said = line
+            Logs.add("USB cable: $line")
+        }
+
         /// Opens [accessory]; returns the bridge's port, or null. Without
         /// permission (no "open with" prompt was shown or answered, as on
         /// realme/ColorOS) it asks, and [ACTION_PERMISSION] comes back.
@@ -43,7 +51,7 @@ class UsbBridge private constructor(
             if (!manager.hasPermission(accessory)) {
                 if (asking != accessory && refused != accessory) {
                     asking = accessory
-                    Log.i("linksy", "usb cable: asking permission")
+                    say("asking permission")
                     val intent = android.content.Intent(ACTION_PERMISSION).setPackage(context.packageName)
                     val flags = if (android.os.Build.VERSION.SDK_INT >= 31) android.app.PendingIntent.FLAG_MUTABLE else 0
                     manager.requestPermission(accessory, android.app.PendingIntent.getBroadcast(context, 0, intent, flags))
@@ -52,17 +60,20 @@ class UsbBridge private constructor(
             }
             asking = null
             val fd = runCatching { manager.openAccessory(accessory) }
-                .onFailure { Log.w("linksy", "usb cable: open failed ($it)") }
+                .onFailure { say("open failed ($it)") }
                 .getOrNull()
             if (fd == null) {
-                Log.w("linksy", "usb cable: openAccessory gave nothing")
+                say("Android didn't open it")
                 return null
             }
             val port = runCatching { NativeCable.bridge(fd.detachFd(), accessory.version) }
-                .onFailure { Log.w("linksy", "usb cable: bridge failed ($it)") }
+                .onFailure { say("bridge failed ($it)") }
                 .getOrDefault(-1)
-            if (port <= 0) return null
-            Log.i("linksy", "usb cable: bridge on 127.0.0.1:$port (version ${accessory.version})")
+            if (port <= 0) {
+                say("no bridge")
+                return null
+            }
+            say("bridge on 127.0.0.1:$port (version ${accessory.version})")
             return UsbBridge(accessory, port).also { current = it }.port
         }
 
@@ -85,6 +96,7 @@ class UsbBridge private constructor(
 
         /// The cable came out.
         fun detached() {
+            say("unplugged")
             asking = null
             refused = null
             current = null

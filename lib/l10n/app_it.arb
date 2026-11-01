@@ -526,6 +526,7 @@
   "settingsThemeLight": "Chiaro",
   "settingsThemeDark": "Scuro",
   "usbConnectedTo": "Connesso a {name} via cavo USB",
+  "usbConnecting": "Connessione via cavo USB…",
   "usbPairTitle": "C’è un computer sul cavo",
   "usbPairBody": "Non è ancora associato a questo telefono. Associarlo tramite il cavo? Entrambi gli schermi mostrano un codice da confrontare.",
   "usbPairAction": "Associa",

@@ -1961,6 +1961,9 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
+  String get usbConnecting => 'Connecting over the USB cable…';
+
+  @override
   String get usbPairTitle => 'A computer is on the cable';
 
   @override

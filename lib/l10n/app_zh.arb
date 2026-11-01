@@ -526,6 +526,7 @@
   "settingsThemeLight": "浅色",
   "settingsThemeDark": "深色",
   "usbConnectedTo": "已通过 USB 数据线连接到 {name}",
+  "usbConnecting": "正在通过 USB 数据线连接…",
   "usbPairTitle": "数据线上有一台电脑",
   "usbPairBody": "它尚未与这部手机配对。要通过数据线配对吗？两边屏幕都会显示一个代码供比对。",
   "usbPairAction": "配对",

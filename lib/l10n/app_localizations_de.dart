@@ -1968,6 +1968,9 @@ class AppLocalizationsDe extends AppLocalizations {
   }
 
   @override
+  String get usbConnecting => 'Verbinde per USB-Kabel…';
+
+  @override
   String get usbPairTitle => 'Ein Computer hängt am Kabel';
 
   @override

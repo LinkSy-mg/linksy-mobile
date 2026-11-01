@@ -3270,6 +3270,12 @@ abstract class AppLocalizations {
   /// **'Connected to {name} by USB cable'**
   String usbConnectedTo(String name);
 
+  /// While the phone dials the computer through the USB cable
+  ///
+  /// In en, this message translates to:
+  /// **'Connecting over the USB cable…'**
+  String get usbConnecting;
+
   /// Dialog title: an unpaired computer is on the USB cable
   ///
   /// In en, this message translates to:

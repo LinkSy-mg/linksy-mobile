@@ -526,6 +526,7 @@
   "settingsThemeLight": "Mazava",
   "settingsThemeDark": "Maizina",
   "usbConnectedTo": "Mifandray amin’i {name} amin’ny tariby USB",
+  "usbConnecting": "Mampifandray amin’ny tariby USB…",
   "usbPairTitle": "Misy solosaina amin’ny tariby",
   "usbPairBody": "Mbola tsy mifamatotra amin’ity finday ity izy. Ampifamatorina amin’ny tariby ve? Samy mampiseho kaody hampitahaina ny efijery roa.",
   "usbPairAction": "Ampifamatory",

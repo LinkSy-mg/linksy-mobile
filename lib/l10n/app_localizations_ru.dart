@@ -1991,6 +1991,9 @@ class AppLocalizationsRu extends AppLocalizations {
   }
 
   @override
+  String get usbConnecting => 'Подключение по USB-кабелю…';
+
+  @override
   String get usbPairTitle => 'К кабелю подключён компьютер';
 
   @override

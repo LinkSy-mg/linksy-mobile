@@ -526,6 +526,7 @@
   "settingsThemeLight": "Светлое",
   "settingsThemeDark": "Тёмное",
   "usbConnectedTo": "Подключено к {name} по USB-кабелю",
+  "usbConnecting": "Подключение по USB-кабелю…",
   "usbPairTitle": "К кабелю подключён компьютер",
   "usbPairBody": "Он ещё не связан с этим телефоном. Связать по кабелю? На обоих экранах появится код для сравнения.",
   "usbPairAction": "Связать",

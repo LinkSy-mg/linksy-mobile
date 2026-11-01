@@ -526,6 +526,7 @@
   "settingsThemeLight": "Hell",
   "settingsThemeDark": "Dunkel",
   "usbConnectedTo": "Mit {name} per USB-Kabel verbunden",
+  "usbConnecting": "Verbinde per USB-Kabel…",
   "usbPairTitle": "Ein Computer hängt am Kabel",
   "usbPairBody": "Er ist noch nicht mit diesem Handy gekoppelt. Über das Kabel koppeln? Beide Bildschirme zeigen einen Code zum Vergleichen.",
   "usbPairAction": "Koppeln",

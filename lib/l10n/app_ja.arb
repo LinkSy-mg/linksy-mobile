@@ -526,6 +526,7 @@
   "settingsThemeLight": "ライト",
   "settingsThemeDark": "ダーク",
   "usbConnectedTo": "USB ケーブルで {name} に接続しました",
+  "usbConnecting": "USB ケーブルで接続中…",
   "usbPairTitle": "ケーブルの先にコンピュータがあります",
   "usbPairBody": "このスマートフォンとはまだペアリングされていません。ケーブル経由でペアリングしますか？両方の画面にコードが表示されるので照合してください。",
   "usbPairAction": "ペアリング",

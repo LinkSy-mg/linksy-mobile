@@ -1926,6 +1926,9 @@ class AppLocalizationsJa extends AppLocalizations {
   }
 
   @override
+  String get usbConnecting => 'USB ケーブルで接続中…';
+
+  @override
   String get usbPairTitle => 'ケーブルの先にコンピュータがあります';
 
   @override

@@ -526,6 +526,7 @@
   "settingsThemeLight": "Claro",
   "settingsThemeDark": "Escuro",
   "usbConnectedTo": "Conectado a {name} por cabo USB",
+  "usbConnecting": "Conectando por cabo USB…",
   "usbPairTitle": "Há um computador no cabo",
   "usbPairBody": "Ele ainda não está pareado com este celular. Parear pelo cabo? As duas telas mostram um código para comparar.",
   "usbPairAction": "Parear",

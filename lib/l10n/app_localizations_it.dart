@@ -1976,6 +1976,9 @@ class AppLocalizationsIt extends AppLocalizations {
   }
 
   @override
+  String get usbConnecting => 'Connessione via cavo USB…';
+
+  @override
   String get usbPairTitle => 'C’è un computer sul cavo';
 
   @override

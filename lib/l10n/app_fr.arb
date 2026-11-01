@@ -526,6 +526,7 @@
   "settingsThemeLight": "Clair",
   "settingsThemeDark": "Sombre",
   "usbConnectedTo": "Connecté à {name} par câble USB",
+  "usbConnecting": "Connexion par câble USB…",
   "usbPairTitle": "Un ordinateur est sur le câble",
   "usbPairBody": "Il n’est pas encore associé à ce téléphone. L’associer par le câble ? Les deux écrans affichent un code à comparer.",
   "usbPairAction": "Associer",

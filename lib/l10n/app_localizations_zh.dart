@@ -1906,6 +1906,9 @@ class AppLocalizationsZh extends AppLocalizations {
   }
 
   @override
+  String get usbConnecting => '正在通过 USB 数据线连接…';
+
+  @override
   String get usbPairTitle => '数据线上有一台电脑';
 
   @override

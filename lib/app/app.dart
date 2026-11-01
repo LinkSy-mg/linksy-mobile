@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 
 import '../core/invite.dart';
 import '../core/models.dart';
+import '../features/device/device_screen.dart';
 import '../features/devices/home_screen.dart';
 import '../features/news/whats_new.dart';
 import '../features/pairing/pairing_flows.dart';
@@ -136,8 +137,21 @@ class _LinksyAppState extends State<LinksyApp> {
 
   Future<void> _onUsb(UsbNews news) async {
     switch (news) {
-      case UsbConnected(:final name):
+      case UsbDialing():
+        _say(tr.usbConnecting);
+      case UsbConnected(:final name, :final id):
         _say(tr.usbConnectedTo(name));
+        // From the home screen, that computer's page, which says "USB cable".
+        final navigator = _navigator.currentState;
+        if (id != null && navigator != null && !navigator.canPop()) {
+          unawaited(
+            navigator.push(
+              MaterialPageRoute<void>(
+                builder: (_) => DeviceScreen(deviceId: id),
+              ),
+            ),
+          );
+        }
       case UsbPairOffer(:final address):
         final context = _navigator.currentContext;
         if (context == null) return;

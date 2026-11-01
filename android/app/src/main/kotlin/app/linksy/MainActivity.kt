@@ -435,14 +435,11 @@ class MainActivity : FlutterActivity() {
                     UsbBridge.ACTION_PERMISSION -> {
                         val granted = intent.getBooleanExtra(android.hardware.usb.UsbManager.EXTRA_PERMISSION_GRANTED, false)
                         UsbBridge.answered(granted)
-                        android.util.Log.i("linksy", "usb cable: permission ${if (granted) "granted" else "refused"}")
+                        UsbBridge.say("permission ${if (granted) "granted" else "refused"}")
                         if (granted) openUsb(intent)
                     }
                     android.hardware.usb.UsbManager.ACTION_USB_ACCESSORY_ATTACHED -> openUsb(intent)
-                    android.hardware.usb.UsbManager.ACTION_USB_ACCESSORY_DETACHED -> {
-                        android.util.Log.i("linksy", "usb cable: unplugged")
-                        UsbBridge.detached()
-                    }
+                    android.hardware.usb.UsbManager.ACTION_USB_ACCESSORY_DETACHED -> UsbBridge.detached()
                 }
             }
         }
