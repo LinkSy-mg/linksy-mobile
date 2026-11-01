@@ -16,6 +16,7 @@
     <string name="camera_didnt_start">Tsy nandeha ny fakantsary.</string>
     <string name="camera_unavailable">Tsy misy ny fakantsary.</string>
     <string name="sharing_screen">Mizara ny efijerinao amin\'i %1$s</string>
+    <string name="controlled_from">Fehezina avy amin\'i %1$s</string>
     <string name="using_microphone">Mampiasa ny mikrôfaonao i %1$s</string>
     <string name="using_camera">Mampiasa ny fakantsarinao i %1$s</string>
     <string name="channel_sharing">Fizarana efijery sy fakantsary</string>

@@ -16,6 +16,7 @@
     <string name="camera_didnt_start">A câmera não iniciou.</string>
     <string name="camera_unavailable">A câmera não está disponível.</string>
     <string name="sharing_screen">Compartilhando sua tela com %1$s</string>
+    <string name="controlled_from">Controlado por %1$s</string>
     <string name="using_microphone">%1$s está usando seu microfone</string>
     <string name="using_camera">%1$s está usando sua câmera</string>
     <string name="channel_sharing">Compartilhamento de tela e câmera</string>

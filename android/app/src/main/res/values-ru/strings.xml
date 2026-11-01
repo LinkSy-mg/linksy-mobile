@@ -16,6 +16,7 @@
     <string name="camera_didnt_start">Камера не запустилась.</string>
     <string name="camera_unavailable">Камера недоступна.</string>
     <string name="sharing_screen">Трансляция экрана для %1$s</string>
+    <string name="controlled_from">Управляется с устройства %1$s</string>
     <string name="using_microphone">%1$s использует ваш микрофон</string>
     <string name="using_camera">%1$s использует вашу камеру</string>
     <string name="channel_sharing">Трансляция экрана и камеры</string>

@@ -16,6 +16,7 @@
     <string name="camera_didnt_start">相机未能启动。</string>
     <string name="camera_unavailable">相机不可用。</string>
     <string name="sharing_screen">正在与 %1$s 共享屏幕</string>
+    <string name="controlled_from">正在由 %1$s 控制</string>
     <string name="using_microphone">%1$s 正在使用你的麦克风</string>
     <string name="using_camera">%1$s 正在使用你的相机</string>
     <string name="channel_sharing">屏幕与相机共享</string>

@@ -8,9 +8,13 @@ import android.app.Service
 import android.content.Context
 import android.content.Intent
 import android.content.pm.ServiceInfo
+import android.hardware.input.InputManager
 import android.media.projection.MediaProjectionManager
 import android.os.Build
+import android.os.Handler
 import android.os.IBinder
+import android.os.Looper
+import android.view.InputDevice
 import android.util.Log
 import app.linksy.MainActivity
 import app.linksy.Lang
@@ -39,8 +43,9 @@ class ShareService : Service() {
         active[session] = mapOf("session" to session, "kind" to kind, "peer" to (intent.getStringExtra(EXTRA_PEER_ID) ?: ""))
         val screen = kind == "screen" || kind == "control"
         val mic = kind == "microphone"
+        peers[session] = peer
         val text = when {
-            screen -> Lang.str(this, R.string.sharing_screen, peer)
+            screen -> screenText(peer)
             mic -> Lang.str(this, R.string.using_microphone, peer)
             else -> Lang.str(this, R.string.using_camera, peer)
         }
@@ -70,6 +75,7 @@ class ShareService : Service() {
                 }
             }
             shares[session] = share
+            if (screen) watchControl()
         } catch (e: Exception) {
             Log.w("linksy", "couldn't start sharing", e)
             stop(session)
@@ -99,9 +105,13 @@ class ShareService : Service() {
         webcams.remove(session)
         active.remove(session)
         kinds.remove(session)
+        peers.remove(session)
+        checkControl()
         shares.remove(session)?.let { runCatching { it.stop() } }
         NativeSession.finish(session)
         if (shares.isEmpty()) {
+            if (watching) inputs.unregisterInputDeviceListener(inputListener)
+            watching = false
             stopForeground(STOP_FOREGROUND_REMOVE)
             stopSelf()
         }
@@ -111,6 +121,51 @@ class ShareService : Service() {
         shares.keys.toList().forEach(::stop)
         super.onDestroy()
     }
+
+    /// Peer names by session, for the notification.
+    private val peers = mutableMapOf<String, String>()
+
+    // A computer that drives the phone over the cable (docs/protocol.md §4.11, desktop
+    // 0.11) plugs a virtual touchscreen into it (Android Open Accessory 2.0) and asks
+    // for a plain screen share. While that touchscreen is there, the share's
+    // notification says who is in control, and its Stop ends it.
+    private var controlled = false
+    private var watching = false
+    private val inputs by lazy { getSystemService(InputManager::class.java) }
+    private val inputListener = object : InputManager.InputDeviceListener {
+        override fun onInputDeviceAdded(deviceId: Int) = checkControl()
+        override fun onInputDeviceRemoved(deviceId: Int) = checkControl()
+        override fun onInputDeviceChanged(deviceId: Int) = checkControl()
+    }
+
+    private fun watchControl() {
+        if (!watching && Build.VERSION.SDK_INT >= 29) {
+            inputs.registerInputDeviceListener(inputListener, Handler(Looper.getMainLooper()))
+            watching = true
+        }
+        checkControl()
+    }
+
+    /// A touchscreen that isn't the phone's own: the computer's, over the cable.
+    private fun touchFromOutside(): Boolean = Build.VERSION.SDK_INT >= 29 &&
+        inputs.inputDeviceIds.any { id ->
+            val device = inputs.getInputDevice(id)
+            device != null && device.isExternal && device.supportsSource(InputDevice.SOURCE_TOUCHSCREEN)
+        }
+
+    private fun checkControl() {
+        val screen = kinds.entries.firstOrNull { it.value == "screen" || it.value == "control" }?.key
+        val now = screen != null && touchFromOutside()
+        if (now == controlled) return
+        controlled = now
+        Log.i("linksy", if (now) "screen: controlled over the cable" else "screen: control over the cable ended")
+        if (screen == null) return
+        val peer = peers[screen] ?: Lang.str(this, R.string.your_computer)
+        getSystemService(NotificationManager::class.java).notify(NOTIFICATION, notification(screenText(peer), screen))
+    }
+
+    private fun screenText(peer: String) =
+        Lang.str(this, if (controlled) R.string.controlled_from else R.string.sharing_screen, peer)
 
     private fun notification(text: String, session: String, camera: Boolean = false): Notification {
         val manager = getSystemService(NotificationManager::class.java)

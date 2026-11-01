@@ -16,6 +16,7 @@
     <string name="camera_didnt_start">カメラが起動しませんでした。</string>
     <string name="camera_unavailable">カメラを使用できません。</string>
     <string name="sharing_screen">%1$s と画面を共有中</string>
+    <string name="controlled_from">%1$s から操作中</string>
     <string name="using_microphone">%1$s がマイクを使用中</string>
     <string name="using_camera">%1$s がカメラを使用中</string>
     <string name="channel_sharing">画面とカメラの共有</string>
