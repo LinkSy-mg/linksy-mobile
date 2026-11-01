@@ -973,31 +973,21 @@ class _AboutState extends State<_About> {
           ],
         ),
         const SizedBox(height: 16),
-        Row(
-          children: [
-            Expanded(
-              child: SettingsPill(
-                icon: Ph.sparkle,
-                label: l.newsTitle,
-                onTap: () async {
-                  final v = (await LinksyPlatform.appVersion())
-                      ?.split(' ')
-                      .first;
-                  if (v == null || !context.mounted) return;
-                  await showWhatsNew(context, v, highlights(v));
-                },
-              ),
-            ),
-            const SizedBox(width: 10),
-            Expanded(
-              child: SettingsPill(
-                icon: Ph.arrowCircleUp,
-                label: l.updateCheck,
-                busy: _checking,
-                onTap: _checking ? null : _check,
-              ),
-            ),
-          ],
+        SettingsPill(
+          icon: Ph.sparkle,
+          label: l.newsTitle,
+          onTap: () async {
+            final v = (await LinksyPlatform.appVersion())?.split(' ').first;
+            if (v == null || !context.mounted) return;
+            await showWhatsNew(context, v, highlights(v));
+          },
+        ),
+        const SizedBox(height: 10),
+        SettingsPill(
+          icon: Ph.arrowCircleUp,
+          label: l.updateCheck,
+          busy: _checking,
+          onTap: _checking ? null : _check,
         ),
       ],
     );
