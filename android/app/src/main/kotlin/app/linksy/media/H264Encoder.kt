@@ -8,22 +8,27 @@ import android.os.Build
 import android.os.SystemClock
 import android.view.Surface
 import app.linksy.Logs
+import kotlin.math.roundToInt
 
 /// Hardware H.264 the way linksy-desktop decodes it (docs/protocol.md §4.8): Annex-B,
 /// Constrained Baseline, a keyframe at least every 2 s, SPS/PPS before every
-/// keyframe. Frames come in through [inputSurface]; each encoded unit goes to
-/// the session. [onEnded] runs once if the session goes away. What it does goes
-/// to the Logs page, under [label] ("Screen", "Webcam").
+/// keyframe. Frames come in through [inputSurface], drawn at [width]×[height];
+/// each encoded unit goes to the session. [onEnded] runs once if the session goes
+/// away. What it does goes to the Logs page, under [label] ("Screen", "Webcam").
 class H264Encoder(
-    width: Int,
-    height: Int,
+    wantWidth: Int,
+    wantHeight: Int,
     bitrate: Int,
     fps: Int,
     private val label: String,
     private val session: String,
     private val onEnded: () -> Unit,
 ) {
-    private val codec = MediaCodec.createEncoderByType(MediaFormat.MIMETYPE_VIDEO_AVC)
+    private val codec: MediaCodec
+    /// The size it encodes: the one asked for, or smaller in the same shape when
+    /// the encoder can't take it.
+    val width: Int
+    val height: Int
     val inputSurface: Surface
     @Volatile private var running = true
     private val drain: Thread
@@ -35,13 +40,46 @@ class H264Encoder(
     private var sent = 0L
 
     init {
-        configure(width, height, bitrate, fps)
+        val (opened, size) = open(wantWidth to wantHeight, bitrate, fps)
+        codec = opened
+        width = size.first
+        height = size.second
         inputSurface = codec.createInputSurface()
         codec.start()
         drain = Thread(::drainLoop, "linksy-encoder").apply { start() }
     }
 
-    private fun configure(width: Int, height: Int, bitrate: Int, fps: Int) {
+    /// The phone's default H.264 encoder (its hardware one) at [want], or at the
+    /// largest size of that shape its capabilities allow; if it refuses even that,
+    /// Android's software encoder. Some refuse a size their capabilities allow: a
+    /// Qualcomm encoder on Android 11 and a portrait 864×1920 (releases#6).
+    private fun open(want: Pair<Int, Int>, bitrate: Int, fps: Int): Pair<MediaCodec, Pair<Int, Int>> {
+        val tried = mutableSetOf<String>()
+        var failure: Exception? = null
+        for (name in listOf<String?>(null) + SOFTWARE) {
+            val candidate = runCatching {
+                if (name == null) MediaCodec.createEncoderByType(MediaFormat.MIMETYPE_VIDEO_AVC) else MediaCodec.createByCodecName(name)
+            }.getOrNull() ?: continue
+            if (!tried.add(candidate.name)) {
+                candidate.release()
+                continue
+            }
+            val caps = runCatching { candidate.codecInfo.getCapabilitiesForType(MediaFormat.MIMETYPE_VIDEO_AVC).videoCapabilities }.getOrNull()
+            val size = fit(want, caps)
+            try {
+                configure(candidate, size, bitrate, fps)
+                if (size != want) Logs.add("$label encoder: ${want.first}×${want.second} is more than it takes, ${size.first}×${size.second} instead")
+                return candidate to size
+            } catch (e: Exception) {
+                failure = e
+                candidate.release()
+            }
+        }
+        throw failure ?: IllegalStateException("no H.264 encoder")
+    }
+
+    private fun configure(codec: MediaCodec, size: Pair<Int, Int>, bitrate: Int, fps: Int) {
+        val (width, height) = size
         fun format(profile: Int) = MediaFormat.createVideoFormat(MediaFormat.MIMETYPE_VIDEO_AVC, width, height).apply {
             setInteger(MediaFormat.KEY_COLOR_FORMAT, CodecCapabilities.COLOR_FormatSurface)
             setInteger(MediaFormat.KEY_BIT_RATE, bitrate)
@@ -70,10 +108,10 @@ class H264Encoder(
             val name = if (profile == CodecProfileLevel.AVCProfileBaseline) "baseline" else "constrained baseline"
             try {
                 codec.configure(format(profile), null, null, MediaCodec.CONFIGURE_FLAG_ENCODE)
-                Logs.add("$label encoder: ${describe()}, $width×$height, ${bitrate / 1000} kbit/s, $fps fps, $name")
+                Logs.add("$label encoder: ${describe(codec)}, $width×$height, ${bitrate / 1000} kbit/s, $fps fps, $name")
                 return
             } catch (e: Exception) {
-                Logs.add("$label encoder: ${describe()} refused $width×$height $name ($e)")
+                Logs.add("$label encoder: ${describe(codec)} refused $width×$height $name ($e)")
                 if (i == profiles.lastIndex) throw e
                 codec.reset()
             }
@@ -81,7 +119,7 @@ class H264Encoder(
     }
 
     /// The codec's name, and whether it's the phone's hardware.
-    private fun describe(): String {
+    private fun describe(codec: MediaCodec): String {
         val name = runCatching { codec.name }.getOrDefault("?")
         if (Build.VERSION.SDK_INT < 29) return name
         return name + if (codec.codecInfo.isHardwareAccelerated) " (hardware)" else " (software)"
@@ -157,6 +195,24 @@ class H264Encoder(
     }
 
     companion object {
+        /// Android's own software encoders, newest first: the fallback when the
+        /// phone's encoder refuses.
+        private val SOFTWARE = listOf("c2.android.avc.encoder", "OMX.google.h264.encoder")
+
+        /// [want], or the largest size of the same shape [caps] allow: the width a
+        /// multiple of 16, stepping down, the height even.
+        fun fit(want: Pair<Int, Int>, caps: android.media.MediaCodecInfo.VideoCapabilities?): Pair<Int, Int> {
+            val (w, h) = want
+            if (caps == null || caps.isSizeSupported(w, h)) return want
+            var width = w / 16 * 16
+            while (width >= 16) {
+                val height = ((width.toDouble() * h / w) / 2).roundToInt() * 2
+                if (caps.isSizeSupported(width, height)) return width to height
+                width -= 16
+            }
+            return want
+        }
+
         /// What the phone's default H.264 encoder can do, for picking sizes.
         fun capabilities(): android.media.MediaCodecInfo.VideoCapabilities? = runCatching {
             val codec = MediaCodec.createEncoderByType(MediaFormat.MIMETYPE_VIDEO_AVC)

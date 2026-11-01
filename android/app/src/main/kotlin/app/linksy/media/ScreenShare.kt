@@ -54,8 +54,9 @@ class ScreenShare(
                 onEnded()
             }
         }, main)
+        // The encoder's own size: smaller than asked when it can't take that.
         display = projection.createVirtualDisplay(
-            "linksy", size.first, size.second, density(),
+            "linksy", encoder.width, encoder.height, density(),
             DisplayManager.VIRTUAL_DISPLAY_FLAG_AUTO_MIRROR, encoder.inputSurface, null, null,
         ) ?: error("screen capture gave no display")
         displays.registerDisplayListener(rotation, main)
@@ -71,7 +72,7 @@ class ScreenShare(
         encoder.stop()
         size = next
         encoder = encoder(next)
-        display.resize(next.first, next.second, density())
+        display.resize(encoder.width, encoder.height, density())
         display.surface = encoder.inputSurface
     }
 

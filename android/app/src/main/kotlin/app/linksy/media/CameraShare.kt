@@ -99,7 +99,7 @@ class CameraShare(
         size = HD
         input = cameraSize(chars, fps, size)
         encoder = H264Encoder(size.width, size.height, bitrate = bitrate(quality), fps = fps, label = "Webcam", session = session, onEnded = onEnded)
-        renderer = GlRenderer(input, encoder.inputSurface, size.width, size.height)
+        renderer = GlRenderer(input, encoder.inputSurface, encoder.width, encoder.height)
         orientation = object : android.view.OrientationEventListener(context) {
             override fun onOrientationChanged(degrees: Int) {
                 if (degrees == ORIENTATION_UNKNOWN) return
@@ -370,7 +370,7 @@ class CameraShare(
     private fun restartEncoder() {
         val old = encoder
         encoder = H264Encoder(size.width, size.height, bitrate = bitrate(quality), fps = fps, label = "Webcam", session = session, onEnded = onEnded)
-        renderer.setOutput(encoder.inputSurface, size.width, size.height)
+        renderer.setOutput(encoder.inputSurface, encoder.width, encoder.height)
         old.stop()
     }
 
