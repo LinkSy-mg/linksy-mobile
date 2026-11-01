@@ -261,7 +261,7 @@ class _LinksyAppState extends State<LinksyApp> {
         widget.controller.themeMode,
       ]),
       builder: (context, _) => MaterialApp(
-        title: 'Linksy',
+        title: 'Linksy Motion',
         debugShowCheckedModeBanner: false,
         navigatorKey: _navigator,
         scaffoldMessengerKey: _messenger,

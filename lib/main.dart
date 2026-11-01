@@ -97,7 +97,8 @@ Future<void> main() async {
     ActivityStore(File('${support.path}/history.json')),
     service: service,
     dir: support,
-    updates: _demo
+    // Motion test build: never offers the regular app's releases.
+    updates: _demo || true
         ? null
         : AppUpdate(
             UpdateChecker(File('${support.path}/releases.json')),

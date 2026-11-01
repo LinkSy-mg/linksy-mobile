@@ -39,7 +39,7 @@
     <uses-permission android:name="android.permission.VIBRATE"/>
 
     <application
-        android:label="Linksy"
+        android:label="Linksy Motion"
         android:allowBackup="false"
         android:fullBackupContent="@xml/backup_rules"
         android:dataExtractionRules="@xml/data_extraction_rules"
@@ -96,7 +96,7 @@
         <activity
             android:name=".ShareTarget"
             android:exported="true"
-            android:label="Linksy"
+            android:label="Linksy Motion"
             android:excludeFromRecents="true"
             android:noHistory="true"
             android:theme="@android:style/Theme.Translucent.NoTitleBar">
