@@ -301,6 +301,7 @@
   "settingsNothingMatches": "「{query}」に一致する設定はありません",
   "settingsRecommended": "おすすめ",
   "settingsReceiving": "受信",
+  "settingsFiles": "ファイル",
   "settingsSaveLocation": "保存先",
   "settingsSaveLocationPath": "ダウンロード › Linksy",
   "settingsAcceptFromMyDevices": "自分のデバイスから自動で受信",

@@ -1920,6 +1920,12 @@ abstract class AppLocalizations {
   /// **'Receiving'**
   String get settingsReceiving;
 
+  /// Settings: the page about received files, the shared folder and photo backup
+  ///
+  /// In en, this message translates to:
+  /// **'Files'**
+  String get settingsFiles;
+
   /// Settings row: where received files are saved
   ///
   /// In en, this message translates to:

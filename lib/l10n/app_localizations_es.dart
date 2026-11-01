@@ -1158,6 +1158,9 @@ class AppLocalizationsEs extends AppLocalizations {
   String get settingsReceiving => 'Recepción';
 
   @override
+  String get settingsFiles => 'Archivos';
+
+  @override
   String get settingsSaveLocation => 'Ubicación de guardado';
 
   @override

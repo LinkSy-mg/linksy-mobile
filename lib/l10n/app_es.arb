@@ -301,6 +301,7 @@
   "settingsNothingMatches": "Nada coincide con «{query}»",
   "settingsRecommended": "Recomendado",
   "settingsReceiving": "Recepción",
+  "settingsFiles": "Archivos",
   "settingsSaveLocation": "Ubicación de guardado",
   "settingsSaveLocationPath": "Descargas › Linksy",
   "settingsAcceptFromMyDevices": "Aceptar de mis dispositivos",

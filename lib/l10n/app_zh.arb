@@ -301,6 +301,7 @@
   "settingsNothingMatches": "没有与“{query}”匹配的设置",
   "settingsRecommended": "推荐",
   "settingsReceiving": "接收",
+  "settingsFiles": "文件",
   "settingsSaveLocation": "保存位置",
   "settingsSaveLocationPath": "下载 › Linksy",
   "settingsAcceptFromMyDevices": "自动接受我的设备",

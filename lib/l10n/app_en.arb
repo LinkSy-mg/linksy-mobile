@@ -1548,6 +1548,10 @@
   "@settingsReceiving": {
     "description": "Settings section label: receiving files"
   },
+  "settingsFiles": "Files",
+  "@settingsFiles": {
+    "description": "Settings: the page about received files, the shared folder and photo backup"
+  },
   "settingsSaveLocation": "Save location",
   "@settingsSaveLocation": {
     "description": "Settings row: where received files are saved"

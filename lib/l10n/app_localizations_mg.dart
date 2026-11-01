@@ -1159,6 +1159,9 @@ class AppLocalizationsMg extends AppLocalizations {
   String get settingsReceiving => 'Fandraisana';
 
   @override
+  String get settingsFiles => 'Rakitra';
+
+  @override
   String get settingsSaveLocation => 'Toerana itahirizana';
 
   @override

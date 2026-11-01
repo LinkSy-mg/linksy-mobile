@@ -1179,6 +1179,9 @@ class AppLocalizationsRu extends AppLocalizations {
   String get settingsReceiving => 'Получение';
 
   @override
+  String get settingsFiles => 'Файлы';
+
+  @override
   String get settingsSaveLocation => 'Куда сохранять';
 
   @override

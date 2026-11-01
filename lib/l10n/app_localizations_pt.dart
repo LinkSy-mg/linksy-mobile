@@ -1157,6 +1157,9 @@ class AppLocalizationsPt extends AppLocalizations {
   String get settingsReceiving => 'Recebimento';
 
   @override
+  String get settingsFiles => 'Arquivos';
+
+  @override
   String get settingsSaveLocation => 'Local de salvamento';
 
   @override

@@ -301,6 +301,7 @@
   "settingsNothingMatches": "Ничего не найдено по запросу «{query}»",
   "settingsRecommended": "Рекомендуем",
   "settingsReceiving": "Получение",
+  "settingsFiles": "Файлы",
   "settingsSaveLocation": "Куда сохранять",
   "settingsSaveLocationPath": "Загрузки › Linksy",
   "settingsAcceptFromMyDevices": "Принимать с моих устройств",

@@ -1121,6 +1121,9 @@ class AppLocalizationsZh extends AppLocalizations {
   String get settingsReceiving => '接收';
 
   @override
+  String get settingsFiles => '文件';
+
+  @override
   String get settingsSaveLocation => '保存位置';
 
   @override

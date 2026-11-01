@@ -1157,6 +1157,9 @@ class AppLocalizationsDe extends AppLocalizations {
   String get settingsReceiving => 'Empfangen';
 
   @override
+  String get settingsFiles => 'Dateien';
+
+  @override
   String get settingsSaveLocation => 'Speicherort';
 
   @override

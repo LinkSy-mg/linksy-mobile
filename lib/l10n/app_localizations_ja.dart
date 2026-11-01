@@ -1131,6 +1131,9 @@ class AppLocalizationsJa extends AppLocalizations {
   String get settingsReceiving => '受信';
 
   @override
+  String get settingsFiles => 'ファイル';
+
+  @override
   String get settingsSaveLocation => '保存先';
 
   @override
