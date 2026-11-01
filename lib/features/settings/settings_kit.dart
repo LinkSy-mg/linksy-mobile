@@ -169,12 +169,9 @@ class _Header extends SliverPersistentHeaderDelegate {
     );
   }
 
+  // Always: a theme change (light ↔ dark) must repaint the bar too.
   @override
-  bool shouldRebuild(_Header old) =>
-      old.title != title ||
-      old.backLabel != backLabel ||
-      old.lead != lead ||
-      old.top != top;
+  bool shouldRebuild(_Header old) => true;
 }
 
 /// A titled group: the title bold above one big rounded card of rows.
@@ -366,20 +363,18 @@ class SettingsCard extends StatelessWidget {
   }
 }
 
-/// A category on the hub: its icon in a coloured circle, its name, and a
-/// line saying how it's set now.
+/// A category on the hub: its icon in a soft circle, its name, and a line
+/// saying how it's set now.
 class CategoryBubble extends StatelessWidget {
   const CategoryBubble({
     super.key,
     required this.icon,
-    required this.color,
     required this.title,
     required this.onTap,
     this.summary,
   });
 
   final IconData icon;
-  final Color color;
   final String title;
   final String? summary;
   final VoidCallback onTap;
@@ -401,7 +396,7 @@ class CategoryBubble extends StatelessWidget {
           ),
           child: Row(
             children: [
-              IconCircle(icon: icon, color: color, size: 46, filled: true),
+              IconCircle(icon: icon, color: Sig.blue, size: 46),
               const SizedBox(width: 14),
               Expanded(
                 child: Column(

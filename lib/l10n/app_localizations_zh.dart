@@ -1139,6 +1139,9 @@ class AppLocalizationsZh extends AppLocalizations {
   String get settingsConnection => '连接';
 
   @override
+  String get settingsWays => '它如何连接你的电脑';
+
+  @override
   String get settingsStayConnected => '保持连接';
 
   @override

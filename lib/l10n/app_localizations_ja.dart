@@ -1150,6 +1150,9 @@ class AppLocalizationsJa extends AppLocalizations {
   String get settingsConnection => '接続';
 
   @override
+  String get settingsWays => 'パソコンとのつながり方';
+
+  @override
   String get settingsStayConnected => '接続を維持';
 
   @override

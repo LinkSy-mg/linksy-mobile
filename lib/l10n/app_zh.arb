@@ -307,6 +307,7 @@
   "settingsAcceptFromMyDevices": "自动接受我的设备",
   "settingsAcceptFromMyDevicesCaption": "来自已配对设备的文件无需确认即可接收。",
   "settingsConnection": "连接",
+  "settingsWays": "它如何连接你的电脑",
   "settingsStayConnected": "保持连接",
   "settingsStayConnectedCaption": "与附近设备共享更快，但更耗电。",
   "settingsKeepRunning": "在后台保持运行",

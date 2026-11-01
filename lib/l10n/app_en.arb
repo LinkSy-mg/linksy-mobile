@@ -1572,6 +1572,10 @@
   "@settingsConnection": {
     "description": "Settings section label"
   },
+  "settingsWays": "How it reaches your computers",
+  "@settingsWays": {
+    "description": "Connection page: label over the list of ways the phone reaches computers (Same Wi-Fi, Away from home, Wi-Fi Direct, USB cable); not buttons"
+  },
   "settingsStayConnected": "Stay connected",
   "@settingsStayConnected": {
     "description": "Settings switch: keep connections to nearby devices open"

@@ -1176,6 +1176,9 @@ class AppLocalizationsPt extends AppLocalizations {
   String get settingsConnection => 'Conexão';
 
   @override
+  String get settingsWays => 'Como alcança seus computadores';
+
+  @override
   String get settingsStayConnected => 'Manter conectado';
 
   @override

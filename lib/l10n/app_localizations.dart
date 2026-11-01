@@ -1956,6 +1956,12 @@ abstract class AppLocalizations {
   /// **'Connection'**
   String get settingsConnection;
 
+  /// Connection page: label over the list of ways the phone reaches computers (Same Wi-Fi, Away from home, Wi-Fi Direct, USB cable); not buttons
+  ///
+  /// In en, this message translates to:
+  /// **'How it reaches your computers'**
+  String get settingsWays;
+
   /// Settings switch: keep connections to nearby devices open
   ///
   /// In en, this message translates to:

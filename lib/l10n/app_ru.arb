@@ -307,6 +307,7 @@
   "settingsAcceptFromMyDevices": "Принимать с моих устройств",
   "settingsAcceptFromMyDevicesCaption": "Файлы со связанных устройств приходят без вопросов.",
   "settingsConnection": "Подключение",
+  "settingsWays": "Как он связывается с компьютерами",
   "settingsStayConnected": "Оставаться на связи",
   "settingsStayConnectedCaption": "Быстрее обмен с устройствами рядом. Расходует больше заряда.",
   "settingsKeepRunning": "Работать в фоне",

@@ -307,6 +307,7 @@
   "settingsAcceptFromMyDevices": "Aceptar de mis dispositivos",
   "settingsAcceptFromMyDevicesCaption": "Los archivos de dispositivos emparejados llegan sin preguntar.",
   "settingsConnection": "Conexión",
+  "settingsWays": "Cómo llega a tus ordenadores",
   "settingsStayConnected": "Mantenerse conectado",
   "settingsStayConnectedCaption": "Comparte más rápido con dispositivos cercanos. Usa más batería.",
   "settingsKeepRunning": "Seguir activo en segundo plano",

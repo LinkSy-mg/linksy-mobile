@@ -1179,6 +1179,9 @@ class AppLocalizationsFr extends AppLocalizations {
   String get settingsConnection => 'Connexion';
 
   @override
+  String get settingsWays => 'Comment il joint vos ordinateurs';
+
+  @override
   String get settingsStayConnected => 'Rester connecté';
 
   @override

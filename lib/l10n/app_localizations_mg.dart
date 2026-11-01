@@ -1178,6 +1178,9 @@ class AppLocalizationsMg extends AppLocalizations {
   String get settingsConnection => 'Fifandraisana';
 
   @override
+  String get settingsWays => 'Ny fomba hifandraisany amin\'ny solosainanao';
+
+  @override
   String get settingsStayConnected => 'Mifandray foana';
 
   @override

@@ -307,6 +307,7 @@
   "settingsAcceptFromMyDevices": "自分のデバイスから自動で受信",
   "settingsAcceptFromMyDevicesCaption": "ペアリング済みのデバイスからのファイルは確認なしで届きます。",
   "settingsConnection": "接続",
+  "settingsWays": "パソコンとのつながり方",
   "settingsStayConnected": "接続を維持",
   "settingsStayConnectedCaption": "近くのデバイスとすばやく共有できます。バッテリーの消費が増えます。",
   "settingsKeepRunning": "バックグラウンドで実行",

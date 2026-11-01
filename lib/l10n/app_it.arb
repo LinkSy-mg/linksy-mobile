@@ -307,6 +307,7 @@
   "settingsAcceptFromMyDevices": "Accetta dai miei dispositivi",
   "settingsAcceptFromMyDevicesCaption": "I file dai dispositivi associati arrivano senza chiedere.",
   "settingsConnection": "Connessione",
+  "settingsWays": "Come raggiunge i tuoi computer",
   "settingsStayConnected": "Resta connesso",
   "settingsStayConnectedCaption": "Condivisione più rapida con i dispositivi vicini. Consuma più batteria.",
   "settingsKeepRunning": "Resta attivo in background",

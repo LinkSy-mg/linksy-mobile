@@ -1198,6 +1198,9 @@ class AppLocalizationsRu extends AppLocalizations {
   String get settingsConnection => 'Подключение';
 
   @override
+  String get settingsWays => 'Как он связывается с компьютерами';
+
+  @override
   String get settingsStayConnected => 'Оставаться на связи';
 
   @override

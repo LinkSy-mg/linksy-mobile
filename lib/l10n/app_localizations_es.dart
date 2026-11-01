@@ -1177,6 +1177,9 @@ class AppLocalizationsEs extends AppLocalizations {
   String get settingsConnection => 'Conexión';
 
   @override
+  String get settingsWays => 'Cómo llega a tus ordenadores';
+
+  @override
   String get settingsStayConnected => 'Mantenerse conectado';
 
   @override

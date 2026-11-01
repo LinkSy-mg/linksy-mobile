@@ -9,6 +9,8 @@ import '../../ui/components.dart';
 import '../../ui/l10n.dart';
 import '../../ui/sig.dart';
 import '../permissions/permissions_sheet.dart';
+import '../update/update_sheet.dart';
+import 'logs_screen.dart';
 import 'settings_kit.dart';
 import 'settings_pages.dart';
 
@@ -32,10 +34,32 @@ class _SettingsScreenState extends State<SettingsScreen> {
 
   void _open(SettingsHit hit) {
     final area = hit.area;
-    if (area == null) {
-      showPermissions(context);
-    } else {
+    if (area != null) {
       openSettingsArea(context, area, highlight: hit.id);
+    } else if (hit.id == 'logs') {
+      _logs();
+    } else {
+      _checkUpdates();
+    }
+  }
+
+  void _logs() =>
+      Navigator.of(context)
+          .push(MaterialPageRoute<void>(builder: (_) => const LogsScreen()));
+
+  var _checking = false;
+
+  /// Asks GitHub now, then offers Update Now.
+  Future<void> _checkUpdates() async {
+    final u = LinksyScope.read(context).updates;
+    setState(() => _checking = true);
+    final found = await u.check();
+    if (!mounted) return;
+    setState(() => _checking = false);
+    if (found) {
+      await showUpdate(context);
+    } else {
+      showMessage(context, context.l10n.updateNewest(u.installed ?? ''));
     }
   }
 
@@ -104,12 +128,32 @@ class _SettingsScreenState extends State<SettingsScreen> {
           for (final area in SettingsArea.values)
             CategoryBubble(
               icon: area.icon,
-              color: area.color,
               title: area.title(l),
               summary: settingsSummary(context, area),
               onTap: () => openSettingsArea(context, area),
             ),
-          const _PermissionsBubble(),
+          // Always here, whatever page they'd belong to.
+          SettingsSection(
+            children: [
+              SettingRow(
+                icon: Ph.arrowCircleUp,
+                title: l.updateCheck,
+                onTap: _checking ? null : _checkUpdates,
+                trailing: _checking
+                    ? const SizedBox.square(
+                        dimension: 18,
+                        child: CircularProgressIndicator(strokeWidth: 2),
+                      )
+                    : null,
+              ),
+              SettingRow(
+                icon: Ph.fileText,
+                title: l.settingsLogs,
+                caption: l.settingsLogsCaption,
+                onTap: _logs,
+              ),
+            ],
+          ),
           if (demo != null)
             SettingsSection(
               title: l.settingsDemo,
@@ -207,64 +251,6 @@ class _Result extends StatelessWidget {
           ),
         ),
       ),
-    );
-  }
-}
-
-/// The permissions: a bubble like the pages', opening Android's questions.
-class _PermissionsBubble extends StatefulWidget {
-  const _PermissionsBubble();
-
-  @override
-  State<_PermissionsBubble> createState() => _PermissionsBubbleState();
-}
-
-class _PermissionsBubbleState extends State<_PermissionsBubble>
-    with WidgetsBindingObserver {
-  int? _allowed;
-
-  @override
-  void initState() {
-    super.initState();
-    WidgetsBinding.instance.addObserver(this);
-    _read();
-  }
-
-  @override
-  void dispose() {
-    WidgetsBinding.instance.removeObserver(this);
-    super.dispose();
-  }
-
-  @override
-  void didChangeAppLifecycleState(AppLifecycleState state) {
-    if (state == AppLifecycleState.resumed) _read();
-  }
-
-  Future<void> _read() async {
-    final p = await LinksyPlatform.permissions();
-    if (!mounted || p == null) return;
-    setState(
-      () => _allowed = [p.notifications, p.camera].where((x) => x).length,
-    );
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    final l = context.l10n;
-    return CategoryBubble(
-      icon: Ph.shieldCheck,
-      color: Sig.cyan,
-      title: l.settingsPermissions,
-      summary: switch (_allowed) {
-        null => l.settingsPermissionsRow,
-        2 => l.settingsPermissionsBoth,
-        final n => l.settingsPermissionsSome(n),
-      },
-      onTap: () async {
-        await showPermissions(context);
-        await _read();
-      },
     );
   }
 }

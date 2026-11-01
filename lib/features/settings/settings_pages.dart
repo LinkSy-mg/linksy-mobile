@@ -11,8 +11,7 @@ import '../../ui/l10n.dart';
 import '../../ui/sig.dart';
 import '../news/whats_new.dart';
 import '../onboarding/language_wheel.dart';
-import '../update/update_sheet.dart';
-import 'logs_screen.dart';
+import '../permissions/permissions_sheet.dart';
 import 'settings_kit.dart';
 
 /// The settings pages the hub opens.
@@ -31,14 +30,6 @@ extension SettingsAreaLook on SettingsArea {
     SettingsArea.connection => Ph.wifiHigh,
     SettingsArea.computers => Ph.desktop,
     SettingsArea.app => Ph.gearSix,
-  };
-
-  /// Cyan for what comes in (files), blue and deep for the rest.
-  Color get color => switch (this) {
-    SettingsArea.files => Sig.cyan,
-    SettingsArea.connection => Sig.blue,
-    SettingsArea.computers => Sig.deep,
-    SettingsArea.app => Sig.blue,
   };
 }
 
@@ -64,7 +55,7 @@ class SettingsHit {
 
   final String id;
 
-  /// Null: not on a page (the permissions, a sheet of their own).
+  /// Null: on the hub itself (Check for Updates, Logs).
   final SettingsArea? area;
   final IconData icon;
   final String title;
@@ -174,13 +165,17 @@ List<SettingsHit> settingsIndex(BuildContext context) {
     ),
     SettingsHit('language', SettingsArea.app, Ph.globe, l.settingsLanguage),
     SettingsHit('news', SettingsArea.app, Ph.sparkle, l.newsTitle),
-    SettingsHit('update', SettingsArea.app, Ph.arrowCircleUp, l.updateCheck),
-    SettingsHit('logs', SettingsArea.app, Ph.fileText, l.settingsLogs, [
+    SettingsHit('update', null, Ph.arrowCircleUp, l.updateCheck),
+    SettingsHit('logs', null, Ph.fileText, l.settingsLogs, [
       l.settingsLogsCaption,
     ]),
-    SettingsHit('permissions', null, Ph.shieldCheck, l.settingsPermissionsRow, [
-      l.settingsPermissions,
-    ]),
+    SettingsHit(
+      'permissions',
+      SettingsArea.app,
+      Ph.shieldCheck,
+      l.settingsPermissionsRow,
+      [l.settingsPermissions],
+    ),
   ];
 }
 
@@ -194,7 +189,8 @@ String settingsSummary(BuildContext context, SettingsArea area) {
     SettingsArea.files => [
       l.settingsSaveLocationPath,
       if (st.autoAccept) l.settingsAcceptFromMyDevices,
-      if (c.sharingFiles && c.filesFolder != null) l.settingsBrowseFiles,
+      if (c.sharingFiles && c.filesReady)
+        c.filesAll ? l.settingsFilesAll : l.settingsBrowseFiles,
     ],
     SettingsArea.connection => [
       l.commonSameWifi,
@@ -232,10 +228,36 @@ Future<void> _update(BuildContext context, NodeSettings next) =>
 
 // Files.
 
-class FilesSettings extends StatelessWidget {
+class FilesSettings extends StatefulWidget {
   const FilesSettings({super.key, this.highlight});
 
   final String? highlight;
+
+  @override
+  State<FilesSettings> createState() => _FilesSettingsState();
+}
+
+class _FilesSettingsState extends State<FilesSettings>
+    with WidgetsBindingObserver {
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addObserver(this);
+  }
+
+  @override
+  void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
+    super.dispose();
+  }
+
+  // Back from Android's All files access page.
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    if (state == AppLifecycleState.resumed) {
+      LinksyScope.read(context).refreshFiles();
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -243,11 +265,11 @@ class FilesSettings extends StatelessWidget {
     final st = c.settings;
     final l = context.l10n;
     if (st == null) return const Scaffold(body: SizedBox.shrink());
-    final sharing = c.sharingFiles && c.filesFolder != null;
+    final sharing = c.sharingFiles && (c.filesAll || c.filesFolder != null);
     return SettingsPage(
       title: l.settingsFiles,
       backLabel: l.settingsTitle,
-      highlight: highlight,
+      highlight: widget.highlight,
       children: [
         SettingsCard(
           id: 'save',
@@ -279,19 +301,34 @@ class FilesSettings extends StatelessWidget {
               caption: sharing ? null : l.settingsBrowseFilesChoose,
               trailing: Switch(
                 value: sharing,
-                onChanged: (v) => v && c.filesFolder == null
+                onChanged: (v) => v && !c.filesAll && c.filesFolder == null
                     ? c.pickFilesFolder()
                     : c.setSharingFiles(v),
               ),
             ),
+            // What they browse: one folder, or everything.
             SubOptions(
               open: sharing,
               children: [
-                SettingRow(
+                _Choice(
+                  selected: !c.filesAll,
                   icon: Ph.folderSimple,
-                  title: c.filesFolder ?? '',
-                  onTap: c.pickFilesFolder,
+                  title: l.settingsFilesFolder,
+                  caption: c.filesFolder,
+                  onTap: () => !c.filesAll || c.filesFolder == null
+                      ? c.pickFilesFolder()
+                      : c.setFilesAll(false),
                 ),
+                if (c.allFiles != 'unsupported')
+                  _Choice(
+                    selected: c.filesAll,
+                    icon: Ph.files,
+                    title: l.settingsFilesAll,
+                    caption: c.allFiles == 'allowed'
+                        ? l.settingsFilesAllCaption
+                        : l.settingsFilesAllAllow,
+                    onTap: () => c.setFilesAll(true),
+                  ),
               ],
             ),
             SettingRow(
@@ -306,6 +343,54 @@ class FilesSettings extends StatelessWidget {
           ],
         ),
       ],
+    );
+  }
+}
+
+/// One of a few choices: a row with a round mark on the right.
+class _Choice extends StatelessWidget {
+  const _Choice({
+    required this.selected,
+    required this.icon,
+    required this.title,
+    required this.onTap,
+    this.caption,
+  });
+
+  final bool selected;
+  final IconData icon;
+  final String title;
+  final String? caption;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    final s = Sig.of(context);
+    return SettingRow(
+      icon: icon,
+      title: title,
+      caption: caption,
+      onTap: onTap,
+      trailing: AnimatedContainer(
+        duration: const Duration(milliseconds: 150),
+        width: 22,
+        height: 22,
+        alignment: Alignment.center,
+        decoration: BoxDecoration(
+          shape: BoxShape.circle,
+          border: Border.all(color: selected ? Sig.blue : s.faint, width: 2),
+        ),
+        child: selected
+            ? Container(
+                width: 10,
+                height: 10,
+                decoration: const BoxDecoration(
+                  color: Sig.blue,
+                  shape: BoxShape.circle,
+                ),
+              )
+            : null,
+      ),
     );
   }
 }
@@ -390,6 +475,8 @@ class ConnectionSettings extends StatelessWidget {
       highlight: highlight,
       children: [
         SettingsCard(
+          id: 'ways',
+          label: l.settingsWays,
           child: _Ways(
             ways: [
               (Ph.wifiHigh, l.commonSameWifi, true),
@@ -473,7 +560,8 @@ class ConnectionSettings extends StatelessWidget {
   }
 }
 
-/// The ways this phone reaches its computers, lit when they're on.
+/// The ways this phone reaches its computers, as a list: what's on is
+/// dark with a cyan dot, what's off is faint. Nothing here is a button.
 class _Ways extends StatelessWidget {
   const _Ways({required this.ways});
 
@@ -481,50 +569,48 @@ class _Ways extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    Widget tile((IconData, String, bool) way) {
-      final s = Sig.of(context);
-      final (icon, label, on) = way;
-      return Expanded(
-        child: Container(
-          padding: const EdgeInsets.all(14),
-          decoration: BoxDecoration(
-            color: s.raised,
-            borderRadius: BorderRadius.circular(20),
-          ),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              IconCircle(icon: icon, color: Sig.blue, size: 38, filled: on),
-              const SizedBox(height: 12),
-              Text(
-                label,
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis,
-                style: TextStyle(
-                  color: on ? s.ink : s.muted,
-                  fontSize: 14.5,
-                  fontWeight: FontWeight.w600,
+    final s = Sig.of(context);
+    return LayoutBuilder(
+      builder: (context, box) {
+        final width = (box.maxWidth - 20) / 2;
+        return Wrap(
+          spacing: 20,
+          runSpacing: 14,
+          children: [
+            for (final (icon, label, on) in ways)
+              SizedBox(
+                width: width,
+                child: Row(
+                  children: [
+                    Icon(icon, size: 19, color: on ? Sig.blue : s.faint),
+                    const SizedBox(width: 9),
+                    Expanded(
+                      child: Text(
+                        label,
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        style: TextStyle(
+                          color: on ? s.ink : s.faint,
+                          fontSize: 14.5,
+                          fontWeight: FontWeight.w500,
+                        ),
+                      ),
+                    ),
+                    const SizedBox(width: 6),
+                    Container(
+                      width: 7,
+                      height: 7,
+                      decoration: BoxDecoration(
+                        color: on ? Sig.cyan : s.line,
+                        shape: BoxShape.circle,
+                      ),
+                    ),
+                  ],
                 ),
               ),
-            ],
-          ),
-        ),
-      );
-    }
-
-    return Column(
-      children: [
-        for (var i = 0; i < ways.length; i += 2) ...[
-          if (i > 0) const SizedBox(height: 10),
-          Row(
-            children: [
-              tile(ways[i]),
-              const SizedBox(width: 10),
-              if (i + 1 < ways.length) tile(ways[i + 1]) else const Spacer(),
-            ],
-          ),
-        ],
-      ],
+          ],
+        );
+      },
     );
   }
 }
@@ -711,20 +797,11 @@ class AppSettings extends StatelessWidget {
             ),
           ],
         ),
-        const SettingsCard(id: 'update', child: _About()),
         SettingsSection(
-          children: [
-            SettingRow(
-              id: 'logs',
-              icon: Ph.fileText,
-              title: l.settingsLogs,
-              caption: l.settingsLogsCaption,
-              onTap: () => Navigator.of(context).push(
-                MaterialPageRoute<void>(builder: (_) => const LogsScreen()),
-              ),
-            ),
-          ],
+          title: l.settingsPermissions,
+          children: const [_Permissions()],
         ),
+        const SettingsCard(id: 'news', child: _About()),
       ],
     );
   }
@@ -926,21 +1003,6 @@ class _About extends StatefulWidget {
 }
 
 class _AboutState extends State<_About> {
-  var _checking = false;
-
-  Future<void> _check() async {
-    final u = LinksyScope.read(context).updates;
-    setState(() => _checking = true);
-    final found = await u.check();
-    if (!mounted) return;
-    setState(() => _checking = false);
-    if (found) {
-      await showUpdate(context);
-    } else {
-      showMessage(context, context.l10n.updateNewest(u.installed ?? ''));
-    }
-  }
-
   @override
   Widget build(BuildContext context) {
     final s = Sig.of(context);
@@ -982,14 +1044,66 @@ class _AboutState extends State<_About> {
             await showWhatsNew(context, v, highlights(v));
           },
         ),
-        const SizedBox(height: 10),
-        SettingsPill(
-          icon: Ph.arrowCircleUp,
-          label: l.updateCheck,
-          busy: _checking,
-          onTap: _checking ? null : _check,
-        ),
       ],
+    );
+  }
+}
+
+/// How many of Linksy's permissions are allowed; opens the sheet that asks
+/// Android for the rest. Read again on return.
+class _Permissions extends StatefulWidget {
+  const _Permissions();
+
+  @override
+  State<_Permissions> createState() => _PermissionsState();
+}
+
+class _PermissionsState extends State<_Permissions>
+    with WidgetsBindingObserver {
+  int? _allowed;
+
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addObserver(this);
+    _read();
+  }
+
+  @override
+  void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
+    super.dispose();
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    if (state == AppLifecycleState.resumed) _read();
+  }
+
+  Future<void> _read() async {
+    final p = await LinksyPlatform.permissions();
+    if (!mounted || p == null) return;
+    setState(
+      () => _allowed = [p.notifications, p.camera].where((x) => x).length,
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final l = context.l10n;
+    return SettingRow(
+      id: 'permissions',
+      icon: Ph.shieldCheck,
+      title: l.settingsPermissionsRow,
+      caption: switch (_allowed) {
+        null => l.settingsPermissionsWhat,
+        2 => l.settingsPermissionsBoth,
+        final n => l.settingsPermissionsSome(n),
+      },
+      onTap: () async {
+        await showPermissions(context);
+        await _read();
+      },
     );
   }
 }
@@ -1073,7 +1187,7 @@ Future<String?> askRelay(BuildContext context, String? current) =>
       keyboardType: TextInputType.url,
     );
 
-/// One line of text; null when dismissed.
+/// One line of text, in a sheet from the bottom; null when dismissed.
 Future<String?> askSettingText(
   BuildContext context, {
   required String current,
@@ -1084,54 +1198,70 @@ Future<String?> askSettingText(
   TextInputType? keyboardType,
 }) {
   final text = TextEditingController(text: current);
-  return showDialog<String>(
+  return showModalBottomSheet<String>(
     context: context,
-    builder: (dialog) {
-      final s = Sig.of(dialog);
-      return Dialog(
-        child: Padding(
-          padding: const EdgeInsets.fromLTRB(24, 28, 24, 16),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              Text(
-                title(dialog.l10n),
-                textAlign: TextAlign.center,
-                style: sora(21, color: s.ink),
-              ),
-              const SizedBox(height: 6),
-              Text(
-                caption(dialog.l10n),
-                textAlign: TextAlign.center,
-                style: TextStyle(color: s.muted),
-              ),
-              const SizedBox(height: 20),
-              TextField(
-                controller: text,
-                autofocus: true,
-                maxLength: maxLength,
-                keyboardType: keyboardType,
-                autocorrect: keyboardType == null,
-                decoration: hint == null
-                    ? null
-                    : InputDecoration(hintText: hint),
-                style: sora(18, weight: FontWeight.w500, color: s.ink),
-                onSubmitted: (v) => Navigator.of(dialog).pop(v.trim()),
-              ),
-              const SizedBox(height: 8),
-              SigButton(
-                label: dialog.l10n.settingsSave,
-                expand: true,
-                onTap: () => Navigator.of(dialog).pop(text.text.trim()),
-              ),
-              SigButton(
-                label: dialog.l10n.settingsCancel,
-                kind: SigButtonKind.quiet,
-                expand: true,
-                onTap: () => Navigator.of(dialog).pop(),
-              ),
-            ],
+    isScrollControlled: true,
+    builder: (sheet) {
+      final s = Sig.of(sheet);
+      return Padding(
+        // Above the keyboard.
+        padding: EdgeInsets.only(bottom: MediaQuery.viewInsetsOf(sheet).bottom),
+        child: SafeArea(
+          child: Padding(
+            padding: const EdgeInsets.fromLTRB(20, 0, 20, 12),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                Text(
+                  title(sheet.l10n),
+                  style: sora(22, weight: FontWeight.w700, color: s.ink),
+                ),
+                const SizedBox(height: 6),
+                Text(
+                  caption(sheet.l10n),
+                  style: TextStyle(color: s.muted, fontSize: 14, height: 1.4),
+                ),
+                const SizedBox(height: 18),
+                Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 18),
+                  decoration: BoxDecoration(
+                    color: s.raised,
+                    borderRadius: BorderRadius.circular(Radii.md + 2),
+                  ),
+                  child: TextField(
+                    controller: text,
+                    autofocus: true,
+                    maxLength: maxLength,
+                    keyboardType: keyboardType,
+                    autocorrect: keyboardType == null,
+                    decoration: InputDecoration(
+                      filled: false,
+                      border: InputBorder.none,
+                      enabledBorder: InputBorder.none,
+                      focusedBorder: InputBorder.none,
+                      counterText: '',
+                      hintText: hint,
+                      hintStyle: TextStyle(color: s.faint),
+                    ),
+                    style: sora(18, weight: FontWeight.w500, color: s.ink),
+                    onSubmitted: (v) => Navigator.of(sheet).pop(v.trim()),
+                  ),
+                ),
+                const SizedBox(height: 16),
+                SigButton(
+                  label: sheet.l10n.settingsSave,
+                  expand: true,
+                  onTap: () => Navigator.of(sheet).pop(text.text.trim()),
+                ),
+                SigButton(
+                  label: sheet.l10n.settingsCancel,
+                  kind: SigButtonKind.quiet,
+                  expand: true,
+                  onTap: () => Navigator.of(sheet).pop(),
+                ),
+              ],
+            ),
           ),
         ),
       );

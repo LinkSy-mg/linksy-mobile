@@ -1178,6 +1178,9 @@ class AppLocalizationsIt extends AppLocalizations {
   String get settingsConnection => 'Connessione';
 
   @override
+  String get settingsWays => 'Come raggiunge i tuoi computer';
+
+  @override
   String get settingsStayConnected => 'Resta connesso';
 
   @override
