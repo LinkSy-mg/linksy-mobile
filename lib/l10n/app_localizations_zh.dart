@@ -2046,6 +2046,14 @@ class AppLocalizationsZh extends AppLocalizations {
   String get updateLater => '稍后';
 
   @override
+  String updateWhatChanged(String version) {
+    return '$version 的更新内容';
+  }
+
+  @override
+  String get updateToInstall => '将要安装';
+
+  @override
   String updateDownloading(String percent) {
     return '正在下载，$percent%';
   }

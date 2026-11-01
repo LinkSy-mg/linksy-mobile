@@ -560,6 +560,8 @@
   "updateBody": "Ity no {current}. Maka sy manamarina ny fanavaozana ny Linksy, avy eo i Android no mangataka anao hametraka azy.",
   "updateNow": "Havaozy izao",
   "updateLater": "Any aoriana",
+  "updateWhatChanged": "Ny niova ao amin'ny {version}",
+  "updateToInstall": "Hapetraka",
   "updateDownloading": "Maka, {percent}%",
   "updateInstalling": "Mametraka azy i Android…",
   "updateNewest": "Linksy {version} no vaovao indrindra.",

@@ -2069,6 +2069,14 @@ class AppLocalizationsJa extends AppLocalizations {
   String get updateLater => '後で';
 
   @override
+  String updateWhatChanged(String version) {
+    return '$version の変更点';
+  }
+
+  @override
+  String get updateToInstall => 'インストールされるもの';
+
+  @override
   String updateDownloading(String percent) {
     return 'ダウンロード中 $percent%';
   }

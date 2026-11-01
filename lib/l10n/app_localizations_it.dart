@@ -2123,6 +2123,14 @@ class AppLocalizationsIt extends AppLocalizations {
   String get updateLater => 'Più tardi';
 
   @override
+  String updateWhatChanged(String version) {
+    return 'Cosa cambia nella $version';
+  }
+
+  @override
+  String get updateToInstall => 'Da installare';
+
+  @override
   String updateDownloading(String percent) {
     return 'Download, $percent%';
   }

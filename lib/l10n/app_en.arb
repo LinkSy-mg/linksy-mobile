@@ -2892,6 +2892,19 @@
   "@updateLater": {
     "description": "Closes the update sheet"
   },
+  "updateWhatChanged": "What changed in {version}",
+  "@updateWhatChanged": {
+    "description": "Update sheet: title of the release notes card",
+    "placeholders": {
+      "version": {
+        "type": "String"
+      }
+    }
+  },
+  "updateToInstall": "To be installed",
+  "@updateToInstall": {
+    "description": "Update sheet: small label above the file that will be installed"
+  },
   "updateDownloading": "Downloading, {percent}%",
   "@updateDownloading": {
     "description": "Download progress",

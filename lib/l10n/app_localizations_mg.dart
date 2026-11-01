@@ -2120,6 +2120,14 @@ class AppLocalizationsMg extends AppLocalizations {
   String get updateLater => 'Any aoriana';
 
   @override
+  String updateWhatChanged(String version) {
+    return 'Ny niova ao amin\'ny $version';
+  }
+
+  @override
+  String get updateToInstall => 'Hapetraka';
+
+  @override
   String updateDownloading(String percent) {
     return 'Maka, $percent%';
   }

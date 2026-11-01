@@ -3474,6 +3474,18 @@ abstract class AppLocalizations {
   /// **'Later'**
   String get updateLater;
 
+  /// Update sheet: title of the release notes card
+  ///
+  /// In en, this message translates to:
+  /// **'What changed in {version}'**
+  String updateWhatChanged(String version);
+
+  /// Update sheet: small label above the file that will be installed
+  ///
+  /// In en, this message translates to:
+  /// **'To be installed'**
+  String get updateToInstall;
+
   /// Download progress
   ///
   /// In en, this message translates to:

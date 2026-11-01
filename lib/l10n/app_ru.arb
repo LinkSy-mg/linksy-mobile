@@ -560,6 +560,8 @@
   "updateBody": "Сейчас установлена {current}. Linksy скачивает обновление и проверяет его, затем Android просит установить.",
   "updateNow": "Обновить сейчас",
   "updateLater": "Позже",
+  "updateWhatChanged": "Что нового в {version}",
+  "updateToInstall": "Будет установлено",
   "updateDownloading": "Загрузка, {percent}%",
   "updateInstalling": "Android устанавливает…",
   "updateNewest": "Linksy {version} — последняя версия.",

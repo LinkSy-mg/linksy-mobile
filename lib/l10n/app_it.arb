@@ -560,6 +560,8 @@
   "updateBody": "Hai la {current}. Linksy scarica l’aggiornamento e lo verifica, poi Android ti chiede di installarlo.",
   "updateNow": "Aggiorna ora",
   "updateLater": "Più tardi",
+  "updateWhatChanged": "Cosa cambia nella {version}",
+  "updateToInstall": "Da installare",
   "updateDownloading": "Download, {percent}%",
   "updateInstalling": "Android lo sta installando…",
   "updateNewest": "Linksy {version} è la versione più recente.",

@@ -2144,6 +2144,14 @@ class AppLocalizationsRu extends AppLocalizations {
   String get updateLater => 'Позже';
 
   @override
+  String updateWhatChanged(String version) {
+    return 'Что нового в $version';
+  }
+
+  @override
+  String get updateToInstall => 'Будет установлено';
+
+  @override
   String updateDownloading(String percent) {
     return 'Загрузка, $percent%';
   }

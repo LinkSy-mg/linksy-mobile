@@ -560,6 +560,8 @@
   "updateBody": "現在は {current} です。Linksy が更新をダウンロードして確認し、Android がインストールの確認を求めます。",
   "updateNow": "今すぐ更新",
   "updateLater": "後で",
+  "updateWhatChanged": "{version} の変更点",
+  "updateToInstall": "インストールされるもの",
   "updateDownloading": "ダウンロード中 {percent}%",
   "updateInstalling": "Android がインストールしています…",
   "updateNewest": "Linksy {version} が最新です。",

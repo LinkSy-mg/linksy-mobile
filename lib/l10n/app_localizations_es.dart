@@ -2121,6 +2121,14 @@ class AppLocalizationsEs extends AppLocalizations {
   String get updateLater => 'Más tarde';
 
   @override
+  String updateWhatChanged(String version) {
+    return 'Qué cambia en $version';
+  }
+
+  @override
+  String get updateToInstall => 'Se instalará';
+
+  @override
   String updateDownloading(String percent) {
     return 'Descargando, $percent %';
   }

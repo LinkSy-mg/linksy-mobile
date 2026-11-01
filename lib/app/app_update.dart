@@ -13,10 +13,15 @@ enum UpdatePhase { idle, downloading, installing, failed }
 /// Android release is out, then download, check and install with one tap
 /// and Android's confirmation. Never downloads anything by itself.
 class AppUpdate extends ChangeNotifier {
-  AppUpdate(this._checker, this._downloads);
+  AppUpdate(this._checker, this._downloads, {this.preview = false});
 
   final UpdateChecker? _checker;
   final Directory? _downloads;
+
+  /// Motion test build: never offers anything by itself; Check for Updates
+  /// shows the newest release whatever its version, and Update Now only
+  /// pretends to download it.
+  final bool preview;
   StreamSubscription<String>? _statuses;
 
   /// This app's version, "0.2.3".
@@ -41,14 +46,45 @@ class AppUpdate extends ChangeNotifier {
       // Nothing there.
     }
     installed = (await LinksyPlatform.appVersion())?.split(' ').first;
+    if (preview) return;
     _offer(_checker?.cached());
     _offer(await _checker?.refresh());
   }
 
   /// Asks GitHub now (the About page's Check for Updates). Whether one is out.
   Future<bool> check() async {
+    if (preview) {
+      available = await _checker?.refresh(force: true) ?? _checker?.cached();
+      notifyListeners();
+      return available != null;
+    }
     _offer(await _checker?.refresh(force: true));
     return available != null;
+  }
+
+  /// The preview's sheet closed: nothing stays offered.
+  void endPreview() {
+    if (!preview) return;
+    available = null;
+    phase = UpdatePhase.idle;
+    progress = 0;
+    notifyListeners();
+  }
+
+  Future<void> _pretend() async {
+    phase = UpdatePhase.downloading;
+    progress = 0;
+    failure = null;
+    notifyListeners();
+    for (var i = 1; i <= 40 && available != null; i++) {
+      await Future<void>.delayed(const Duration(milliseconds: 60));
+      progress = i / 40;
+      notifyListeners();
+    }
+    phase = UpdatePhase.installing;
+    notifyListeners();
+    await Future<void>.delayed(const Duration(seconds: 2));
+    if (available != null) _fail('preview: nothing was installed');
   }
 
   void _offer(AppRelease? release) {
@@ -60,6 +96,9 @@ class AppUpdate extends ChangeNotifier {
 
   /// Downloads, checks and installs [available].
   Future<void> run() async {
+    if (preview && available != null && phase != UpdatePhase.downloading) {
+      return _pretend();
+    }
     final release = available, dir = _downloads;
     if (release == null || dir == null || phase == UpdatePhase.downloading) {
       return;
