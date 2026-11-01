@@ -10,10 +10,12 @@ import android.content.Intent
 import android.content.pm.ServiceInfo
 import android.hardware.input.InputManager
 import android.media.projection.MediaProjectionManager
+import android.net.wifi.WifiManager
 import android.os.Build
 import android.os.Handler
 import android.os.IBinder
 import android.os.Looper
+import android.os.PowerManager
 import android.view.InputDevice
 import android.util.Log
 import app.linksy.MainActivity
@@ -75,6 +77,7 @@ class ShareService : Service() {
                 }
             }
             shares[session] = share
+            holdAwake()
             if (screen) watchControl()
         } catch (e: Exception) {
             Log.w("linksy", "couldn't start sharing", e)
@@ -112,6 +115,7 @@ class ShareService : Service() {
         if (shares.isEmpty()) {
             if (watching) inputs.unregisterInputDeviceListener(inputListener)
             watching = false
+            letGo()
             stopForeground(STOP_FOREGROUND_REMOVE)
             stopSelf()
         }
@@ -124,6 +128,32 @@ class ShareService : Service() {
 
     /// Peer names by session, for the notification.
     private val peers = mutableMapOf<String, String>()
+
+    // With the phone locked, the CPU sleeps and Wi-Fi saves power, and a webcam
+    // or microphone freezes on the computer: both are held while anything is shared.
+    private var wake: PowerManager.WakeLock? = null
+    private var wifi: WifiManager.WifiLock? = null
+
+    private fun holdAwake() {
+        if (wake == null) {
+            wake = (getSystemService(Context.POWER_SERVICE) as PowerManager)
+                .newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, "linksy:sharing")
+                .apply { setReferenceCounted(false); acquire() }
+        }
+        if (wifi == null) {
+            @Suppress("DEPRECATION")
+            wifi = (applicationContext.getSystemService(Context.WIFI_SERVICE) as WifiManager)
+                .createWifiLock(WifiManager.WIFI_MODE_FULL_HIGH_PERF, "linksy:sharing")
+                .apply { setReferenceCounted(false); acquire() }
+        }
+    }
+
+    private fun letGo() {
+        wake?.takeIf { it.isHeld }?.release()
+        wake = null
+        wifi?.takeIf { it.isHeld }?.release()
+        wifi = null
+    }
 
     // A computer that drives the phone over the cable (docs/protocol.md §4.11, desktop
     // 0.11) plugs a virtual touchscreen into it (Android Open Accessory 2.0) and asks
