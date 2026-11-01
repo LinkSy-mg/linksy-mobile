@@ -1145,6 +1145,17 @@ class AppLocalizationsMg extends AppLocalizations {
   String get settingsTitle => 'Fikirana';
 
   @override
+  String get settingsSearch => 'Hikaroka ao amin\'ny fikirana';
+
+  @override
+  String settingsNothingMatches(String query) {
+    return 'Tsy misy mifanaraka amin\'ny « $query »';
+  }
+
+  @override
+  String get settingsRecommended => 'Soso-kevitra';
+
+  @override
   String get settingsReceiving => 'Fandraisana';
 
   @override

@@ -1143,6 +1143,17 @@ class AppLocalizationsPt extends AppLocalizations {
   String get settingsTitle => 'Configurações';
 
   @override
+  String get settingsSearch => 'Pesquisar nas configurações';
+
+  @override
+  String settingsNothingMatches(String query) {
+    return 'Nada corresponde a “$query”';
+  }
+
+  @override
+  String get settingsRecommended => 'Recomendado';
+
+  @override
   String get settingsReceiving => 'Recebimento';
 
   @override

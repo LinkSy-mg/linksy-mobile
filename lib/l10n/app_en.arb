@@ -1527,6 +1527,23 @@
   "@settingsTitle": {
     "description": "Title of the Settings screen"
   },
+  "settingsSearch": "Search settings",
+  "@settingsSearch": {
+    "description": "Settings: placeholder of the search field"
+  },
+  "settingsNothingMatches": "Nothing matches “{query}”",
+  "@settingsNothingMatches": {
+    "description": "Settings search: no setting matches",
+    "placeholders": {
+      "query": {
+        "type": "String"
+      }
+    }
+  },
+  "settingsRecommended": "Recommended",
+  "@settingsRecommended": {
+    "description": "Settings: label of the card suggesting one thing to set up next"
+  },
   "settingsReceiving": "Receiving",
   "@settingsReceiving": {
     "description": "Settings section label: receiving files"

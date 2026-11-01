@@ -1144,6 +1144,17 @@ class AppLocalizationsEs extends AppLocalizations {
   String get settingsTitle => 'Ajustes';
 
   @override
+  String get settingsSearch => 'Buscar en ajustes';
+
+  @override
+  String settingsNothingMatches(String query) {
+    return 'Nada coincide con «$query»';
+  }
+
+  @override
+  String get settingsRecommended => 'Recomendado';
+
+  @override
   String get settingsReceiving => 'Recepción';
 
   @override

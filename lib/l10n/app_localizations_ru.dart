@@ -1165,6 +1165,17 @@ class AppLocalizationsRu extends AppLocalizations {
   String get settingsTitle => 'Настройки';
 
   @override
+  String get settingsSearch => 'Поиск в настройках';
+
+  @override
+  String settingsNothingMatches(String query) {
+    return 'Ничего не найдено по запросу «$query»';
+  }
+
+  @override
+  String get settingsRecommended => 'Рекомендуем';
+
+  @override
   String get settingsReceiving => 'Получение';
 
   @override

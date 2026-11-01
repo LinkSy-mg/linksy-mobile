@@ -1117,6 +1117,17 @@ class AppLocalizationsJa extends AppLocalizations {
   String get settingsTitle => '設定';
 
   @override
+  String get settingsSearch => '設定を検索';
+
+  @override
+  String settingsNothingMatches(String query) {
+    return '「$query」に一致する設定はありません';
+  }
+
+  @override
+  String get settingsRecommended => 'おすすめ';
+
+  @override
   String get settingsReceiving => '受信';
 
   @override

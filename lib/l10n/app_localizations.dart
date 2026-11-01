@@ -1896,6 +1896,24 @@ abstract class AppLocalizations {
   /// **'Settings'**
   String get settingsTitle;
 
+  /// Settings: placeholder of the search field
+  ///
+  /// In en, this message translates to:
+  /// **'Search settings'**
+  String get settingsSearch;
+
+  /// Settings search: no setting matches
+  ///
+  /// In en, this message translates to:
+  /// **'Nothing matches “{query}”'**
+  String settingsNothingMatches(String query);
+
+  /// Settings: label of the card suggesting one thing to set up next
+  ///
+  /// In en, this message translates to:
+  /// **'Recommended'**
+  String get settingsRecommended;
+
   /// Settings section label: receiving files
   ///
   /// In en, this message translates to:

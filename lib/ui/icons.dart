@@ -87,6 +87,10 @@ abstract final class Ph {
   static const presentation = IconData(0xe654, fontFamily: 'PhosphorRegular');
   static const images = IconData(0xe836, fontFamily: 'PhosphorRegular');
   static const folderOpen = IconData(0xe256, fontFamily: 'PhosphorRegular');
+  static const magnifyingGlass = IconData(
+    0xe30c,
+    fontFamily: 'PhosphorRegular',
+  );
   static const lockSimple = IconData(0xe308, fontFamily: 'PhosphorRegular');
   static const phoneCall = IconData(0xe3ba, fontFamily: 'PhosphorRegular');
   static const caretLeft = IconData(0xe138, fontFamily: 'PhosphorRegular');

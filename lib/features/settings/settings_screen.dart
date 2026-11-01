@@ -16,316 +16,11 @@ import '../permissions/permissions_sheet.dart';
 import '../update/update_sheet.dart';
 import '../../ui/sig.dart';
 
-class SettingsScreen extends StatelessWidget {
+class SettingsScreen extends StatefulWidget {
   const SettingsScreen({super.key});
 
   @override
-  Widget build(BuildContext context) {
-    final c = LinksyScope.of(context);
-    final st = c.settings;
-    final s = Sig.of(context);
-    final demo = c.node is DemoNode ? c.node as DemoNode : null;
-
-    Future<void> update(NodeSettings next) =>
-        report(context, c.updateSettings(next));
-
-    return Scaffold(
-      body: SafeArea(
-        bottom: false,
-        child: st == null
-            ? const SizedBox.shrink()
-            : ListView(
-                padding: const EdgeInsets.fromLTRB(16, 8, 16, 40),
-                children: [
-                  Row(
-                    children: [
-                      RoundButton(
-                        icon: Ph.arrowLeft,
-                        tooltip: context.l10n.settingsBack,
-                        onTap: () => Navigator.of(context).maybePop(),
-                      ),
-                    ],
-                  ),
-                  Padding(
-                    padding: const EdgeInsets.fromLTRB(8, 20, 8, 20),
-                    child: Text(
-                      context.l10n.settingsTitle,
-                      style: sora(34, weight: FontWeight.w700, color: s.ink),
-                    ),
-                  ),
-                  _ThisPhone(
-                    name: st.name,
-                    shortId: c.node.info.shortId,
-                    picture: c.ownPicture,
-                    pictureVersion: c.pictureVersion,
-                    onRename: () async {
-                      final name = await _askName(context, st.name);
-                      if (name != null && name.isNotEmpty && name != st.name) {
-                        await update(st.copyWith(name: name));
-                      }
-                    },
-                  ),
-                  SectionLabel(context.l10n.settingsReceiving),
-                  _Group(
-                    children: [
-                      _Row(
-                        icon: Ph.folderSimple,
-                        title: context.l10n.settingsSaveLocation,
-                        // Files land in the app's folder, then move to
-                        // Downloads (Android 10+).
-                        caption: context.l10n.settingsSaveLocationPath,
-                      ),
-                      _Row(
-                        icon: Ph.shieldCheck,
-                        title: context.l10n.settingsAcceptFromMyDevices,
-                        caption:
-                            context.l10n.settingsAcceptFromMyDevicesCaption,
-                        trailing: Switch(
-                          value: st.autoAccept,
-                          onChanged: (v) => update(st.copyWith(autoAccept: v)),
-                        ),
-                      ),
-                    ],
-                  ),
-                  SectionLabel(context.l10n.settingsConnection),
-                  _Group(
-                    children: [
-                      _Row(
-                        icon: Ph.lightning,
-                        title: context.l10n.settingsStayConnected,
-                        caption: context.l10n.settingsStayConnectedCaption,
-                        trailing: Switch(
-                          value: st.stayConnected,
-                          onChanged: (v) =>
-                              update(st.copyWith(stayConnected: v)),
-                        ),
-                      ),
-                      _Row(
-                        icon: Ph.deviceMobile,
-                        title: context.l10n.settingsKeepRunning,
-                        caption: context.l10n.settingsKeepRunningCaption,
-                        trailing: Switch(
-                          value: c.stayRunning,
-                          onChanged: c.setStayRunning,
-                        ),
-                      ),
-                      _Row(
-                        icon: Ph.globeHemisphereWest,
-                        title: context.l10n.settingsAwayFromHome,
-                        caption: context.l10n.settingsAwayFromHomeCaption,
-                        trailing: Switch(
-                          value: st.away,
-                          onChanged: (v) => update(st.copyWith(away: v)),
-                        ),
-                      ),
-                      // Direct links (§4.17) for big transfers
-                      _Row(
-                        icon: Ph.arrowsLeftRight,
-                        title: context.l10n.settingsDirect,
-                        caption: context.l10n.settingsDirectCaption,
-                        trailing: Switch(
-                          value: c.directOn,
-                          onChanged: c.setDirectOn,
-                        ),
-                      ),
-                      // Self-hosting: a relay of the user's own (linksy-server).
-                      _Row(
-                        icon: Ph.network,
-                        title: context.l10n.settingsRelay,
-                        caption: st.relay ?? context.l10n.settingsRelayDefault,
-                        onTap: () async {
-                          final relay = await _askRelay(context, st.relay);
-                          // Null: dismissed. Empty: back to Linksy's own.
-                          if (relay == null || relay == (st.relay ?? '')) {
-                            return;
-                          }
-                          await update(
-                            st.copyWith(relay: relay.isEmpty ? null : relay),
-                          );
-                        },
-                      ),
-                    ],
-                  ),
-                  SectionLabel(context.l10n.settingsWithYourComputers),
-                  _Group(
-                    children: [
-                      _Row(
-                        icon: Ph.phoneCall,
-                        title: context.l10n.settingsPauseMusic,
-                        caption: context.l10n.settingsPauseMusicCaption,
-                        trailing: Switch(
-                          value: c.pauseOnCalls,
-                          onChanged: c.setPauseOnCalls,
-                        ),
-                      ),
-                      _Row(
-                        icon: Ph.musicNotes,
-                        title: context.l10n.settingsMediaNotice,
-                        caption: context.l10n.settingsMediaNoticeCaption,
-                        trailing: Switch(
-                          value: c.mediaNotice,
-                          onChanged: c.setMediaNotice,
-                        ),
-                      ),
-                      _Row(
-                        icon: Ph.mouseSimple,
-                        title: context.l10n.settingsReverseScroll,
-                        caption: context.l10n.settingsReverseScrollCaption,
-                        trailing: Switch(
-                          value: c.scrollReversed,
-                          onChanged: c.setScrollReversed,
-                        ),
-                      ),
-                      _Row(
-                        icon: Ph.folderOpen,
-                        title: context.l10n.settingsBrowseFiles,
-                        caption: c.filesFolder == null
-                            ? context.l10n.settingsBrowseFilesChoose
-                            : context.l10n.settingsSharesFolder(c.filesFolder!),
-                        onTap: c.pickFilesFolder,
-                        trailing: Switch(
-                          value: c.sharingFiles && c.filesFolder != null,
-                          onChanged: (v) => v && c.filesFolder == null
-                              ? c.pickFilesFolder()
-                              : c.setSharingFiles(v),
-                        ),
-                      ),
-                      _Row(
-                        icon: Ph.userCircle,
-                        title: context.l10n.settingsPicture,
-                        caption: c.ownPicture == null
-                            ? context.l10n.settingsPictureChoose
-                            : context.l10n.settingsPictureChange,
-                        onTap: c.pickOwnPicture,
-                        trailing: c.ownPicture == null
-                            ? null
-                            : TextButton(
-                                onPressed: c.removeOwnPicture,
-                                child: Text(context.l10n.settingsPictureRemove),
-                              ),
-                      ),
-                      _Row(
-                        icon: Ph.mapPin,
-                        title: context.l10n.settingsLocate,
-                        caption: context.l10n.settingsLocateCaption,
-                        trailing: Switch(
-                          value: c.locatable,
-                          onChanged: (v) async {
-                            final ok = await c.setLocatable(v);
-                            if (!ok && context.mounted) {
-                              showMessage(
-                                context,
-                                context.l10n.settingsLocatePermission,
-                              );
-                            }
-                          },
-                        ),
-                      ),
-                      _Row(
-                        icon: Ph.images,
-                        title: context.l10n.settingsPhotoFolder,
-                        caption: c.photosFolder == null
-                            ? context.l10n.settingsPhotoFolderChoose
-                            : context.l10n.settingsPhotoFolderBacksUp(
-                                c.photosFolder!,
-                              ),
-                        onTap: c.pickPhotosFolder,
-                      ),
-                    ],
-                  ),
-                  SectionLabel(context.l10n.settingsThisApp),
-                  _Group(
-                    children: [
-                      _Row(
-                        icon: Ph.globe,
-                        title: context.l10n.settingsLanguage,
-                        caption: languages
-                            .firstWhere(
-                              (l) => l.code == c.locale.value.languageCode,
-                              orElse: () => languages.first,
-                            )
-                            .name,
-                        onTap: () => showLanguagePicker(context),
-                      ),
-                      const _ThemeChoice(),
-                      _Row(
-                        icon: Ph.sparkle,
-                        title: context.l10n.newsTitle,
-                        onTap: () async {
-                          final v = (await LinksyPlatform.appVersion())
-                              ?.split(' ')
-                              .first;
-                          if (v == null || !context.mounted) return;
-                          await showWhatsNew(context, v, highlights(v));
-                        },
-                      ),
-                      const _CheckUpdates(),
-                      _Row(
-                        icon: Ph.fileText,
-                        title: context.l10n.settingsLogs,
-                        caption: context.l10n.settingsLogsCaption,
-                        onTap: () => Navigator.of(context).push(
-                          MaterialPageRoute<void>(
-                            builder: (_) => const LogsScreen(),
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
-                  SectionLabel(context.l10n.settingsPermissions),
-                  const _Group(children: [_Permissions()]),
-                  if (demo != null) ...[
-                    SectionLabel(context.l10n.settingsDemo),
-                    _Group(
-                      children: [
-                        Padding(
-                          padding: const EdgeInsets.all(16),
-                          child: Text(
-                            context.l10n.settingsDemoCaption,
-                            style: TextStyle(color: s.muted, height: 1.4),
-                          ),
-                        ),
-                        _Row(
-                          icon: Ph.downloadSimple,
-                          title: context.l10n.settingsDemoReceiveFiles,
-                          onTap: demo.simulateIncomingFiles,
-                        ),
-                        _Row(
-                          icon: Ph.handshake,
-                          title: context.l10n.settingsDemoReceivePairing,
-                          onTap: demo.simulateIncomingPairing,
-                        ),
-                        _Row(
-                          icon: Ph.clipboardText,
-                          title: context.l10n.settingsDemoReceiveClipboard,
-                          onTap: demo.simulateClipboard,
-                        ),
-                      ],
-                    ),
-                  ],
-                  const SizedBox(height: 40),
-                  const Center(child: AppIcon(size: 52)),
-                  const SizedBox(height: 10),
-                  Text(
-                    context.l10n.settingsTagline,
-                    textAlign: TextAlign.center,
-                    style: TextStyle(color: s.faint, fontSize: 13, height: 1.5),
-                  ),
-                  const SizedBox(height: 6),
-                  // Which build is installed (updates from GitHub are manual).
-                  FutureBuilder<String?>(
-                    future: LinksyPlatform.appVersion(),
-                    builder: (context, v) => Text(
-                      v.data == null ? '' : 'Linksy ${v.data}',
-                      textAlign: TextAlign.center,
-                      style: TextStyle(color: s.faint, fontSize: 12),
-                    ),
-                  ),
-                ],
-              ),
-      ),
-    );
-  }
+  State<SettingsScreen> createState() => _SettingsScreenState();
 
   static Future<String?> _askName(BuildContext context, String current) =>
       _askText(
@@ -425,19 +120,27 @@ class _ThemeChoice extends StatelessWidget {
     final t = context.l10n;
     return ValueListenableBuilder(
       valueListenable: c.themeMode,
-      builder: (context, mode, _) => Padding(
-        padding: const EdgeInsets.fromLTRB(16, 14, 14, 14),
+      builder: (context, mode, _) => Container(
+        padding: const EdgeInsets.fromLTRB(12, 12, 12, 12),
+        decoration: BoxDecoration(
+          color: s.card,
+          borderRadius: BorderRadius.circular(Radii.lg),
+        ),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Row(
               children: [
-                const Icon(Ph.circleHalf, color: Sig.blue, size: 22),
-                const SizedBox(width: 14),
+                const IconCircle(
+                  icon: Ph.circleHalf,
+                  color: Sig.blue,
+                  size: 40,
+                ),
+                const SizedBox(width: 12),
                 Text(
                   t.settingsAppearance,
                   style: TextStyle(
-                    fontSize: 15.5,
+                    fontSize: 16,
                     fontWeight: FontWeight.w600,
                     color: s.ink,
                   ),
@@ -579,28 +282,6 @@ class _ThisPhone extends StatelessWidget {
   }
 }
 
-class _Group extends StatelessWidget {
-  const _Group({required this.children});
-
-  final List<Widget> children;
-
-  @override
-  Widget build(BuildContext context) {
-    final s = Sig.of(context);
-    return SigCard(
-      padding: EdgeInsets.zero,
-      child: Column(
-        children: [
-          for (var i = 0; i < children.length; i++) ...[
-            if (i > 0) Divider(height: 1, thickness: 1, color: s.line),
-            children[i],
-          ],
-        ],
-      ),
-    );
-  }
-}
-
 /// Check for Updates: asks GitHub now, then offers Update Now.
 class _CheckUpdates extends StatefulWidget {
   const _CheckUpdates();
@@ -657,12 +338,17 @@ class _Row extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final s = Sig.of(context);
-    final row = Padding(
-      padding: const EdgeInsets.fromLTRB(16, 14, 14, 14),
+    final row = Container(
+      constraints: const BoxConstraints(minHeight: 66),
+      padding: const EdgeInsets.fromLTRB(12, 12, 12, 12),
+      decoration: BoxDecoration(
+        color: s.card,
+        borderRadius: BorderRadius.circular(Radii.lg),
+      ),
       child: Row(
         children: [
-          Icon(icon, color: Sig.blue, size: 22),
-          const SizedBox(width: 14),
+          IconCircle(icon: icon, color: Sig.blue, size: 40),
+          const SizedBox(width: 12),
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -670,7 +356,7 @@ class _Row extends StatelessWidget {
                 Text(
                   title,
                   style: TextStyle(
-                    fontSize: 15.5,
+                    fontSize: 16,
                     fontWeight: FontWeight.w600,
                     color: s.ink,
                   ),
@@ -751,4 +437,621 @@ class _PermissionsState extends State<_Permissions>
       await _read();
     },
   );
+}
+
+/// One setting: the words search finds it by, and its row.
+class _Entry {
+  const _Entry(this.terms, this.child);
+
+  final List<String> terms;
+  final Widget child;
+}
+
+class _SettingsScreenState extends State<SettingsScreen> {
+  final _search = TextEditingController();
+
+  @override
+  void dispose() {
+    _search.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final c = LinksyScope.of(context);
+    final st = c.settings;
+    final s = Sig.of(context);
+    final l = context.l10n;
+    final demo = c.node is DemoNode ? c.node as DemoNode : null;
+    if (st == null) return const Scaffold(body: SizedBox.shrink());
+
+    Future<void> update(NodeSettings next) =>
+        report(context, c.updateSettings(next));
+
+    final language = languages
+        .firstWhere(
+          (x) => x.code == c.locale.value.languageCode,
+          orElse: () => languages.first,
+        )
+        .name;
+
+    // Every setting, by section, with what search finds it by.
+    final sections = <(String, List<_Entry>)>[
+      (
+        l.settingsReceiving,
+        [
+          _Entry(
+            [l.settingsSaveLocation, l.settingsSaveLocationPath],
+            _Row(
+              icon: Ph.folderSimple,
+              title: l.settingsSaveLocation,
+              // Files land in the app's folder, then move to Downloads
+              // (Android 10+).
+              caption: l.settingsSaveLocationPath,
+            ),
+          ),
+          _Entry(
+            [
+              l.settingsAcceptFromMyDevices,
+              l.settingsAcceptFromMyDevicesCaption,
+            ],
+            _Row(
+              icon: Ph.shieldCheck,
+              title: l.settingsAcceptFromMyDevices,
+              caption: l.settingsAcceptFromMyDevicesCaption,
+              trailing: Switch(
+                value: st.autoAccept,
+                onChanged: (v) => update(st.copyWith(autoAccept: v)),
+              ),
+            ),
+          ),
+        ],
+      ),
+      (
+        l.settingsConnection,
+        [
+          _Entry(
+            [l.settingsStayConnected, l.settingsStayConnectedCaption],
+            _Row(
+              icon: Ph.lightning,
+              title: l.settingsStayConnected,
+              caption: l.settingsStayConnectedCaption,
+              trailing: Switch(
+                value: st.stayConnected,
+                onChanged: (v) => update(st.copyWith(stayConnected: v)),
+              ),
+            ),
+          ),
+          _Entry(
+            [l.settingsKeepRunning, l.settingsKeepRunningCaption],
+            _Row(
+              icon: Ph.deviceMobile,
+              title: l.settingsKeepRunning,
+              caption: l.settingsKeepRunningCaption,
+              trailing: Switch(
+                value: c.stayRunning,
+                onChanged: c.setStayRunning,
+              ),
+            ),
+          ),
+          _Entry(
+            [l.settingsAwayFromHome, l.settingsAwayFromHomeCaption],
+            _Row(
+              icon: Ph.globeHemisphereWest,
+              title: l.settingsAwayFromHome,
+              caption: l.settingsAwayFromHomeCaption,
+              trailing: Switch(
+                value: st.away,
+                onChanged: (v) => update(st.copyWith(away: v)),
+              ),
+            ),
+          ),
+          // Direct links (§4.17) for big transfers
+          _Entry(
+            [l.settingsDirect, l.settingsDirectCaption],
+            _Row(
+              icon: Ph.arrowsLeftRight,
+              title: l.settingsDirect,
+              caption: l.settingsDirectCaption,
+              trailing: Switch(value: c.directOn, onChanged: c.setDirectOn),
+            ),
+          ),
+          // Self-hosting: a relay of the user's own (linksy-server).
+          _Entry(
+            [l.settingsRelay, st.relay ?? l.settingsRelayDefault],
+            _Row(
+              icon: Ph.network,
+              title: l.settingsRelay,
+              caption: st.relay ?? l.settingsRelayDefault,
+              onTap: () async {
+                final relay = await SettingsScreen._askRelay(context, st.relay);
+                // Null: dismissed. Empty: back to Linksy's own.
+                if (relay == null || relay == (st.relay ?? '')) return;
+                await update(st.copyWith(relay: relay.isEmpty ? null : relay));
+              },
+            ),
+          ),
+        ],
+      ),
+      (
+        l.settingsWithYourComputers,
+        [
+          _Entry(
+            [l.settingsPauseMusic, l.settingsPauseMusicCaption],
+            _Row(
+              icon: Ph.phoneCall,
+              title: l.settingsPauseMusic,
+              caption: l.settingsPauseMusicCaption,
+              trailing: Switch(
+                value: c.pauseOnCalls,
+                onChanged: c.setPauseOnCalls,
+              ),
+            ),
+          ),
+          _Entry(
+            [l.settingsMediaNotice, l.settingsMediaNoticeCaption],
+            _Row(
+              icon: Ph.musicNotes,
+              title: l.settingsMediaNotice,
+              caption: l.settingsMediaNoticeCaption,
+              trailing: Switch(
+                value: c.mediaNotice,
+                onChanged: c.setMediaNotice,
+              ),
+            ),
+          ),
+          _Entry(
+            [l.settingsReverseScroll, l.settingsReverseScrollCaption],
+            _Row(
+              icon: Ph.mouseSimple,
+              title: l.settingsReverseScroll,
+              caption: l.settingsReverseScrollCaption,
+              trailing: Switch(
+                value: c.scrollReversed,
+                onChanged: c.setScrollReversed,
+              ),
+            ),
+          ),
+          _Entry(
+            [l.settingsBrowseFiles, l.settingsBrowseFilesChoose],
+            _Row(
+              icon: Ph.folderOpen,
+              title: l.settingsBrowseFiles,
+              caption: c.filesFolder == null
+                  ? l.settingsBrowseFilesChoose
+                  : l.settingsSharesFolder(c.filesFolder!),
+              onTap: c.pickFilesFolder,
+              trailing: Switch(
+                value: c.sharingFiles && c.filesFolder != null,
+                onChanged: (v) => v && c.filesFolder == null
+                    ? c.pickFilesFolder()
+                    : c.setSharingFiles(v),
+              ),
+            ),
+          ),
+          _Entry(
+            [l.settingsPicture, l.settingsPictureChoose],
+            _Row(
+              icon: Ph.userCircle,
+              title: l.settingsPicture,
+              caption: c.ownPicture == null
+                  ? l.settingsPictureChoose
+                  : l.settingsPictureChange,
+              onTap: c.pickOwnPicture,
+              trailing: c.ownPicture == null
+                  ? null
+                  : TextButton(
+                      onPressed: c.removeOwnPicture,
+                      child: Text(l.settingsPictureRemove),
+                    ),
+            ),
+          ),
+          _Entry(
+            [l.settingsLocate, l.settingsLocateCaption],
+            _Row(
+              icon: Ph.mapPin,
+              title: l.settingsLocate,
+              caption: l.settingsLocateCaption,
+              trailing: Switch(
+                value: c.locatable,
+                onChanged: (v) async {
+                  final ok = await c.setLocatable(v);
+                  if (!ok && context.mounted) {
+                    showMessage(context, context.l10n.settingsLocatePermission);
+                  }
+                },
+              ),
+            ),
+          ),
+          _Entry(
+            [l.settingsPhotoFolder, l.settingsPhotoFolderChoose],
+            _Row(
+              icon: Ph.images,
+              title: l.settingsPhotoFolder,
+              caption: c.photosFolder == null
+                  ? l.settingsPhotoFolderChoose
+                  : l.settingsPhotoFolderBacksUp(c.photosFolder!),
+              onTap: c.pickPhotosFolder,
+            ),
+          ),
+        ],
+      ),
+      (
+        l.settingsThisApp,
+        [
+          _Entry(
+            [l.settingsLanguage, language],
+            _Row(
+              icon: Ph.globe,
+              title: l.settingsLanguage,
+              caption: language,
+              onTap: () => showLanguagePicker(context),
+            ),
+          ),
+          _Entry([
+            l.settingsAppearance,
+            l.settingsThemeSystem,
+            l.settingsThemeLight,
+            l.settingsThemeDark,
+          ], const _ThemeChoice()),
+          _Entry(
+            [l.newsTitle],
+            _Row(
+              icon: Ph.sparkle,
+              title: l.newsTitle,
+              onTap: () async {
+                final v = (await LinksyPlatform.appVersion())?.split(' ').first;
+                if (v == null || !context.mounted) return;
+                await showWhatsNew(context, v, highlights(v));
+              },
+            ),
+          ),
+          _Entry([l.updateCheck], const _CheckUpdates()),
+          _Entry(
+            [l.settingsLogs, l.settingsLogsCaption],
+            _Row(
+              icon: Ph.fileText,
+              title: l.settingsLogs,
+              caption: l.settingsLogsCaption,
+              onTap: () => Navigator.of(context).push(
+                MaterialPageRoute<void>(builder: (_) => const LogsScreen()),
+              ),
+            ),
+          ),
+        ],
+      ),
+      (
+        l.settingsPermissions,
+        [
+          _Entry([
+            l.settingsPermissionsRow,
+            l.settingsPermissionsWhat,
+          ], const _Permissions()),
+        ],
+      ),
+      if (demo != null)
+        (
+          l.settingsDemo,
+          [
+            _Entry(
+              [l.settingsDemoReceiveFiles],
+              _Row(
+                icon: Ph.downloadSimple,
+                title: l.settingsDemoReceiveFiles,
+                caption: l.settingsDemoCaption,
+                onTap: demo.simulateIncomingFiles,
+              ),
+            ),
+            _Entry(
+              [l.settingsDemoReceivePairing],
+              _Row(
+                icon: Ph.handshake,
+                title: l.settingsDemoReceivePairing,
+                onTap: demo.simulateIncomingPairing,
+              ),
+            ),
+            _Entry(
+              [l.settingsDemoReceiveClipboard],
+              _Row(
+                icon: Ph.clipboardText,
+                title: l.settingsDemoReceiveClipboard,
+                onTap: demo.simulateClipboard,
+              ),
+            ),
+          ],
+        ),
+    ];
+
+    final query = _search.text.trim().toLowerCase();
+    final searching = query.isNotEmpty;
+    bool found(String section, _Entry e) =>
+        !searching ||
+        section.toLowerCase().contains(query) ||
+        e.terms.any((t) => t.toLowerCase().contains(query));
+    final shown = [
+      for (final (label, entries) in sections)
+        if (entries.where((e) => found(label, e)).toList() case final list
+            when list.isNotEmpty)
+          (label, list),
+    ];
+
+    return Scaffold(
+      body: SafeArea(
+        bottom: false,
+        child: ListView(
+          padding: const EdgeInsets.fromLTRB(16, 8, 16, 40),
+          keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag,
+          children: [
+            Row(
+              children: [
+                RoundButton(
+                  icon: Ph.arrowLeft,
+                  tooltip: l.settingsBack,
+                  onTap: () => Navigator.of(context).maybePop(),
+                ),
+              ],
+            ),
+            // The mark over the big title.
+            Padding(
+              padding: const EdgeInsets.fromLTRB(8, 18, 8, 16),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const LinksyMark(size: 32),
+                  const SizedBox(height: 8),
+                  Text(
+                    l.settingsTitle,
+                    style: sora(34, weight: FontWeight.w700, color: s.ink),
+                  ),
+                ],
+              ),
+            ),
+            _SearchField(
+              controller: _search,
+              onChanged: (_) => setState(() {}),
+            ),
+            const SizedBox(height: 16),
+            if (!searching) ...[
+              _ThisPhone(
+                name: st.name,
+                shortId: c.node.info.shortId,
+                picture: c.ownPicture,
+                pictureVersion: c.pictureVersion,
+                onRename: () async {
+                  final name = await SettingsScreen._askName(context, st.name);
+                  if (name != null && name.isNotEmpty && name != st.name) {
+                    await update(st.copyWith(name: name));
+                  }
+                },
+              ),
+              const _Recommended(),
+            ],
+            for (final (label, entries) in shown) ...[
+              SectionLabel(label),
+              for (var i = 0; i < entries.length; i++) ...[
+                if (i > 0) const SizedBox(height: 10),
+                entries[i].child,
+              ],
+            ],
+            if (searching && shown.isEmpty)
+              Padding(
+                padding: const EdgeInsets.fromLTRB(8, 24, 8, 0),
+                child: Text(
+                  l.settingsNothingMatches(_search.text.trim()),
+                  style: TextStyle(color: s.muted, fontSize: 15),
+                ),
+              ),
+            if (!searching) ...[
+              const SizedBox(height: 40),
+              const Center(child: AppIcon(size: 52)),
+              const SizedBox(height: 10),
+              Text(
+                l.settingsTagline,
+                textAlign: TextAlign.center,
+                style: TextStyle(color: s.faint, fontSize: 13, height: 1.5),
+              ),
+              const SizedBox(height: 6),
+              // Which build is installed (updates from GitHub are manual).
+              FutureBuilder<String?>(
+                future: LinksyPlatform.appVersion(),
+                builder: (context, v) => Text(
+                  v.data == null ? '' : 'Linksy ${v.data}',
+                  textAlign: TextAlign.center,
+                  style: TextStyle(color: s.faint, fontSize: 12),
+                ),
+              ),
+            ],
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+/// Finds any setting by its name or what it says.
+class _SearchField extends StatelessWidget {
+  const _SearchField({required this.controller, required this.onChanged});
+
+  final TextEditingController controller;
+  final ValueChanged<String> onChanged;
+
+  @override
+  Widget build(BuildContext context) {
+    final s = Sig.of(context);
+    return Container(
+      height: 52,
+      padding: const EdgeInsets.symmetric(horizontal: 18),
+      decoration: BoxDecoration(
+        color: s.card,
+        borderRadius: BorderRadius.circular(99),
+      ),
+      child: Row(
+        children: [
+          Icon(Ph.magnifyingGlass, color: s.muted, size: 20),
+          const SizedBox(width: 10),
+          Expanded(
+            child: TextField(
+              controller: controller,
+              onChanged: onChanged,
+              textInputAction: TextInputAction.search,
+              style: TextStyle(fontSize: 15.5, color: s.ink),
+              decoration: InputDecoration(
+                isCollapsed: true,
+                filled: false,
+                border: InputBorder.none,
+                enabledBorder: InputBorder.none,
+                focusedBorder: InputBorder.none,
+                hintText: context.l10n.settingsSearch,
+                hintStyle: TextStyle(fontSize: 15.5, color: s.faint),
+              ),
+            ),
+          ),
+          if (controller.text.isNotEmpty)
+            GestureDetector(
+              onTap: () {
+                controller.clear();
+                onChanged('');
+              },
+              child: Icon(Ph.x, color: s.muted, size: 18),
+            ),
+        ],
+      ),
+    );
+  }
+}
+
+/// One thing worth doing next, when there is one: the permissions, then a
+/// photo folder, then this phone's picture. Then a line, then the rest.
+class _Recommended extends StatefulWidget {
+  const _Recommended();
+
+  @override
+  State<_Recommended> createState() => _RecommendedState();
+}
+
+class _RecommendedState extends State<_Recommended>
+    with WidgetsBindingObserver {
+  bool? _allAllowed;
+
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addObserver(this);
+    _read();
+  }
+
+  @override
+  void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
+    super.dispose();
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    if (state == AppLifecycleState.resumed) _read();
+  }
+
+  Future<void> _read() async {
+    final p = await LinksyPlatform.permissions();
+    if (!mounted || p == null) return;
+    setState(() => _allAllowed = p.notifications && p.camera);
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final c = LinksyScope.of(context);
+    final s = Sig.of(context);
+    final l = context.l10n;
+    final (IconData, String, String, VoidCallback)? next = switch (c) {
+      _ when _allAllowed == false => (
+        Ph.shieldCheck,
+        l.settingsPermissionsRow,
+        l.settingsPermissions,
+        () async {
+          await showPermissions(context);
+          await _read();
+        },
+      ),
+      _ when c.photosFolder == null => (
+        Ph.images,
+        l.settingsPhotoFolder,
+        l.settingsWithYourComputers,
+        c.pickPhotosFolder,
+      ),
+      _ when c.ownPicture == null => (
+        Ph.userCircle,
+        l.settingsPicture,
+        l.settingsWithYourComputers,
+        c.pickOwnPicture,
+      ),
+      _ => null,
+    };
+    if (next == null) return const SizedBox(height: 4);
+    final (icon, title, section, onTap) = next;
+    return Padding(
+      padding: const EdgeInsets.only(top: 12),
+      child: Column(
+        children: [
+          Pressable(
+            onTap: onTap,
+            semanticLabel: title,
+            child: Container(
+              width: double.infinity,
+              padding: const EdgeInsets.all(18),
+              decoration: BoxDecoration(
+                color: s.card,
+                borderRadius: BorderRadius.circular(24),
+              ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    l.settingsRecommended,
+                    style: TextStyle(
+                      color: s.muted,
+                      fontSize: 13,
+                      fontWeight: FontWeight.w500,
+                    ),
+                  ),
+                  const SizedBox(height: 14),
+                  Row(
+                    children: [
+                      IconCircle(icon: icon, color: Sig.blue, size: 44),
+                      const SizedBox(width: 12),
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              title,
+                              style: TextStyle(
+                                color: s.ink,
+                                fontSize: 16,
+                                fontWeight: FontWeight.w700,
+                              ),
+                            ),
+                            const SizedBox(height: 2),
+                            Text(
+                              section,
+                              style: TextStyle(color: s.muted, fontSize: 13),
+                            ),
+                          ],
+                        ),
+                      ),
+                      Icon(Ph.caretRight, color: s.faint, size: 18),
+                    ],
+                  ),
+                ],
+              ),
+            ),
+          ),
+          Container(
+            height: 1,
+            margin: const EdgeInsets.fromLTRB(4, 18, 4, 0),
+            color: s.line,
+          ),
+        ],
+      ),
+    );
+  }
 }

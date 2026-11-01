@@ -1107,6 +1107,17 @@ class AppLocalizationsZh extends AppLocalizations {
   String get settingsTitle => '设置';
 
   @override
+  String get settingsSearch => '搜索设置';
+
+  @override
+  String settingsNothingMatches(String query) {
+    return '没有与“$query”匹配的设置';
+  }
+
+  @override
+  String get settingsRecommended => '推荐';
+
+  @override
   String get settingsReceiving => '接收';
 
   @override
