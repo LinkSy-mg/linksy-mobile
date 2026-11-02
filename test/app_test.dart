@@ -83,7 +83,12 @@ void main() {
     expect(find.text('Ping'), findsOneWidget);
     expect(find.text('Remote'), findsOneWidget);
     expect(find.text('Find it'), findsOneWidget);
+    // Its switches are on its settings page, behind the gear.
+    expect(find.text('Back up photos'), findsNothing);
+    await tester.tap(find.byTooltip('Settings'));
+    await tester.pumpAndSettle();
     expect(find.text('Back up photos'), findsOneWidget);
+    expect(find.text('Forget this device'), findsOneWidget);
   });
 
   testWidgets('incoming files ask first', (tester) async {
