@@ -3,6 +3,7 @@
 <resources>
     <string name="channel_incoming_files">Incoming files</string>
     <string name="channel_arrived">From your computers</string>
+    <string name="phone_storage">Phone storage</string>
     <string name="accept">Accept</string>
     <string name="decline">Decline</string>
     <string name="keep_alive_default">Linksy is connected</string>

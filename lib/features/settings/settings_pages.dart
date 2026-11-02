@@ -90,6 +90,13 @@ List<SettingsHit> settingsIndex(BuildContext context) {
       [l.settingsBrowseFilesChoose],
     ),
     SettingsHit(
+      'gallery',
+      SettingsArea.files,
+      Ph.imagesSquare,
+      l.settingsGallery,
+      [l.settingsGalleryCaption],
+    ),
+    SettingsHit(
       'photos',
       SettingsArea.files,
       Ph.images,
@@ -354,6 +361,21 @@ class _FilesSettingsState extends State<FilesSettings>
                     onTap: () => c.setFilesAll(true),
                   ),
               ],
+            ),
+            SettingRow(
+              id: 'gallery',
+              icon: Ph.imagesSquare,
+              title: l.settingsGallery,
+              caption: l.settingsGalleryCaption,
+              trailing: Switch(
+                value: c.gallery,
+                onChanged: (v) async {
+                  final on = await c.setGallery(v);
+                  if (v && !on && context.mounted) {
+                    showMessage(context, l.settingsGalleryDenied);
+                  }
+                },
+              ),
             ),
             SettingRow(
               id: 'photos',

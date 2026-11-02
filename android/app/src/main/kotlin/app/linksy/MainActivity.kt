@@ -16,7 +16,9 @@ import io.flutter.embedding.engine.FlutterEngine
 import io.flutter.plugin.common.MethodCall
 import io.flutter.plugin.common.MethodChannel
 import app.linksy.files.FileServer
+import app.linksy.files.GalleryServer
 import app.linksy.files.NativeFiles
+import app.linksy.files.NativeGallery
 import app.linksy.media.DisplayReceiver
 import app.linksy.media.NativeSession
 import app.linksy.media.QrScanner
@@ -330,9 +332,20 @@ class MainActivity : FlutterActivity() {
                         } else {
                             result.success(true)
                         }
+                        "photos" -> requestPermission(
+                            if (Build.VERSION.SDK_INT >= 33) Manifest.permission.READ_MEDIA_IMAGES else Manifest.permission.READ_EXTERNAL_STORAGE,
+                            REQUEST_PHOTOS, result,
+                        )
                         else -> result.notImplemented()
                     }
                     // True once per install: whether to show the permissions sheet.
+                    // Photos for the computers' Gallery (§4.18): the requests
+                    // reach the server only while Android allows it.
+                    "shareGallery" -> {
+                        val allowed = galleryServer(this@MainActivity).allowed()
+                        NativeGallery.sharing(allowed && call.argument<Boolean>("on") == true)
+                        result.success(allowed)
+                    }
                     "firstPermissionsVisit" -> {
                         val prefs = getSharedPreferences("permissions", MODE_PRIVATE)
                         val first = !prefs.getBoolean("sheet_shown", false)
@@ -823,7 +836,12 @@ class MainActivity : FlutterActivity() {
     private fun requestPermission(permission: String, code: Int, result: MethodChannel.Result) {
         // Android 12+ shows the location dialog only when coarse is asked too;
         // either is enough for one fix.
-        val also = if (permission == Manifest.permission.ACCESS_FINE_LOCATION) Manifest.permission.ACCESS_COARSE_LOCATION else null
+        val also = when (permission) {
+            Manifest.permission.ACCESS_FINE_LOCATION -> Manifest.permission.ACCESS_COARSE_LOCATION
+            // Videos come with photos in the same dialog.
+            Manifest.permission.READ_MEDIA_IMAGES -> Manifest.permission.READ_MEDIA_VIDEO
+            else -> null
+        }
         if (granted(permission) || (also != null && granted(also))) {
             result.success(true)
             return
@@ -1041,11 +1059,17 @@ class MainActivity : FlutterActivity() {
         const val REQUEST_FOLDER = 45
         const val REQUEST_PICTURE = 46
         const val REQUEST_NOTIFICATION_ACCESS = 52
+        const val REQUEST_PHOTOS = 53
 
         private var files: FileServer? = null
 
         /// One file server per process, whatever happens to the activity.
         fun fileServer(context: Context): FileServer =
             files ?: FileServer(context.applicationContext).also { files = it; it.start() }
+
+        private var gallery: GalleryServer? = null
+
+        fun galleryServer(context: Context): GalleryServer =
+            gallery ?: GalleryServer(context.applicationContext).also { gallery = it; it.start() }
     }
 }

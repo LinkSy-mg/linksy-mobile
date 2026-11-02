@@ -3,6 +3,7 @@
 <resources>
     <string name="channel_incoming_files">收到的文件</string>
     <string name="channel_arrived">来自你的电脑</string>
+    <string name="phone_storage">手机存储</string>
     <string name="accept">接受</string>
     <string name="decline">拒绝</string>
     <string name="keep_alive_default">Linksy 已连接</string>

@@ -3,6 +3,7 @@
 <resources>
     <string name="channel_incoming_files">受信ファイル</string>
     <string name="channel_arrived">コンピュータから</string>
+    <string name="phone_storage">スマホのストレージ</string>
     <string name="accept">受け入れる</string>
     <string name="decline">断る</string>
     <string name="keep_alive_default">Linksy は接続中です</string>

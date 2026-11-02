@@ -3,6 +3,7 @@
 <resources>
     <string name="channel_incoming_files">Archivos entrantes</string>
     <string name="channel_arrived">De tus computadoras</string>
+    <string name="phone_storage">Almacenamiento del teléfono</string>
     <string name="accept">Aceptar</string>
     <string name="decline">Rechazar</string>
     <string name="keep_alive_default">Linksy está conectado</string>

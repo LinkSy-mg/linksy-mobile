@@ -54,6 +54,9 @@ abstract final class Ph {
   static const linkBreak = IconData(0xe2e4, fontFamily: 'PhosphorRegular');
   static const network = IconData(0xedde, fontFamily: 'PhosphorRegular');
   static const pencilSimple = IconData(0xe3b4, fontFamily: 'PhosphorRegular');
+  static const squaresFour = IconData(0xe464, fontFamily: 'PhosphorRegular');
+  static const imagesSquare = IconData(0xe834, fontFamily: 'PhosphorRegular');
+  static const trash = IconData(0xe4a6, fontFamily: 'PhosphorRegular');
   static const qrCode = IconData(0xe3e6, fontFamily: 'PhosphorRegular');
   static const scan = IconData(0xebb6, fontFamily: 'PhosphorRegular');
   static const shieldCheck = IconData(0xe40c, fontFamily: 'PhosphorRegular');
