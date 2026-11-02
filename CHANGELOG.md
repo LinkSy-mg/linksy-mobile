@@ -2,6 +2,22 @@
 
 All notable changes to Linksy for Android. Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), versions follow [SemVer](https://semver.org/).
 
+## [0.3.0] - 2026-11-02
+
+A new look across the app: calmer, with the same blue and the same island.
+
+### Added
+- **All files**: "Let computers browse files" can share all of the phone's storage instead of one folder. Choosing All files opens Android's own "All files access" page for Linksy; a folder you choose stays the default ([#17](https://github.com/LinkSy-mg/linksy-mobile/issues/17)).
+- **Device settings**: each device has its own settings page behind the gear on its page: its picture, photo backup, its clipboard, what it may do from away, and Forget.
+- **Settings search**: type what you're looking for and Linksy opens the right page with that setting lit up.
+
+### Changed
+- **Settings**: a short main page with a Recommended next step and four pages: Files, Connection, With your computers and This app. Check for Updates and Logs stay on the main page, permissions are in This app, and the relay server is set in a sheet from the bottom.
+- **Device pages**: Send files and the quick actions (Clipboard, Ping, Find it) share one card. Remote, the computer's screen and the Terminal are under Control; the webcam, microphone and second display are under "This phone as", as status only. Back and the gear stay at the top while you scroll. Watching a computer's screen asks Control or Watch in a sheet.
+- **Home**: calmer, with quieter headings and status, soft send and pair buttons, and a centred welcome when nothing is paired yet.
+- **Updates**: the update sheet shows what changed and the APK it installs, with a full-width Update Now that fills as it downloads.
+- **Launch**: the Linksy mark flies from the splash screen into the logo at the top.
+
 ## [0.2.13] - 2026-11-01
 
 ### Fixed
