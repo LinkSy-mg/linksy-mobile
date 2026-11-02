@@ -1866,16 +1866,25 @@ class LinksyController extends ChangeNotifier with WidgetsBindingObserver {
     _addLocal(deviceId, ActivityKind.ping, incoming: false, text: tr.ctlPing);
   });
 
-  /// "Find my computer": makes it ring until [stopFinding].
-  Future<String?> find(String deviceId) => _run(() async {
-    await node.ring(deviceId, on: true);
+  /// "Find my computer": makes it ring until [stopFinding]. Shown as
+  /// ringing at once, and back if it couldn't.
+  Future<String?> find(String deviceId) async {
     _finding.remove(deviceId)?.cancel();
     _finding[deviceId] = Timer(ringFor, () {
       _finding.remove(deviceId);
       notifyListeners();
     });
-    _addLocal(deviceId, ActivityKind.ring, incoming: false);
-  });
+    notifyListeners();
+    final error = await _run(() async {
+      await node.ring(deviceId, on: true);
+      _addLocal(deviceId, ActivityKind.ring, incoming: false);
+    });
+    if (error != null) {
+      _finding.remove(deviceId)?.cancel();
+      notifyListeners();
+    }
+    return error;
+  }
 
   Future<String?> stopFinding(String deviceId) => _run(() async {
     _finding.remove(deviceId)?.cancel();

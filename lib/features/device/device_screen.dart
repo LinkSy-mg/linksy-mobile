@@ -207,25 +207,41 @@ class _DeviceScreenState extends State<DeviceScreen> {
                               child: Column(
                                 crossAxisAlignment: CrossAxisAlignment.stretch,
                                 children: [
-                                  if (c.media[deviceId]?.players
-                                      case final players?
-                                      when players.isNotEmpty)
-                                    for (final p in players)
-                                      Padding(
-                                        padding: const EdgeInsets.only(top: 10),
-                                        child: _NowPlaying(
-                                          deviceId: deviceId,
-                                          player: p,
-                                        ),
-                                      ),
-                                  if (volume != null)
-                                    Padding(
-                                      padding: const EdgeInsets.only(top: 10),
-                                      child: _Volume(
-                                        deviceId: deviceId,
-                                        volume: volume,
-                                      ),
+                                  // Players come and go: the page makes room.
+                                  AnimatedSize(
+                                    duration: motion(context, 220),
+                                    curve: Curves.easeOutCubic,
+                                    alignment: Alignment.topCenter,
+                                    child: Column(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.stretch,
+                                      children: [
+                                        if (c.media[deviceId]?.players
+                                            case final players?
+                                            when players.isNotEmpty)
+                                          for (final p in players)
+                                            Padding(
+                                              padding: const EdgeInsets.only(
+                                                top: 10,
+                                              ),
+                                              child: _NowPlaying(
+                                                deviceId: deviceId,
+                                                player: p,
+                                              ),
+                                            ),
+                                        if (volume != null)
+                                          Padding(
+                                            padding: const EdgeInsets.only(
+                                              top: 10,
+                                            ),
+                                            child: _Volume(
+                                              deviceId: deviceId,
+                                              volume: volume,
+                                            ),
+                                          ),
+                                      ],
                                     ),
+                                  ),
                                   _Control(view: view),
                                   if (_isComputer(view.device))
                                     _PhoneAs(view: view),
@@ -550,10 +566,10 @@ class _Actions extends StatelessWidget {
       ),
       child: Column(
         children: [
-          Pressable(
+          Pressable.builder(
             onTap: () => pickAndSend(context, id),
             semanticLabel: context.l10n.deviceSendFiles,
-            child: Padding(
+            builder: (context, down) => Padding(
               padding: const EdgeInsets.fromLTRB(20, 18, 18, 18),
               child: Row(
                 children: [
@@ -573,17 +589,25 @@ class _Actions extends StatelessWidget {
                       ],
                     ),
                   ),
-                  Container(
-                    width: 52,
-                    height: 52,
-                    decoration: const BoxDecoration(
-                      shape: BoxShape.circle,
-                      color: Sig.blue,
-                    ),
-                    child: const Icon(
-                      PhFill.paperPlaneTilt,
-                      color: Colors.white,
-                      size: 24,
+                  // The round button darkens and dips a little more than
+                  // the row, so the press shows where the eye is.
+                  AnimatedScale(
+                    scale: down ? 0.92 : 1,
+                    duration: motion(context, 120),
+                    curve: Curves.easeOut,
+                    child: AnimatedContainer(
+                      duration: motion(context, 90),
+                      width: 52,
+                      height: 52,
+                      decoration: BoxDecoration(
+                        shape: BoxShape.circle,
+                        color: down ? Sig.deep : Sig.blue,
+                      ),
+                      child: const Icon(
+                        PhFill.paperPlaneTilt,
+                        color: Colors.white,
+                        size: 24,
+                      ),
                     ),
                   ),
                 ],
@@ -605,14 +629,16 @@ class _Actions extends StatelessWidget {
                   child: _Quick(
                     icon: Ph.clipboardText,
                     label: context.l10n.deviceClipboard,
-                    onTap: () => report(context, c.sendClipboard(id)),
+                    confirms: true,
+                    onTap: () => c.sendClipboard(id),
                   ),
                 ),
                 Expanded(
                   child: _Quick(
                     icon: Ph.bellRinging,
                     label: context.l10n.devicePing,
-                    onTap: () => report(context, c.ping(id)),
+                    confirms: true,
+                    onTap: () => c.ping(id),
                   ),
                 ),
                 Expanded(child: _FindAction(view: view)),
@@ -626,50 +652,78 @@ class _Actions extends StatelessWidget {
 }
 
 /// A quick action: its icon in a soft circle over its name. Solid blue while
-/// it's going on (ringing).
-class _Quick extends StatelessWidget {
+/// it's going on (ringing); when it [confirms], a check and "Sent" for a
+/// moment once it went.
+class _Quick extends StatefulWidget {
   const _Quick({
     required this.icon,
     required this.label,
     required this.onTap,
     this.active = false,
+    this.confirms = false,
   });
 
   final IconData icon;
   final String label;
-  final VoidCallback onTap;
+  final Future<String?> Function() onTap;
   final bool active;
+  final bool confirms;
+
+  @override
+  State<_Quick> createState() => _QuickState();
+}
+
+class _QuickState extends State<_Quick> {
+  Timer? _sent;
+
+  Future<void> _tap() async {
+    final ok = await report(context, widget.onTap());
+    if (!ok || !widget.confirms || !mounted) return;
+    _sent?.cancel();
+    setState(() {
+      _sent = Timer(const Duration(milliseconds: 1500), () {
+        if (mounted) setState(() => _sent = null);
+      });
+    });
+  }
+
+  @override
+  void dispose() {
+    _sent?.cancel();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
     final s = Sig.of(context);
+    final sent = _sent != null;
+    final label = sent ? context.l10n.activitySent : widget.label;
     return Pressable(
-      onTap: onTap,
-      semanticLabel: label,
+      onTap: _tap,
+      semanticLabel: widget.label,
       child: Padding(
         padding: const EdgeInsets.symmetric(vertical: 10),
         child: Column(
           children: [
-            active
-                ? Container(
-                    width: 46,
-                    height: 46,
-                    decoration: const BoxDecoration(
-                      shape: BoxShape.circle,
-                      color: Sig.blue,
-                    ),
-                    child: Icon(icon, color: Colors.white, size: 21),
-                  )
-                : IconCircle(icon: icon, color: Sig.blue, size: 46),
+            IconCircle(
+              icon: sent ? PhBold.check : widget.icon,
+              color: Sig.blue,
+              size: 46,
+              filled: widget.active,
+            ),
             const SizedBox(height: 8),
-            Text(
-              label,
-              maxLines: 1,
-              overflow: TextOverflow.ellipsis,
-              style: TextStyle(
-                fontSize: 13,
-                fontWeight: FontWeight.w600,
-                color: s.ink,
+            AnimatedSwitcher(
+              duration: motion(context, 180),
+              child: Text(
+                label,
+                key: ValueKey(label),
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+                style: TextStyle(
+                  fontSize: 13,
+                  fontWeight: FontWeight.w600,
+                  color: s.ink,
+                ),
               ),
             ),
           ],
@@ -729,7 +783,7 @@ class _FindAction extends StatelessWidget {
       icon: ringing ? PhFill.bellRinging : Ph.binoculars,
       label: ringing ? context.l10n.deviceTapToStop : context.l10n.deviceFindIt,
       active: ringing,
-      onTap: () => report(context, ringing ? c.stopFinding(id) : c.find(id)),
+      onTap: () => ringing ? c.stopFinding(id) : c.find(id),
     );
   }
 }
@@ -844,20 +898,29 @@ class _NowPlayingState extends State<_NowPlaying> {
       bool big = false,
     }) => Tooltip(
       message: tip,
-      child: Pressable(
+      child: Pressable.builder(
         onTap: onTap,
+        scale: 0.88,
         semanticLabel: tip,
-        child: Container(
+        builder: (context, down) => AnimatedContainer(
+          duration: motion(context, 90),
           width: big ? 48 : 40,
           height: big ? 48 : 40,
           decoration: BoxDecoration(
             shape: BoxShape.circle,
-            color: big ? Sig.blue : Colors.transparent,
+            color: big
+                ? (down ? Sig.deep : Sig.blue)
+                : (down ? s.raised : s.raised.withValues(alpha: 0)),
           ),
-          child: Icon(
-            icon,
-            size: big ? 22 : 20,
-            color: big ? Colors.white : s.ink,
+          child: AnimatedSwitcher(
+            duration: motion(context, 160),
+            transitionBuilder: popIn,
+            child: Icon(
+              icon,
+              key: ValueKey(icon),
+              size: big ? 22 : 20,
+              color: big ? Colors.white : s.ink,
+            ),
           ),
         ),
       ),
@@ -1062,17 +1125,23 @@ class _VolumeState extends State<_Volume> {
                     .setVolume(widget.deviceId, muted: !v.muted),
               ),
               semanticLabel: tip,
+              scale: 0.88,
               child: SizedBox(
                 width: 44,
                 height: 44,
-                child: Icon(
-                  silent
-                      ? Ph.speakerSlash
-                      : level < 0.5
-                      ? Ph.speakerLow
-                      : Ph.speakerHigh,
-                  size: 22,
-                  color: v.muted ? s.muted : Sig.blue,
+                child: AnimatedSwitcher(
+                  duration: motion(context, 160),
+                  transitionBuilder: popIn,
+                  child: Icon(
+                    silent
+                        ? Ph.speakerSlash
+                        : level < 0.5
+                        ? Ph.speakerLow
+                        : Ph.speakerHigh,
+                    key: ValueKey((silent, level < 0.5, v.muted)),
+                    size: 22,
+                    color: v.muted ? s.muted : Sig.blue,
+                  ),
                 ),
               ),
             ),
@@ -1265,7 +1334,8 @@ class _Filters extends StatelessWidget {
                 Pressable(
                   onTap: () => onSelected(kind),
                   semanticLabel: semantic,
-                  child: Container(
+                  child: AnimatedContainer(
+                    duration: motion(context, 160),
                     height: 38,
                     padding: const EdgeInsets.symmetric(horizontal: 16),
                     decoration: BoxDecoration(
@@ -1274,13 +1344,14 @@ class _Filters extends StatelessWidget {
                     ),
                     child: Center(
                       widthFactor: 1,
-                      child: Text(
-                        label,
+                      child: AnimatedDefaultTextStyle(
+                        duration: motion(context, 160),
                         style: TextStyle(
                           fontSize: 13.5,
                           fontWeight: FontWeight.w600,
                           color: selected == kind ? Colors.white : s.ink,
                         ),
+                        child: Text(label),
                       ),
                     ),
                   ),
@@ -1317,20 +1388,8 @@ class _PhoneAs extends StatelessWidget {
     final ready = context.l10n.deviceReadyWhenAsks(d.name);
     final size = c.screenSize;
 
-    Widget action(String label, VoidCallback onTap) => SizedBox(
-      height: 40,
-      child: TextButton(
-        onPressed: onTap,
-        style: TextButton.styleFrom(
-          backgroundColor: s.raised,
-          foregroundColor: Sig.blue,
-          padding: const EdgeInsets.symmetric(horizontal: 14),
-          shape: const StadiumBorder(),
-          textStyle: const TextStyle(fontWeight: FontWeight.w600),
-        ),
-        child: Text(label),
-      ),
-    );
+    Widget action(String label, VoidCallback onTap) =>
+        SmallAction(label: label, onTap: onTap, fill: s.raised);
 
     final rows = [
       if (d.can('camera'))
