@@ -42,7 +42,22 @@ class AppUpdate extends ChangeNotifier {
     }
     installed = (await LinksyPlatform.appVersion())?.split(' ').first;
     _offer(_checker?.cached());
-    _offer(await _checker?.refresh());
+    await recheck();
+  }
+
+  var _asking = false;
+
+  /// Each time the app is opened: asks GitHub when the last answer is an
+  /// hour old. Linksy stays running in the background, so this, not
+  /// [start], is what usually hears of a new release.
+  Future<void> recheck() async {
+    if (_asking || installed == null) return;
+    _asking = true;
+    try {
+      _offer(await _checker?.refresh());
+    } finally {
+      _asking = false;
+    }
   }
 
   /// Asks GitHub now (the About page's Check for Updates). Whether one is out.

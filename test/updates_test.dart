@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:io';
 
 import 'package:flutter_test/flutter_test.dart';
 import 'package:linksy/core/updates.dart';
@@ -37,6 +38,23 @@ void main() {
     expect(r.version, '0.2.10');
     expect(r.notes, 'Fixes.');
     expect(AppRelease.newest('not json'), isNull);
+  });
+
+  test('an answer under an hour old is used, not asked again', () async {
+    final dir = Directory.systemTemp.createTempSync('linksy_updates');
+    addTearDown(() => dir.deleteSync(recursive: true));
+    final cache = File('${dir.path}/releases.json')
+      ..writeAsStringSync(
+        jsonEncode([
+          _release('v0.3.1', ['linksy-0.3.1.apk']),
+        ]),
+      )
+      ..setLastModifiedSync(
+        DateTime.now().subtract(const Duration(minutes: 40)),
+      );
+    final checker = UpdateChecker(cache);
+    expect(await checker.refresh(), isNull);
+    expect(checker.cached()?.version, '0.3.1');
   });
 
   test('the APK for this phone, else the universal one', () {

@@ -117,7 +117,7 @@ String? sumFor(String sums, String name) {
   return null;
 }
 
-/// Asks GitHub at most once a day, keeping the last answer in [cache].
+/// Asks GitHub at most once an hour, keeping the last answer in [cache].
 class UpdateChecker {
   UpdateChecker(this.cache);
   final File cache;
@@ -131,13 +131,13 @@ class UpdateChecker {
     }
   }
 
-  /// A fresh answer when the last is a day old, or [force]; else null.
+  /// A fresh answer when the last is an hour old, or [force]; else null.
   Future<AppRelease?> refresh({bool force = false}) async {
     try {
       if (!force &&
           cache.existsSync() &&
           DateTime.now().difference(cache.lastModifiedSync()) <
-              const Duration(days: 1)) {
+              const Duration(hours: 1)) {
         return null;
       }
     } on Object {
@@ -150,7 +150,7 @@ class UpdateChecker {
       try {
         await cache.writeAsString(raw);
       } on Object {
-        // Asked again tomorrow.
+        // Asked again next time.
       }
     }
     return release;

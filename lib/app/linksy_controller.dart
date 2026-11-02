@@ -335,11 +335,12 @@ class LinksyController extends ChangeNotifier with WidgetsBindingObserver {
     );
   }
 
-  /// Back in the app: new photos may be waiting.
+  /// Back in the app: new photos may be waiting, and maybe a new release.
   @override
   void didChangeAppLifecycleState(AppLifecycleState state) {
     if (state == AppLifecycleState.resumed) {
       _importAll();
+      unawaited(updates.recheck());
       // Back from Developer options, maybe.
       _readShareProtections();
     } else if (state == AppLifecycleState.hidden) {
