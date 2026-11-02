@@ -109,6 +109,8 @@ class _UpdateSheet extends StatelessWidget {
                   ),
                   const SizedBox(height: 8),
                   _Apk(release: release, installed: u.installed),
+                  const SizedBox(height: 10),
+                  const _PlayProtect(),
                   if (u.phase == UpdatePhase.failed) ...[
                     const SizedBox(height: 12),
                     Text(
@@ -180,8 +182,57 @@ class _Card extends StatelessWidget {
   );
 }
 
+/// Linksy can read notifications (when allowed), so Play Protect blocks
+/// installing it from outside the Play Store in many countries, with no
+/// "Install anyway": how to get past it.
+class _PlayProtect extends StatelessWidget {
+  const _PlayProtect();
+
+  @override
+  Widget build(BuildContext context) {
+    final s = Sig.of(context);
+    final l10n = context.l10n;
+    return Container(
+      padding: const EdgeInsets.fromLTRB(14, 14, 14, 16),
+      decoration: BoxDecoration(
+        color: Sig.blue.withValues(alpha: 0.07),
+        borderRadius: BorderRadius.circular(Radii.md),
+        border: Border.all(color: Sig.blue.withValues(alpha: 0.22)),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              const Padding(
+                padding: EdgeInsets.only(top: 1),
+                child: Icon(Ph.shieldCheck, size: 19, color: Sig.blue),
+              ),
+              const SizedBox(width: 10),
+              Expanded(
+                child: Text(
+                  l10n.updatePlayProtect,
+                  style: TextStyle(color: s.ink, fontSize: 13.5, height: 1.4),
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 12),
+          NumberedSteps([
+            l10n.updateProtectStep1,
+            l10n.updateProtectStep2,
+            l10n.updateProtectStep3,
+          ], fontSize: 13.5),
+        ],
+      ),
+    );
+  }
+}
+
 /// The release notes, read as a list: their headings ("Fixed") small above
-/// their points, each point after a dot; Markdown's marks left out.
+/// their points, each point after a dot; Markdown's marks left out, and
+/// quoted boxes ("> [!IMPORTANT]") too: the sheet says those in its own.
 class _Notes extends StatelessWidget {
   const _Notes(this.notes);
 
@@ -197,7 +248,7 @@ class _Notes extends StatelessWidget {
     final s = Sig.of(context);
     final children = <Widget>[];
     for (final raw in notes.split('\n')) {
-      if (raw.trim().isEmpty) continue;
+      if (raw.trim().isEmpty || raw.trimLeft().startsWith('>')) continue;
       if (RegExp(r'^\s*#+\s*').hasMatch(raw)) {
         children.add(
           Padding(
