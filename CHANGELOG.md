@@ -2,6 +2,12 @@
 
 All notable changes to Linksy for Android. Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), versions follow [SemVer](https://semver.org/).
 
+## [Unreleased]
+
+### Changed
+
+- Update sheet: the release notes show in full; the sheet scrolls down to Update Now instead of the notes scrolling in their own small box.
+
 ## [0.3.2] - 2026-11-02
 
 > [!IMPORTANT]

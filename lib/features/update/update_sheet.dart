@@ -81,15 +81,7 @@ class _UpdateSheet extends StatelessWidget {
                             ),
                           ),
                           const SizedBox(height: 6),
-                          ConstrainedBox(
-                            constraints: BoxConstraints(
-                              maxHeight:
-                                  MediaQuery.sizeOf(context).height * 0.28,
-                            ),
-                            child: SingleChildScrollView(
-                              child: _Notes(release.notes),
-                            ),
-                          ),
+                          _Notes(release.notes),
                         ],
                       ),
                     ),
