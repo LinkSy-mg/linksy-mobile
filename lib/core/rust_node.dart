@@ -299,6 +299,26 @@ class RustNode implements LinksyNode {
   );
 
   @override
+  Future<void> setFeatures(List<String> features) =>
+      _node.setFeatures(features: features);
+
+  @override
+  Future<void> postNotification(String id, Map<String, Object?> notification) =>
+      _guard(
+        () => _node.postNotification(
+          id: id,
+          notificationJson: jsonEncode(notification),
+        ),
+        name: _nameOf(id),
+      );
+
+  @override
+  Future<void> removeNotification(String id, String key) => _guard(
+    () => _node.removeNotification(id: id, key: key),
+    name: _nameOf(id),
+  );
+
+  @override
   Future<String> importFiles(String id, List<String> paths) => _guard(
     () => _node.importFiles(id: id, paths: paths),
     name: _nameOf(id),

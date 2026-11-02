@@ -86,6 +86,19 @@ abstract interface class LinksyNode {
   /// `ringing`, `active` or `idle`.
   Future<void> sendCallState(String id, String state);
 
+  /// What this phone can do now, the whole list (docs/protocol.md §4.10):
+  /// connected computers hear it at once.
+  Future<void> setFeatures(List<String> features);
+
+  /// One of this phone's notifications, new or changed, to show on [id]
+  /// (docs/protocol.md §4.5): `key`, `app`, `app_name`, `title`, `body`,
+  /// `can_reply`, `actions`, `icon`, and for chats `category`,
+  /// `conversation`, `sender`, `group`, `time`, `picture`.
+  Future<void> postNotification(String id, Map<String, Object?> notification);
+
+  /// The notification [key] went away on this phone.
+  Future<void> removeNotification(String id, String key);
+
   /// A step of a direct link this phone hosts, to [id] (docs/protocol.md
   /// §4.17): `{'type': 'invite', 'address': ...}`, `connecting`, `up` with
   /// `ip` and `port`, or `end` with a `reason`.

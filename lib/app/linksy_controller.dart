@@ -1387,6 +1387,10 @@ class LinksyController extends ChangeNotifier with WidgetsBindingObserver {
         refresh();
       case OpenUrlReceived(:final from, :final url):
         _addLocal(from.id, ActivityKind.link, incoming: true, text: url);
+      case NotificationReplyRequested() ||
+          NotificationActionRequested() ||
+          NotificationDismissRequested():
+        break;
       case RingRequested(:final from, on: true):
         final stray = _strayRingStops.remove(from.id);
         if (stray != null &&

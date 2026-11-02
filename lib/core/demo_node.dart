@@ -367,6 +367,18 @@ class DemoNode implements LinksyNode {
   Future<void> sendCallState(String id, String state) async {}
 
   @override
+  Future<void> setFeatures(List<String> features) async {}
+
+  @override
+  Future<void> postNotification(
+    String id,
+    Map<String, Object?> notification,
+  ) async {}
+
+  @override
+  Future<void> removeNotification(String id, String key) async {}
+
+  @override
   Future<void> directSend(String id, Map<String, Object?> step) async {}
 
   @override

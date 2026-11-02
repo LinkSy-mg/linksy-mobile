@@ -9,7 +9,7 @@ use std::path::PathBuf;
 use std::sync::OnceLock;
 
 use flutter_rust_bridge::frb;
-use linksy_core::{Battery, CallState, Config, DeviceKind, Error, Fingerprint, MediaCommand, Node, SessionKind, Settings, Uuid};
+use linksy_core::{Battery, CallState, Config, DeviceKind, Error, Fingerprint, MediaCommand, Node, RemoteNotification, SessionKind, Settings, Uuid};
 use linksy_core::{Event, Link, TerminalOpen};
 use tokio::runtime::Runtime;
 use tokio::sync::broadcast::error::RecvError;
@@ -365,6 +365,35 @@ impl LinksyNode {
         let state: CallState = serde_json::from_value(state.into()).map_err(|e| format!("other:{e}"))?;
         let node = self.node.clone();
         run(async move { node.send_call_state(&id, state, None).await }).await
+    }
+
+    /// What this phone can do now (§4.10), the whole list: connected
+    /// computers hear it at once, others at their next handshake.
+    pub async fn set_features(&self, features: Vec<String>) -> Result<(), String> {
+        let node = self.node.clone();
+        run(async move {
+            node.set_features(features).await;
+            Ok(())
+        })
+        .await
+    }
+
+    /// One of this phone's notifications, new or changed (§4.5), shown on the
+    /// computer: `notification_json` in the core's shape (`key`, `app`,
+    /// `app_name`, `title`, `body`, `can_reply`, `actions`, `icon`, and for
+    /// chats `category`, `conversation`, `sender`, `group`, `time`, `picture`).
+    pub async fn post_notification(&self, id: String, notification_json: String) -> Result<(), String> {
+        let id = fingerprint(&id)?;
+        let notification: RemoteNotification = serde_json::from_str(&notification_json).map_err(|e| format!("other:{e}"))?;
+        let node = self.node.clone();
+        run(async move { node.post_notification(&id, notification).await }).await
+    }
+
+    /// The notification `key` went away on this phone.
+    pub async fn remove_notification(&self, id: String, key: String) -> Result<(), String> {
+        let id = fingerprint(&id)?;
+        let node = self.node.clone();
+        run(async move { node.remove_notification(&id, &key).await }).await
     }
 
     /// Photo auto-import: offers files into the computer's picture library.

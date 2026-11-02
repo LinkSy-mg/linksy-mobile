@@ -124,8 +124,20 @@ abstract class LinksyNode implements RustOpaqueInterface {
   /// The port this node listens on, for "pair by address" from elsewhere.
   int port();
 
+  /// One of this phone's notifications, new or changed (§4.5), shown on the
+  /// computer: `notification_json` in the core's shape (`key`, `app`,
+  /// `app_name`, `title`, `body`, `can_reply`, `actions`, `icon`, and for
+  /// chats `category`, `conversation`, `sender`, `group`, `time`, `picture`).
+  Future<void> postNotification({
+    required String id,
+    required String notificationJson,
+  });
+
   /// Answers `locate` with why not.
   Future<void> refuseLocation({required String id, required String reason});
+
+  /// The notification `key` went away on this phone.
+  Future<void> removeNotification({required String id, required String key});
 
   /// Answer a pairing or transfer request. False if it already expired.
   bool respond({required String request, required bool accept});
@@ -180,6 +192,10 @@ abstract class LinksyNode implements RustOpaqueInterface {
 
   /// Everything allowed from away for this device (screens, camera, files…).
   void setAwayAll({required String id, required bool on_});
+
+  /// What this phone can do now (§4.10), the whole list: connected
+  /// computers hear it at once, others at their next handshake.
+  Future<void> setFeatures({required List<String> features});
 
   /// The computer's volume: `level` from 0 to 1, `muted`, or both.
   Future<void> setVolume({required String id, double? level, bool? muted});

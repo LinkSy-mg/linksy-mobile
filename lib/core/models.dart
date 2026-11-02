@@ -530,6 +530,38 @@ class PictureReceived extends LinksyEvent {
   final String image;
 }
 
+/// A computer answers one of this phone's notifications it shows (§4.5):
+/// [text] goes back through the notification's own reply.
+class NotificationReplyRequested extends LinksyEvent {
+  const NotificationReplyRequested({
+    required this.from,
+    required this.key,
+    required this.text,
+  });
+  final DeviceInfo from;
+  final String key;
+  final String text;
+}
+
+/// …presses one of its buttons ([action], the id this phone gave it).
+class NotificationActionRequested extends LinksyEvent {
+  const NotificationActionRequested({
+    required this.from,
+    required this.key,
+    required this.action,
+  });
+  final DeviceInfo from;
+  final String key;
+  final String action;
+}
+
+/// …or was clicked or swiped away there: it goes here too.
+class NotificationDismissRequested extends LinksyEvent {
+  const NotificationDismissRequested({required this.from, required this.key});
+  final DeviceInfo from;
+  final String key;
+}
+
 /// A computer asks where this phone is, once (§4.14).
 class LocateRequested extends LinksyEvent {
   const LocateRequested(this.from);

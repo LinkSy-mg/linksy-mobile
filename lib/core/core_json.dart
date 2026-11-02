@@ -179,6 +179,20 @@ LinksyEvent? eventFromJson(Json j) {
       from: device('from'),
       state: mediaStateFromJson(j['state'] as Json),
     ),
+    'notification_reply' => NotificationReplyRequested(
+      from: device('from'),
+      key: j['key'] as String,
+      text: j['text'] as String? ?? '',
+    ),
+    'notification_action' => NotificationActionRequested(
+      from: device('from'),
+      key: j['key'] as String,
+      action: j['action'] as String? ?? '',
+    ),
+    'notification_dismissed' => NotificationDismissRequested(
+      from: device('from'),
+      key: j['key'] as String,
+    ),
     'volume_state' => VolumeStateReceived(
       from: device('from'),
       state: volumeStateFromJson(j['state'] as Json),

@@ -132,6 +132,33 @@ void main() {
     expect(v.battery?.level, 40);
   });
 
+  test('reads what a computer answers to this phone\'s notifications', () {
+    const key = '0|com.whatsapp|1|null|10123';
+    final reply = parse({
+      'type': 'notification_reply',
+      'from': device,
+      'key': key,
+      'text': 'Sure!',
+    });
+    expect((reply as NotificationReplyRequested).key, key);
+    expect(reply.text, 'Sure!');
+
+    final action = parse({
+      'type': 'notification_action',
+      'from': device,
+      'key': key,
+      'action': '1',
+    });
+    expect((action as NotificationActionRequested).action, '1');
+
+    final dismissed = parse({
+      'type': 'notification_dismissed',
+      'from': device,
+      'key': key,
+    });
+    expect((dismissed as NotificationDismissRequested).key, key);
+  });
+
   test('reads media and lock-when-away events', () {
     final media = parse({
       'type': 'media_state',
