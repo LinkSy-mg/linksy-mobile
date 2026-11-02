@@ -1,6 +1,7 @@
 import 'dart:ui' show lerpDouble;
 
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 
 import '../../ui/components.dart';
 import '../../ui/sig.dart';
@@ -28,31 +29,36 @@ class SettingsPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final top = MediaQuery.paddingOf(context).top;
-    return _Highlight(
-      id: highlight,
-      child: Scaffold(
-        body: CustomScrollView(
-          keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag,
-          slivers: [
-            SliverPersistentHeader(
-              pinned: true,
-              delegate: _Header(
-                title: title,
-                backLabel: backLabel,
-                lead: lead,
-                top: top,
+    // Its own status bar icons: opened from a device's blue banner, the
+    // banner's light ones would stay.
+    return AnnotatedRegion<SystemUiOverlayStyle>(
+      value: overlayFor(Theme.of(context).brightness),
+      child: _Highlight(
+        id: highlight,
+        child: Scaffold(
+          body: CustomScrollView(
+            keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag,
+            slivers: [
+              SliverPersistentHeader(
+                pinned: true,
+                delegate: _Header(
+                  title: title,
+                  backLabel: backLabel,
+                  lead: lead,
+                  top: top,
+                ),
               ),
-            ),
-            SliverPadding(
-              padding: EdgeInsets.fromLTRB(
-                16,
-                4,
-                16,
-                40 + MediaQuery.paddingOf(context).bottom,
+              SliverPadding(
+                padding: EdgeInsets.fromLTRB(
+                  16,
+                  4,
+                  16,
+                  40 + MediaQuery.paddingOf(context).bottom,
+                ),
+                sliver: SliverList.list(children: children),
               ),
-              sliver: SliverList.list(children: children),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );
@@ -222,6 +228,7 @@ class SettingRow extends StatelessWidget {
     this.caption,
     this.trailing,
     this.onTap,
+    this.warn = false,
   });
 
   /// What a search result points at ([Flash]).
@@ -231,6 +238,9 @@ class SettingRow extends StatelessWidget {
   final String? caption;
   final Widget? trailing;
   final VoidCallback? onTap;
+
+  /// The caption in red: something needs a look.
+  final bool warn;
 
   @override
   Widget build(BuildContext context) {
@@ -261,7 +271,7 @@ class SettingRow extends StatelessWidget {
                     overflow: TextOverflow.ellipsis,
                     style: TextStyle(
                       fontSize: 13,
-                      color: s.muted,
+                      color: warn ? s.red : s.muted,
                       height: 1.35,
                     ),
                   ),
