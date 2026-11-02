@@ -4,9 +4,24 @@ All notable changes to Linksy for Android. Format: [Keep a Changelog](https://ke
 
 ## [Unreleased]
 
+### Added
+
+- Reduce motion (Settings › This app): screens fade instead of sliding, and buttons dim instead of shrinking. Linksy also follows the phone's own "Remove animations".
+
 ### Changed
 
 - Update sheet: the release notes show in full; the sheet scrolls down to Update Now instead of the notes scrolling in their own small box.
+- Every tap shows: buttons dip even on a quick tap in a list, keys and media buttons light up while pressed, and a switch row toggles from anywhere on it.
+- Phone as mouse: Touchpad and Slides slide from one to the other, as does the pill above them; the camera's tabs and choices slide the same way.
+- Clipboard and Ping show "Sent" for a moment, Find it rings at once, Pair and Stop show they're working, and the last few Material buttons now press like the rest.
+- Things that come and go (notices, share banners, players, the number pad, the Recommended card) make room and close up instead of jumping.
+- What arrives is felt too: a ping knocks twice, copied text and links give a light tick, as do files when they come in and when they're all there, both ways. The snack bar shows what came.
+- A ping or a link from a computer while Linksy isn't on screen now shows a notification ("From your computers") instead of waiting in the timeline.
+- Find my phone: a soft wave leaves the bell while it rings.
+
+### Fixed
+
+- The transfer bubble's check vanished at once when files finished; it now stays while the bubble goes.
 
 ## [0.3.2] - 2026-11-02
 
