@@ -2530,4 +2530,115 @@ class AppLocalizationsRu extends AppLocalizations {
   @override
   String get settingsReduceMotionCaption =>
       'Экраны появляются плавно, а не выезжают, а кнопки тускнеют, а не сжимаются.';
+
+  @override
+  String get deviceDeck => 'Пульт';
+
+  @override
+  String deviceDeckCaption(String name) {
+    return 'Ваши кнопки для $name';
+  }
+
+  @override
+  String get deckEdit => 'Изменить';
+
+  @override
+  String get deckDone => 'Готово';
+
+  @override
+  String deckAsking(String name) {
+    return 'Спрашиваем у $name, что может пульт…';
+  }
+
+  @override
+  String deckAway(String name) {
+    return '$name не подключён. Пульт заработает, как только подключится.';
+  }
+
+  @override
+  String deckNothingOffered(String name) {
+    return '$name пока ничего не разрешает пульту. Включите действия в Linksy на компьютере.';
+  }
+
+  @override
+  String get deckEmptyPage =>
+      'Здесь пока пусто. Нажмите «Изменить», затем «Добавить».';
+
+  @override
+  String get deckAdd => 'Добавить';
+
+  @override
+  String get deckAddTitle => 'Добавить на пульт';
+
+  @override
+  String get deckUnavailable => 'Недоступно';
+
+  @override
+  String get deckGroupMedia => 'Медиа';
+
+  @override
+  String get deckGroupSound => 'Звук';
+
+  @override
+  String get deckGroupSystem => 'Система';
+
+  @override
+  String get deckGroupCommands => 'Команды';
+
+  @override
+  String get deckKindButton => 'Кнопка';
+
+  @override
+  String get deckKindToggle => 'Вкл. или выкл.';
+
+  @override
+  String get deckKindSlider => 'Ползунок';
+
+  @override
+  String get deckSize => 'Размер';
+
+  @override
+  String get deckSizeSmall => 'Маленькая';
+
+  @override
+  String get deckSizeWide => 'Широкая';
+
+  @override
+  String get deckSizeTall => 'Высокая';
+
+  @override
+  String get deckSizeBig => 'Большая';
+
+  @override
+  String get deckSizeRow => 'Вся строка';
+
+  @override
+  String get deckColor => 'Цвет';
+
+  @override
+  String get deckIcon => 'Значок';
+
+  @override
+  String get deckRemove => 'Убрать с пульта';
+
+  @override
+  String get deckNewPage => 'Новая страница';
+
+  @override
+  String get deckRemovePage => 'Удалить эту страницу';
+
+  @override
+  String get deckMoveHint =>
+      'Удерживайте кнопку и перетащите, чтобы переместить.';
+
+  @override
+  String get settingsGallery => 'Фото на ваших компьютерах';
+
+  @override
+  String get settingsGalleryCaption =>
+      'Ваши компьютеры могут просматривать фото и видео этого телефона и сохранять выбранные.';
+
+  @override
+  String get settingsGalleryDenied =>
+      'Разрешите Linksy видеть ваши фото в настройках Android.';
 }

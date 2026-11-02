@@ -4109,6 +4109,204 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Screens fade instead of sliding, and buttons dim instead of shrinking.'**
   String get settingsReduceMotionCaption;
+
+  /// Device page, Control section: the deck, this phone as buttons for the computer (desktop's own name for the feature)
+  ///
+  /// In en, this message translates to:
+  /// **'Deck'**
+  String get deviceDeck;
+
+  /// Under Deck; name is the computer
+  ///
+  /// In en, this message translates to:
+  /// **'Your own buttons for {name}'**
+  String deviceDeckCaption(String name);
+
+  /// Deck
+  ///
+  /// In en, this message translates to:
+  /// **'Edit'**
+  String get deckEdit;
+
+  /// Deck
+  ///
+  /// In en, this message translates to:
+  /// **'Done'**
+  String get deckDone;
+
+  /// Deck screen, waiting for the computer's list of actions
+  ///
+  /// In en, this message translates to:
+  /// **'Asking {name} what the deck may do…'**
+  String deckAsking(String name);
+
+  /// Deck screen when the computer isn't connected
+  ///
+  /// In en, this message translates to:
+  /// **'{name} isn\'t connected. The deck works once it is.'**
+  String deckAway(String name);
+
+  /// Deck screen when the computer turned on no actions for this phone
+  ///
+  /// In en, this message translates to:
+  /// **'{name} lets the deck do nothing yet. Turn its actions on in Linksy on the computer.'**
+  String deckNothingOffered(String name);
+
+  /// An empty page of the deck
+  ///
+  /// In en, this message translates to:
+  /// **'Nothing here yet. Tap Edit, then Add.'**
+  String get deckEmptyPage;
+
+  /// Deck
+  ///
+  /// In en, this message translates to:
+  /// **'Add'**
+  String get deckAdd;
+
+  /// Deck
+  ///
+  /// In en, this message translates to:
+  /// **'Add to the deck'**
+  String get deckAddTitle;
+
+  /// On a deck button whose action the computer no longer offers
+  ///
+  /// In en, this message translates to:
+  /// **'Not available'**
+  String get deckUnavailable;
+
+  /// Group of deck actions sent by the computer as Media
+  ///
+  /// In en, this message translates to:
+  /// **'Media'**
+  String get deckGroupMedia;
+
+  /// Deck
+  ///
+  /// In en, this message translates to:
+  /// **'Sound'**
+  String get deckGroupSound;
+
+  /// Deck
+  ///
+  /// In en, this message translates to:
+  /// **'System'**
+  String get deckGroupSystem;
+
+  /// Deck
+  ///
+  /// In en, this message translates to:
+  /// **'Commands'**
+  String get deckGroupCommands;
+
+  /// Deck
+  ///
+  /// In en, this message translates to:
+  /// **'Button'**
+  String get deckKindButton;
+
+  /// A deck action that switches something on or off
+  ///
+  /// In en, this message translates to:
+  /// **'On or off'**
+  String get deckKindToggle;
+
+  /// Deck
+  ///
+  /// In en, this message translates to:
+  /// **'Slider'**
+  String get deckKindSlider;
+
+  /// Deck
+  ///
+  /// In en, this message translates to:
+  /// **'Size'**
+  String get deckSize;
+
+  /// Deck
+  ///
+  /// In en, this message translates to:
+  /// **'Small'**
+  String get deckSizeSmall;
+
+  /// Deck
+  ///
+  /// In en, this message translates to:
+  /// **'Wide'**
+  String get deckSizeWide;
+
+  /// Deck
+  ///
+  /// In en, this message translates to:
+  /// **'Tall'**
+  String get deckSizeTall;
+
+  /// Deck
+  ///
+  /// In en, this message translates to:
+  /// **'Big'**
+  String get deckSizeBig;
+
+  /// Deck button size: as wide as the whole row
+  ///
+  /// In en, this message translates to:
+  /// **'Full row'**
+  String get deckSizeRow;
+
+  /// Deck
+  ///
+  /// In en, this message translates to:
+  /// **'Color'**
+  String get deckColor;
+
+  /// Deck
+  ///
+  /// In en, this message translates to:
+  /// **'Icon'**
+  String get deckIcon;
+
+  /// Deck
+  ///
+  /// In en, this message translates to:
+  /// **'Remove from the deck'**
+  String get deckRemove;
+
+  /// Deck
+  ///
+  /// In en, this message translates to:
+  /// **'New page'**
+  String get deckNewPage;
+
+  /// Deck
+  ///
+  /// In en, this message translates to:
+  /// **'Remove this page'**
+  String get deckRemovePage;
+
+  /// Deck, editing: how to move a button
+  ///
+  /// In en, this message translates to:
+  /// **'Hold a button and drag it to move it.'**
+  String get deckMoveHint;
+
+  /// Settings > Files: computers can browse this phone's photos (their Gallery)
+  ///
+  /// In en, this message translates to:
+  /// **'Photos on your computers'**
+  String get settingsGallery;
+
+  /// Deck
+  ///
+  /// In en, this message translates to:
+  /// **'Your computers can look through this phone\'s photos and videos, and save the ones you pick.'**
+  String get settingsGalleryCaption;
+
+  /// Snack bar when Android didn't allow photo access
+  ///
+  /// In en, this message translates to:
+  /// **'Allow Linksy to see your photos in Android\'s settings.'**
+  String get settingsGalleryDenied;
 }
 
 class _AppLocalizationsDelegate

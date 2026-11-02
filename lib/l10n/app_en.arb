@@ -3332,5 +3332,157 @@
   "settingsReduceMotionCaption": "Screens fade instead of sliding, and buttons dim instead of shrinking.",
   "@settingsReduceMotionCaption": {
     "description": "What Reduce motion changes"
+  },
+  "deviceDeck": "Deck",
+  "@deviceDeck": {
+    "description": "Device page, Control section: the deck, this phone as buttons for the computer (desktop's own name for the feature)"
+  },
+  "deviceDeckCaption": "Your own buttons for {name}",
+  "@deviceDeckCaption": {
+    "description": "Under Deck; name is the computer",
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "deckEdit": "Edit",
+  "@deckEdit": {
+    "description": "Deck"
+  },
+  "deckDone": "Done",
+  "@deckDone": {
+    "description": "Deck"
+  },
+  "deckAsking": "Asking {name} what the deck may do…",
+  "@deckAsking": {
+    "description": "Deck screen, waiting for the computer's list of actions",
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "deckAway": "{name} isn't connected. The deck works once it is.",
+  "@deckAway": {
+    "description": "Deck screen when the computer isn't connected",
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "deckNothingOffered": "{name} lets the deck do nothing yet. Turn its actions on in Linksy on the computer.",
+  "@deckNothingOffered": {
+    "description": "Deck screen when the computer turned on no actions for this phone",
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "deckEmptyPage": "Nothing here yet. Tap Edit, then Add.",
+  "@deckEmptyPage": {
+    "description": "An empty page of the deck"
+  },
+  "deckAdd": "Add",
+  "@deckAdd": {
+    "description": "Deck"
+  },
+  "deckAddTitle": "Add to the deck",
+  "@deckAddTitle": {
+    "description": "Deck"
+  },
+  "deckUnavailable": "Not available",
+  "@deckUnavailable": {
+    "description": "On a deck button whose action the computer no longer offers"
+  },
+  "deckGroupMedia": "Media",
+  "@deckGroupMedia": {
+    "description": "Group of deck actions sent by the computer as Media"
+  },
+  "deckGroupSound": "Sound",
+  "@deckGroupSound": {
+    "description": "Deck"
+  },
+  "deckGroupSystem": "System",
+  "@deckGroupSystem": {
+    "description": "Deck"
+  },
+  "deckGroupCommands": "Commands",
+  "@deckGroupCommands": {
+    "description": "Deck"
+  },
+  "deckKindButton": "Button",
+  "@deckKindButton": {
+    "description": "Deck"
+  },
+  "deckKindToggle": "On or off",
+  "@deckKindToggle": {
+    "description": "A deck action that switches something on or off"
+  },
+  "deckKindSlider": "Slider",
+  "@deckKindSlider": {
+    "description": "Deck"
+  },
+  "deckSize": "Size",
+  "@deckSize": {
+    "description": "Deck"
+  },
+  "deckSizeSmall": "Small",
+  "@deckSizeSmall": {
+    "description": "Deck"
+  },
+  "deckSizeWide": "Wide",
+  "@deckSizeWide": {
+    "description": "Deck"
+  },
+  "deckSizeTall": "Tall",
+  "@deckSizeTall": {
+    "description": "Deck"
+  },
+  "deckSizeBig": "Big",
+  "@deckSizeBig": {
+    "description": "Deck"
+  },
+  "deckSizeRow": "Full row",
+  "@deckSizeRow": {
+    "description": "Deck button size: as wide as the whole row"
+  },
+  "deckColor": "Color",
+  "@deckColor": {
+    "description": "Deck"
+  },
+  "deckIcon": "Icon",
+  "@deckIcon": {
+    "description": "Deck"
+  },
+  "deckRemove": "Remove from the deck",
+  "@deckRemove": {
+    "description": "Deck"
+  },
+  "deckNewPage": "New page",
+  "@deckNewPage": {
+    "description": "Deck"
+  },
+  "deckRemovePage": "Remove this page",
+  "@deckRemovePage": {
+    "description": "Deck"
+  },
+  "deckMoveHint": "Hold a button and drag it to move it.",
+  "@deckMoveHint": {
+    "description": "Deck, editing: how to move a button"
+  },
+  "settingsGallery": "Photos on your computers",
+  "@settingsGallery": {
+    "description": "Settings > Files: computers can browse this phone's photos (their Gallery)"
+  },
+  "settingsGalleryCaption": "Your computers can look through this phone's photos and videos, and save the ones you pick.",
+  "@settingsGalleryCaption": {
+    "description": "Deck"
+  },
+  "settingsGalleryDenied": "Allow Linksy to see your photos in Android's settings.",
+  "@settingsGalleryDenied": {
+    "description": "Snack bar when Android didn't allow photo access"
   }
 }

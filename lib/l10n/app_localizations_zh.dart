@@ -2398,4 +2398,111 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get settingsReduceMotionCaption => '页面淡入而不滑动，按钮变淡而不缩小。';
+
+  @override
+  String get deviceDeck => '控制面板';
+
+  @override
+  String deviceDeckCaption(String name) {
+    return '你为 $name 设置的按钮';
+  }
+
+  @override
+  String get deckEdit => '编辑';
+
+  @override
+  String get deckDone => '完成';
+
+  @override
+  String deckAsking(String name) {
+    return '正在询问 $name 控制面板可以做什么…';
+  }
+
+  @override
+  String deckAway(String name) {
+    return '$name 未连接。连接后控制面板即可使用。';
+  }
+
+  @override
+  String deckNothingOffered(String name) {
+    return '$name 还没有允许控制面板做任何事。请在电脑上的 Linksy 中开启相应操作。';
+  }
+
+  @override
+  String get deckEmptyPage => '这里还没有内容。点按“编辑”，然后点按“添加”。';
+
+  @override
+  String get deckAdd => '添加';
+
+  @override
+  String get deckAddTitle => '添加到控制面板';
+
+  @override
+  String get deckUnavailable => '不可用';
+
+  @override
+  String get deckGroupMedia => '媒体';
+
+  @override
+  String get deckGroupSound => '声音';
+
+  @override
+  String get deckGroupSystem => '系统';
+
+  @override
+  String get deckGroupCommands => '命令';
+
+  @override
+  String get deckKindButton => '按钮';
+
+  @override
+  String get deckKindToggle => '开或关';
+
+  @override
+  String get deckKindSlider => '滑块';
+
+  @override
+  String get deckSize => '大小';
+
+  @override
+  String get deckSizeSmall => '小';
+
+  @override
+  String get deckSizeWide => '宽';
+
+  @override
+  String get deckSizeTall => '高';
+
+  @override
+  String get deckSizeBig => '大';
+
+  @override
+  String get deckSizeRow => '整行';
+
+  @override
+  String get deckColor => '颜色';
+
+  @override
+  String get deckIcon => '图标';
+
+  @override
+  String get deckRemove => '从控制面板移除';
+
+  @override
+  String get deckNewPage => '新页面';
+
+  @override
+  String get deckRemovePage => '移除此页面';
+
+  @override
+  String get deckMoveHint => '按住按钮并拖动即可移动。';
+
+  @override
+  String get settingsGallery => '在电脑上查看照片';
+
+  @override
+  String get settingsGalleryCaption => '你的电脑可以浏览这部手机上的照片和视频，并保存你选中的。';
+
+  @override
+  String get settingsGalleryDenied => '请在 Android 设置中允许 Linksy 查看你的照片。';
 }

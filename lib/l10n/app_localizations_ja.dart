@@ -2434,4 +2434,111 @@ class AppLocalizationsJa extends AppLocalizations {
 
   @override
   String get settingsReduceMotionCaption => '画面はスライドせずにフェードし、ボタンは縮まずに薄くなります。';
+
+  @override
+  String get deviceDeck => 'デッキ';
+
+  @override
+  String deviceDeckCaption(String name) {
+    return '$name 用のあなたのボタン';
+  }
+
+  @override
+  String get deckEdit => '編集';
+
+  @override
+  String get deckDone => '完了';
+
+  @override
+  String deckAsking(String name) {
+    return 'デッキでできることを $name に確認しています…';
+  }
+
+  @override
+  String deckAway(String name) {
+    return '$name は接続されていません。接続するとデッキが使えます。';
+  }
+
+  @override
+  String deckNothingOffered(String name) {
+    return '$name はまだデッキに何も許可していません。コンピュータの Linksy で操作をオンにしてください。';
+  }
+
+  @override
+  String get deckEmptyPage => 'まだ何もありません。「編集」→「追加」をタップします。';
+
+  @override
+  String get deckAdd => '追加';
+
+  @override
+  String get deckAddTitle => 'デッキに追加';
+
+  @override
+  String get deckUnavailable => '利用できません';
+
+  @override
+  String get deckGroupMedia => 'メディア';
+
+  @override
+  String get deckGroupSound => 'サウンド';
+
+  @override
+  String get deckGroupSystem => 'システム';
+
+  @override
+  String get deckGroupCommands => 'コマンド';
+
+  @override
+  String get deckKindButton => 'ボタン';
+
+  @override
+  String get deckKindToggle => 'オン／オフ';
+
+  @override
+  String get deckKindSlider => 'スライダー';
+
+  @override
+  String get deckSize => 'サイズ';
+
+  @override
+  String get deckSizeSmall => '小';
+
+  @override
+  String get deckSizeWide => '横長';
+
+  @override
+  String get deckSizeTall => '縦長';
+
+  @override
+  String get deckSizeBig => '大';
+
+  @override
+  String get deckSizeRow => '1 行';
+
+  @override
+  String get deckColor => '色';
+
+  @override
+  String get deckIcon => 'アイコン';
+
+  @override
+  String get deckRemove => 'デッキから削除';
+
+  @override
+  String get deckNewPage => '新しいページ';
+
+  @override
+  String get deckRemovePage => 'このページを削除';
+
+  @override
+  String get deckMoveHint => 'ボタンを長押ししてドラッグすると移動できます。';
+
+  @override
+  String get settingsGallery => 'コンピュータで写真を見る';
+
+  @override
+  String get settingsGalleryCaption => 'コンピュータからこのスマホの写真や動画を見て、選んだものを保存できます。';
+
+  @override
+  String get settingsGalleryDenied => 'Android の設定で Linksy に写真へのアクセスを許可してください。';
 }

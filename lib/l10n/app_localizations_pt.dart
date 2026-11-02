@@ -2503,4 +2503,114 @@ class AppLocalizationsPt extends AppLocalizations {
   @override
   String get settingsReduceMotionCaption =>
       'As telas aparecem com esmaecimento em vez de deslizar, e os botões ficam mais claros em vez de encolher.';
+
+  @override
+  String get deviceDeck => 'Deck';
+
+  @override
+  String deviceDeckCaption(String name) {
+    return 'Seus próprios botões para $name';
+  }
+
+  @override
+  String get deckEdit => 'Editar';
+
+  @override
+  String get deckDone => 'Concluir';
+
+  @override
+  String deckAsking(String name) {
+    return 'Perguntando a $name o que o deck pode fazer…';
+  }
+
+  @override
+  String deckAway(String name) {
+    return '$name não está conectado. O deck funciona assim que estiver.';
+  }
+
+  @override
+  String deckNothingOffered(String name) {
+    return '$name ainda não deixa o deck fazer nada. Ative as ações no Linksy no computador.';
+  }
+
+  @override
+  String get deckEmptyPage =>
+      'Nada aqui ainda. Toque em Editar e depois em Adicionar.';
+
+  @override
+  String get deckAdd => 'Adicionar';
+
+  @override
+  String get deckAddTitle => 'Adicionar ao deck';
+
+  @override
+  String get deckUnavailable => 'Indisponível';
+
+  @override
+  String get deckGroupMedia => 'Mídia';
+
+  @override
+  String get deckGroupSound => 'Som';
+
+  @override
+  String get deckGroupSystem => 'Sistema';
+
+  @override
+  String get deckGroupCommands => 'Comandos';
+
+  @override
+  String get deckKindButton => 'Botão';
+
+  @override
+  String get deckKindToggle => 'Ligado ou desligado';
+
+  @override
+  String get deckKindSlider => 'Controle deslizante';
+
+  @override
+  String get deckSize => 'Tamanho';
+
+  @override
+  String get deckSizeSmall => 'Pequeno';
+
+  @override
+  String get deckSizeWide => 'Largo';
+
+  @override
+  String get deckSizeTall => 'Alto';
+
+  @override
+  String get deckSizeBig => 'Grande';
+
+  @override
+  String get deckSizeRow => 'Linha inteira';
+
+  @override
+  String get deckColor => 'Cor';
+
+  @override
+  String get deckIcon => 'Ícone';
+
+  @override
+  String get deckRemove => 'Remover do deck';
+
+  @override
+  String get deckNewPage => 'Nova página';
+
+  @override
+  String get deckRemovePage => 'Remover esta página';
+
+  @override
+  String get deckMoveHint => 'Toque e segure um botão e arraste para movê-lo.';
+
+  @override
+  String get settingsGallery => 'Fotos nos seus computadores';
+
+  @override
+  String get settingsGalleryCaption =>
+      'Seus computadores podem ver as fotos e vídeos deste telefone e salvar os que você escolher.';
+
+  @override
+  String get settingsGalleryDenied =>
+      'Permita que o Linksy veja suas fotos nas configurações do Android.';
 }

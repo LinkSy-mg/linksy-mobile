@@ -2511,4 +2511,115 @@ class AppLocalizationsMg extends AppLocalizations {
   @override
   String get settingsReduceMotionCaption =>
       'Miseho moramora ny efijery fa tsy mitsoaka, ary manjavozavo ny bokotra fa tsy mihena.';
+
+  @override
+  String get deviceDeck => 'Deck';
+
+  @override
+  String deviceDeckCaption(String name) {
+    return 'Ny bokotrao manokana ho an\'i $name';
+  }
+
+  @override
+  String get deckEdit => 'Ovay';
+
+  @override
+  String get deckDone => 'Vita';
+
+  @override
+  String deckAsking(String name) {
+    return 'Manontany an\'i $name izay azon\'ny deck atao…';
+  }
+
+  @override
+  String deckAway(String name) {
+    return 'Tsy mifandray i $name. Mandeha ny deck rehefa mifandray izy.';
+  }
+
+  @override
+  String deckNothingOffered(String name) {
+    return 'Mbola tsy mamela ny deck hanao na inona na inona i $name. Alefaso ny asany ao amin\'ny Linksy eo amin\'ny solosaina.';
+  }
+
+  @override
+  String get deckEmptyPage =>
+      'Mbola tsy misy na inona na inona eto. Tsindrio ny Ovay, avy eo Ampio.';
+
+  @override
+  String get deckAdd => 'Ampio';
+
+  @override
+  String get deckAddTitle => 'Ampio amin\'ny deck';
+
+  @override
+  String get deckUnavailable => 'Tsy misy';
+
+  @override
+  String get deckGroupMedia => 'Haino aman-jery';
+
+  @override
+  String get deckGroupSound => 'Feo';
+
+  @override
+  String get deckGroupSystem => 'Rafitra';
+
+  @override
+  String get deckGroupCommands => 'Baiko';
+
+  @override
+  String get deckKindButton => 'Bokotra';
+
+  @override
+  String get deckKindToggle => 'Mandeha na tsia';
+
+  @override
+  String get deckKindSlider => 'Slider';
+
+  @override
+  String get deckSize => 'Habe';
+
+  @override
+  String get deckSizeSmall => 'Kely';
+
+  @override
+  String get deckSizeWide => 'Midadasika';
+
+  @override
+  String get deckSizeTall => 'Lava';
+
+  @override
+  String get deckSizeBig => 'Lehibe';
+
+  @override
+  String get deckSizeRow => 'Andalana iray manontolo';
+
+  @override
+  String get deckColor => 'Loko';
+
+  @override
+  String get deckIcon => 'Sary famantarana';
+
+  @override
+  String get deckRemove => 'Esory amin\'ny deck';
+
+  @override
+  String get deckNewPage => 'Pejy vaovao';
+
+  @override
+  String get deckRemovePage => 'Esory ity pejy ity';
+
+  @override
+  String get deckMoveHint =>
+      'Tazony ny bokotra ary sintony hanetsiketsehana azy.';
+
+  @override
+  String get settingsGallery => 'Sary ao amin\'ny solosainao';
+
+  @override
+  String get settingsGalleryCaption =>
+      'Afaka mijery ny sary sy horonan-tsarin\'ity finday ity ny solosainao, ary mitahiry izay safidinao.';
+
+  @override
+  String get settingsGalleryDenied =>
+      'Avelao ny Linksy hahita ny sarinao ao amin\'ny fikirana Android.';
 }
