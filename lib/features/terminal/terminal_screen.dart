@@ -228,77 +228,98 @@ class _TerminalScreenState extends State<TerminalScreen> {
                     onAdd: _newTab,
                   ),
                   Expanded(
-                    child: tab == null
-                        ? _Start(
-                            deviceId: widget.deviceId,
-                            name: _name,
-                            onNew: () => _newTab(),
-                            onResume: (r) => _newTab(resume: r),
-                          )
-                        : Stack(
-                            children: [
-                              Positioned.fill(
-                                child: Padding(
-                                  padding: const EdgeInsets.fromLTRB(
-                                    8,
-                                    4,
-                                    4,
-                                    0,
-                                  ),
-                                  // Two fingers: pinch the text smaller
-                                  // for more columns (wide output like
-                                  // fastfetch), or bigger to read.
-                                  child: Listener(
-                                    onPointerDown: _pointerDown,
-                                    onPointerMove: _pointerMove,
-                                    onPointerUp: _pointerUp,
-                                    onPointerCancel: _pointerUp,
-                                    child: TerminalView(
-                                      tab.term,
-                                      key: ObjectKey(tab),
-                                      theme: _theme,
-                                      focusNode: _focus,
-                                      autofocus: tab.state == TabState.live,
-                                      readOnly: tab.state != TabState.live,
-                                      keyboardType:
-                                          TextInputType.visiblePassword,
-                                      // Nerd Font symbols for prompts
-                                      // (starship, powerline) and logos.
-                                      textStyle: TerminalStyle(
-                                        fontSize: _fontSize,
-                                        fontFamily: 'JetBrainsMono',
-                                        fontFamilyFallback: const [
-                                          'NerdSymbols',
-                                          'monospace',
-                                          'Noto Sans Mono',
-                                          'Noto Sans Symbols',
-                                          'Noto Color Emoji',
-                                        ],
+                    child: AnimatedSwitcher(
+                      duration: motion(context),
+                      child: tab == null
+                          ? _Start(
+                              key: const ValueKey('start'),
+                              deviceId: widget.deviceId,
+                              name: _name,
+                              onNew: () => _newTab(),
+                              onResume: (r) => _newTab(resume: r),
+                            )
+                          : Stack(
+                              key: const ValueKey('tabs'),
+                              children: [
+                                Positioned.fill(
+                                  child: Padding(
+                                    padding: const EdgeInsets.fromLTRB(
+                                      8,
+                                      4,
+                                      4,
+                                      0,
+                                    ),
+                                    // Two fingers: pinch the text smaller
+                                    // for more columns (wide output like
+                                    // fastfetch), or bigger to read.
+                                    child: Listener(
+                                      onPointerDown: _pointerDown,
+                                      onPointerMove: _pointerMove,
+                                      onPointerUp: _pointerUp,
+                                      onPointerCancel: _pointerUp,
+                                      child: TerminalView(
+                                        tab.term,
+                                        key: ObjectKey(tab),
+                                        theme: _theme,
+                                        focusNode: _focus,
+                                        autofocus: tab.state == TabState.live,
+                                        readOnly: tab.state != TabState.live,
+                                        keyboardType:
+                                            TextInputType.visiblePassword,
+                                        // Nerd Font symbols for prompts
+                                        // (starship, powerline) and logos.
+                                        textStyle: TerminalStyle(
+                                          fontSize: _fontSize,
+                                          fontFamily: 'JetBrainsMono',
+                                          fontFamilyFallback: const [
+                                            'NerdSymbols',
+                                            'monospace',
+                                            'Noto Sans Mono',
+                                            'Noto Sans Symbols',
+                                            'Noto Color Emoji',
+                                          ],
+                                        ),
                                       ),
                                     ),
                                   ),
                                 ),
-                              ),
-                              if (tab.state == TabState.detached)
-                                _StateCard(
-                                  icon: Ph.terminalWindow,
-                                  title: context.l10n.terminalDetached,
-                                  detail: context.l10n.terminalDetachedDetail(
-                                    _name,
+                                Positioned(
+                                  left: 16,
+                                  right: 16,
+                                  bottom: 16,
+                                  child: AnimatedSwitcher(
+                                    duration: motion(context),
+                                    child: tab.state == TabState.detached
+                                        ? _StateCard(
+                                            icon: Ph.terminalWindow,
+                                            title:
+                                                context.l10n.terminalDetached,
+                                            detail: context.l10n
+                                                .terminalDetachedDetail(_name),
+                                            action:
+                                                context.l10n.terminalReattach,
+                                            onAction: () => _reattach(tab!),
+                                          )
+                                        : const SizedBox(
+                                            width: double.infinity,
+                                          ),
                                   ),
-                                  action: context.l10n.terminalReattach,
-                                  onAction: () => _reattach(tab!),
                                 ),
-                              if (tab.state == TabState.ended)
-                                const SizedBox.shrink(),
-                              if (tab.state == TabState.opening)
-                                const Center(
-                                  child: CircularProgressIndicator(
-                                    color: Sig.cyan,
+                                Positioned.fill(
+                                  child: AnimatedSwitcher(
+                                    duration: motion(context),
+                                    child: tab.state == TabState.opening
+                                        ? const Center(
+                                            child: CircularProgressIndicator(
+                                              color: Sig.cyan,
+                                            ),
+                                          )
+                                        : const SizedBox.shrink(),
                                   ),
                                 ),
-                            ],
-                          ),
+                              ],
+                            ),
+                    ),
                   ),
                   if (tab != null && tab.state == TabState.live)
                     _KeyBar(tab: tab),
@@ -397,20 +418,12 @@ class _Header extends StatelessWidget {
           if (tab != null)
             Padding(
               padding: const EdgeInsets.only(left: 4),
-              child: SizedBox(
-                height: 40,
-                child: TextButton.icon(
-                  onPressed: onClose,
-                  icon: const Icon(Ph.x, size: 16),
-                  label: Text(l.terminalClose),
-                  style: TextButton.styleFrom(
-                    foregroundColor: const Color(0xFFFF8A9A),
-                    backgroundColor: const Color(0x26FF5C72),
-                    shape: const StadiumBorder(),
-                    padding: const EdgeInsets.symmetric(horizontal: 14),
-                    textStyle: const TextStyle(fontWeight: FontWeight.w600),
-                  ),
-                ),
+              child: SmallAction(
+                label: l.terminalClose,
+                icon: Ph.x,
+                onTap: onClose,
+                color: const Color(0xFFFF8A9A),
+                fill: const Color(0x26FF5C72),
               ),
             ),
         ],
@@ -449,7 +462,8 @@ class _Tabs extends StatelessWidget {
               child: Pressable(
                 onTap: () => onPick(t),
                 semanticLabel: t.title,
-                child: Container(
+                child: AnimatedContainer(
+                  duration: motion(context, 150),
                   constraints: const BoxConstraints(maxWidth: 200),
                   padding: const EdgeInsets.only(left: 14),
                   decoration: BoxDecoration(
@@ -520,6 +534,7 @@ class _Tabs extends StatelessWidget {
 /// No tab yet: what still runs on the computer, and a new one.
 class _Start extends StatefulWidget {
   const _Start({
+    super.key,
     required this.deviceId,
     required this.name,
     required this.onNew,
@@ -670,54 +685,43 @@ class _StateCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Positioned(
-      left: 16,
-      right: 16,
-      bottom: 16,
-      child: Container(
-        padding: const EdgeInsets.fromLTRB(16, 14, 12, 14),
-        decoration: BoxDecoration(
-          color: _panel,
-          borderRadius: BorderRadius.circular(Radii.lg),
-          border: Border.all(color: _raised),
-        ),
-        child: Row(
-          children: [
-            Icon(icon, color: const Color(0xFFF5C451), size: 24),
-            const SizedBox(width: 12),
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(title, style: sora(16, color: Colors.white)),
-                  const SizedBox(height: 2),
-                  Text(
-                    detail,
-                    style: const TextStyle(
-                      color: _muted,
-                      fontSize: 13,
-                      height: 1.35,
-                    ),
+    return Container(
+      padding: const EdgeInsets.fromLTRB(16, 14, 12, 14),
+      decoration: BoxDecoration(
+        color: _panel,
+        borderRadius: BorderRadius.circular(Radii.lg),
+        border: Border.all(color: _raised),
+      ),
+      child: Row(
+        children: [
+          Icon(icon, color: const Color(0xFFF5C451), size: 24),
+          const SizedBox(width: 12),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(title, style: sora(16, color: Colors.white)),
+                const SizedBox(height: 2),
+                Text(
+                  detail,
+                  style: const TextStyle(
+                    color: _muted,
+                    fontSize: 13,
+                    height: 1.35,
                   ),
-                ],
-              ),
-            ),
-            const SizedBox(width: 8),
-            SizedBox(
-              height: 42,
-              child: TextButton(
-                onPressed: onAction,
-                style: TextButton.styleFrom(
-                  backgroundColor: Sig.blue,
-                  foregroundColor: Colors.white,
-                  shape: const StadiumBorder(),
-                  padding: const EdgeInsets.symmetric(horizontal: 16),
                 ),
-                child: Text(action),
-              ),
+              ],
             ),
-          ],
-        ),
+          ),
+          const SizedBox(width: 8),
+          SmallAction(
+            label: action,
+            onTap: onAction,
+            color: Colors.white,
+            fill: Sig.blue,
+            height: 42,
+          ),
+        ],
       ),
     );
   }
@@ -740,20 +744,22 @@ class _KeyBar extends StatelessWidget {
       IconData? icon,
     }) => Padding(
       padding: const EdgeInsets.only(right: 6),
-      child: Pressable(
-        onTap: () {
-          HapticFeedback.selectionClick();
-          onTap();
-        },
+      child: Pressable.builder(
+        onTap: onTap,
         scale: 0.9,
         semanticLabel: label,
-        child: Container(
+        builder: (context, down) => AnimatedContainer(
+          duration: motion(context, 120),
           constraints: const BoxConstraints(minWidth: 44),
           height: 44,
           padding: const EdgeInsets.symmetric(horizontal: 10),
           alignment: Alignment.center,
           decoration: BoxDecoration(
-            color: on ? Sig.blue : _raised,
+            color: on
+                ? Sig.blue
+                : down
+                ? Color.lerp(_raised, Colors.white, 0.12)
+                : _raised,
             borderRadius: BorderRadius.circular(Radii.sm),
           ),
           child: icon != null
@@ -927,13 +933,11 @@ class _CodeSheetState extends State<_CodeSheet> {
             ),
           ),
           Align(
-            child: TextButton(
-              onPressed: _busy
-                  ? null
-                  : () => setState(() => _letters = !_letters),
-              child: Text(
-                _letters ? l.terminalCodeUseDigits : l.terminalCodeUseLetters,
-              ),
+            child: SmallAction(
+              label: _letters
+                  ? l.terminalCodeUseDigits
+                  : l.terminalCodeUseLetters,
+              onTap: _busy ? null : () => setState(() => _letters = !_letters),
             ),
           ),
           const SizedBox(height: 6),
