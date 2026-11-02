@@ -2,6 +2,30 @@
 
 All notable changes to Linksy for Android. Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), versions follow [SemVer](https://semver.org/).
 
+## [0.3.2] - 2026-11-02
+
+> [!IMPORTANT]
+> **Play Protect may block this version.** Linksy can now show your phone's notifications on your computers, so Google Play Protect may stop the install ("App blocked to protect your device") when it doesn't come from the Play Store. To install it:
+> 1. Open the Play Store, tap your picture, then **Play Protect**, then the gear at the top right.
+> 2. Turn off **Scan apps with Play Protect**.
+> 3. Install Linksy (or tap **Update Now** in the app), then turn scanning back on.
+>
+> **To show notifications on your computer:** turn on Settings › With your computers › Show this phone's notifications. On Android 13 and later, Android greys out Linksy's switch in Notification access when it was installed from the web: open **App info** for Linksy, tap **⋮** at the top right, then **Allow restricted settings**, and turn Linksy on again. Linksy walks you through it.
+
+### Added
+- **This phone's notifications on your computers**: Settings › With your computers › Show this phone's notifications. Each one shows on your paired computers (Linksy 0.11 there), with Reply for messages (WhatsApp, Signal, Telegram, the SMS app, without any SMS permission) and the app's own buttons. Dismissing it on the computer dismisses it on the phone, and the other way. Linksy's own notifications and ongoing ones (music, navigation, downloads) stay on the phone, and nothing is kept on either side. It needs Android's Notification access: on Android 13 and later, Android greys out that switch for apps installed from the web, and Linksy shows how to allow it (App info › ⋮ › Allow restricted settings). Android 15 may still hide the text of some notifications from Linksy, such as one-time codes.
+- **Messages on your computer**: a chat's notification also tells the computer which chat it's in, who wrote the newest message, when, whether it's a group, and the person's or group's picture, so the computer can show your conversations on its Messages page (needs the computer's Linksy that has it). Turning notifications on or off tells your connected computers at once, without reconnecting.
+- **Keep Linksy alive**: Settings › Connection › Keep Linksy alive lists what to change on your phone's brand (Xiaomi, Samsung, OPPO, realme, OnePlus, vivo, Huawei, Honor and others) so it doesn't close Linksy in the background.
+- **Logs**: each read and write on the USB cable, for the first moments of a connection, then a summary every few seconds.
+
+### Changed
+- **Update sheet**: says what to do when Play Protect blocks the install, step by step.
+- **What's New** is back for this version: notifications on your computer, and Keep Linksy alive.
+
+### Fixed
+- **USB cable**: when the cable's link closes because the computer said nothing for 5 seconds, Linksy lets the cable go and opens it again, instead of staying on "connecting" until it's unplugged. Only Linksy reads the cable, and closing it no longer leaves a read waiting on it.
+- **Smaller download**: the app no longer carries two libraries it never used (about 1.4 MB on 64-bit phones).
+
 ## [0.3.1] - 2026-11-02
 
 ### Changed
