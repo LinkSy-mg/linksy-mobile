@@ -12,6 +12,7 @@ import '../../ui/sig.dart';
 import '../news/whats_new.dart';
 import '../onboarding/language_wheel.dart';
 import '../permissions/permissions_sheet.dart';
+import 'battery_guide.dart';
 import 'phone_notifications.dart';
 import 'settings_kit.dart';
 
@@ -108,6 +109,13 @@ List<SettingsHit> settingsIndex(BuildContext context) {
       Ph.deviceMobile,
       l.settingsKeepRunning,
       [l.settingsKeepRunningCaption],
+    ),
+    SettingsHit(
+      'battery',
+      SettingsArea.connection,
+      Ph.batteryCharging,
+      l.batteryGuide,
+      [l.batteryGuideCaption(makerName(LinksyScope.read(context).maker))],
     ),
     SettingsHit(
       'away',
@@ -516,6 +524,15 @@ class ConnectionSettings extends StatelessWidget {
               trailing: Switch(
                 value: c.stayRunning,
                 onChanged: c.setStayRunning,
+              ),
+            ),
+            SettingRow(
+              id: 'battery',
+              icon: Ph.batteryCharging,
+              title: l.batteryGuide,
+              caption: l.batteryGuideCaption(makerName(c.maker)),
+              onTap: () => Navigator.of(context).push(
+                MaterialPageRoute<void>(builder: (_) => const BatteryGuide()),
               ),
             ),
           ],
