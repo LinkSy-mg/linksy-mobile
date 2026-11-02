@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:io';
 import 'dart:math';
 
@@ -13,17 +14,36 @@ import 'sig.dart';
 
 export 'icons.dart';
 
-/// Shrinks a little while pressed, instead of an ink ripple.
+/// [ms] long, or done by the next frame when motion is reduced (the
+/// phone's setting, or Settings › This app › Reduce motion). Not zero:
+/// AnimatedSize can't take that.
+Duration motion(BuildContext context, [int ms = 200]) =>
+    MediaQuery.disableAnimationsOf(context)
+    ? const Duration(milliseconds: 1)
+    : Duration(milliseconds: ms);
+
+/// Shrinks a little while pressed, instead of an ink ripple; dims instead
+/// when motion is reduced.
 class Pressable extends StatefulWidget {
   const Pressable({
     super.key,
-    required this.child,
+    required Widget this.child,
     this.onTap,
     this.scale = 0.97,
     this.semanticLabel,
-  });
+  }) : builder = null;
 
-  final Widget child;
+  /// Built with whether it's held, for keys that also light up.
+  const Pressable.builder({
+    super.key,
+    required Widget Function(BuildContext context, bool down) this.builder,
+    this.onTap,
+    this.scale = 0.97,
+    this.semanticLabel,
+  }) : child = null;
+
+  final Widget? child;
+  final Widget Function(BuildContext context, bool down)? builder;
   final VoidCallback? onTap;
   final double scale;
   final String? semanticLabel;
@@ -34,33 +54,62 @@ class Pressable extends StatefulWidget {
 
 class _PressableState extends State<Pressable> {
   bool _down = false;
+  DateTime _since = DateTime(0);
+  Timer? _release;
 
-  void _set(bool down) {
-    if (_down != down) setState(() => _down = down);
+  void _press() {
+    _release?.cancel();
+    _since = DateTime.now();
+    if (!_down) setState(() => _down = true);
+  }
+
+  /// Held a moment at least: in a list a quick tap reports down and up
+  /// together, and would show nothing.
+  void _lift() {
+    final left =
+        const Duration(milliseconds: 90) - DateTime.now().difference(_since);
+    _release?.cancel();
+    _release = left > Duration.zero ? Timer(left, _up) : null;
+    if (_release == null) _up();
+  }
+
+  void _up() {
+    _release?.cancel();
+    if (mounted && _down) setState(() => _down = false);
+  }
+
+  @override
+  void dispose() {
+    _release?.cancel();
+    super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
     final enabled = widget.onTap != null;
+    final reduced = MediaQuery.disableAnimationsOf(context);
     return Semantics(
       button: enabled,
       label: widget.semanticLabel,
       child: GestureDetector(
         behavior: HitTestBehavior.opaque,
-        onTapDown: enabled ? (_) => _set(true) : null,
-        onTapUp: enabled ? (_) => _set(false) : null,
-        onTapCancel: enabled ? () => _set(false) : null,
+        onTapDown: enabled ? (_) => _press() : null,
+        onTapUp: enabled ? (_) => _lift() : null,
+        onTapCancel: enabled ? _up : null,
         onTap: enabled
             ? () {
                 HapticFeedback.selectionClick();
                 widget.onTap!();
               }
             : null,
-        child: AnimatedScale(
-          scale: _down ? widget.scale : 1,
-          duration: const Duration(milliseconds: 120),
-          curve: Curves.easeOut,
-          child: widget.child,
+        child: Opacity(
+          opacity: reduced && _down ? 0.6 : 1,
+          child: AnimatedScale(
+            scale: !reduced && _down ? widget.scale : 1,
+            duration: const Duration(milliseconds: 120),
+            curve: Curves.easeOut,
+            child: widget.builder?.call(context, _down) ?? widget.child,
+          ),
         ),
       ),
     );
@@ -166,16 +215,177 @@ class SigButton extends StatelessWidget {
         ),
       ],
     );
-    return Opacity(
+    return AnimatedOpacity(
       opacity: onTap == null ? 0.5 : 1,
+      duration: motion(context, 150),
       child: Pressable(
         onTap: onTap,
         semanticLabel: label,
-        child: Container(
+        child: AnimatedContainer(
+          duration: motion(context, 150),
           height: height,
           padding: const EdgeInsets.symmetric(horizontal: 24),
           decoration: decoration,
           child: ExcludeSemantics(child: content),
+        ),
+      ),
+    );
+  }
+}
+
+/// A small text button (See more, Allow, Stop): [color] text on [fill], or
+/// on nothing. Dips while pressed like the rest, and darkens or tints too;
+/// Material's TextButton only shades.
+class SmallAction extends StatelessWidget {
+  const SmallAction({
+    super.key,
+    required this.label,
+    required this.onTap,
+    this.icon,
+    this.color = Sig.blue,
+    this.fill,
+    this.height = 40,
+  });
+
+  final String label;
+  final VoidCallback? onTap;
+  final IconData? icon;
+  final Color color;
+  final Color? fill;
+  final double height;
+
+  @override
+  Widget build(BuildContext context) {
+    final fill = this.fill;
+    return AnimatedOpacity(
+      opacity: onTap == null ? 0.5 : 1,
+      duration: motion(context, 150),
+      child: Pressable.builder(
+        onTap: onTap,
+        scale: 0.95,
+        semanticLabel: label,
+        builder: (context, down) => AnimatedContainer(
+          duration: motion(context, 90),
+          height: height,
+          padding: EdgeInsets.symmetric(horizontal: fill == null ? 12 : 16),
+          decoration: BoxDecoration(
+            color: fill == null
+                ? color.withValues(alpha: down ? 0.12 : 0)
+                : down
+                ? Color.alphaBlend(Colors.black.withValues(alpha: 0.1), fill)
+                : fill,
+            borderRadius: BorderRadius.circular(99),
+          ),
+          child: ExcludeSemantics(
+            child: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                if (icon case final icon?) ...[
+                  Icon(icon, size: 16, color: color),
+                  const SizedBox(width: 6),
+                ],
+                Flexible(
+                  child: Text(
+                    label,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: TextStyle(
+                      color: color,
+                      fontSize: 14,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+/// Equal tabs in one track, with a [pill] that slides under the chosen one.
+class Segments extends StatelessWidget {
+  const Segments({
+    super.key,
+    required this.labels,
+    required this.selected,
+    required this.onChanged,
+    required this.builder,
+    this.pill = Sig.blue,
+    this.track,
+    this.height = 44,
+    this.radius = 99,
+    this.inset = 4,
+  });
+
+  /// One per tab, for screen readers.
+  final List<String> labels;
+  final int selected;
+  final ValueChanged<int> onChanged;
+
+  /// Tab [i]'s content; [on] goes from 0 to 1 as it becomes the chosen one.
+  final Widget Function(BuildContext context, int i, double on) builder;
+  final Color pill;
+  final Color? track;
+  final double height;
+  final double radius;
+  final double inset;
+
+  @override
+  Widget build(BuildContext context) {
+    final n = labels.length;
+    // None chosen (a value the list lacks): no pill.
+    final chosen = selected >= 0 && selected < n;
+    final at = chosen ? selected : 0;
+    return Container(
+      padding: EdgeInsets.all(inset),
+      decoration: BoxDecoration(
+        color: track ?? Sig.of(context).card,
+        borderRadius: BorderRadius.circular(radius),
+      ),
+      child: SizedBox(
+        height: height,
+        child: Stack(
+          fit: StackFit.expand,
+          children: [
+            AnimatedAlign(
+              alignment: AlignmentDirectional(
+                n < 2 ? 0 : -1 + 2 * at / (n - 1),
+                0,
+              ),
+              duration: motion(context, 260),
+              curve: Curves.easeOutCubic,
+              child: FractionallySizedBox(
+                widthFactor: 1 / n,
+                heightFactor: 1,
+                child: DecoratedBox(
+                  decoration: BoxDecoration(
+                    color: chosen ? pill : pill.withValues(alpha: 0),
+                    borderRadius: BorderRadius.circular(radius - inset),
+                  ),
+                ),
+              ),
+            ),
+            Row(
+              children: [
+                for (var i = 0; i < n; i++)
+                  Expanded(
+                    child: Pressable(
+                      onTap: () => onChanged(i),
+                      semanticLabel: labels[i],
+                      child: TweenAnimationBuilder<double>(
+                        tween: Tween(end: i == selected ? 1 : 0),
+                        duration: motion(context),
+                        builder: (context, on, _) =>
+                            Center(child: builder(context, i, on)),
+                      ),
+                    ),
+                  ),
+              ],
+            ),
+          ],
         ),
       ),
     );
@@ -440,16 +650,36 @@ class IconCircle extends StatelessWidget {
   final bool filled;
 
   @override
-  Widget build(BuildContext context) => Container(
+  Widget build(BuildContext context) => AnimatedContainer(
+    duration: motion(context, 180),
     width: size,
     height: size,
     decoration: BoxDecoration(
       shape: BoxShape.circle,
       color: filled ? color : color.withValues(alpha: 0.13),
     ),
-    child: Icon(icon, size: size * 0.48, color: filled ? Colors.white : color),
+    child: AnimatedSwitcher(
+      duration: motion(context, 180),
+      transitionBuilder: popIn,
+      child: Icon(
+        icon,
+        key: ValueKey((icon, filled)),
+        size: size * 0.48,
+        color: filled ? Colors.white : color,
+      ),
+    ),
   );
 }
+
+/// How an icon or a short label changes in an [AnimatedSwitcher]: it fades,
+/// growing from a little smaller.
+Widget popIn(Widget child, Animation<double> animation) => FadeTransition(
+  opacity: animation,
+  child: ScaleTransition(
+    scale: Tween(begin: 0.8, end: 1.0).animate(animation),
+    child: child,
+  ),
+);
 
 IconData kindIcon(DeviceKind kind) => switch (kind) {
   DeviceKind.desktop => Ph.desktop,
@@ -723,15 +953,16 @@ void showMessage(BuildContext context, String message) {
     ..showSnackBar(SnackBar(content: Text(message)));
 }
 
-/// Runs a controller action and shows its error, if any. The messenger is
-/// taken before waiting, so the screen may close meanwhile.
-Future<void> report(BuildContext context, Future<String?> action) async {
+/// Runs a controller action and shows its error, if any; true when it went.
+/// The messenger is taken before waiting, so the screen may close meanwhile.
+Future<bool> report(BuildContext context, Future<String?> action) async {
   final messenger = ScaffoldMessenger.of(context);
   final error = await action;
-  if (error == null) return;
+  if (error == null) return true;
   messenger
     ..hideCurrentSnackBar()
     ..showSnackBar(SnackBar(content: Text(error)));
+  return false;
 }
 
 /// One choice in a sheet: icon, title and caption; [primary] is the blue one.
