@@ -128,25 +128,99 @@ class SharingBanners extends StatelessWidget {
         .where((s) => deviceId == null || s.peer.id == deviceId)
         .where((s) => kinds == null || kinds!.contains(s.kind))
         .toList();
-    if (shares.isEmpty) return const SizedBox.shrink();
-    return Padding(
-      padding: const EdgeInsets.fromLTRB(16, 16, 16, 0),
-      child: Column(
-        children: [
-          for (final share in shares) ...[
-            Padding(
-              padding: const EdgeInsets.only(bottom: 10),
-              child: _Banner(share: share, controller: controller),
-            ),
-            if ((share.kind == SessionKind.screen ||
-                    share.kind == SessionKind.control) &&
-                controller.warnShareProtections)
-              Padding(
-                padding: const EdgeInsets.only(bottom: 10),
-                child: _ProtectionHint(controller: controller),
+    // Banners come and go: the page makes room, and closes up.
+    return AnimatedSize(
+      duration: motion(context, 220),
+      curve: Curves.easeOutCubic,
+      alignment: Alignment.topCenter,
+      child: shares.isEmpty
+          ? const SizedBox(width: double.infinity)
+          : Padding(
+              padding: const EdgeInsets.fromLTRB(16, 16, 16, 0),
+              child: Column(
+                children: [
+                  for (final share in shares) ...[
+                    Padding(
+                      padding: const EdgeInsets.only(bottom: 10),
+                      child: _Banner(share: share, controller: controller),
+                    ),
+                    if ((share.kind == SessionKind.screen ||
+                            share.kind == SessionKind.control) &&
+                        controller.warnShareProtections)
+                      Padding(
+                        padding: const EdgeInsets.only(bottom: 10),
+                        child: _ProtectionHint(controller: controller),
+                      ),
+                  ],
+                ],
               ),
-          ],
-        ],
+            ),
+    );
+  }
+}
+
+/// Stop on a banner: dims with a small spinner until the share has ended.
+class _Stop extends StatefulWidget {
+  const _Stop({required this.onStop});
+
+  final Future<void> Function() onStop;
+
+  @override
+  State<_Stop> createState() => _StopState();
+}
+
+class _StopState extends State<_Stop> {
+  bool _stopping = false;
+
+  Future<void> _stop() async {
+    setState(() => _stopping = true);
+    try {
+      await widget.onStop();
+    } finally {
+      // Still here: it didn't end, so it can be tried again.
+      if (mounted) setState(() => _stopping = false);
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final l = context.l10n;
+    return AnimatedOpacity(
+      opacity: _stopping ? 0.7 : 1,
+      duration: motion(context, 150),
+      child: Pressable(
+        onTap: _stopping ? null : _stop,
+        semanticLabel: l.sharingStopSharing,
+        child: Container(
+          padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.circular(99),
+          ),
+          child: AnimatedSize(
+            duration: motion(context, 150),
+            child: AnimatedSwitcher(
+              duration: motion(context, 150),
+              child: _stopping
+                  ? const SizedBox.square(
+                      key: ValueKey(true),
+                      dimension: 18,
+                      child: CircularProgressIndicator(
+                        strokeWidth: 2,
+                        color: Sig.deep,
+                      ),
+                    )
+                  : Text(
+                      l.sharingStop,
+                      key: const ValueKey(false),
+                      style: const TextStyle(
+                        color: Sig.deep,
+                        fontWeight: FontWeight.w700,
+                      ),
+                    ),
+            ),
+          ),
+        ),
       ),
     );
   }
@@ -187,13 +261,13 @@ class _ProtectionHint extends StatelessWidget {
           Row(
             mainAxisAlignment: MainAxisAlignment.end,
             children: [
-              TextButton(
-                onPressed: controller.dismissShareHint,
-                child: Text(context.l10n.sharingGotIt),
+              SmallAction(
+                label: context.l10n.sharingGotIt,
+                onTap: controller.dismissShareHint,
               ),
-              TextButton(
-                onPressed: LinksyPlatform.developerOptions,
-                child: Text(context.l10n.sharingDeveloperOptions),
+              SmallAction(
+                label: context.l10n.sharingDeveloperOptions,
+                onTap: LinksyPlatform.developerOptions,
               ),
             ],
           ),
@@ -278,24 +352,7 @@ class _Banner extends StatelessWidget {
             ),
             const SizedBox(width: 8),
           ],
-          Pressable(
-            onTap: () => controller.stopSharing(share.session),
-            semanticLabel: l.sharingStopSharing,
-            child: Container(
-              padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
-              decoration: BoxDecoration(
-                color: Colors.white,
-                borderRadius: BorderRadius.circular(99),
-              ),
-              child: Text(
-                l.sharingStop,
-                style: const TextStyle(
-                  color: Sig.deep,
-                  fontWeight: FontWeight.w700,
-                ),
-              ),
-            ),
-          ),
+          _Stop(onStop: () => controller.stopSharing(share.session)),
         ],
       ),
     );

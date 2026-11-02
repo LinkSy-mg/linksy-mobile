@@ -229,7 +229,7 @@ class _DisplayScreenState extends State<DisplayScreen> {
             IgnorePointer(
               child: AnimatedOpacity(
                 opacity: _hint ? 1 : 0,
-                duration: const Duration(milliseconds: 400),
+                duration: motion(context, 250),
                 child: Align(
                   alignment: Alignment.topCenter,
                   child: Container(
@@ -291,20 +291,21 @@ class _ChooseButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final name = context.l10n.displayChooseScreen;
-    return Semantics(
-      button: true,
-      label: name,
-      excludeSemantics: true,
-      child: Material(
-        color: Sig.deep.withValues(alpha: 0.8),
-        shape: const StadiumBorder(),
-        clipBehavior: Clip.antiAlias,
-        child: InkWell(
-          onTap: onTap,
+    return Pressable(
+      onTap: onTap,
+      scale: 0.92,
+      semanticLabel: name,
+      child: ExcludeSemantics(
+        child: DecoratedBox(
+          decoration: ShapeDecoration(
+            color: Sig.deep.withValues(alpha: 0.8),
+            shape: const StadiumBorder(),
+          ),
           child: Padding(
             padding: const EdgeInsets.all(10),
             child: AnimatedSize(
-              duration: const Duration(milliseconds: 400),
+              duration: motion(context, 220),
+              curve: Curves.easeOutCubic,
               child: Row(
                 mainAxisSize: MainAxisSize.min,
                 children: [

@@ -418,45 +418,27 @@ class _WebcamScreenState extends State<WebcamScreen> {
   // Settings, in tabs.
 
   Widget _tabs(Sig s) {
-    Widget tab(_Tab t, String label) {
-      final on = _tab == t;
-      return Expanded(
-        child: Pressable(
-          onTap: () => setState(() => _tab = t),
-          semanticLabel: label,
-          child: Container(
-            height: 38,
-            alignment: Alignment.center,
-            decoration: BoxDecoration(
-              color: on ? s.raised : Colors.transparent,
-              borderRadius: BorderRadius.circular(99),
-            ),
-            child: Text(
-              label,
-              style: TextStyle(
-                fontWeight: FontWeight.w600,
-                fontSize: 13.5,
-                color: on ? s.ink : s.muted,
-              ),
-            ),
-          ),
+    final labels = [
+      context.l10n.webcamTabLight,
+      context.l10n.webcamTabFocus,
+      context.l10n.webcamTabColor,
+      context.l10n.webcamTabStream,
+    ];
+    return Segments(
+      labels: labels,
+      selected: _tab.index,
+      onChanged: (i) => setState(() => _tab = _Tab.values[i]),
+      pill: s.raised,
+      height: 38,
+      builder: (context, i, on) => Text(
+        labels[i],
+        maxLines: 1,
+        overflow: TextOverflow.ellipsis,
+        style: TextStyle(
+          fontWeight: FontWeight.w600,
+          fontSize: 13.5,
+          color: Color.lerp(s.muted, s.ink, on),
         ),
-      );
-    }
-
-    return Container(
-      padding: const EdgeInsets.all(4),
-      decoration: BoxDecoration(
-        color: s.card,
-        borderRadius: BorderRadius.circular(99),
-      ),
-      child: Row(
-        children: [
-          tab(_Tab.light, context.l10n.webcamTabLight),
-          tab(_Tab.focus, context.l10n.webcamTabFocus),
-          tab(_Tab.color, context.l10n.webcamTabColor),
-          tab(_Tab.stream, context.l10n.webcamTabStream),
-        ],
       ),
     );
   }
@@ -471,13 +453,21 @@ class _WebcamScreenState extends State<WebcamScreen> {
     return SigCard(
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
       child: AnimatedSize(
-        duration: const Duration(milliseconds: 180),
+        duration: motion(context, 180),
         alignment: Alignment.topCenter,
-        child: Column(
-          children: [
-            for (var i = 0; i < rows.length; i++)
-              _Divided(last: i == rows.length - 1, child: rows[i]),
-          ],
+        child: AnimatedSwitcher(
+          duration: motion(context, 150),
+          layoutBuilder: (current, previous) => Stack(
+            alignment: Alignment.topCenter,
+            children: [...previous, ?current],
+          ),
+          child: Column(
+            key: ValueKey(_tab),
+            children: [
+              for (var i = 0; i < rows.length; i++)
+                _Divided(last: i == rows.length - 1, child: rows[i]),
+            ],
+          ),
         ),
       ),
     );
@@ -847,38 +837,23 @@ class _Segmented extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final s = Sig.of(context);
-    return Container(
-      padding: const EdgeInsets.all(3),
-      decoration: BoxDecoration(
-        color: s.raised,
-        borderRadius: BorderRadius.circular(Radii.md),
-      ),
-      child: Row(
-        children: [
-          for (final (id, label) in options)
-            Expanded(
-              child: Pressable(
-                onTap: () => onChanged(id),
-                semanticLabel: label,
-                child: Container(
-                  height: 36,
-                  alignment: Alignment.center,
-                  decoration: BoxDecoration(
-                    color: id == selected ? Sig.blue : Colors.transparent,
-                    borderRadius: BorderRadius.circular(Radii.md - 3),
-                  ),
-                  child: Text(
-                    label,
-                    style: TextStyle(
-                      fontWeight: FontWeight.w600,
-                      fontSize: 13.5,
-                      color: id == selected ? Colors.white : s.muted,
-                    ),
-                  ),
-                ),
-              ),
-            ),
-        ],
+    return Segments(
+      labels: [for (final (_, label) in options) label],
+      selected: options.indexWhere((o) => o.$1 == selected),
+      onChanged: (i) => onChanged(options[i].$1),
+      track: s.raised,
+      height: 36,
+      radius: Radii.md,
+      inset: 3,
+      builder: (context, i, on) => Text(
+        options[i].$2,
+        maxLines: 1,
+        overflow: TextOverflow.ellipsis,
+        style: TextStyle(
+          fontWeight: FontWeight.w600,
+          fontSize: 13.5,
+          color: Color.lerp(s.muted, Colors.white, on),
+        ),
       ),
     );
   }
@@ -901,7 +876,8 @@ class _Pill extends StatelessWidget {
     return Pressable(
       onTap: onTap,
       semanticLabel: label,
-      child: Container(
+      child: AnimatedContainer(
+        duration: motion(context, 160),
         height: 36,
         padding: const EdgeInsets.symmetric(horizontal: 14),
         alignment: Alignment.center,
@@ -909,13 +885,14 @@ class _Pill extends StatelessWidget {
           color: selected ? Sig.blue : s.raised,
           borderRadius: BorderRadius.circular(99),
         ),
-        child: Text(
-          label,
+        child: AnimatedDefaultTextStyle(
+          duration: motion(context, 160),
           style: TextStyle(
             fontWeight: FontWeight.w600,
             fontSize: 13.5,
             color: selected ? Colors.white : s.ink,
           ),
+          child: Text(label),
         ),
       ),
     );
@@ -937,7 +914,9 @@ class _ZoomChip extends StatelessWidget {
   Widget build(BuildContext context) => Pressable(
     onTap: onTap,
     semanticLabel: context.l10n.webcamZoomTo(label),
-    child: Container(
+    child: AnimatedContainer(
+      duration: motion(context, 160),
+      curve: Curves.easeOutCubic,
       width: selected ? 44 : 36,
       height: selected ? 44 : 36,
       margin: const EdgeInsets.symmetric(horizontal: 2),
@@ -946,13 +925,14 @@ class _ZoomChip extends StatelessWidget {
         shape: BoxShape.circle,
         color: selected ? Colors.white : const Color(0x33FFFFFF),
       ),
-      child: Text(
-        label,
+      child: AnimatedDefaultTextStyle(
+        duration: motion(context, 160),
         style: TextStyle(
           fontWeight: FontWeight.w700,
           fontSize: selected ? 12.5 : 11,
           color: selected ? Sig.deep : Colors.white,
         ),
+        child: Text(label),
       ),
     ),
   );
@@ -1011,31 +991,47 @@ class _Action extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final s = Sig.of(context);
-    return Opacity(
+    return AnimatedOpacity(
       opacity: enabled ? 1 : 0.35,
+      duration: motion(context, 150),
       child: Pressable(
         onTap: enabled ? onTap : null,
+        scale: 0.92,
         semanticLabel: label,
         child: Column(
           children: [
-            Container(
+            AnimatedContainer(
+              duration: motion(context, 180),
               width: 56,
               height: 56,
               decoration: BoxDecoration(
                 shape: BoxShape.circle,
                 color: on ? Sig.blue : s.card,
               ),
-              child: Icon(icon, size: 24, color: on ? Colors.white : s.ink),
+              child: AnimatedSwitcher(
+                duration: motion(context, 180),
+                transitionBuilder: popIn,
+                child: Icon(
+                  icon,
+                  key: ValueKey((icon, on)),
+                  size: 24,
+                  color: on ? Colors.white : s.ink,
+                ),
+              ),
             ),
             const SizedBox(height: 8),
-            Text(
-              label,
-              maxLines: 1,
-              overflow: TextOverflow.ellipsis,
-              style: TextStyle(
-                fontSize: 12.5,
-                fontWeight: FontWeight.w600,
-                color: on ? s.ink : s.muted,
+            AnimatedSwitcher(
+              duration: motion(context, 180),
+              child: Text(
+                label,
+                key: ValueKey((label, on)),
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+                style: TextStyle(
+                  fontSize: 12.5,
+                  fontWeight: FontWeight.w600,
+                  color: on ? s.ink : s.muted,
+                ),
               ),
             ),
           ],
