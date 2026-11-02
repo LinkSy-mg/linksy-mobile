@@ -2392,4 +2392,10 @@ class AppLocalizationsZh extends AppLocalizations {
   @override
   String get news032BatteryBody =>
       '设置 › 连接 › 让 Linksy 保持运行 会按你的手机品牌说明需要更改的设置，让 Linksy 在后台继续运行。';
+
+  @override
+  String get settingsReduceMotion => '减少动态效果';
+
+  @override
+  String get settingsReduceMotionCaption => '页面淡入而不滑动，按钮变淡而不缩小。';
 }

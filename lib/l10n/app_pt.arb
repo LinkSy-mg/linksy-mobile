@@ -663,5 +663,7 @@
   "news032NotificationsTitle": "Suas notificações no computador",
   "news032NotificationsBody": "Mensagens e outras notificações aparecem nos seus computadores pareados, com Responder. Ative em Configurações › Com seus computadores. Se o Android deixar a chave cinza: Informações do app › ⋮ › Permitir configurações restritas.",
   "news032BatteryTitle": "Manter o Linksy ativo",
-  "news032BatteryBody": "Configurações › Conexão › Manter o Linksy ativo mostra o que mudar conforme a marca do seu telefone para o Linksy continuar em segundo plano."
+  "news032BatteryBody": "Configurações › Conexão › Manter o Linksy ativo mostra o que mudar conforme a marca do seu telefone para o Linksy continuar em segundo plano.",
+  "settingsReduceMotion": "Reduzir movimento",
+  "settingsReduceMotionCaption": "As telas aparecem com esmaecimento em vez de deslizar, e os botões ficam mais claros em vez de encolher."
 }

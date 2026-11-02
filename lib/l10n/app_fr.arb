@@ -663,5 +663,7 @@
   "news032NotificationsTitle": "Vos notifications sur votre ordinateur",
   "news032NotificationsBody": "Les messages et autres notifications s'affichent sur vos ordinateurs associés, avec Répondre. Activez-le dans Réglages › Avec vos ordinateurs. Si Android grise le bouton : Infos sur l'appli › ⋮ › Autoriser les paramètres restreints.",
   "news032BatteryTitle": "Garder Linksy actif",
-  "news032BatteryBody": "Réglages › Connexion › Garder Linksy actif montre ce qu'il faut changer selon la marque de votre téléphone pour que Linksy continue en arrière-plan."
+  "news032BatteryBody": "Réglages › Connexion › Garder Linksy actif montre ce qu'il faut changer selon la marque de votre téléphone pour que Linksy continue en arrière-plan.",
+  "settingsReduceMotion": "Réduire les animations",
+  "settingsReduceMotionCaption": "Les écrans apparaissent en fondu au lieu de glisser, et les boutons pâlissent au lieu de rétrécir."
 }

@@ -663,5 +663,7 @@
   "news032NotificationsTitle": "Le tue notifiche sul computer",
   "news032NotificationsBody": "Messaggi e altre notifiche appaiono sui tuoi computer associati, con Rispondi. Attivalo in Impostazioni › Con i tuoi computer. Se Android disattiva l'interruttore: Informazioni app › ⋮ › Consenti impostazioni con limitazioni.",
   "news032BatteryTitle": "Tieni attivo Linksy",
-  "news032BatteryBody": "Impostazioni › Connessione › Tieni attivo Linksy mostra cosa cambiare in base alla marca del telefono perché Linksy resti attivo in background."
+  "news032BatteryBody": "Impostazioni › Connessione › Tieni attivo Linksy mostra cosa cambiare in base alla marca del telefono perché Linksy resti attivo in background.",
+  "settingsReduceMotion": "Riduci movimento",
+  "settingsReduceMotionCaption": "Le schermate appaiono in dissolvenza invece di scorrere, e i pulsanti si attenuano invece di rimpicciolirsi."
 }

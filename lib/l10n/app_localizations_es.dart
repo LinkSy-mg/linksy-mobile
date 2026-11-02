@@ -2502,4 +2502,11 @@ class AppLocalizationsEs extends AppLocalizations {
   @override
   String get news032BatteryBody =>
       'Ajustes › Conexión › Mantener Linksy activo muestra qué cambiar según la marca de tu teléfono para que Linksy siga en segundo plano.';
+
+  @override
+  String get settingsReduceMotion => 'Reducir movimiento';
+
+  @override
+  String get settingsReduceMotionCaption =>
+      'Las pantallas aparecen con un fundido en vez de deslizarse, y los botones se atenúan en vez de encogerse.';
 }

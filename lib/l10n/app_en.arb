@@ -3324,5 +3324,13 @@
   "news032BatteryBody": "Settings › Connection › Keep Linksy alive shows what to change on your phone's brand so Linksy keeps running in the background.",
   "@news032BatteryBody": {
     "description": "What's New body"
+  },
+  "settingsReduceMotion": "Reduce motion",
+  "@settingsReduceMotion": {
+    "description": "Settings › This app: a switch for fewer animations (like the phone's own Remove animations)"
+  },
+  "settingsReduceMotionCaption": "Screens fade instead of sliding, and buttons dim instead of shrinking.",
+  "@settingsReduceMotionCaption": {
+    "description": "What Reduce motion changes"
   }
 }

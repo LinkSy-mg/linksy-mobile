@@ -2504,4 +2504,11 @@ class AppLocalizationsMg extends AppLocalizations {
   @override
   String get news032BatteryBody =>
       'Fikirana › Fifandraisana › Tazomy ho velona ny Linksy dia mampiseho izay ovaina arakaraka ny marika findainao mba hijanonan\'ny Linksy mandeha ao ambadika.';
+
+  @override
+  String get settingsReduceMotion => 'Ahenoy ny fihetsiketsehana';
+
+  @override
+  String get settingsReduceMotionCaption =>
+      'Miseho moramora ny efijery fa tsy mitsoaka, ary manjavozavo ny bokotra fa tsy mihena.';
 }

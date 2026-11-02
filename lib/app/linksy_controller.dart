@@ -165,6 +165,15 @@ class LinksyController extends ChangeNotifier with WidgetsBindingObserver {
     await _setPref('theme', mode == ThemeMode.system ? null : mode.name);
   }
 
+  /// Fewer animations, as when the phone's own are off; the app rebuilds
+  /// when it changes.
+  final reduceMotion = ValueNotifier<bool>(false);
+
+  Future<void> setReduceMotion(bool on) async {
+    reduceMotion.value = on;
+    await _setPref('motion', on ? 'less' : null);
+  }
+
   /// The first-run setup (language, then what Linksy may do) is done.
   bool get onboarded => prefs['onboarded'] == '1';
 
@@ -366,6 +375,7 @@ class LinksyController extends ChangeNotifier with WidgetsBindingObserver {
     locale.value = resolveLocale(languageCode);
     useLocale(locale.value);
     themeMode.value = themeFrom(prefs['theme']);
+    reduceMotion.value = prefs['motion'] == 'less';
     // Shares that went on while the app's screen was recreated.
     for (final (session, kind, peerId) in await LinksyPlatform.activeShares()) {
       final peer = device(peerId)?.device;

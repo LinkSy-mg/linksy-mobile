@@ -2496,4 +2496,11 @@ class AppLocalizationsDe extends AppLocalizations {
   @override
   String get news032BatteryBody =>
       'Einstellungen › Verbindung › Linksy am Laufen halten zeigt, was du je nach Marke deines Telefons ändern musst, damit Linksy im Hintergrund weiterläuft.';
+
+  @override
+  String get settingsReduceMotion => 'Bewegung reduzieren';
+
+  @override
+  String get settingsReduceMotionCaption =>
+      'Bildschirme blenden über, statt zu gleiten, und Tasten werden blasser, statt kleiner zu werden.';
 }

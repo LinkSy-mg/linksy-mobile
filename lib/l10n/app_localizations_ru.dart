@@ -2523,4 +2523,11 @@ class AppLocalizationsRu extends AppLocalizations {
   @override
   String get news032BatteryBody =>
       'Настройки › Подключение › Чтобы Linksy не закрывался: что изменить на телефоне вашей марки, чтобы Linksy работал в фоне.';
+
+  @override
+  String get settingsReduceMotion => 'Уменьшить движение';
+
+  @override
+  String get settingsReduceMotionCaption =>
+      'Экраны появляются плавно, а не выезжают, а кнопки тускнеют, а не сжимаются.';
 }

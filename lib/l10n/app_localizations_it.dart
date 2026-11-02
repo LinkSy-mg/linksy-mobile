@@ -2502,4 +2502,11 @@ class AppLocalizationsIt extends AppLocalizations {
   @override
   String get news032BatteryBody =>
       'Impostazioni › Connessione › Tieni attivo Linksy mostra cosa cambiare in base alla marca del telefono perché Linksy resti attivo in background.';
+
+  @override
+  String get settingsReduceMotion => 'Riduci movimento';
+
+  @override
+  String get settingsReduceMotionCaption =>
+      'Le schermate appaiono in dissolvenza invece di scorrere, e i pulsanti si attenuano invece di rimpicciolirsi.';
 }

@@ -188,9 +188,7 @@ ThemeData buildTheme(Brightness brightness) {
       systemOverlayStyle: overlayFor(brightness),
     ),
     pageTransitionsTheme: const PageTransitionsTheme(
-      builders: {
-        TargetPlatform.android: PredictiveBackPageTransitionsBuilder(),
-      },
+      builders: {TargetPlatform.android: _PageTransitions()},
     ),
     dialogTheme: DialogThemeData(
       elevation: 0,
@@ -267,6 +265,31 @@ ThemeData buildTheme(Brightness brightness) {
       linearMinHeight: 5,
     ),
   );
+}
+
+/// Android's own page transition, with predictive back; a fade instead when
+/// motion is reduced.
+class _PageTransitions extends PageTransitionsBuilder {
+  const _PageTransitions();
+
+  static const _android = PredictiveBackPageTransitionsBuilder();
+
+  @override
+  Widget buildTransitions<T>(
+    PageRoute<T> route,
+    BuildContext context,
+    Animation<double> animation,
+    Animation<double> secondaryAnimation,
+    Widget child,
+  ) => MediaQuery.disableAnimationsOf(context)
+      ? FadeTransition(opacity: animation, child: child)
+      : _android.buildTransitions(
+          route,
+          context,
+          animation,
+          secondaryAnimation,
+          child,
+        );
 }
 
 SystemUiOverlayStyle overlayFor(Brightness brightness) => SystemUiOverlayStyle(

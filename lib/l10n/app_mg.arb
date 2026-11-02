@@ -663,5 +663,7 @@
   "news032NotificationsTitle": "Ny fampandrenesanao ao amin'ny solosainao",
   "news032NotificationsBody": "Miseho ao amin'ny solosaina mifandray aminao ny hafatra sy ny fampandrenesana hafa, miaraka amin'ny Valio. Alefaso ao amin'ny Fikirana › Miaraka amin'ny solosainao. Raha manamaizina ny bokotra ny Android: Mombamomba ny app › ⋮ › Avelao ny fikirana voafetra.",
   "news032BatteryTitle": "Tazomy ho velona ny Linksy",
-  "news032BatteryBody": "Fikirana › Fifandraisana › Tazomy ho velona ny Linksy dia mampiseho izay ovaina arakaraka ny marika findainao mba hijanonan'ny Linksy mandeha ao ambadika."
+  "news032BatteryBody": "Fikirana › Fifandraisana › Tazomy ho velona ny Linksy dia mampiseho izay ovaina arakaraka ny marika findainao mba hijanonan'ny Linksy mandeha ao ambadika.",
+  "settingsReduceMotion": "Ahenoy ny fihetsiketsehana",
+  "settingsReduceMotionCaption": "Miseho moramora ny efijery fa tsy mitsoaka, ary manjavozavo ny bokotra fa tsy mihena."
 }

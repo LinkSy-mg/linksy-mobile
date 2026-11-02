@@ -663,5 +663,7 @@
   "news032NotificationsTitle": "在电脑上查看你的通知",
   "news032NotificationsBody": "消息和其他通知会显示在已配对的电脑上，并可直接回复。在 设置 › 与你的电脑 中开启。如果 Android 将开关变灰：应用信息 › ⋮ › 允许受限制的设置。",
   "news032BatteryTitle": "让 Linksy 保持运行",
-  "news032BatteryBody": "设置 › 连接 › 让 Linksy 保持运行 会按你的手机品牌说明需要更改的设置，让 Linksy 在后台继续运行。"
+  "news032BatteryBody": "设置 › 连接 › 让 Linksy 保持运行 会按你的手机品牌说明需要更改的设置，让 Linksy 在后台继续运行。",
+  "settingsReduceMotion": "减少动态效果",
+  "settingsReduceMotionCaption": "页面淡入而不滑动，按钮变淡而不缩小。"
 }

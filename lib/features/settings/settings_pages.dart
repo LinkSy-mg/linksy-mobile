@@ -179,6 +179,13 @@ List<SettingsHit> settingsIndex(BuildContext context) {
       l.settingsAppearance,
       [l.settingsThemeSystem, l.settingsThemeLight, l.settingsThemeDark],
     ),
+    SettingsHit(
+      'motion',
+      SettingsArea.app,
+      Ph.personSimpleWalk,
+      l.settingsReduceMotion,
+      [l.settingsReduceMotionCaption],
+    ),
     SettingsHit('language', SettingsArea.app, Ph.globe, l.settingsLanguage),
     SettingsHit('news', SettingsArea.app, Ph.sparkle, l.newsTitle),
     SettingsHit('update', null, Ph.arrowCircleUp, l.updateCheck),
@@ -832,6 +839,16 @@ class AppSettings extends StatelessWidget {
         ),
         SettingsSection(
           children: [
+            SettingRow(
+              id: 'motion',
+              icon: Ph.personSimpleWalk,
+              title: l.settingsReduceMotion,
+              caption: l.settingsReduceMotionCaption,
+              trailing: Switch(
+                value: c.reduceMotion.value,
+                onChanged: c.setReduceMotion,
+              ),
+            ),
             SettingRow(
               id: 'language',
               icon: Ph.globe,

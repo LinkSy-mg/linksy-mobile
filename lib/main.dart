@@ -119,6 +119,7 @@ Future<void> main() async {
   controller.themeMode.value = LinksyController.themeFrom(
     controller.prefs['theme'],
   );
+  controller.reduceMotion.value = controller.prefs['motion'] == 'less';
   await controller.start();
   runApp(LinksyApp(controller: controller));
 }

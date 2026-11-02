@@ -20,6 +20,10 @@ abstract final class Ph {
   static const clock = IconData(0xe19a, fontFamily: 'PhosphorRegular');
   static const arrowCircleUp = IconData(0xe030, fontFamily: 'PhosphorRegular');
   static const sparkle = IconData(0xe6a2, fontFamily: 'PhosphorRegular');
+  static const personSimpleWalk = IconData(
+    0xe73a,
+    fontFamily: 'PhosphorRegular',
+  );
   static const star = IconData(0xe46a, fontFamily: 'PhosphorRegular');
   static const eyeSlash = IconData(0xe224, fontFamily: 'PhosphorRegular');
   static const copy = IconData(0xe1ca, fontFamily: 'PhosphorRegular');

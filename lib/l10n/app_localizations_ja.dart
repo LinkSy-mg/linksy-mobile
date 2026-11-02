@@ -2428,4 +2428,10 @@ class AppLocalizationsJa extends AppLocalizations {
   @override
   String get news032BatteryBody =>
       '設定 › 接続 › Linksy を動かし続ける で、スマホのメーカーごとに変更する設定がわかり、Linksy がバックグラウンドで動き続けます。';
+
+  @override
+  String get settingsReduceMotion => '動きを減らす';
+
+  @override
+  String get settingsReduceMotionCaption => '画面はスライドせずにフェードし、ボタンは縮まずに薄くなります。';
 }

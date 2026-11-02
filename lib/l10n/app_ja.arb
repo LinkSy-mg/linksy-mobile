@@ -663,5 +663,7 @@
   "news032NotificationsTitle": "通知をコンピュータで",
   "news032NotificationsBody": "メッセージなどの通知が、ペアリングしたコンピュータに返信ボタン付きで表示されます。設定 › コンピュータとの連携 でオンにします。スイッチがグレー表示なら：アプリ情報 › ⋮ › 制限付き設定を許可。",
   "news032BatteryTitle": "Linksy を動かし続ける",
-  "news032BatteryBody": "設定 › 接続 › Linksy を動かし続ける で、スマホのメーカーごとに変更する設定がわかり、Linksy がバックグラウンドで動き続けます。"
+  "news032BatteryBody": "設定 › 接続 › Linksy を動かし続ける で、スマホのメーカーごとに変更する設定がわかり、Linksy がバックグラウンドで動き続けます。",
+  "settingsReduceMotion": "動きを減らす",
+  "settingsReduceMotionCaption": "画面はスライドせずにフェードし、ボタンは縮まずに薄くなります。"
 }

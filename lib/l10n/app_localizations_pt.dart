@@ -2496,4 +2496,11 @@ class AppLocalizationsPt extends AppLocalizations {
   @override
   String get news032BatteryBody =>
       'Configurações › Conexão › Manter o Linksy ativo mostra o que mudar conforme a marca do seu telefone para o Linksy continuar em segundo plano.';
+
+  @override
+  String get settingsReduceMotion => 'Reduzir movimento';
+
+  @override
+  String get settingsReduceMotionCaption =>
+      'As telas aparecem com esmaecimento em vez de deslizar, e os botões ficam mais claros em vez de encolher.';
 }

@@ -2507,4 +2507,11 @@ class AppLocalizationsFr extends AppLocalizations {
   @override
   String get news032BatteryBody =>
       'Réglages › Connexion › Garder Linksy actif montre ce qu\'il faut changer selon la marque de votre téléphone pour que Linksy continue en arrière-plan.';
+
+  @override
+  String get settingsReduceMotion => 'Réduire les animations';
+
+  @override
+  String get settingsReduceMotionCaption =>
+      'Les écrans apparaissent en fondu au lieu de glisser, et les boutons pâlissent au lieu de rétrécir.';
 }

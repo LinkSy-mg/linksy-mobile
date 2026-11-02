@@ -260,6 +260,7 @@ class _LinksyAppState extends State<LinksyApp> {
       listenable: Listenable.merge([
         widget.controller.locale,
         widget.controller.themeMode,
+        widget.controller.reduceMotion,
       ]),
       builder: (context, _) => MaterialApp(
         title: 'Linksy',
@@ -272,13 +273,24 @@ class _LinksyAppState extends State<LinksyApp> {
         locale: widget.controller.locale.value,
         supportedLocales: [for (final l in languages) Locale(l.code)],
         localizationsDelegates: localizationsDelegates,
-        // The launch intro over everything, until the mark has landed.
-        builder: (context, child) => Stack(
-          children: [
-            child!,
-            LaunchIntro(plays: widget.controller.onboarded),
-          ],
-        ),
+        // The launch intro over everything, until the mark has landed; and
+        // Reduce motion, read like the phone's own setting.
+        builder: (context, child) {
+          final media = MediaQuery.of(context);
+          return MediaQuery(
+            data: media.copyWith(
+              disableAnimations:
+                  media.disableAnimations ||
+                  widget.controller.reduceMotion.value,
+            ),
+            child: Stack(
+              children: [
+                child!,
+                LaunchIntro(plays: widget.controller.onboarded),
+              ],
+            ),
+          );
+        },
         home: const HomeScreen(),
       ),
     ),

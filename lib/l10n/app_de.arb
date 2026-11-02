@@ -663,5 +663,7 @@
   "news032NotificationsTitle": "Deine Benachrichtigungen auf dem Computer",
   "news032NotificationsBody": "Nachrichten und andere Benachrichtigungen erscheinen auf deinen gekoppelten Computern, mit Antworten. Einschalten unter Einstellungen › Mit deinen Computern. Graut Android den Schalter aus: App-Info › ⋮ › Eingeschränkte Einstellungen zulassen.",
   "news032BatteryTitle": "Linksy am Laufen halten",
-  "news032BatteryBody": "Einstellungen › Verbindung › Linksy am Laufen halten zeigt, was du je nach Marke deines Telefons ändern musst, damit Linksy im Hintergrund weiterläuft."
+  "news032BatteryBody": "Einstellungen › Verbindung › Linksy am Laufen halten zeigt, was du je nach Marke deines Telefons ändern musst, damit Linksy im Hintergrund weiterläuft.",
+  "settingsReduceMotion": "Bewegung reduzieren",
+  "settingsReduceMotionCaption": "Bildschirme blenden über, statt zu gleiten, und Tasten werden blasser, statt kleiner zu werden."
 }

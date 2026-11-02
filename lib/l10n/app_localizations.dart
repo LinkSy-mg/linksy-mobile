@@ -4097,6 +4097,18 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Settings › Connection › Keep Linksy alive shows what to change on your phone\'s brand so Linksy keeps running in the background.'**
   String get news032BatteryBody;
+
+  /// Settings › This app: a switch for fewer animations (like the phone's own Remove animations)
+  ///
+  /// In en, this message translates to:
+  /// **'Reduce motion'**
+  String get settingsReduceMotion;
+
+  /// What Reduce motion changes
+  ///
+  /// In en, this message translates to:
+  /// **'Screens fade instead of sliding, and buttons dim instead of shrinking.'**
+  String get settingsReduceMotionCaption;
 }
 
 class _AppLocalizationsDelegate

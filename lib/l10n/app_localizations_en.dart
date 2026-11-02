@@ -2483,4 +2483,11 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get news032BatteryBody =>
       'Settings › Connection › Keep Linksy alive shows what to change on your phone\'s brand so Linksy keeps running in the background.';
+
+  @override
+  String get settingsReduceMotion => 'Reduce motion';
+
+  @override
+  String get settingsReduceMotionCaption =>
+      'Screens fade instead of sliding, and buttons dim instead of shrinking.';
 }
