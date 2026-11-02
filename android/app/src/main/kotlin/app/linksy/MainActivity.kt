@@ -63,7 +63,9 @@ class MainActivity : FlutterActivity() {
         watchBattery()
         Logs.sink = { line -> runOnUiThread { channel?.invokeMethod("log", line) } }
         PhoneNotifications.posted = { n -> runOnUiThread { channel?.invokeMethod("phoneNotification", n) } }
-        PhoneNotifications.removed = { key -> runOnUiThread { channel?.invokeMethod("phoneNotificationGone", key) } }
+        PhoneNotifications.removed = { key, kept ->
+            runOnUiThread { channel?.invokeMethod("phoneNotificationGone", mapOf("key" to key, "kept" to kept)) }
+        }
         ShareService.webcamListener = { session, state ->
             runOnUiThread { channel?.invokeMethod("webcamChanged", mapOf("session" to session, "state" to state.toString())) }
         }
@@ -137,6 +139,17 @@ class MainActivity : FlutterActivity() {
                         PhoneNotifications.act(call.argument<String>("key")!!, call.argument<String>("action")!!),
                     )
                     "dismissNotification" -> result.success(PhoneNotifications.dismiss(call.argument<String>("key")!!))
+                    "inboxHistory" -> InboxStore.page(
+                        this@MainActivity, call.argument<String>("app")!!, call.argument<String>("conversation")!!,
+                        call.argument<Number>("before")!!.toLong(), call.argument<Int>("limit")!!,
+                    ) { messages, more ->
+                        val page = mapOf("messages" to messages.map { it.json().toString() }, "more" to more)
+                        runOnUiThread { result.success(page) }
+                    }
+                    "forgetInbox" -> {
+                        InboxStore.forget(this@MainActivity)
+                        result.success(null)
+                    }
                     "openAppInfo" -> {
                         runCatching {
                             startActivity(Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS, android.net.Uri.parse("package:$packageName")))
