@@ -140,25 +140,41 @@ class _RemoteScreenState extends State<RemoteScreen> {
                   ],
                 ),
                 const SizedBox(height: 16),
-                if (!live)
-                  Expanded(
-                    child: _Waiting(
-                      name: name,
-                      asking: _asking,
-                      error: _error,
-                      ended: !_asking && _error == null,
-                      onRetry: _connect,
-                    ),
-                  )
-                else ...[
-                  _ModeSwitch(mode: _mode, onChanged: _setMode),
-                  const SizedBox(height: 14),
-                  Expanded(
-                    child: _mode == _Mode.touchpad
-                        ? _Touchpad(send: _send, onKey: _key)
-                        : _Slides(send: _send, onKey: _key, typing: typing),
+                Expanded(
+                  child: AnimatedSwitcher(
+                    duration: motion(context),
+                    child: !live
+                        ? _Waiting(
+                            key: const ValueKey(false),
+                            name: name,
+                            asking: _asking,
+                            error: _error,
+                            ended: !_asking && _error == null,
+                            onRetry: _connect,
+                          )
+                        : Column(
+                            key: const ValueKey(true),
+                            crossAxisAlignment: CrossAxisAlignment.stretch,
+                            children: [
+                              _ModeSwitch(mode: _mode, onChanged: _setMode),
+                              const SizedBox(height: 14),
+                              Expanded(
+                                child: _Sliding(
+                                  index: _mode.index,
+                                  children: [
+                                    _Touchpad(send: _send, onKey: _key),
+                                    _Slides(
+                                      send: _send,
+                                      onKey: _key,
+                                      typing: typing,
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ],
+                          ),
                   ),
-                ],
+                ),
               ],
             ),
           ),
@@ -170,6 +186,7 @@ class _RemoteScreenState extends State<RemoteScreen> {
 
 class _Waiting extends StatelessWidget {
   const _Waiting({
+    super.key,
     required this.name,
     required this.asking,
     required this.error,
@@ -225,48 +242,61 @@ class _ModeSwitch extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final s = Sig.of(context);
-    Widget tab(_Mode m, IconData icon, String label) {
-      final on = mode == m;
-      return Expanded(
-        child: Pressable(
-          onTap: () => onChanged(m),
-          semanticLabel: label,
-          child: Container(
-            height: 44,
-            decoration: BoxDecoration(
-              color: on ? Sig.blue : Colors.transparent,
-              borderRadius: BorderRadius.circular(99),
+    final tabs = [
+      (Ph.mouseSimple, context.l10n.remoteTouchpad),
+      (Ph.presentation, context.l10n.remoteSlides),
+    ];
+    return Segments(
+      labels: [for (final (_, label) in tabs) label],
+      selected: mode.index,
+      onChanged: (i) => onChanged(_Mode.values[i]),
+      builder: (context, i, on) {
+        final (icon, label) = tabs[i];
+        final color = Color.lerp(s.muted, Colors.white, on);
+        return Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Icon(icon, size: 18, color: color),
+            const SizedBox(width: 8),
+            Text(
+              label,
+              style: TextStyle(fontWeight: FontWeight.w600, color: color),
             ),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Icon(icon, size: 18, color: on ? Colors.white : s.muted),
-                const SizedBox(width: 8),
-                Text(
-                  label,
-                  style: TextStyle(
-                    fontWeight: FontWeight.w600,
-                    color: on ? Colors.white : s.muted,
-                  ),
-                ),
-              ],
-            ),
-          ),
-        ),
-      );
-    }
+          ],
+        );
+      },
+    );
+  }
+}
 
-    return Container(
-      padding: const EdgeInsets.all(4),
-      decoration: BoxDecoration(
-        color: s.card,
-        borderRadius: BorderRadius.circular(99),
-      ),
-      child: Row(
-        children: [
-          tab(_Mode.touchpad, Ph.mouseSimple, context.l10n.remoteTouchpad),
-          tab(_Mode.slides, Ph.presentation, context.l10n.remoteSlides),
-        ],
+/// The modes side by side: switching slides from one to the next, the way
+/// the pill above moves. Only the one that's on is kept once it settles.
+class _Sliding extends StatelessWidget {
+  const _Sliding({required this.index, required this.children});
+
+  final int index;
+  final List<Widget> children;
+
+  @override
+  Widget build(BuildContext context) {
+    final rtl = Directionality.of(context) == TextDirection.rtl;
+    return ClipRect(
+      child: TweenAnimationBuilder<double>(
+        tween: Tween(end: index.toDouble()),
+        duration: motion(context, 260),
+        curve: Curves.easeOutCubic,
+        builder: (context, t, _) => Stack(
+          fit: StackFit.expand,
+          children: [
+            for (final (i, child) in children.indexed)
+              if ((i - t).abs() < 1)
+                FractionalTranslation(
+                  key: ValueKey(i),
+                  translation: Offset((rtl ? t - i : i - t), 0),
+                  child: child,
+                ),
+          ],
+        ),
       ),
     );
   }
@@ -536,14 +566,15 @@ class _PadButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final s = Sig.of(context);
-    return Pressable(
+    return Pressable.builder(
       onTap: onTap,
       semanticLabel: label,
-      child: Container(
+      builder: (context, down) => AnimatedContainer(
+        duration: motion(context, 90),
         height: 56,
         alignment: Alignment.center,
         decoration: BoxDecoration(
-          color: s.card,
+          color: down ? s.raised : s.card,
           borderRadius: BorderRadius.circular(Radii.md),
         ),
         child: Text(
@@ -583,34 +614,38 @@ class _Slides extends StatelessWidget {
       children: [
         Expanded(
           flex: 3,
-          child: Pressable(
-            onTap: () {
-              HapticFeedback.lightImpact();
-              onKey(Keysym.right);
-            },
+          child: Pressable.builder(
+            onTap: () => onKey(Keysym.right),
             semanticLabel: context.l10n.remoteNextSlide,
-            child: Container(
+            builder: (context, down) => AnimatedContainer(
+              duration: motion(context, 90),
               decoration: BoxDecoration(
-                color: Sig.blue,
+                color: down ? Sig.deep : Sig.blue,
                 borderRadius: BorderRadius.circular(Radii.xl),
               ),
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Icon(
-                    Ph.caretRight,
-                    color: Colors.white,
-                    size: numpad ? 40 : 56,
-                  ),
-                  Text(
-                    context.l10n.remoteNext,
-                    style: sora(
-                      numpad ? 20 : 26,
-                      weight: FontWeight.w700,
+              // Smaller while the number pad takes room.
+              child: TweenAnimationBuilder<double>(
+                tween: Tween(end: numpad ? 0 : 1),
+                duration: motion(context, 220),
+                curve: Curves.easeOutCubic,
+                builder: (context, big, _) => Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Icon(
+                      Ph.caretRight,
                       color: Colors.white,
+                      size: 40 + 16 * big,
                     ),
-                  ),
-                ],
+                    Text(
+                      context.l10n.remoteNext,
+                      style: sora(
+                        20 + 6 * big,
+                        weight: FontWeight.w700,
+                        color: Colors.white,
+                      ),
+                    ),
+                  ],
+                ),
               ),
             ),
           ),
@@ -618,15 +653,13 @@ class _Slides extends StatelessWidget {
         const SizedBox(height: 12),
         Expanded(
           flex: 2,
-          child: Pressable(
-            onTap: () {
-              HapticFeedback.lightImpact();
-              onKey(Keysym.left);
-            },
+          child: Pressable.builder(
+            onTap: () => onKey(Keysym.left),
             semanticLabel: context.l10n.remotePreviousSlide,
-            child: Container(
+            builder: (context, down) => AnimatedContainer(
+              duration: motion(context, 90),
               decoration: BoxDecoration(
-                color: s.card,
+                color: down ? s.raised : s.card,
                 borderRadius: BorderRadius.circular(Radii.xl),
               ),
               child: Row(
@@ -644,7 +677,17 @@ class _Slides extends StatelessWidget {
           ),
         ),
         const SizedBox(height: 12),
-        if (numpad) ...[_Numpad(onKey: onKey), const SizedBox(height: 12)],
+        AnimatedSize(
+          duration: motion(context, 220),
+          curve: Curves.easeOutCubic,
+          alignment: Alignment.topCenter,
+          child: numpad
+              ? Padding(
+                  padding: const EdgeInsets.only(bottom: 12),
+                  child: _Numpad(onKey: onKey),
+                )
+              : const SizedBox(width: double.infinity),
+        ),
         Row(
           children: [
             Expanded(
@@ -687,14 +730,21 @@ class _Slides extends StatelessWidget {
             ),
           ],
         ),
-        if (!numpad && !typing) ...[
-          const SizedBox(height: 10),
-          Text(
-            context.l10n.remoteVolumeHint,
-            textAlign: TextAlign.center,
-            style: TextStyle(color: s.muted, fontSize: 13),
-          ),
-        ],
+        AnimatedSize(
+          duration: motion(context, 220),
+          curve: Curves.easeOutCubic,
+          alignment: Alignment.topCenter,
+          child: !numpad && !typing
+              ? Padding(
+                  padding: const EdgeInsets.only(top: 10),
+                  child: Text(
+                    context.l10n.remoteVolumeHint,
+                    textAlign: TextAlign.center,
+                    style: TextStyle(color: s.muted, fontSize: 13),
+                  ),
+                )
+              : const SizedBox(width: double.infinity),
+        ),
       ],
     );
   }
@@ -713,17 +763,15 @@ class _Numpad extends StatelessWidget {
     Widget key(int keysym, String label, {IconData? icon}) => Expanded(
       child: Padding(
         padding: const EdgeInsets.all(4),
-        child: Pressable(
-          onTap: () {
-            HapticFeedback.selectionClick();
-            onKey(keysym);
-          },
+        child: Pressable.builder(
+          onTap: () => onKey(keysym),
           semanticLabel: label,
-          child: Container(
+          builder: (context, down) => AnimatedContainer(
+            duration: motion(context, 90),
             height: 48,
             alignment: Alignment.center,
             decoration: BoxDecoration(
-              color: s.card,
+              color: down ? s.raised : s.card,
               borderRadius: BorderRadius.circular(Radii.md),
             ),
             child: icon != null
