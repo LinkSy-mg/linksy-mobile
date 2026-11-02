@@ -14,8 +14,9 @@ SDK=${ANDROID_HOME:-/opt/homebrew/share/android-commandlinetools}
 export ANDROID_NDK_HOME=${ANDROID_NDK_HOME:-$SDK/ndk/28.2.13676358}
 
 flutter_rust_bridge_codegen generate
-# Only the bridge belongs here: libraries left by older builds would ship too.
-find android/app/src/main/jniLibs -name '*.so' ! -name liblinksy_bridge.so -delete 2>/dev/null || true
 (cd rust && cargo ndk -t arm64-v8a -t armeabi-v7a -t x86_64 -P 24 \
   -o ../android/app/src/main/jniLibs build --release)
+# Only the bridge belongs here: cargo-ndk also copies the iroh crates' own
+# libraries, which the bridge doesn't load, and they'd ship in the APK.
+find android/app/src/main/jniLibs -name '*.so' ! -name liblinksy_bridge.so -delete
 ls -la android/app/src/main/jniLibs/*/liblinksy_bridge.so
