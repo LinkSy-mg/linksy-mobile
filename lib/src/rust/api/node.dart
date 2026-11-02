@@ -37,6 +37,16 @@ abstract class LinksyNode implements RustOpaqueInterface {
   /// Connect over the internet now (away from home).
   Future<void> connectAway({required String id});
 
+  /// This phone's deck for that computer shows (`open`) or stopped (§4.19).
+  Future<void> deckOpen({required String id, required bool open});
+
+  /// Runs one of the deck's actions there: a tap, or a slider's `value` (0 to 1).
+  Future<void> deckRun({
+    required String id,
+    required String action,
+    double? value,
+  });
+
   /// Turns down a session this phone can't do at all (the desktop then says
   /// "can't" rather than "didn't allow it"). False if it already expired.
   bool declineUnsupported({required String request});
@@ -68,6 +78,16 @@ abstract class LinksyNode implements RustOpaqueInterface {
 
   /// Photo auto-import: offers files into the computer's picture library.
   Future<String> importFiles({required String id, required List<String> paths});
+
+  /// Answers `inbox_history`: a conversation's earlier messages this phone
+  /// kept, oldest first (`messages_json`, a list in the core's shape).
+  Future<void> inboxHistoryPage({
+    required String id,
+    required String app,
+    required String conversation,
+    required String messagesJson,
+    required bool more,
+  });
 
   /// This device, as `DeviceInfo` JSON.
   String infoJson();
@@ -127,7 +147,8 @@ abstract class LinksyNode implements RustOpaqueInterface {
   /// One of this phone's notifications, new or changed (§4.5), shown on the
   /// computer: `notification_json` in the core's shape (`key`, `app`,
   /// `app_name`, `title`, `body`, `can_reply`, `actions`, `icon`, and for
-  /// chats `category`, `conversation`, `sender`, `group`, `time`, `picture`).
+  /// chats `category`, `conversation`, `sender`, `group`, `time`, `picture`,
+  /// `messages`, `mine`; for mail `subject`).
   Future<void> postNotification({
     required String id,
     required String notificationJson,
@@ -136,8 +157,13 @@ abstract class LinksyNode implements RustOpaqueInterface {
   /// Answers `locate` with why not.
   Future<void> refuseLocation({required String id, required String reason});
 
-  /// The notification `key` went away on this phone.
-  Future<void> removeNotification({required String id, required String key});
+  /// The notification `key` went away on this phone; with `reply_kept`, its
+  /// conversation can still be answered (§4.5).
+  Future<void> removeNotification({
+    required String id,
+    required String key,
+    required bool replyKept,
+  });
 
   /// Answer a pairing or transfer request. False if it already expired.
   bool respond({required String request, required bool accept});

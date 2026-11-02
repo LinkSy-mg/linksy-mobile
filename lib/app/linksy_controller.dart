@@ -8,6 +8,7 @@ import 'package:flutter/material.dart' show ThemeMode;
 import 'package:flutter/widgets.dart';
 import 'package:flutter/services.dart';
 
+import '../core/deck.dart';
 import '../core/linksy_node.dart';
 import 'app_log.dart';
 import '../core/models.dart';
@@ -130,7 +131,7 @@ class LinksyController extends ChangeNotifier with WidgetsBindingObserver {
   Timer? _importTimer;
   StreamSubscription<String>? _callSub;
   StreamSubscription<Map<String, Object?>>? _noticeSub;
-  StreamSubscription<String>? _noticeGoneSub;
+  StreamSubscription<(String, bool)>? _noticeGoneSub;
   StreamSubscription<(String, bool)>? _answerSub;
   StreamSubscription<(String, Map<String, Object?>)>? _directSub;
   StreamSubscription<void>? _networkSub;
@@ -362,6 +363,7 @@ class LinksyController extends ChangeNotifier with WidgetsBindingObserver {
       unawaited(updates.recheck());
       // Back from Notification access or App info, maybe.
       unawaited(refreshNotificationAccess());
+      unawaited(_refreshGallery());
       // Back from Developer options, maybe.
       _readShareProtections();
     } else if (state == AppLifecycleState.hidden) {
@@ -402,6 +404,7 @@ class LinksyController extends ChangeNotifier with WidgetsBindingObserver {
     await LinksyPlatform.shareFiles(sharingFiles && filesReady, all: filesAll);
     await LinksyPlatform.watchCalls(pauseOnCalls);
     await refreshNotificationAccess();
+    await _refreshGallery();
     final phone = await LinksyPlatform.phoneMaker();
     maker = phone.maker;
     sdk = phone.sdk;
@@ -992,6 +995,8 @@ class LinksyController extends ChangeNotifier with WidgetsBindingObserver {
 
   Future<void> setPhoneNotifications(bool on) async {
     await _setPref('phone_notifications', on ? 'on' : null);
+    // Turned off: the conversations kept for the computers go too.
+    if (!on) await LinksyPlatform.forgetInbox();
     await _mirror();
   }
 
@@ -1014,14 +1019,51 @@ class LinksyController extends ChangeNotifier with WidgetsBindingObserver {
   }
 
   /// Whether notifications go, to the listener and to the computers: they
-  /// show their Messages page while this phone announces `notifications`.
+  /// show their Inbox while this phone announces `notifications` (and scroll
+  /// back with `inbox_history`).
   Future<void> _mirror() async {
     await LinksyPlatform.mirrorNotifications(mirroring);
+    await _announce();
+  }
+
+  /// What this phone can do that comes and goes (§4.10), told to the
+  /// computers whenever it changes.
+  Future<void> _announce() async {
+    const changing = {'notifications', 'inbox_history', 'gallery'};
     final features = [
-      ...node.info.features.where((f) => f != 'notifications'),
-      if (mirroring) 'notifications',
+      ...node.info.features.where((f) => !changing.contains(f)),
+      if (mirroring) ...['notifications', 'inbox_history'],
+      if (gallery) 'gallery',
     ];
     await node.setFeatures(features).catchError((Object _) {});
+  }
+
+  /// Linksy may read the phone's photos and videos (Android's permission, or
+  /// All files access).
+  bool photoAccess = false;
+
+  /// Computers may look through them in their Gallery (§4.18, Settings ›
+  /// Files): on unless turned off, once Linksy may read them.
+  bool get gallery => photoAccess && prefs['gallery'] != 'off';
+
+  Future<void> _refreshGallery() async {
+    final was = gallery;
+    photoAccess = await LinksyPlatform.shareGallery(prefs['gallery'] != 'off');
+    if (gallery != was) {
+      await _announce();
+      notifyListeners();
+    }
+  }
+
+  /// Turns it on, asking Android for the photos first when it must, or off;
+  /// whether it's on now.
+  Future<bool> setGallery(bool on) async {
+    await _setPref('gallery', on ? null : 'off');
+    if (on && !photoAccess) await LinksyPlatform.requestPermission('photos');
+    await _refreshGallery();
+    await _announce();
+    notifyListeners();
+    return gallery;
   }
 
   /// The computers that get them: paired and around.
@@ -1038,10 +1080,33 @@ class LinksyController extends ChangeNotifier with WidgetsBindingObserver {
     }
   }
 
-  void _onPhoneNotificationGone(String key) {
+  void _onPhoneNotificationGone((String, bool) gone) {
+    final (key, kept) = gone;
     for (final id in _noticeTargets) {
-      node.removeNotification(id, key).catchError((Object _) {});
+      node
+          .removeNotification(id, key, replyKept: kept)
+          .catchError((Object _) {});
     }
+  }
+
+  /// A computer scrolls back in a conversation: what the listener kept.
+  Future<void> _answerHistory(InboxHistoryRequested r) async {
+    if (!mirroring) return;
+    final (messages, more) = await LinksyPlatform.inboxHistory(
+      r.app,
+      r.conversation,
+      r.beforeMs,
+      r.limit,
+    );
+    await node
+        .inboxHistoryPage(
+          r.from.id,
+          r.app,
+          r.conversation,
+          messages,
+          more: more,
+        )
+        .catchError((Object _) {});
   }
 
   // Files (§4.9): computers browse the one folder the user picked.
@@ -1082,6 +1147,8 @@ class LinksyController extends ChangeNotifier with WidgetsBindingObserver {
   Future<void> refreshFiles() async {
     allFiles = await LinksyPlatform.allFilesState();
     await LinksyPlatform.shareFiles(sharingFiles && filesReady, all: filesAll);
+    // All files access lets computers see the photos too.
+    await _refreshGallery();
     notifyListeners();
   }
 
@@ -1502,6 +1569,18 @@ class LinksyController extends ChangeNotifier with WidgetsBindingObserver {
         LinksyPlatform.notificationAction(key, action);
       case NotificationDismissRequested(:final key) when mirroring:
         LinksyPlatform.dismissNotification(key);
+      case InboxHistoryRequested():
+        _answerHistory(e);
+      case DeckActionsReceived(:final from, :final actions):
+        deckActions[from.id] = actions;
+        _deckFirstLayout(from.id, actions);
+        notifyListeners();
+      case DeckStateReceived(:final from, :final states):
+        final now = deckStates.putIfAbsent(from.id, () => {});
+        for (final st in states) {
+          now[st.id] = st;
+        }
+        notifyListeners();
       // Turned off here since: nothing to answer.
       case NotificationReplyRequested() ||
           NotificationActionRequested() ||
@@ -1913,6 +1992,86 @@ class LinksyController extends ChangeNotifier with WidgetsBindingObserver {
     notifyListeners();
     await node.ring(deviceId, on: false);
   });
+
+  // The deck (§4.19): this phone as buttons for a computer.
+
+  /// What each computer lets the deck do, once it said so, by device id.
+  final deckActions = <String, List<DeckAction>>{};
+
+  /// Their state now, by device id and action.
+  final deckStates = <String, Map<String, DeckState>>{};
+
+  final _deckLayouts = <String, DeckLayout?>{};
+
+  /// The deck's layout for [id], saved on the phone; none until that
+  /// computer first offers something.
+  DeckLayout? deckLayout(String id) =>
+      _deckLayouts[id] ??= DeckLayout.decode(prefs['deck.$id']);
+
+  Future<void> saveDeck(String id, DeckLayout layout) async {
+    _deckLayouts[id] = layout;
+    await _setPref('deck.$id', layout.encode());
+  }
+
+  /// The first time a computer offers actions, a deck made of them; after
+  /// that, tiles keep the names and kinds it says now.
+  void _deckFirstLayout(String id, List<DeckAction> actions) {
+    final layout = deckLayout(id);
+    if (layout == null) {
+      if (actions.isNotEmpty) saveDeck(id, DeckLayout.first(actions));
+      return;
+    }
+    var changed = false;
+    for (final page in layout.pages) {
+      for (final t in page.tiles) {
+        final a = actions.where((a) => a.id == t.action).firstOrNull;
+        if (a != null && (a.name != t.name || a.kind != t.kind)) {
+          t
+            ..name = a.name
+            ..kind = a.kind;
+          changed = true;
+        }
+      }
+    }
+    if (changed) saveDeck(id, layout);
+  }
+
+  /// The deck shows: the computer sends what it may do, then its state.
+  Future<void> openDeck(String id) =>
+      node.deckOpen(id, open: true).catchError((Object _) {});
+
+  /// …and stopped: it stops sending.
+  Future<void> closeDeck(String id) =>
+      node.deckOpen(id, open: false).catchError((Object _) {});
+
+  final _slid = <String, double>{};
+  final _sliding = <String, Timer>{};
+
+  /// Runs [action] on [id]: a tap, or a slider's [value]. While a slider is
+  /// dragged its newest value goes at most every 80 ms, the last one always.
+  void runDeck(String id, String action, {double? value}) {
+    if (value == null) {
+      node.deckRun(id, action).catchError((Object _) {});
+      return;
+    }
+    final key = '$id $action';
+    _slid[key] = value;
+    if (_sliding.containsKey(key)) return;
+    bool send() {
+      final v = _slid.remove(key);
+      if (v == null) return false;
+      node.deckRun(id, action, value: v).catchError((Object _) {});
+      return true;
+    }
+
+    send();
+    _sliding[key] = Timer.periodic(const Duration(milliseconds: 80), (t) {
+      if (!send()) {
+        t.cancel();
+        _sliding.remove(key);
+      }
+    });
+  }
 
   /// "Open on PC": the computer opens [url] in its browser.
   Future<String?> openUrl(String deviceId, String url) => _run(() async {

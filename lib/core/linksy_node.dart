@@ -93,11 +93,34 @@ abstract interface class LinksyNode {
   /// One of this phone's notifications, new or changed, to show on [id]
   /// (docs/protocol.md §4.5): `key`, `app`, `app_name`, `title`, `body`,
   /// `can_reply`, `actions`, `icon`, and for chats `category`,
-  /// `conversation`, `sender`, `group`, `time`, `picture`.
+  /// `conversation`, `sender`, `group`, `time`, `picture`, `messages`,
+  /// `mine`; for mail `subject`.
   Future<void> postNotification(String id, Map<String, Object?> notification);
 
-  /// The notification [key] went away on this phone.
-  Future<void> removeNotification(String id, String key);
+  /// The notification [key] went away on this phone; with [replyKept], its
+  /// conversation can still be answered from [id].
+  Future<void> removeNotification(
+    String id,
+    String key, {
+    bool replyKept = false,
+  });
+
+  /// Answers [id]'s `inbox_history`: a conversation's earlier messages this
+  /// phone kept, oldest first ([messagesJson], a JSON list), and whether
+  /// there are older ones still.
+  Future<void> inboxHistoryPage(
+    String id,
+    String app,
+    String conversation,
+    String messagesJson, {
+    required bool more,
+  });
+
+  /// This phone's deck for [id] shows ([open]) or stopped (§4.19).
+  Future<void> deckOpen(String id, {required bool open});
+
+  /// Runs one of [id]'s deck actions: a tap, or a slider's [value] (0 to 1).
+  Future<void> deckRun(String id, String action, {double? value});
 
   /// A step of a direct link this phone hosts, to [id] (docs/protocol.md
   /// §4.17): `{'type': 'invite', 'address': ...}`, `connecting`, `up` with

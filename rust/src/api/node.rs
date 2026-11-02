@@ -9,7 +9,7 @@ use std::path::PathBuf;
 use std::sync::OnceLock;
 
 use flutter_rust_bridge::frb;
-use linksy_core::{Battery, CallState, Config, DeviceKind, Error, Fingerprint, MediaCommand, Node, RemoteNotification, SessionKind, Settings, Uuid};
+use linksy_core::{Battery, CallState, Config, ConversationMessage, DeviceKind, Error, Fingerprint, MediaCommand, Node, RemoteNotification, SessionKind, Settings, Uuid};
 use linksy_core::{Event, Link, TerminalOpen};
 use tokio::runtime::Runtime;
 use tokio::sync::broadcast::error::RecvError;
@@ -119,6 +119,7 @@ pub async fn start_node(
             Ok(node) => {
                 crate::sessions::collect(&node);
                 crate::files::collect(&node);
+                crate::gallery::collect(&node);
                 crate::heartbeats::run(&node);
                 *RUNNING.lock().unwrap() = Some(node.clone());
                 return Ok(LinksyNode { node });
@@ -381,7 +382,8 @@ impl LinksyNode {
     /// One of this phone's notifications, new or changed (§4.5), shown on the
     /// computer: `notification_json` in the core's shape (`key`, `app`,
     /// `app_name`, `title`, `body`, `can_reply`, `actions`, `icon`, and for
-    /// chats `category`, `conversation`, `sender`, `group`, `time`, `picture`).
+    /// chats `category`, `conversation`, `sender`, `group`, `time`, `picture`,
+    /// `messages`, `mine`; for mail `subject`).
     pub async fn post_notification(&self, id: String, notification_json: String) -> Result<(), String> {
         let id = fingerprint(&id)?;
         let notification: RemoteNotification = serde_json::from_str(&notification_json).map_err(|e| format!("other:{e}"))?;
@@ -389,11 +391,49 @@ impl LinksyNode {
         run(async move { node.post_notification(&id, notification).await }).await
     }
 
-    /// The notification `key` went away on this phone.
-    pub async fn remove_notification(&self, id: String, key: String) -> Result<(), String> {
+    /// The notification `key` went away on this phone; with `reply_kept`, its
+    /// conversation can still be answered (§4.5).
+    pub async fn remove_notification(&self, id: String, key: String, reply_kept: bool) -> Result<(), String> {
         let id = fingerprint(&id)?;
         let node = self.node.clone();
-        run(async move { node.remove_notification(&id, &key).await }).await
+        run(async move {
+            if reply_kept {
+                node.remove_notification_reply_kept(&id, &key).await
+            } else {
+                node.remove_notification(&id, &key).await
+            }
+        })
+        .await
+    }
+
+    /// Answers `inbox_history`: a conversation's earlier messages this phone
+    /// kept, oldest first (`messages_json`, a list in the core's shape).
+    pub async fn inbox_history_page(
+        &self,
+        id: String,
+        app: String,
+        conversation: String,
+        messages_json: String,
+        more: bool,
+    ) -> Result<(), String> {
+        let id = fingerprint(&id)?;
+        let messages: Vec<ConversationMessage> = serde_json::from_str(&messages_json).map_err(|e| format!("other:{e}"))?;
+        let node = self.node.clone();
+        run(async move { node.inbox_history_page(&id, &app, &conversation, messages, more).await }).await
+    }
+
+    /// This phone's deck for that computer shows (`open`) or stopped (§4.19).
+    pub async fn deck_open(&self, id: String, open: bool) -> Result<(), String> {
+        let id = fingerprint(&id)?;
+        let node = self.node.clone();
+        run(async move { node.deck_open(&id, open).await }).await
+    }
+
+    /// Runs one of the deck's actions there: a tap, or a slider's `value` (0 to 1).
+    pub async fn deck_run(&self, id: String, action: String, value: Option<f64>) -> Result<(), String> {
+        let id = fingerprint(&id)?;
+        let node = self.node.clone();
+        run(async move { node.deck_run(&id, &action, value).await }).await
     }
 
     /// Photo auto-import: offers files into the computer's picture library.

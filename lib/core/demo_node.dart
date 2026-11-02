@@ -58,6 +58,7 @@ class DemoNode implements LinksyNode {
           'camera',
           'microphone',
           'terminal',
+          'deck',
         ],
       ),
       trusted: true,
@@ -376,7 +377,102 @@ class DemoNode implements LinksyNode {
   ) async {}
 
   @override
-  Future<void> removeNotification(String id, String key) async {}
+  Future<void> removeNotification(
+    String id,
+    String key, {
+    bool replyKept = false,
+  }) async {}
+
+  @override
+  Future<void> inboxHistoryPage(
+    String id,
+    String app,
+    String conversation,
+    String messagesJson, {
+    required bool more,
+  }) async {}
+
+  // The deck (§4.19): what a desktop offers, and its state as it's run.
+
+  static const _deck = [
+    DeckAction(
+      id: 'media.play_pause',
+      name: 'Play or Pause',
+      kind: DeckKind.button,
+      group: 'Media',
+    ),
+    DeckAction(
+      id: 'media.previous',
+      name: 'Previous',
+      kind: DeckKind.button,
+      group: 'Media',
+    ),
+    DeckAction(
+      id: 'media.next',
+      name: 'Next',
+      kind: DeckKind.button,
+      group: 'Media',
+    ),
+    DeckAction(
+      id: 'sound.volume',
+      name: 'Volume',
+      kind: DeckKind.slider,
+      group: 'Sound',
+    ),
+    DeckAction(
+      id: 'sound.mute',
+      name: 'Mute',
+      kind: DeckKind.toggle,
+      group: 'Sound',
+    ),
+    DeckAction(
+      id: 'sound.mic_mute',
+      name: 'Mute microphone',
+      kind: DeckKind.toggle,
+      group: 'Sound',
+    ),
+    DeckAction(
+      id: 'system.lock',
+      name: 'Lock',
+      kind: DeckKind.button,
+      group: 'System',
+    ),
+    DeckAction(
+      id: 'command.backup',
+      name: 'Backup',
+      kind: DeckKind.button,
+      group: 'Commands',
+    ),
+  ];
+
+  final _deckState = <String, DeckState>{
+    'sound.volume': const DeckState(id: 'sound.volume', value: 0.42),
+    'sound.mute': const DeckState(id: 'sound.mute', on: false),
+    'sound.mic_mute': const DeckState(id: 'sound.mic_mute', on: false),
+  };
+
+  @override
+  Future<void> deckOpen(String id, {required bool open}) async {
+    final from = _devices[id]?.device;
+    if (!open || from == null) return;
+    _emit(DeckActionsReceived(from: from, actions: _deck));
+    _emit(DeckStateReceived(from: from, states: _deckState.values.toList()));
+  }
+
+  @override
+  Future<void> deckRun(String id, String action, {double? value}) async {
+    final from = _devices[id]?.device;
+    if (from == null) return;
+    final now = _deckState[action];
+    if (value != null) {
+      _deckState[action] = DeckState(id: action, value: value);
+    } else if (now?.on != null) {
+      _deckState[action] = DeckState(id: action, on: !now!.on!);
+    } else {
+      return;
+    }
+    _emit(DeckStateReceived(from: from, states: [_deckState[action]!]));
+  }
 
   @override
   Future<void> directSend(String id, Map<String, Object?> step) async {}

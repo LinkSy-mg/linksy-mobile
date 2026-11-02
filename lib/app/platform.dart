@@ -40,7 +40,8 @@ abstract final class LinksyPlatform {
   static final _callStates = StreamController<String>.broadcast();
   static final _phoneNotifications =
       StreamController<Map<String, Object?>>.broadcast();
-  static final _phoneNotificationsGone = StreamController<String>.broadcast();
+  static final _phoneNotificationsGone =
+      StreamController<(String, bool)>.broadcast();
   static final _volumeKeys = StreamController<bool>.broadcast();
   static final _webcamChanges =
       StreamController<(String, Map<String, Object?>)>.broadcast();
@@ -92,8 +93,12 @@ abstract final class LinksyPlatform {
           _phoneNotifications.add(
             (call.arguments as Map).cast<String, Object?>(),
           );
-        case 'phoneNotificationGone' when call.arguments is String:
-          _phoneNotificationsGone.add(call.arguments as String);
+        case 'phoneNotificationGone':
+          final a = call.arguments as Map;
+          _phoneNotificationsGone.add((
+            a['key'] as String,
+            a['kept'] as bool? ?? false,
+          ));
         case 'webcamChanged':
           final a = call.arguments as Map;
           _webcamChanges.add((
@@ -262,7 +267,9 @@ abstract final class LinksyPlatform {
   }
 
   /// …and the keys of those that went away.
-  static Stream<String> get phoneNotificationsGone {
+  /// The key of one that went, and whether its conversation's reply is kept
+  /// (it can still be answered from a computer).
+  static Stream<(String, bool)> get phoneNotificationsGone {
     _listen();
     return _phoneNotificationsGone.stream;
   }
@@ -279,6 +286,32 @@ abstract final class LinksyPlatform {
   /// Sends this phone's notifications to [phoneNotifications], or stops.
   static Future<void> mirrorNotifications(bool on) =>
       _call<void>('mirrorNotifications', {'on': on});
+
+  /// What the listener kept of a conversation (§4.5): its messages older than
+  /// [before] (ms), oldest first, as a JSON list; and whether there are more.
+  static Future<(String, bool)> inboxHistory(
+    String app,
+    String conversation,
+    int before,
+    int limit,
+  ) async {
+    final page = await _call<Map>('inboxHistory', {
+      'app': app,
+      'conversation': conversation,
+      'before': before,
+      'limit': limit,
+    });
+    final messages = (page?['messages'] as List?)?.cast<String>() ?? const [];
+    return ('[${messages.join(',')}]', page?['more'] as bool? ?? false);
+  }
+
+  /// Lets computers look through the photos ([on]) while Android allows it;
+  /// whether it does (the photo permission, or All files access).
+  static Future<bool> shareGallery(bool on) async =>
+      await _call<bool>('shareGallery', {'on': on}) ?? false;
+
+  /// Forgets every conversation the listener kept.
+  static Future<void> forgetInbox() => _call<void>('forgetInbox');
 
   /// Answers notification [key] through its own reply; false if it's gone.
   static Future<bool> replyNotification(String key, String text) async =>

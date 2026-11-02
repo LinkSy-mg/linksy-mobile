@@ -530,6 +530,75 @@ class PictureReceived extends LinksyEvent {
   final String image;
 }
 
+/// A computer scrolls back in a conversation (§4.5, `inbox_history`): the
+/// messages this phone kept of it, older than [beforeMs], at most [limit].
+class InboxHistoryRequested extends LinksyEvent {
+  const InboxHistoryRequested({
+    required this.from,
+    required this.app,
+    required this.conversation,
+    required this.beforeMs,
+    required this.limit,
+  });
+  final DeviceInfo from;
+  final String app;
+  final String conversation;
+  final int beforeMs;
+  final int limit;
+}
+
+/// What a computer lets this phone's deck do (§4.19), in its [group]:
+/// `Media`, `Sound`, `System` or `Commands`, in English whatever the
+/// language ([name] is in the computer's).
+class DeckAction {
+  const DeckAction({
+    required this.id,
+    required this.name,
+    required this.kind,
+    this.group = '',
+  });
+  final String id;
+  final String name;
+  final DeckKind kind;
+  final String group;
+}
+
+/// A tap runs a button, flips a toggle (its state says [DeckState.on]), and
+/// a slider takes a value from 0 to 1 ([DeckState.value]).
+enum DeckKind {
+  button,
+  toggle,
+  slider;
+
+  static DeckKind parse(String? s) => switch (s) {
+    'toggle' => toggle,
+    'slider' => slider,
+    _ => button,
+  };
+}
+
+/// An action's state now, for its tile.
+class DeckState {
+  const DeckState({required this.id, this.on, this.value});
+  final String id;
+  final bool? on;
+  final double? value;
+}
+
+/// A computer's deck actions, on `deck_open` and whenever they change there.
+class DeckActionsReceived extends LinksyEvent {
+  const DeckActionsReceived({required this.from, required this.actions});
+  final DeviceInfo from;
+  final List<DeckAction> actions;
+}
+
+/// …and their state while the deck shows, when something changes.
+class DeckStateReceived extends LinksyEvent {
+  const DeckStateReceived({required this.from, required this.states});
+  final DeviceInfo from;
+  final List<DeckState> states;
+}
+
 /// A computer answers one of this phone's notifications it shows (§4.5):
 /// [text] goes back through the notification's own reply.
 class NotificationReplyRequested extends LinksyEvent {

@@ -5,5 +5,6 @@ pub mod api;
 mod frb_generated;
 mod cable;
 mod files;
+mod gallery;
 mod heartbeats;
 mod sessions;

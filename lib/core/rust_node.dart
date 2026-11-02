@@ -313,8 +313,42 @@ class RustNode implements LinksyNode {
       );
 
   @override
-  Future<void> removeNotification(String id, String key) => _guard(
-    () => _node.removeNotification(id: id, key: key),
+  Future<void> removeNotification(
+    String id,
+    String key, {
+    bool replyKept = false,
+  }) => _guard(
+    () => _node.removeNotification(id: id, key: key, replyKept: replyKept),
+    name: _nameOf(id),
+  );
+
+  @override
+  Future<void> inboxHistoryPage(
+    String id,
+    String app,
+    String conversation,
+    String messagesJson, {
+    required bool more,
+  }) => _guard(
+    () => _node.inboxHistoryPage(
+      id: id,
+      app: app,
+      conversation: conversation,
+      messagesJson: messagesJson,
+      more: more,
+    ),
+    name: _nameOf(id),
+  );
+
+  @override
+  Future<void> deckOpen(String id, {required bool open}) => _guard(
+    () => _node.deckOpen(id: id, open: open),
+    name: _nameOf(id),
+  );
+
+  @override
+  Future<void> deckRun(String id, String action, {double? value}) => _guard(
+    () => _node.deckRun(id: id, action: action, value: value),
     name: _nameOf(id),
   );
 

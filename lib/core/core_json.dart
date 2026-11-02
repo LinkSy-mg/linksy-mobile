@@ -228,6 +228,36 @@ LinksyEvent? eventFromJson(Json j) {
       from: device('from'),
       path: j['path'] as String,
     ),
+    'inbox_history' => InboxHistoryRequested(
+      from: device('from'),
+      app: j['app'] as String? ?? '',
+      conversation: j['conversation'] as String? ?? '',
+      beforeMs: _int(j['before_ms']),
+      limit: _int(j['limit']),
+    ),
+    'deck_actions' => DeckActionsReceived(
+      from: device('from'),
+      actions: [
+        for (final a in (j['actions'] as List? ?? const []).cast<Json>())
+          DeckAction(
+            id: a['id'] as String,
+            name: a['name'] as String? ?? '',
+            kind: DeckKind.parse(a['kind'] as String?),
+            group: a['group'] as String? ?? '',
+          ),
+      ],
+    ),
+    'deck_state' => DeckStateReceived(
+      from: device('from'),
+      states: [
+        for (final d in (j['states'] as List? ?? const []).cast<Json>())
+          DeckState(
+            id: d['id'] as String,
+            on: d['on'] as bool?,
+            value: (d['value'] as num?)?.toDouble(),
+          ),
+      ],
+    ),
     _ => null,
   };
 }
