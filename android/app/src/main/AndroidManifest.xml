@@ -1,8 +1,8 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android">
     <!-- QUIC over the local network, and mDNS presence (needs a multicast lock). -->
     <uses-permission android:name="android.permission.INTERNET"/>
-    <!-- Motion test build: "All files" for computers browsing this phone (mobile#17),
-         asked in Android's own settings page only when chosen. -->
+    <!-- "All files", when chosen, for computers browsing this phone (mobile#17);
+         granted in Android's own settings page, never asked at start. -->
     <uses-permission android:name="android.permission.MANAGE_EXTERNAL_STORAGE"/>
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE"/>
     <uses-permission android:name="android.permission.ACCESS_WIFI_STATE"/>
@@ -42,7 +42,7 @@
     <uses-permission android:name="android.permission.VIBRATE"/>
 
     <application
-        android:label="Linksy Motion"
+        android:label="Linksy"
         android:allowBackup="false"
         android:fullBackupContent="@xml/backup_rules"
         android:dataExtractionRules="@xml/data_extraction_rules"
@@ -99,7 +99,7 @@
         <activity
             android:name=".ShareTarget"
             android:exported="true"
-            android:label="Linksy Motion"
+            android:label="Linksy"
             android:excludeFromRecents="true"
             android:noHistory="true"
             android:theme="@android:style/Theme.Translucent.NoTitleBar">

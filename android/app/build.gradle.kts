@@ -4,7 +4,7 @@ plugins {
     id("com.android.application")
     // The Flutter Gradle Plugin must be applied after the Android and Kotlin Gradle plugins.
     id("dev.flutter.flutter-gradle-plugin")
-    // Motion test build: its own app id, which Firebase doesn't know, so no push.
+    id("com.google.gms.google-services")
 }
 
 // Release signing comes from android/key.properties (never committed).
@@ -24,7 +24,7 @@ android {
     }
 
     defaultConfig {
-        applicationId = "mg.linksy.motion.test"
+        applicationId = "app.linksy.mg"
         minSdk = flutter.minSdkVersion
         targetSdk = flutter.targetSdkVersion
         // Uses the version code from pubspec.yaml. When using split APKs, 1000 * ABI_VERSION

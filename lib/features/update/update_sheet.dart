@@ -10,14 +10,11 @@ import '../../ui/sig.dart';
 
 /// "Linksy X Is Available": what changed, the APK it installs, and Update
 /// Now filling with its progress.
-Future<void> showUpdate(BuildContext context) {
-  final updates = LinksyScope.read(context).updates;
-  return showModalBottomSheet<void>(
-    context: context,
-    isScrollControlled: true,
-    builder: (_) => const _UpdateSheet(),
-  ).whenComplete(updates.endPreview);
-}
+Future<void> showUpdate(BuildContext context) => showModalBottomSheet<void>(
+  context: context,
+  isScrollControlled: true,
+  builder: (_) => const _UpdateSheet(),
+);
 
 /// The APK's own id: the update is always the regular app.
 const _package = 'app.linksy.mg';
