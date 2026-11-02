@@ -3905,6 +3905,198 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Updating Linksy on {name} makes pairing even safer.'**
   String pairingUpdateOlder(String name);
+
+  /// Settings › With your computers: switch that mirrors this phone's notifications to paired computers
+  ///
+  /// In en, this message translates to:
+  /// **'Show this phone\'s notifications'**
+  String get settingsPhoneNotifications;
+
+  /// Caption of that switch
+  ///
+  /// In en, this message translates to:
+  /// **'On your computers, with Reply for messages.'**
+  String get settingsPhoneNotificationsCaption;
+
+  /// Caption (shown in red) when the switch is wanted but Android's Notification access isn't allowed
+  ///
+  /// In en, this message translates to:
+  /// **'Android hasn\'t allowed it yet. Tap to allow notification access.'**
+  String get settingsPhoneNotificationsAllow;
+
+  /// Sheet title: guide to allow Notification access
+  ///
+  /// In en, this message translates to:
+  /// **'Allow notification access'**
+  String get noticeAccessTitle;
+
+  /// Android 13+: Notification access is greyed out for apps installed from a browser (restricted settings)
+  ///
+  /// In en, this message translates to:
+  /// **'Android greys out the switch for apps installed from the web. To allow it:'**
+  String get noticeAccessGreyed;
+
+  /// Step 1 of the restricted settings guide
+  ///
+  /// In en, this message translates to:
+  /// **'Open App info for Linksy.'**
+  String get noticeAccessStepInfo;
+
+  /// Step 2: Android's own label is Allow restricted settings
+  ///
+  /// In en, this message translates to:
+  /// **'Tap ⋮ at the top right, then Allow restricted settings.'**
+  String get noticeAccessStepRestricted;
+
+  /// Step 3; Try again is the button below
+  ///
+  /// In en, this message translates to:
+  /// **'Come back, tap Try again and turn Linksy on.'**
+  String get noticeAccessStepAgain;
+
+  /// Before Android 13: just turn Linksy on in Notification access
+  ///
+  /// In en, this message translates to:
+  /// **'Turn Linksy on in Android\'s Notification access, then come back.'**
+  String get noticeAccessPlain;
+
+  /// Button opening Android's App info page for Linksy
+  ///
+  /// In en, this message translates to:
+  /// **'Open App info'**
+  String get commonOpenAppInfo;
+
+  /// Settings › Connection row and page title: per-brand steps so Android doesn't close Linksy
+  ///
+  /// In en, this message translates to:
+  /// **'Keep Linksy alive'**
+  String get batteryGuide;
+
+  /// Caption of that row; maker is the phone's maker as Android writes it (realme, Xiaomi, samsung)
+  ///
+  /// In en, this message translates to:
+  /// **'What to change on this {maker} phone'**
+  String batteryGuideCaption(String maker);
+
+  /// Intro of the battery guide page
+  ///
+  /// In en, this message translates to:
+  /// **'To save battery, some phones close apps in the background, and Linksy then misses files and notifications. On this {maker} phone:'**
+  String batteryIntro(String maker);
+
+  /// Battery guide step (Xiaomi, vivo): Android's labels
+  ///
+  /// In en, this message translates to:
+  /// **'App info › Autostart: on.'**
+  String get batteryAutostart;
+
+  /// Battery guide step (Xiaomi)
+  ///
+  /// In en, this message translates to:
+  /// **'App info › Battery saver: No restrictions.'**
+  String get batteryXiaomiSaver;
+
+  /// Battery guide step (Xiaomi, OPPO, realme, OnePlus, vivo, Huawei): lock the app in the recent apps screen
+  ///
+  /// In en, this message translates to:
+  /// **'In recent apps, hold Linksy and tap the lock, so clearing them leaves it running.'**
+  String get batteryLockRecents;
+
+  /// Battery guide step (Samsung)
+  ///
+  /// In en, this message translates to:
+  /// **'App info › Battery: Unrestricted.'**
+  String get batterySamsungUnrestricted;
+
+  /// Battery guide step (Samsung)
+  ///
+  /// In en, this message translates to:
+  /// **'Settings › Battery › Background usage limits: take Linksy out of Sleeping and Deep sleeping apps.'**
+  String get batterySamsungSleeping;
+
+  /// Battery guide step (OPPO, realme, OnePlus)
+  ///
+  /// In en, this message translates to:
+  /// **'App info › Battery usage: allow background activity, foreground activity and auto launch.'**
+  String get batteryOppoBackground;
+
+  /// Battery guide step (vivo, iQOO)
+  ///
+  /// In en, this message translates to:
+  /// **'Settings › Battery › Background power consumption: allow Linksy.'**
+  String get batteryVivoBackground;
+
+  /// Battery guide step (Huawei, Honor)
+  ///
+  /// In en, this message translates to:
+  /// **'Settings › Battery › App launch › Linksy: manage manually, with Auto-launch, Secondary launch and Run in background on.'**
+  String get batteryHuaweiLaunch;
+
+  /// Battery guide step (Pixel and other phones)
+  ///
+  /// In en, this message translates to:
+  /// **'App info › App battery usage: Unrestricted.'**
+  String get batteryUnrestricted;
+
+  /// Last step of the battery guide, for every phone
+  ///
+  /// In en, this message translates to:
+  /// **'In Linksy: Settings › Connection › Keep running in the background.'**
+  String get batteryKeepRunning;
+
+  /// Small note under the battery guide's steps
+  ///
+  /// In en, this message translates to:
+  /// **'The names change a little between versions of Android.'**
+  String get batteryNames;
+
+  /// Update sheet, Important box: Play Protect may block installing Linksy (it can read notifications); steps follow
+  ///
+  /// In en, this message translates to:
+  /// **'Linksy can show your notifications on your computers, so Play Protect may stop the install. If it does:'**
+  String get updatePlayProtect;
+
+  /// Step 1 of getting past Play Protect: where its settings are
+  ///
+  /// In en, this message translates to:
+  /// **'Play Store › your picture › Play Protect › ⚙.'**
+  String get updateProtectStep1;
+
+  /// Step 2: Play Protect's own label is Scan apps with Play Protect
+  ///
+  /// In en, this message translates to:
+  /// **'Turn off Scan apps with Play Protect.'**
+  String get updateProtectStep2;
+
+  /// Step 3; Update Now is the button below
+  ///
+  /// In en, this message translates to:
+  /// **'Tap Update Now again, then turn scanning back on.'**
+  String get updateProtectStep3;
+
+  /// What's New: this phone's notifications on its computers
+  ///
+  /// In en, this message translates to:
+  /// **'Your notifications on your computer'**
+  String get news032NotificationsTitle;
+
+  /// What's New body; mentions Android 13+ restricted settings
+  ///
+  /// In en, this message translates to:
+  /// **'Messages and other notifications show on your paired computers, with Reply. Turn it on in Settings › With your computers. If Android greys out the switch: App info › ⋮ › Allow restricted settings.'**
+  String get news032NotificationsBody;
+
+  /// What's New: the per-brand battery guide (same name as its Settings row)
+  ///
+  /// In en, this message translates to:
+  /// **'Keep Linksy alive'**
+  String get news032BatteryTitle;
+
+  /// What's New body
+  ///
+  /// In en, this message translates to:
+  /// **'Settings › Connection › Keep Linksy alive shows what to change on your phone\'s brand so Linksy keeps running in the background.'**
+  String get news032BatteryBody;
 }
 
 class _AppLocalizationsDelegate

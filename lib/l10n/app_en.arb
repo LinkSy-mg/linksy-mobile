@@ -3186,5 +3186,143 @@
         "type": "String"
       }
     }
+  },
+  "settingsPhoneNotifications": "Show this phone's notifications",
+  "@settingsPhoneNotifications": {
+    "description": "Settings › With your computers: switch that mirrors this phone's notifications to paired computers"
+  },
+  "settingsPhoneNotificationsCaption": "On your computers, with Reply for messages.",
+  "@settingsPhoneNotificationsCaption": {
+    "description": "Caption of that switch"
+  },
+  "settingsPhoneNotificationsAllow": "Android hasn't allowed it yet. Tap to allow notification access.",
+  "@settingsPhoneNotificationsAllow": {
+    "description": "Caption (shown in red) when the switch is wanted but Android's Notification access isn't allowed"
+  },
+  "noticeAccessTitle": "Allow notification access",
+  "@noticeAccessTitle": {
+    "description": "Sheet title: guide to allow Notification access"
+  },
+  "noticeAccessGreyed": "Android greys out the switch for apps installed from the web. To allow it:",
+  "@noticeAccessGreyed": {
+    "description": "Android 13+: Notification access is greyed out for apps installed from a browser (restricted settings)"
+  },
+  "noticeAccessStepInfo": "Open App info for Linksy.",
+  "@noticeAccessStepInfo": {
+    "description": "Step 1 of the restricted settings guide"
+  },
+  "noticeAccessStepRestricted": "Tap ⋮ at the top right, then Allow restricted settings.",
+  "@noticeAccessStepRestricted": {
+    "description": "Step 2: Android's own label is Allow restricted settings"
+  },
+  "noticeAccessStepAgain": "Come back, tap Try again and turn Linksy on.",
+  "@noticeAccessStepAgain": {
+    "description": "Step 3; Try again is the button below"
+  },
+  "noticeAccessPlain": "Turn Linksy on in Android's Notification access, then come back.",
+  "@noticeAccessPlain": {
+    "description": "Before Android 13: just turn Linksy on in Notification access"
+  },
+  "commonOpenAppInfo": "Open App info",
+  "@commonOpenAppInfo": {
+    "description": "Button opening Android's App info page for Linksy"
+  },
+  "batteryGuide": "Keep Linksy alive",
+  "@batteryGuide": {
+    "description": "Settings › Connection row and page title: per-brand steps so Android doesn't close Linksy"
+  },
+  "batteryGuideCaption": "What to change on this {maker} phone",
+  "@batteryGuideCaption": {
+    "description": "Caption of that row; maker is the phone's maker as Android writes it (realme, Xiaomi, samsung)",
+    "placeholders": {
+      "maker": {
+        "type": "String"
+      }
+    }
+  },
+  "batteryIntro": "To save battery, some phones close apps in the background, and Linksy then misses files and notifications. On this {maker} phone:",
+  "@batteryIntro": {
+    "description": "Intro of the battery guide page",
+    "placeholders": {
+      "maker": {
+        "type": "String"
+      }
+    }
+  },
+  "batteryAutostart": "App info › Autostart: on.",
+  "@batteryAutostart": {
+    "description": "Battery guide step (Xiaomi, vivo): Android's labels"
+  },
+  "batteryXiaomiSaver": "App info › Battery saver: No restrictions.",
+  "@batteryXiaomiSaver": {
+    "description": "Battery guide step (Xiaomi)"
+  },
+  "batteryLockRecents": "In recent apps, hold Linksy and tap the lock, so clearing them leaves it running.",
+  "@batteryLockRecents": {
+    "description": "Battery guide step (Xiaomi, OPPO, realme, OnePlus, vivo, Huawei): lock the app in the recent apps screen"
+  },
+  "batterySamsungUnrestricted": "App info › Battery: Unrestricted.",
+  "@batterySamsungUnrestricted": {
+    "description": "Battery guide step (Samsung)"
+  },
+  "batterySamsungSleeping": "Settings › Battery › Background usage limits: take Linksy out of Sleeping and Deep sleeping apps.",
+  "@batterySamsungSleeping": {
+    "description": "Battery guide step (Samsung)"
+  },
+  "batteryOppoBackground": "App info › Battery usage: allow background activity, foreground activity and auto launch.",
+  "@batteryOppoBackground": {
+    "description": "Battery guide step (OPPO, realme, OnePlus)"
+  },
+  "batteryVivoBackground": "Settings › Battery › Background power consumption: allow Linksy.",
+  "@batteryVivoBackground": {
+    "description": "Battery guide step (vivo, iQOO)"
+  },
+  "batteryHuaweiLaunch": "Settings › Battery › App launch › Linksy: manage manually, with Auto-launch, Secondary launch and Run in background on.",
+  "@batteryHuaweiLaunch": {
+    "description": "Battery guide step (Huawei, Honor)"
+  },
+  "batteryUnrestricted": "App info › App battery usage: Unrestricted.",
+  "@batteryUnrestricted": {
+    "description": "Battery guide step (Pixel and other phones)"
+  },
+  "batteryKeepRunning": "In Linksy: Settings › Connection › Keep running in the background.",
+  "@batteryKeepRunning": {
+    "description": "Last step of the battery guide, for every phone"
+  },
+  "batteryNames": "The names change a little between versions of Android.",
+  "@batteryNames": {
+    "description": "Small note under the battery guide's steps"
+  },
+  "updatePlayProtect": "Linksy can show your notifications on your computers, so Play Protect may stop the install. If it does:",
+  "@updatePlayProtect": {
+    "description": "Update sheet, Important box: Play Protect may block installing Linksy (it can read notifications); steps follow"
+  },
+  "updateProtectStep1": "Play Store › your picture › Play Protect › ⚙.",
+  "@updateProtectStep1": {
+    "description": "Step 1 of getting past Play Protect: where its settings are"
+  },
+  "updateProtectStep2": "Turn off Scan apps with Play Protect.",
+  "@updateProtectStep2": {
+    "description": "Step 2: Play Protect's own label is Scan apps with Play Protect"
+  },
+  "updateProtectStep3": "Tap Update Now again, then turn scanning back on.",
+  "@updateProtectStep3": {
+    "description": "Step 3; Update Now is the button below"
+  },
+  "news032NotificationsTitle": "Your notifications on your computer",
+  "@news032NotificationsTitle": {
+    "description": "What's New: this phone's notifications on its computers"
+  },
+  "news032NotificationsBody": "Messages and other notifications show on your paired computers, with Reply. Turn it on in Settings › With your computers. If Android greys out the switch: App info › ⋮ › Allow restricted settings.",
+  "@news032NotificationsBody": {
+    "description": "What's New body; mentions Android 13+ restricted settings"
+  },
+  "news032BatteryTitle": "Keep Linksy alive",
+  "@news032BatteryTitle": {
+    "description": "What's New: the per-brand battery guide (same name as its Settings row)"
+  },
+  "news032BatteryBody": "Settings › Connection › Keep Linksy alive shows what to change on your phone's brand so Linksy keeps running in the background.",
+  "@news032BatteryBody": {
+    "description": "What's New body"
   }
 }

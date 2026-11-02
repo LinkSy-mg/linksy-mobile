@@ -2382,4 +2382,129 @@ class AppLocalizationsFr extends AppLocalizations {
   String pairingUpdateOlder(String name) {
     return 'Mettre à jour Linksy sur $name rend l\'association encore plus sûre.';
   }
+
+  @override
+  String get settingsPhoneNotifications =>
+      'Afficher les notifications de ce téléphone';
+
+  @override
+  String get settingsPhoneNotificationsCaption =>
+      'Sur vos ordinateurs, avec Répondre pour les messages.';
+
+  @override
+  String get settingsPhoneNotificationsAllow =>
+      'Android ne l\'a pas encore autorisé. Touchez pour autoriser l\'accès aux notifications.';
+
+  @override
+  String get noticeAccessTitle => 'Autoriser l\'accès aux notifications';
+
+  @override
+  String get noticeAccessGreyed =>
+      'Android grise ce bouton pour les applis installées depuis le web. Pour l\'autoriser :';
+
+  @override
+  String get noticeAccessStepInfo => 'Ouvrez Infos sur l\'appli pour Linksy.';
+
+  @override
+  String get noticeAccessStepRestricted =>
+      'Touchez ⋮ en haut à droite, puis Autoriser les paramètres restreints.';
+
+  @override
+  String get noticeAccessStepAgain =>
+      'Revenez, touchez Réessayer et activez Linksy.';
+
+  @override
+  String get noticeAccessPlain =>
+      'Activez Linksy dans Accès aux notifications d\'Android, puis revenez.';
+
+  @override
+  String get commonOpenAppInfo => 'Ouvrir Infos sur l\'appli';
+
+  @override
+  String get batteryGuide => 'Garder Linksy actif';
+
+  @override
+  String batteryGuideCaption(String maker) {
+    return 'Ce qu\'il faut changer sur ce téléphone $maker';
+  }
+
+  @override
+  String batteryIntro(String maker) {
+    return 'Pour économiser la batterie, certains téléphones ferment les applis en arrière-plan, et Linksy rate alors des fichiers et des notifications. Sur ce téléphone $maker :';
+  }
+
+  @override
+  String get batteryAutostart =>
+      'Infos sur l\'appli › Démarrage automatique : activé.';
+
+  @override
+  String get batteryXiaomiSaver =>
+      'Infos sur l\'appli › Économiseur de batterie : Aucune restriction.';
+
+  @override
+  String get batteryLockRecents =>
+      'Dans les applis récentes, maintenez Linksy appuyé et touchez le cadenas, pour qu\'il reste quand vous les effacez.';
+
+  @override
+  String get batterySamsungUnrestricted =>
+      'Infos sur l\'appli › Batterie : Sans restriction.';
+
+  @override
+  String get batterySamsungSleeping =>
+      'Paramètres › Batterie › Limites d\'utilisation en arrière-plan : retirez Linksy des applis en veille et en veille prolongée.';
+
+  @override
+  String get batteryOppoBackground =>
+      'Infos sur l\'appli › Utilisation de la batterie : autorisez l\'activité en arrière-plan, au premier plan et le lancement automatique.';
+
+  @override
+  String get batteryVivoBackground =>
+      'Paramètres › Batterie › Consommation en arrière-plan : autorisez Linksy.';
+
+  @override
+  String get batteryHuaweiLaunch =>
+      'Paramètres › Batterie › Lancement d\'applis › Linksy : gérer manuellement, avec Lancement auto, Lancement secondaire et Exécution en arrière-plan activés.';
+
+  @override
+  String get batteryUnrestricted =>
+      'Infos sur l\'appli › Utilisation de la batterie par l\'appli : Sans restriction.';
+
+  @override
+  String get batteryKeepRunning =>
+      'Dans Linksy : Réglages › Connexion › Continuer en arrière-plan.';
+
+  @override
+  String get batteryNames =>
+      'Les noms changent un peu selon la version d\'Android.';
+
+  @override
+  String get updatePlayProtect =>
+      'Linksy peut afficher vos notifications sur vos ordinateurs, donc Play Protect peut bloquer l\'installation. Si c\'est le cas :';
+
+  @override
+  String get updateProtectStep1 =>
+      'Play Store › votre photo › Play Protect › ⚙.';
+
+  @override
+  String get updateProtectStep2 =>
+      'Désactivez Analyser les applis avec Play Protect.';
+
+  @override
+  String get updateProtectStep3 =>
+      'Touchez de nouveau Mettre à jour, puis réactivez l\'analyse.';
+
+  @override
+  String get news032NotificationsTitle =>
+      'Vos notifications sur votre ordinateur';
+
+  @override
+  String get news032NotificationsBody =>
+      'Les messages et autres notifications s\'affichent sur vos ordinateurs associés, avec Répondre. Activez-le dans Réglages › Avec vos ordinateurs. Si Android grise le bouton : Infos sur l\'appli › ⋮ › Autoriser les paramètres restreints.';
+
+  @override
+  String get news032BatteryTitle => 'Garder Linksy actif';
+
+  @override
+  String get news032BatteryBody =>
+      'Réglages › Connexion › Garder Linksy actif montre ce qu\'il faut changer selon la marque de votre téléphone pour que Linksy continue en arrière-plan.';
 }

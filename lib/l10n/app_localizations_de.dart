@@ -2374,4 +2374,126 @@ class AppLocalizationsDe extends AppLocalizations {
   String pairingUpdateOlder(String name) {
     return 'Ein Update von Linksy auf $name macht das Koppeln noch sicherer.';
   }
+
+  @override
+  String get settingsPhoneNotifications =>
+      'Benachrichtigungen dieses Telefons zeigen';
+
+  @override
+  String get settingsPhoneNotificationsCaption =>
+      'Auf deinen Computern, mit Antworten für Nachrichten.';
+
+  @override
+  String get settingsPhoneNotificationsAllow =>
+      'Android hat es noch nicht erlaubt. Tippe, um den Benachrichtigungszugriff zu erlauben.';
+
+  @override
+  String get noticeAccessTitle => 'Benachrichtigungszugriff erlauben';
+
+  @override
+  String get noticeAccessGreyed =>
+      'Android graut diesen Schalter für Apps aus, die aus dem Web installiert wurden. So erlaubst du es:';
+
+  @override
+  String get noticeAccessStepInfo => 'Öffne die App-Info von Linksy.';
+
+  @override
+  String get noticeAccessStepRestricted =>
+      'Tippe oben rechts auf ⋮, dann auf Eingeschränkte Einstellungen zulassen.';
+
+  @override
+  String get noticeAccessStepAgain =>
+      'Komm zurück, tippe auf Erneut versuchen und schalte Linksy ein.';
+
+  @override
+  String get noticeAccessPlain =>
+      'Schalte Linksy in Androids Benachrichtigungszugriff ein und komm dann zurück.';
+
+  @override
+  String get commonOpenAppInfo => 'App-Info öffnen';
+
+  @override
+  String get batteryGuide => 'Linksy am Laufen halten';
+
+  @override
+  String batteryGuideCaption(String maker) {
+    return 'Was auf diesem $maker-Telefon zu ändern ist';
+  }
+
+  @override
+  String batteryIntro(String maker) {
+    return 'Um Akku zu sparen, schließen manche Telefone Apps im Hintergrund, und Linksy verpasst dann Dateien und Benachrichtigungen. Auf diesem $maker-Telefon:';
+  }
+
+  @override
+  String get batteryAutostart => 'App-Info › Autostart: an.';
+
+  @override
+  String get batteryXiaomiSaver =>
+      'App-Info › Energiesparmodus: Keine Einschränkungen.';
+
+  @override
+  String get batteryLockRecents =>
+      'Halte Linksy in den letzten Apps gedrückt und tippe auf das Schloss, damit es beim Leeren weiterläuft.';
+
+  @override
+  String get batterySamsungUnrestricted =>
+      'App-Info › Akku: Nicht eingeschränkt.';
+
+  @override
+  String get batterySamsungSleeping =>
+      'Einstellungen › Akku › Nutzungsbeschränkungen im Hintergrund: nimm Linksy aus den Apps im Standby und im Tiefschlaf.';
+
+  @override
+  String get batteryOppoBackground =>
+      'App-Info › Akkunutzung: Aktivität im Hintergrund, im Vordergrund und automatischen Start erlauben.';
+
+  @override
+  String get batteryVivoBackground =>
+      'Einstellungen › Akku › Energieverbrauch im Hintergrund: Linksy erlauben.';
+
+  @override
+  String get batteryHuaweiLaunch =>
+      'Einstellungen › Akku › App-Start › Linksy: manuell verwalten, mit Automatischer Start, Sekundärer Start und Im Hintergrund ausführen an.';
+
+  @override
+  String get batteryUnrestricted =>
+      'App-Info › Akkunutzung der App: Nicht eingeschränkt.';
+
+  @override
+  String get batteryKeepRunning =>
+      'In Linksy: Einstellungen › Verbindung › Im Hintergrund weiterlaufen.';
+
+  @override
+  String get batteryNames =>
+      'Die Namen unterscheiden sich je nach Android-Version etwas.';
+
+  @override
+  String get updatePlayProtect =>
+      'Linksy kann deine Benachrichtigungen auf deinen Computern zeigen, deshalb kann Play Protect die Installation stoppen. Dann:';
+
+  @override
+  String get updateProtectStep1 => 'Play Store › dein Bild › Play Protect › ⚙.';
+
+  @override
+  String get updateProtectStep2 => 'Schalte Apps mit Play Protect scannen aus.';
+
+  @override
+  String get updateProtectStep3 =>
+      'Tippe noch einmal auf Jetzt aktualisieren und schalte das Scannen danach wieder ein.';
+
+  @override
+  String get news032NotificationsTitle =>
+      'Deine Benachrichtigungen auf dem Computer';
+
+  @override
+  String get news032NotificationsBody =>
+      'Nachrichten und andere Benachrichtigungen erscheinen auf deinen gekoppelten Computern, mit Antworten. Einschalten unter Einstellungen › Mit deinen Computern. Graut Android den Schalter aus: App-Info › ⋮ › Eingeschränkte Einstellungen zulassen.';
+
+  @override
+  String get news032BatteryTitle => 'Linksy am Laufen halten';
+
+  @override
+  String get news032BatteryBody =>
+      'Einstellungen › Verbindung › Linksy am Laufen halten zeigt, was du je nach Marke deines Telefons ändern musst, damit Linksy im Hintergrund weiterläuft.';
 }

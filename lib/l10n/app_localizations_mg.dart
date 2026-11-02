@@ -2378,4 +2378,130 @@ class AppLocalizationsMg extends AppLocalizations {
   String pairingUpdateOlder(String name) {
     return 'Rehefa havaozina ny Linksy ao amin\'ny $name, vao mainka azo antoka ny fampifandraisana.';
   }
+
+  @override
+  String get settingsPhoneNotifications =>
+      'Asehoy ny fampandrenesan\'ity finday ity';
+
+  @override
+  String get settingsPhoneNotificationsCaption =>
+      'Ao amin\'ny solosainao, miaraka amin\'ny Valio ho an\'ny hafatra.';
+
+  @override
+  String get settingsPhoneNotificationsAllow =>
+      'Mbola tsy nanome alalana ny Android. Tsindrio mba hanomezana alalana hamaky ny fampandrenesana.';
+
+  @override
+  String get noticeAccessTitle => 'Omeo alalana hamaky ny fampandrenesana';
+
+  @override
+  String get noticeAccessGreyed =>
+      'Manamaizina io bokotra io ny Android ho an\'ny app nampidirina avy amin\'ny tranonkala. Mba hanomezana alalana:';
+
+  @override
+  String get noticeAccessStepInfo =>
+      'Sokafy ny Mombamomba ny app ho an\'ny Linksy.';
+
+  @override
+  String get noticeAccessStepRestricted =>
+      'Tsindrio ny ⋮ eo ambony havanana, avy eo Avelao ny fikirana voafetra.';
+
+  @override
+  String get noticeAccessStepAgain =>
+      'Miverena, tsindrio ny Andramo indray ary alefaso ny Linksy.';
+
+  @override
+  String get noticeAccessPlain =>
+      'Alefaso ny Linksy ao amin\'ny Fidirana amin\'ny fampandrenesana an\'ny Android, dia miverena.';
+
+  @override
+  String get commonOpenAppInfo => 'Sokafy ny Mombamomba ny app';
+
+  @override
+  String get batteryGuide => 'Tazomy ho velona ny Linksy';
+
+  @override
+  String batteryGuideCaption(String maker) {
+    return 'Izay ovaina amin\'ity finday $maker ity';
+  }
+
+  @override
+  String batteryIntro(String maker) {
+    return 'Mba hitsitsiana bateria, misy finday manidy ny app ao ambadika, ka tsy mahazo rakitra sy fampandrenesana ny Linksy. Amin\'ity finday $maker ity:';
+  }
+
+  @override
+  String get batteryAutostart =>
+      'Mombamomba ny app › Fanombohana ho azy: alefa.';
+
+  @override
+  String get batteryXiaomiSaver =>
+      'Mombamomba ny app › Fitsitsiana bateria: Tsy misy fetra.';
+
+  @override
+  String get batteryLockRecents =>
+      'Ao amin\'ny app vao nampiasaina, tazony ny Linksy ary tsindrio ny hidy, mba tsy hikatona izy rehefa diovinao ireo.';
+
+  @override
+  String get batterySamsungUnrestricted =>
+      'Mombamomba ny app › Bateria: Tsy voafetra.';
+
+  @override
+  String get batterySamsungSleeping =>
+      'Fikirana › Bateria › Fetran\'ny fampiasana ao ambadika: esory amin\'ny app matory sy matory lalina ny Linksy.';
+
+  @override
+  String get batteryOppoBackground =>
+      'Mombamomba ny app › Fampiasana bateria: avelao ny asa ao ambadika, ny asa eo anoloana ary ny fanombohana ho azy.';
+
+  @override
+  String get batteryVivoBackground =>
+      'Fikirana › Bateria › Fanjifana herinaratra ao ambadika: avelao ny Linksy.';
+
+  @override
+  String get batteryHuaweiLaunch =>
+      'Fikirana › Bateria › Fanombohana app › Linksy: tantano tanana, ka alefaso ny Fanombohana ho azy, Fanombohana faharoa ary Mandeha ao ambadika.';
+
+  @override
+  String get batteryUnrestricted =>
+      'Mombamomba ny app › Fampiasana bateria an\'ny app: Tsy voafetra.';
+
+  @override
+  String get batteryKeepRunning =>
+      'Ao amin\'ny Linksy: Fikirana › Fifandraisana › Mandeha foana ao ambadika.';
+
+  @override
+  String get batteryNames =>
+      'Miova kely ny anarana arakaraka ny dikan\'ny Android.';
+
+  @override
+  String get updatePlayProtect =>
+      'Afaka mampiseho ny fampandrenesanao ao amin\'ny solosainao ny Linksy, ka mety hanakana ny fametrahana ny Play Protect. Raha izany:';
+
+  @override
+  String get updateProtectStep1 =>
+      'Play Store › ny sarinao › Play Protect › ⚙.';
+
+  @override
+  String get updateProtectStep2 =>
+      'Vonoy ny Hamaky ny app amin\'ny Play Protect.';
+
+  @override
+  String get updateProtectStep3 =>
+      'Tsindrio indray ny Havaozy izao, dia avereno alefa ny famakiana.';
+
+  @override
+  String get news032NotificationsTitle =>
+      'Ny fampandrenesanao ao amin\'ny solosainao';
+
+  @override
+  String get news032NotificationsBody =>
+      'Miseho ao amin\'ny solosaina mifandray aminao ny hafatra sy ny fampandrenesana hafa, miaraka amin\'ny Valio. Alefaso ao amin\'ny Fikirana › Miaraka amin\'ny solosainao. Raha manamaizina ny bokotra ny Android: Mombamomba ny app › ⋮ › Avelao ny fikirana voafetra.';
+
+  @override
+  String get news032BatteryTitle => 'Tazomy ho velona ny Linksy';
+
+  @override
+  String get news032BatteryBody =>
+      'Fikirana › Fifandraisana › Tazomy ho velona ny Linksy dia mampiseho izay ovaina arakaraka ny marika findainao mba hijanonan\'ny Linksy mandeha ao ambadika.';
 }

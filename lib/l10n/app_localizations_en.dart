@@ -2364,4 +2364,123 @@ class AppLocalizationsEn extends AppLocalizations {
   String pairingUpdateOlder(String name) {
     return 'Updating Linksy on $name makes pairing even safer.';
   }
+
+  @override
+  String get settingsPhoneNotifications => 'Show this phone\'s notifications';
+
+  @override
+  String get settingsPhoneNotificationsCaption =>
+      'On your computers, with Reply for messages.';
+
+  @override
+  String get settingsPhoneNotificationsAllow =>
+      'Android hasn\'t allowed it yet. Tap to allow notification access.';
+
+  @override
+  String get noticeAccessTitle => 'Allow notification access';
+
+  @override
+  String get noticeAccessGreyed =>
+      'Android greys out the switch for apps installed from the web. To allow it:';
+
+  @override
+  String get noticeAccessStepInfo => 'Open App info for Linksy.';
+
+  @override
+  String get noticeAccessStepRestricted =>
+      'Tap ⋮ at the top right, then Allow restricted settings.';
+
+  @override
+  String get noticeAccessStepAgain =>
+      'Come back, tap Try again and turn Linksy on.';
+
+  @override
+  String get noticeAccessPlain =>
+      'Turn Linksy on in Android\'s Notification access, then come back.';
+
+  @override
+  String get commonOpenAppInfo => 'Open App info';
+
+  @override
+  String get batteryGuide => 'Keep Linksy alive';
+
+  @override
+  String batteryGuideCaption(String maker) {
+    return 'What to change on this $maker phone';
+  }
+
+  @override
+  String batteryIntro(String maker) {
+    return 'To save battery, some phones close apps in the background, and Linksy then misses files and notifications. On this $maker phone:';
+  }
+
+  @override
+  String get batteryAutostart => 'App info › Autostart: on.';
+
+  @override
+  String get batteryXiaomiSaver => 'App info › Battery saver: No restrictions.';
+
+  @override
+  String get batteryLockRecents =>
+      'In recent apps, hold Linksy and tap the lock, so clearing them leaves it running.';
+
+  @override
+  String get batterySamsungUnrestricted => 'App info › Battery: Unrestricted.';
+
+  @override
+  String get batterySamsungSleeping =>
+      'Settings › Battery › Background usage limits: take Linksy out of Sleeping and Deep sleeping apps.';
+
+  @override
+  String get batteryOppoBackground =>
+      'App info › Battery usage: allow background activity, foreground activity and auto launch.';
+
+  @override
+  String get batteryVivoBackground =>
+      'Settings › Battery › Background power consumption: allow Linksy.';
+
+  @override
+  String get batteryHuaweiLaunch =>
+      'Settings › Battery › App launch › Linksy: manage manually, with Auto-launch, Secondary launch and Run in background on.';
+
+  @override
+  String get batteryUnrestricted =>
+      'App info › App battery usage: Unrestricted.';
+
+  @override
+  String get batteryKeepRunning =>
+      'In Linksy: Settings › Connection › Keep running in the background.';
+
+  @override
+  String get batteryNames =>
+      'The names change a little between versions of Android.';
+
+  @override
+  String get updatePlayProtect =>
+      'Linksy can show your notifications on your computers, so Play Protect may stop the install. If it does:';
+
+  @override
+  String get updateProtectStep1 =>
+      'Play Store › your picture › Play Protect › ⚙.';
+
+  @override
+  String get updateProtectStep2 => 'Turn off Scan apps with Play Protect.';
+
+  @override
+  String get updateProtectStep3 =>
+      'Tap Update Now again, then turn scanning back on.';
+
+  @override
+  String get news032NotificationsTitle => 'Your notifications on your computer';
+
+  @override
+  String get news032NotificationsBody =>
+      'Messages and other notifications show on your paired computers, with Reply. Turn it on in Settings › With your computers. If Android greys out the switch: App info › ⋮ › Allow restricted settings.';
+
+  @override
+  String get news032BatteryTitle => 'Keep Linksy alive';
+
+  @override
+  String get news032BatteryBody =>
+      'Settings › Connection › Keep Linksy alive shows what to change on your phone\'s brand so Linksy keeps running in the background.';
 }

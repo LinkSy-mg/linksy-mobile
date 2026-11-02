@@ -2287,4 +2287,109 @@ class AppLocalizationsZh extends AppLocalizations {
   String pairingUpdateOlder(String name) {
     return '更新 $name 上的 Linksy，配对会更安全。';
   }
+
+  @override
+  String get settingsPhoneNotifications => '显示这部手机的通知';
+
+  @override
+  String get settingsPhoneNotificationsCaption => '显示在你的电脑上，消息可直接回复。';
+
+  @override
+  String get settingsPhoneNotificationsAllow => 'Android 还没有允许。点按以允许通知使用权。';
+
+  @override
+  String get noticeAccessTitle => '允许通知使用权';
+
+  @override
+  String get noticeAccessGreyed => '对于从网页安装的应用，Android 会将此开关变灰。要允许它：';
+
+  @override
+  String get noticeAccessStepInfo => '打开 Linksy 的应用信息。';
+
+  @override
+  String get noticeAccessStepRestricted => '点按右上角的 ⋮，然后点按“允许受限制的设置”。';
+
+  @override
+  String get noticeAccessStepAgain => '返回这里，点按“重试”，然后开启 Linksy。';
+
+  @override
+  String get noticeAccessPlain => '在 Android 的“通知使用权”中开启 Linksy，然后返回。';
+
+  @override
+  String get commonOpenAppInfo => '打开应用信息';
+
+  @override
+  String get batteryGuide => '让 Linksy 保持运行';
+
+  @override
+  String batteryGuideCaption(String maker) {
+    return '这部 $maker 手机需要更改的设置';
+  }
+
+  @override
+  String batteryIntro(String maker) {
+    return '为了省电，有些手机会关闭后台应用，Linksy 就会漏收文件和通知。在这部 $maker 手机上：';
+  }
+
+  @override
+  String get batteryAutostart => '应用信息 › 自启动：开启。';
+
+  @override
+  String get batteryXiaomiSaver => '应用信息 › 省电策略：无限制。';
+
+  @override
+  String get batteryLockRecents => '在最近任务中，长按 Linksy 并点按锁，这样清理时它会继续运行。';
+
+  @override
+  String get batterySamsungUnrestricted => '应用信息 › 电池：不受限制。';
+
+  @override
+  String get batterySamsungSleeping =>
+      '设置 › 电池 › 后台使用限制：把 Linksy 移出休眠应用和深度休眠应用。';
+
+  @override
+  String get batteryOppoBackground => '应用信息 › 耗电管理：允许后台运行、前台运行和自动启动。';
+
+  @override
+  String get batteryVivoBackground => '设置 › 电池 › 后台耗电管理：允许 Linksy。';
+
+  @override
+  String get batteryHuaweiLaunch =>
+      '设置 › 电池 › 应用启动管理 › Linksy：手动管理，开启自动启动、关联启动和后台活动。';
+
+  @override
+  String get batteryUnrestricted => '应用信息 › 应用的电池用量：无限制。';
+
+  @override
+  String get batteryKeepRunning => '在 Linksy 中：设置 › 连接 › 在后台保持运行。';
+
+  @override
+  String get batteryNames => '不同版本的 Android 中名称会略有不同。';
+
+  @override
+  String get updatePlayProtect =>
+      'Linksy 可以在你的电脑上显示通知，因此 Play 保护机制可能会阻止安装。如果出现这种情况：';
+
+  @override
+  String get updateProtectStep1 => 'Play 商店 › 你的头像 › Play 保护机制 › ⚙。';
+
+  @override
+  String get updateProtectStep2 => '关闭“使用 Play 保护机制扫描应用”。';
+
+  @override
+  String get updateProtectStep3 => '再次点按“立即更新”，然后重新开启扫描。';
+
+  @override
+  String get news032NotificationsTitle => '在电脑上查看你的通知';
+
+  @override
+  String get news032NotificationsBody =>
+      '消息和其他通知会显示在已配对的电脑上，并可直接回复。在 设置 › 与你的电脑 中开启。如果 Android 将开关变灰：应用信息 › ⋮ › 允许受限制的设置。';
+
+  @override
+  String get news032BatteryTitle => '让 Linksy 保持运行';
+
+  @override
+  String get news032BatteryBody =>
+      '设置 › 连接 › 让 Linksy 保持运行 会按你的手机品牌说明需要更改的设置，让 Linksy 在后台继续运行。';
 }

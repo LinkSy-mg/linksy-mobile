@@ -2401,4 +2401,126 @@ class AppLocalizationsRu extends AppLocalizations {
   String pairingUpdateOlder(String name) {
     return 'Обновите Linksy на $name, и сопряжение станет ещё безопаснее.';
   }
+
+  @override
+  String get settingsPhoneNotifications =>
+      'Показывать уведомления этого телефона';
+
+  @override
+  String get settingsPhoneNotificationsCaption =>
+      'На ваших компьютерах, с ответом на сообщения.';
+
+  @override
+  String get settingsPhoneNotificationsAllow =>
+      'Android ещё не разрешил это. Нажмите, чтобы разрешить доступ к уведомлениям.';
+
+  @override
+  String get noticeAccessTitle => 'Разрешите доступ к уведомлениям';
+
+  @override
+  String get noticeAccessGreyed =>
+      'Android делает этот переключатель серым для приложений, установленных из интернета. Чтобы разрешить:';
+
+  @override
+  String get noticeAccessStepInfo => 'Откройте «О приложении» для Linksy.';
+
+  @override
+  String get noticeAccessStepRestricted =>
+      'Нажмите ⋮ вверху справа, затем «Разрешить настройки с ограниченным доступом».';
+
+  @override
+  String get noticeAccessStepAgain =>
+      'Вернитесь, нажмите «Повторить» и включите Linksy.';
+
+  @override
+  String get noticeAccessPlain =>
+      'Включите Linksy в разделе «Доступ к уведомлениям» Android и вернитесь.';
+
+  @override
+  String get commonOpenAppInfo => 'Открыть «О приложении»';
+
+  @override
+  String get batteryGuide => 'Чтобы Linksy не закрывался';
+
+  @override
+  String batteryGuideCaption(String maker) {
+    return 'Что изменить на этом телефоне $maker';
+  }
+
+  @override
+  String batteryIntro(String maker) {
+    return 'Чтобы экономить батарею, некоторые телефоны закрывают приложения в фоне, и Linksy пропускает файлы и уведомления. На этом телефоне $maker:';
+  }
+
+  @override
+  String get batteryAutostart => 'О приложении › Автозапуск: вкл.';
+
+  @override
+  String get batteryXiaomiSaver =>
+      'О приложении › Контроль активности: Нет ограничений.';
+
+  @override
+  String get batteryLockRecents =>
+      'В недавних приложениях удерживайте Linksy и нажмите на замок, чтобы он не закрывался при очистке.';
+
+  @override
+  String get batterySamsungUnrestricted =>
+      'О приложении › Батарея: Не ограничено.';
+
+  @override
+  String get batterySamsungSleeping =>
+      'Настройки › Батарея › Ограничения фонового использования: уберите Linksy из спящих и глубоко спящих приложений.';
+
+  @override
+  String get batteryOppoBackground =>
+      'О приложении › Использование батареи: разрешите работу в фоне, на переднем плане и автозапуск.';
+
+  @override
+  String get batteryVivoBackground =>
+      'Настройки › Батарея › Энергопотребление в фоне: разрешите Linksy.';
+
+  @override
+  String get batteryHuaweiLaunch =>
+      'Настройки › Батарея › Запуск приложений › Linksy: управлять вручную, включив автозапуск, косвенный запуск и работу в фоне.';
+
+  @override
+  String get batteryUnrestricted =>
+      'О приложении › Расход заряда батареи: Без ограничений.';
+
+  @override
+  String get batteryKeepRunning =>
+      'В Linksy: Настройки › Подключение › Работать в фоне.';
+
+  @override
+  String get batteryNames =>
+      'Названия немного отличаются в разных версиях Android.';
+
+  @override
+  String get updatePlayProtect =>
+      'Linksy может показывать ваши уведомления на компьютерах, поэтому Play Защита может остановить установку. Тогда:';
+
+  @override
+  String get updateProtectStep1 => 'Play Маркет › ваше фото › Play Защита › ⚙.';
+
+  @override
+  String get updateProtectStep2 =>
+      'Отключите «Проверять приложения с помощью Play Защиты».';
+
+  @override
+  String get updateProtectStep3 =>
+      'Снова нажмите «Обновить сейчас», а потом включите проверку.';
+
+  @override
+  String get news032NotificationsTitle => 'Ваши уведомления на компьютере';
+
+  @override
+  String get news032NotificationsBody =>
+      'Сообщения и другие уведомления появляются на сопряжённых компьютерах, с ответом. Включите в Настройки › С вашими компьютерами. Если Android делает переключатель серым: О приложении › ⋮ › Разрешить настройки с ограниченным доступом.';
+
+  @override
+  String get news032BatteryTitle => 'Чтобы Linksy не закрывался';
+
+  @override
+  String get news032BatteryBody =>
+      'Настройки › Подключение › Чтобы Linksy не закрывался: что изменить на телефоне вашей марки, чтобы Linksy работал в фоне.';
 }

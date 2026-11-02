@@ -2379,4 +2379,127 @@ class AppLocalizationsEs extends AppLocalizations {
   String pairingUpdateOlder(String name) {
     return 'Actualizar Linksy en $name hace el emparejamiento aún más seguro.';
   }
+
+  @override
+  String get settingsPhoneNotifications =>
+      'Mostrar las notificaciones de este teléfono';
+
+  @override
+  String get settingsPhoneNotificationsCaption =>
+      'En tus computadoras, con Responder para los mensajes.';
+
+  @override
+  String get settingsPhoneNotificationsAllow =>
+      'Android aún no lo ha permitido. Toca para permitir el acceso a las notificaciones.';
+
+  @override
+  String get noticeAccessTitle => 'Permitir el acceso a las notificaciones';
+
+  @override
+  String get noticeAccessGreyed =>
+      'Android desactiva este interruptor para las apps instaladas desde la web. Para permitirlo:';
+
+  @override
+  String get noticeAccessStepInfo => 'Abre Información de la app de Linksy.';
+
+  @override
+  String get noticeAccessStepRestricted =>
+      'Toca ⋮ arriba a la derecha y luego Permitir ajustes restringidos.';
+
+  @override
+  String get noticeAccessStepAgain =>
+      'Vuelve, toca Reintentar y activa Linksy.';
+
+  @override
+  String get noticeAccessPlain =>
+      'Activa Linksy en Acceso a notificaciones de Android y vuelve.';
+
+  @override
+  String get commonOpenAppInfo => 'Abrir Información de la app';
+
+  @override
+  String get batteryGuide => 'Mantener Linksy activo';
+
+  @override
+  String batteryGuideCaption(String maker) {
+    return 'Qué cambiar en este teléfono $maker';
+  }
+
+  @override
+  String batteryIntro(String maker) {
+    return 'Para ahorrar batería, algunos teléfonos cierran las apps en segundo plano, y Linksy pierde archivos y notificaciones. En este teléfono $maker:';
+  }
+
+  @override
+  String get batteryAutostart =>
+      'Información de la app › Inicio automático: activado.';
+
+  @override
+  String get batteryXiaomiSaver =>
+      'Información de la app › Ahorro de batería: Sin restricciones.';
+
+  @override
+  String get batteryLockRecents =>
+      'En las apps recientes, mantén pulsado Linksy y toca el candado, para que siga activo al borrarlas.';
+
+  @override
+  String get batterySamsungUnrestricted =>
+      'Información de la app › Batería: Sin restricciones.';
+
+  @override
+  String get batterySamsungSleeping =>
+      'Ajustes › Batería › Límites de uso en segundo plano: saca Linksy de las apps inactivas y en suspensión profunda.';
+
+  @override
+  String get batteryOppoBackground =>
+      'Información de la app › Uso de batería: permite la actividad en segundo plano, en primer plano y el inicio automático.';
+
+  @override
+  String get batteryVivoBackground =>
+      'Ajustes › Batería › Consumo en segundo plano: permite Linksy.';
+
+  @override
+  String get batteryHuaweiLaunch =>
+      'Ajustes › Batería › Inicio de apps › Linksy: gestionar manualmente, con Inicio automático, Inicio secundario y Ejecutar en segundo plano activados.';
+
+  @override
+  String get batteryUnrestricted =>
+      'Información de la app › Uso de batería de la app: Sin restricciones.';
+
+  @override
+  String get batteryKeepRunning =>
+      'En Linksy: Ajustes › Conexión › Seguir activo en segundo plano.';
+
+  @override
+  String get batteryNames =>
+      'Los nombres cambian un poco según la versión de Android.';
+
+  @override
+  String get updatePlayProtect =>
+      'Linksy puede mostrar tus notificaciones en tus computadoras, así que Play Protect puede detener la instalación. Si pasa:';
+
+  @override
+  String get updateProtectStep1 => 'Play Store › tu foto › Play Protect › ⚙.';
+
+  @override
+  String get updateProtectStep2 => 'Desactiva Analizar apps con Play Protect.';
+
+  @override
+  String get updateProtectStep3 =>
+      'Vuelve a tocar Actualizar ahora y luego vuelve a activar el análisis.';
+
+  @override
+  String get news032NotificationsTitle =>
+      'Tus notificaciones en tu computadora';
+
+  @override
+  String get news032NotificationsBody =>
+      'Los mensajes y demás notificaciones aparecen en tus computadoras emparejadas, con Responder. Actívalo en Ajustes › Con tus computadoras. Si Android desactiva el interruptor: Información de la app › ⋮ › Permitir ajustes restringidos.';
+
+  @override
+  String get news032BatteryTitle => 'Mantener Linksy activo';
+
+  @override
+  String get news032BatteryBody =>
+      'Ajustes › Conexión › Mantener Linksy activo muestra qué cambiar según la marca de tu teléfono para que Linksy siga en segundo plano.';
 }

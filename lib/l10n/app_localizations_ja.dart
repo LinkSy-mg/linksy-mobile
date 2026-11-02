@@ -2318,4 +2318,114 @@ class AppLocalizationsJa extends AppLocalizations {
   String pairingUpdateOlder(String name) {
     return '$name の Linksy を更新すると、ペアリングがさらに安全になります。';
   }
+
+  @override
+  String get settingsPhoneNotifications => 'このスマホの通知を表示';
+
+  @override
+  String get settingsPhoneNotificationsCaption => 'コンピュータに表示し、メッセージには返信できます。';
+
+  @override
+  String get settingsPhoneNotificationsAllow =>
+      'まだ Android で許可されていません。タップして通知へのアクセスを許可します。';
+
+  @override
+  String get noticeAccessTitle => '通知へのアクセスを許可';
+
+  @override
+  String get noticeAccessGreyed =>
+      'ウェブからインストールしたアプリでは、Android がこのスイッチをグレー表示にします。許可するには：';
+
+  @override
+  String get noticeAccessStepInfo => 'Linksy のアプリ情報を開きます。';
+
+  @override
+  String get noticeAccessStepRestricted => '右上の ⋮ をタップし、「制限付き設定を許可」をタップします。';
+
+  @override
+  String get noticeAccessStepAgain => '戻ってきて「再試行」をタップし、Linksy をオンにします。';
+
+  @override
+  String get noticeAccessPlain =>
+      'Android の「通知へのアクセス」で Linksy をオンにしてから戻ってきてください。';
+
+  @override
+  String get commonOpenAppInfo => 'アプリ情報を開く';
+
+  @override
+  String get batteryGuide => 'Linksy を動かし続ける';
+
+  @override
+  String batteryGuideCaption(String maker) {
+    return 'この $maker のスマホで変更すること';
+  }
+
+  @override
+  String batteryIntro(String maker) {
+    return '電池を節約するため、バックグラウンドのアプリを終了するスマホがあり、Linksy がファイルや通知を受け取れなくなります。この $maker のスマホでは：';
+  }
+
+  @override
+  String get batteryAutostart => 'アプリ情報 › 自動起動：オン。';
+
+  @override
+  String get batteryXiaomiSaver => 'アプリ情報 › バッテリーセーバー：制限なし。';
+
+  @override
+  String get batteryLockRecents =>
+      '最近使ったアプリで Linksy を長押しして鍵をタップすると、まとめて閉じても動き続けます。';
+
+  @override
+  String get batterySamsungUnrestricted => 'アプリ情報 › 電池：制限なし。';
+
+  @override
+  String get batterySamsungSleeping =>
+      '設定 › 電池 › バックグラウンドでの使用制限：Linksy をスリープ中アプリとディープスリープ中アプリから外します。';
+
+  @override
+  String get batteryOppoBackground =>
+      'アプリ情報 › 電池の使用：バックグラウンド、フォアグラウンドでの動作と自動起動を許可します。';
+
+  @override
+  String get batteryVivoBackground => '設定 › 電池 › バックグラウンドでの電力消費：Linksy を許可します。';
+
+  @override
+  String get batteryHuaweiLaunch =>
+      '設定 › 電池 › アプリ起動 › Linksy：手動で管理し、自動起動・二次起動・バックグラウンドで実行をオンにします。';
+
+  @override
+  String get batteryUnrestricted => 'アプリ情報 › アプリの電池使用量：制限なし。';
+
+  @override
+  String get batteryKeepRunning => 'Linksy では：設定 › 接続 › バックグラウンドで実行。';
+
+  @override
+  String get batteryNames => '名前は Android のバージョンによって少し異なります。';
+
+  @override
+  String get updatePlayProtect =>
+      'Linksy はコンピュータに通知を表示できるため、Play プロテクトがインストールを止めることがあります。その場合：';
+
+  @override
+  String get updateProtectStep1 => 'Play ストア › プロフィール写真 › Play プロテクト › ⚙。';
+
+  @override
+  String get updateProtectStep2 => '「Play プロテクトでアプリをスキャン」をオフにします。';
+
+  @override
+  String get updateProtectStep3 => 'もう一度「今すぐ更新」をタップし、その後スキャンをオンに戻します。';
+
+  @override
+  String get news032NotificationsTitle => '通知をコンピュータで';
+
+  @override
+  String get news032NotificationsBody =>
+      'メッセージなどの通知が、ペアリングしたコンピュータに返信ボタン付きで表示されます。設定 › コンピュータとの連携 でオンにします。スイッチがグレー表示なら：アプリ情報 › ⋮ › 制限付き設定を許可。';
+
+  @override
+  String get news032BatteryTitle => 'Linksy を動かし続ける';
+
+  @override
+  String get news032BatteryBody =>
+      '設定 › 接続 › Linksy を動かし続ける で、スマホのメーカーごとに変更する設定がわかり、Linksy がバックグラウンドで動き続けます。';
 }
