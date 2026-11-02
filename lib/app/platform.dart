@@ -38,6 +38,9 @@ abstract final class LinksyPlatform {
   static final _shares = StreamController<SharedIn>.broadcast();
   static final _batteries = StreamController<Battery>.broadcast();
   static final _callStates = StreamController<String>.broadcast();
+  static final _phoneNotifications =
+      StreamController<Map<String, Object?>>.broadcast();
+  static final _phoneNotificationsGone = StreamController<String>.broadcast();
   static final _volumeKeys = StreamController<bool>.broadcast();
   static final _webcamChanges =
       StreamController<(String, Map<String, Object?>)>.broadcast();
@@ -85,6 +88,12 @@ abstract final class LinksyPlatform {
           if (share != null) _shares.add(share);
         case 'callState' when call.arguments is String:
           _callStates.add(call.arguments as String);
+        case 'phoneNotification' when call.arguments is Map:
+          _phoneNotifications.add(
+            (call.arguments as Map).cast<String, Object?>(),
+          );
+        case 'phoneNotificationGone' when call.arguments is String:
+          _phoneNotificationsGone.add(call.arguments as String);
         case 'webcamChanged':
           final a = call.arguments as Map;
           _webcamChanges.add((
@@ -242,6 +251,60 @@ abstract final class LinksyPlatform {
   static Stream<String> get callStates {
     _listen();
     return _callStates.stream;
+  }
+
+  /// This phone's notifications while [mirrorNotifications] is on and
+  /// Android lets Linksy read them: each new or changed one, in the core's
+  /// shape (docs/protocol.md §4.5).
+  static Stream<Map<String, Object?>> get phoneNotifications {
+    _listen();
+    return _phoneNotifications.stream;
+  }
+
+  /// …and the keys of those that went away.
+  static Stream<String> get phoneNotificationsGone {
+    _listen();
+    return _phoneNotificationsGone.stream;
+  }
+
+  /// Whether Android lets Linksy read notifications (Notification access).
+  static Future<bool> notificationAccess() async =>
+      await _call<bool>('notificationAccess') ?? false;
+
+  /// Android's Notification access page for Linksy; whether it's allowed
+  /// once the user comes back.
+  static Future<bool> askNotificationAccess() async =>
+      await _call<bool>('askNotificationAccess') ?? false;
+
+  /// Sends this phone's notifications to [phoneNotifications], or stops.
+  static Future<void> mirrorNotifications(bool on) =>
+      _call<void>('mirrorNotifications', {'on': on});
+
+  /// Answers notification [key] through its own reply; false if it's gone.
+  static Future<bool> replyNotification(String key, String text) async =>
+      await _call<bool>('replyNotification', {'key': key, 'text': text}) ??
+      false;
+
+  /// Presses its button [action] (the id it was sent with).
+  static Future<bool> notificationAction(String key, String action) async =>
+      await _call<bool>('notificationAction', {'key': key, 'action': action}) ??
+      false;
+
+  /// Takes it away, as if swiped.
+  static Future<bool> dismissNotification(String key) async =>
+      await _call<bool>('dismissNotification', {'key': key}) ?? false;
+
+  /// Linksy's App info page in Android's settings.
+  static Future<void> openAppInfo() => _call<void>('openAppInfo');
+
+  /// Who made this phone (`Build.MANUFACTURER`, as written) and its Android
+  /// API level.
+  static Future<({String maker, int sdk})> phoneMaker() async {
+    final m = await _call<Map>('phoneMaker');
+    return (
+      maker: m?['maker'] as String? ?? '',
+      sdk: (m?['sdk'] as num?)?.toInt() ?? 0,
+    );
   }
 
   /// New photos in the `photos` folder after [sinceMs], copied into month

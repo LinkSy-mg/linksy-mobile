@@ -37,6 +37,7 @@ class MainActivity : FlutterActivity() {
     private var calls: CallWatcher? = null
     /// Waiting on the photo picker: which device, and Dart's reply.
     private var pendingPicture: Pair<String, MethodChannel.Result>? = null
+    private var pendingNotificationAccess: MethodChannel.Result? = null
     /// Waiting on Android's folder picker: which folder, and Dart's reply.
     private var pendingFolder: Pair<String, MethodChannel.Result>? = null
     private var batteryReceiver: BroadcastReceiver? = null
@@ -61,6 +62,8 @@ class MainActivity : FlutterActivity() {
         takeShared(intent)
         watchBattery()
         Logs.sink = { line -> runOnUiThread { channel?.invokeMethod("log", line) } }
+        PhoneNotifications.posted = { n -> runOnUiThread { channel?.invokeMethod("phoneNotification", n) } }
+        PhoneNotifications.removed = { key -> runOnUiThread { channel?.invokeMethod("phoneNotificationGone", key) } }
         ShareService.webcamListener = { session, state ->
             runOnUiThread { channel?.invokeMethod("webcamChanged", mapOf("session" to session, "state" to state.toString())) }
         }
@@ -108,6 +111,39 @@ class MainActivity : FlutterActivity() {
                         result.success(null)
                     }
                     "allFilesState" -> result.success(allFilesState())
+                    "notificationAccess" -> result.success(PhoneNotifications.allowed(this@MainActivity))
+                    "askNotificationAccess" -> {
+                        // Android's page; the answer comes back with the user.
+                        pendingNotificationAccess?.success(PhoneNotifications.allowed(this@MainActivity))
+                        pendingNotificationAccess = result
+                        val opened = runCatching {
+                            startActivityForResult(PhoneNotifications.settingsIntent(this@MainActivity), REQUEST_NOTIFICATION_ACCESS)
+                        }.recoverCatching {
+                            startActivityForResult(Intent(Settings.ACTION_NOTIFICATION_LISTENER_SETTINGS), REQUEST_NOTIFICATION_ACCESS)
+                        }
+                        if (opened.isFailure) {
+                            pendingNotificationAccess = null
+                            result.success(PhoneNotifications.allowed(this@MainActivity))
+                        }
+                    }
+                    "mirrorNotifications" -> {
+                        PhoneNotifications.on = call.argument<Boolean>("on") == true
+                        result.success(null)
+                    }
+                    "replyNotification" -> result.success(
+                        PhoneNotifications.reply(call.argument<String>("key")!!, call.argument<String>("text")!!),
+                    )
+                    "notificationAction" -> result.success(
+                        PhoneNotifications.act(call.argument<String>("key")!!, call.argument<String>("action")!!),
+                    )
+                    "dismissNotification" -> result.success(PhoneNotifications.dismiss(call.argument<String>("key")!!))
+                    "openAppInfo" -> {
+                        runCatching {
+                            startActivity(Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS, android.net.Uri.parse("package:$packageName")))
+                        }
+                        result.success(null)
+                    }
+                    "phoneMaker" -> result.success(mapOf("maker" to Build.MANUFACTURER, "sdk" to Build.VERSION.SDK_INT))
                     "allowAllFiles" -> {
                         // Android's own page for it; the app hears back on resume.
                         runCatching {
@@ -688,6 +724,8 @@ class MainActivity : FlutterActivity() {
         networks?.stop()
         networks = null
         TransferNotice.answer = null
+        PhoneNotifications.posted = null
+        PhoneNotifications.removed = null
         DirectHost.step = null
         ShareService.webcamListener = null
         previews.keys.toList().forEach { webcamPreview(it, false) }
@@ -892,6 +930,11 @@ class MainActivity : FlutterActivity() {
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         @Suppress("DEPRECATION")
         super.onActivityResult(requestCode, resultCode, data)
+        if (requestCode == REQUEST_NOTIFICATION_ACCESS) {
+            pendingNotificationAccess?.success(PhoneNotifications.allowed(this))
+            pendingNotificationAccess = null
+            return
+        }
         if (requestCode == REQUEST_PICTURE) {
             val (device, result) = pendingPicture ?: return
             pendingPicture = null
@@ -977,6 +1020,7 @@ class MainActivity : FlutterActivity() {
         const val REQUEST_PICK = 44
         const val REQUEST_FOLDER = 45
         const val REQUEST_PICTURE = 46
+        const val REQUEST_NOTIFICATION_ACCESS = 52
 
         private var files: FileServer? = null
 

@@ -12,6 +12,7 @@ import '../../ui/sig.dart';
 import '../news/whats_new.dart';
 import '../onboarding/language_wheel.dart';
 import '../permissions/permissions_sheet.dart';
+import 'phone_notifications.dart';
 import 'settings_kit.dart';
 
 /// The settings pages the hub opens.
@@ -133,6 +134,13 @@ List<SettingsHit> settingsIndex(BuildContext context) {
       [l.settingsPictureChoose],
     ),
     SettingsHit(
+      'notifications',
+      SettingsArea.computers,
+      Ph.bellRinging,
+      l.settingsPhoneNotifications,
+      [l.settingsPhoneNotificationsCaption],
+    ),
+    SettingsHit(
       'calls',
       SettingsArea.computers,
       Ph.phoneCall,
@@ -199,6 +207,7 @@ String settingsSummary(BuildContext context, SettingsArea area) {
       if (st.stayConnected) l.settingsStayConnected,
     ],
     SettingsArea.computers => [
+      if (c.mirroring) l.settingsPhoneNotifications,
       if (c.pauseOnCalls) l.settingsPauseMusic,
       if (c.mediaNotice) l.settingsMediaNotice,
       if (c.scrollReversed) l.settingsReverseScroll,
@@ -713,6 +722,24 @@ class ComputersSettings extends StatelessWidget {
         ),
         SettingsSection(
           children: [
+            SettingRow(
+              id: 'notifications',
+              icon: Ph.bellRinging,
+              title: l.settingsPhoneNotifications,
+              caption: c.phoneNotifications && !c.notificationAccess
+                  ? l.settingsPhoneNotificationsAllow
+                  : l.settingsPhoneNotificationsCaption,
+              warn: c.phoneNotifications && !c.notificationAccess,
+              onTap: c.phoneNotifications && !c.notificationAccess
+                  ? () => allowPhoneNotifications(context)
+                  : null,
+              trailing: Switch(
+                value: c.mirroring,
+                onChanged: (v) => v
+                    ? allowPhoneNotifications(context)
+                    : c.setPhoneNotifications(false),
+              ),
+            ),
             SettingRow(
               id: 'calls',
               icon: Ph.phoneCall,

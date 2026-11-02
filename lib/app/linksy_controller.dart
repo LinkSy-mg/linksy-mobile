@@ -129,6 +129,8 @@ class LinksyController extends ChangeNotifier with WidgetsBindingObserver {
   bool _importing = false;
   Timer? _importTimer;
   StreamSubscription<String>? _callSub;
+  StreamSubscription<Map<String, Object?>>? _noticeSub;
+  StreamSubscription<String>? _noticeGoneSub;
   StreamSubscription<(String, bool)>? _answerSub;
   StreamSubscription<(String, Map<String, Object?>)>? _directSub;
   StreamSubscription<void>? _networkSub;
@@ -249,6 +251,10 @@ class LinksyController extends ChangeNotifier with WidgetsBindingObserver {
     notifyListeners();
     _batterySub = LinksyPlatform.batteryChanges.listen(_onBattery);
     _callSub = LinksyPlatform.callStates.listen(_onCall);
+    _noticeSub = LinksyPlatform.phoneNotifications.listen(_onPhoneNotification);
+    _noticeGoneSub = LinksyPlatform.phoneNotificationsGone.listen(
+      _onPhoneNotificationGone,
+    );
     _answerSub = LinksyPlatform.transferAnswers.listen(
       (a) => respond(a.$1, accept: a.$2),
     );
@@ -341,6 +347,8 @@ class LinksyController extends ChangeNotifier with WidgetsBindingObserver {
     if (state == AppLifecycleState.resumed) {
       _importAll();
       unawaited(updates.recheck());
+      // Back from Notification access or App info, maybe.
+      unawaited(refreshNotificationAccess());
       // Back from Developer options, maybe.
       _readShareProtections();
     } else if (state == AppLifecycleState.hidden) {
@@ -379,6 +387,10 @@ class LinksyController extends ChangeNotifier with WidgetsBindingObserver {
     allFiles = await LinksyPlatform.allFilesState();
     await LinksyPlatform.shareFiles(sharingFiles && filesReady, all: filesAll);
     await LinksyPlatform.watchCalls(pauseOnCalls);
+    await refreshNotificationAccess();
+    final phone = await LinksyPlatform.phoneMaker();
+    maker = phone.maker;
+    sdk = phone.sdk;
     _updateKeepAlive();
     notifyListeners();
     addListener(_shareTargets);
@@ -944,6 +956,80 @@ class LinksyController extends ChangeNotifier with WidgetsBindingObserver {
     }
   }
 
+  // This phone's notifications on its computers (§4.5).
+
+  /// Wanted, in Settings; they go once Android allows [notificationAccess].
+  bool get phoneNotifications => prefs['phone_notifications'] == 'on';
+
+  /// Android lets Linksy read notifications (Notification access).
+  bool notificationAccess = false;
+
+  /// Who made this phone (`Build.MANUFACTURER`) and its Android API level,
+  /// for the battery guide and the Notification access steps.
+  String maker = '';
+  int sdk = 0;
+
+  /// Both: notifications go to the computers.
+  bool get mirroring => phoneNotifications && notificationAccess;
+
+  /// Android's page for Notification access was opened once already: next
+  /// time, the steps for a switch Android greys out come first.
+  bool get notificationAccessAsked => prefs['notification_asked'] == 'on';
+
+  Future<void> setPhoneNotifications(bool on) async {
+    await _setPref('phone_notifications', on ? 'on' : null);
+    await _mirror();
+  }
+
+  /// Opens Android's Notification access page; whether it's allowed now.
+  Future<bool> askNotificationAccess() async {
+    await _setPref('notification_asked', 'on');
+    notificationAccess = await LinksyPlatform.askNotificationAccess();
+    await _mirror();
+    notifyListeners();
+    return notificationAccess;
+  }
+
+  /// Again, after Android's settings (it can be taken back there too).
+  Future<void> refreshNotificationAccess() async {
+    final access = await LinksyPlatform.notificationAccess();
+    final changed = access != notificationAccess;
+    notificationAccess = access;
+    await _mirror();
+    if (changed) notifyListeners();
+  }
+
+  /// Whether notifications go, to the listener and to the computers: they
+  /// show their Messages page while this phone announces `notifications`.
+  Future<void> _mirror() async {
+    await LinksyPlatform.mirrorNotifications(mirroring);
+    final features = [
+      ...node.info.features.where((f) => f != 'notifications'),
+      if (mirroring) 'notifications',
+    ];
+    await node.setFeatures(features).catchError((Object _) {});
+  }
+
+  /// The computers that get them: paired and around.
+  Iterable<String> get _noticeTargets => [
+    for (final v in devices)
+      if (v.trusted && _isComputer(v.device) && (v.connected || v.nearby))
+        v.device.id,
+  ];
+
+  void _onPhoneNotification(Map<String, Object?> n) {
+    if (!mirroring) return;
+    for (final id in _noticeTargets) {
+      node.postNotification(id, n).catchError((Object _) {});
+    }
+  }
+
+  void _onPhoneNotificationGone(String key) {
+    for (final id in _noticeTargets) {
+      node.removeNotification(id, key).catchError((Object _) {});
+    }
+  }
+
   // Files (§4.9): computers browse the one folder the user picked.
 
   Future<String?> pickFilesFolder() async {
@@ -1387,6 +1473,15 @@ class LinksyController extends ChangeNotifier with WidgetsBindingObserver {
         refresh();
       case OpenUrlReceived(:final from, :final url):
         _addLocal(from.id, ActivityKind.link, incoming: true, text: url);
+      // Answers to this phone's notifications, from a computer showing them.
+      case NotificationReplyRequested(:final key, :final text) when mirroring:
+        LinksyPlatform.replyNotification(key, text);
+      case NotificationActionRequested(:final key, :final action)
+          when mirroring:
+        LinksyPlatform.notificationAction(key, action);
+      case NotificationDismissRequested(:final key) when mirroring:
+        LinksyPlatform.dismissNotification(key);
+      // Turned off here since: nothing to answer.
       case NotificationReplyRequested() ||
           NotificationActionRequested() ||
           NotificationDismissRequested():
@@ -1948,6 +2043,8 @@ class LinksyController extends ChangeNotifier with WidgetsBindingObserver {
     _sub?.cancel();
     _batterySub?.cancel();
     _callSub?.cancel();
+    _noticeSub?.cancel();
+    _noticeGoneSub?.cancel();
     _answerSub?.cancel();
     _directSub?.cancel();
     _networkSub?.cancel();

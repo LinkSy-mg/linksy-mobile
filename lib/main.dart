@@ -19,10 +19,12 @@ import 'ui/l10n.dart';
 /// `--dart-define=LINKSY_DEMO=true` runs on made-up devices, for UI work.
 const _demo = bool.fromEnvironment('LINKSY_DEMO');
 
-/// What this phone does for computers (docs/protocol.md §4.10). Not `control`,
-/// `notifications` or `sms` (each needs a permission that gets sideloaded
-/// apps blocked at install), nor `media_state` or `clipboard_watch`
-/// (Android doesn't let apps watch either in the background).
+/// What this phone does for computers (docs/protocol.md §4.10). Not `control`
+/// or `sms` (each needs a permission that gets sideloaded apps blocked at
+/// install), nor `media_state` or `clipboard_watch` (Android doesn't let apps
+/// watch either in the background). `notifications` is added while they're
+/// mirrored: Notification access, the one such permission the user chose to
+/// give (Play Protect may stop the install over it).
 const _features = [
   'files',
   'clipboard',
@@ -66,6 +68,11 @@ Future<void> main() async {
   // Direct links (§4.17), unless turned off in Settings: a Wi-Fi Direct
   // group of its own for big transfers, or another phone's to join
   final direct = prefs['direct'] != 'off' && await LinksyPlatform.directHost();
+  // This phone's notifications on its computers (§4.5), told at the start;
+  // the controller tells them again when they're turned on or off.
+  final notifications =
+      prefs['phone_notifications'] == 'on' &&
+      await LinksyPlatform.notificationAccess();
 
   final LinksyNode node;
   if (_demo) {
@@ -80,6 +87,7 @@ Future<void> main() async {
         features: [
           ..._features,
           if (direct) ...['direct_host', 'direct_join', 'direct_group'],
+          if (notifications) 'notifications',
         ],
         away: true,
         relay: service.cached()?.relay ?? defaultRelay,

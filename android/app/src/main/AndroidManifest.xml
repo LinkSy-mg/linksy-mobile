@@ -124,6 +124,17 @@
             android:name=".media.ShareService"
             android:exported="false"
             android:foregroundServiceType="mediaProjection|camera|microphone"/>
+        <!-- This phone's notifications on its computers (§4.5), once the user allows
+             Notification access and turns it on in Settings. -->
+        <service
+            android:name=".PhoneNotifications"
+            android:exported="true"
+            android:label="Linksy"
+            android:permission="android.permission.BIND_NOTIFICATION_LISTENER_SERVICE">
+            <intent-filter>
+                <action android:name="android.service.notification.NotificationListenerService"/>
+            </intent-filter>
+        </service>
         <service
             android:name=".KeepAlive"
             android:exported="false"
