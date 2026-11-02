@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- The "Sender" mark for the launch screen: 288dp (a splash icon with no background),
+     the mark 120dp in its middle, where the app's launch intro picks it up. -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="288dp" android:height="288dp"
+    android:viewportWidth="288" android:viewportHeight="288">
+    <group android:translateX="84" android:translateY="84" android:scaleX="1.2" android:scaleY="1.2">
+        <path android:fillColor="#FF2563FF" android:pathData="M13,75a12,12 0 1,0 24,0a12,12 0 1,0 -24,0"/>
+        <path android:strokeColor="#FF2563FF" android:strokeWidth="9.5" android:strokeLineCap="round"
+            android:fillColor="#00000000" android:pathData="M25,47 A28,28 0 0,1 53,75"/>
+        <path android:strokeColor="#FF22C3E6" android:strokeWidth="8" android:strokeLineCap="round"
+            android:fillColor="#00000000" android:pathData="M78,42 A20,20 0 0,1 58,22"/>
+        <path android:fillColor="#FF22C3E6" android:pathData="M70,22a8,8 0 1,0 16,0a8,8 0 1,0 -16,0"/>
+    </group>
+</vector>

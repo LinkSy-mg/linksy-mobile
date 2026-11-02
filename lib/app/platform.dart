@@ -206,9 +206,16 @@ abstract final class LinksyPlatform {
   static Future<String?> folder(String kind) =>
       _call<String>('folder', {'kind': kind});
 
-  /// Lets paired computers browse the `files` folder (or not).
-  static Future<void> shareFiles(bool on) =>
-      _call<void>('shareFiles', {'on': on});
+  /// Lets paired computers browse the `files` folder, or with [all] the
+  /// phone's whole storage (once All files access is allowed), or nothing.
+  static Future<void> shareFiles(bool on, {bool all = false}) =>
+      _call<void>('shareFiles', {'on': on, 'all': all});
+
+  /// All files access: `allowed`, `denied`, or `unsupported` (before Android 11).
+  static Future<String?> allFilesState() => _call<String>('allFilesState');
+
+  /// Android's page that allows All files access for Linksy.
+  static Future<void> allowAllFiles() => _call<void>('allowAllFiles');
 
   /// Keeps Linksy running with the screen off, with a quiet notification
   /// saying [text]; [awake] keeps the CPU on too (heartbeats). With

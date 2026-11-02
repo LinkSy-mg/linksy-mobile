@@ -1896,11 +1896,35 @@ abstract class AppLocalizations {
   /// **'Settings'**
   String get settingsTitle;
 
+  /// Settings: placeholder of the search field
+  ///
+  /// In en, this message translates to:
+  /// **'Search settings'**
+  String get settingsSearch;
+
+  /// Settings search: no setting matches
+  ///
+  /// In en, this message translates to:
+  /// **'Nothing matches “{query}”'**
+  String settingsNothingMatches(String query);
+
+  /// Settings: label of the card suggesting one thing to set up next
+  ///
+  /// In en, this message translates to:
+  /// **'Recommended'**
+  String get settingsRecommended;
+
   /// Settings section label: receiving files
   ///
   /// In en, this message translates to:
   /// **'Receiving'**
   String get settingsReceiving;
+
+  /// Settings: the page about received files, the shared folder and photo backup
+  ///
+  /// In en, this message translates to:
+  /// **'Files'**
+  String get settingsFiles;
 
   /// Settings row: where received files are saved
   ///
@@ -1931,6 +1955,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Connection'**
   String get settingsConnection;
+
+  /// Connection page: label over the list of ways the phone reaches computers (Same Wi-Fi, Away from home, Wi-Fi Direct, USB cable); not buttons
+  ///
+  /// In en, this message translates to:
+  /// **'How it reaches your computers'**
+  String get settingsWays;
 
   /// Settings switch: keep connections to nearby devices open
   ///
@@ -2009,6 +2039,30 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Let computers browse files'**
   String get settingsBrowseFiles;
+
+  /// Browse files: computers see one folder the user picks
+  ///
+  /// In en, this message translates to:
+  /// **'A folder you choose'**
+  String get settingsFilesFolder;
+
+  /// Browse files: computers see all of the phone's files (Android's All files access)
+  ///
+  /// In en, this message translates to:
+  /// **'All files'**
+  String get settingsFilesAll;
+
+  /// Under All files, once allowed
+  ///
+  /// In en, this message translates to:
+  /// **'Your computers can open every file on this phone.'**
+  String get settingsFilesAllCaption;
+
+  /// Under All files, before Android allows it
+  ///
+  /// In en, this message translates to:
+  /// **'Allow “All files access” for Linksy in Android’s settings.'**
+  String get settingsFilesAllAllow;
 
   /// Caption when no shared folder is chosen yet
   ///
@@ -3473,6 +3527,18 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Later'**
   String get updateLater;
+
+  /// Update sheet: title of the release notes card
+  ///
+  /// In en, this message translates to:
+  /// **'What changed in {version}'**
+  String updateWhatChanged(String version);
+
+  /// Update sheet: small label above the file that will be installed
+  ///
+  /// In en, this message translates to:
+  /// **'To be installed'**
+  String get updateToInstall;
 
   /// Download progress
   ///

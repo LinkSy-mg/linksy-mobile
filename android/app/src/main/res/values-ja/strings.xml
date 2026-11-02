@@ -30,4 +30,5 @@
     <string name="media_next">次へ</string>
     <string name="media_back10">10 秒戻る</string>
     <string name="media_forward10">10 秒進む</string>
+    <string name="all_files">すべてのファイル</string>
 </resources>

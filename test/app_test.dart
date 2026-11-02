@@ -3,6 +3,7 @@ import 'package:flutter/widgets.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:linksy/app/activity.dart';
 import 'package:linksy/app/app.dart';
+import 'package:linksy/app/launch_intro.dart';
 import 'package:linksy/app/linksy_controller.dart';
 import 'package:linksy/core/demo_node.dart';
 import 'package:linksy/core/updates.dart';
@@ -36,6 +37,8 @@ void main() {
     await c.start();
     // Cancels its timers (photo backup checks) before the test ends.
     addTearDown(c.dispose);
+    // No launch intro: nothing to cover or fly.
+    LaunchIntro.enabled = false;
     await tester.pumpWidget(LinksyApp(controller: c));
     await tester.pumpAndSettle();
     return (c, node);
@@ -43,10 +46,10 @@ void main() {
 
   testWidgets('home lists paired and unpaired devices', (tester) async {
     await pumpApp(tester);
-    expect(find.text('YOUR DEVICES'), findsOneWidget);
+    expect(find.text('Your devices'), findsOneWidget);
     expect(find.text('Studio Desktop'), findsOneWidget);
     expect(find.text('ThinkPad'), findsOneWidget);
-    expect(find.text('NEARBY, NOT PAIRED'), findsOneWidget);
+    expect(find.text('Nearby, not paired'), findsOneWidget);
     expect(find.text('Living Room PC'), findsOneWidget);
     expect(find.text('Pair'), findsOneWidget);
   });
@@ -80,7 +83,12 @@ void main() {
     expect(find.text('Ping'), findsOneWidget);
     expect(find.text('Remote'), findsOneWidget);
     expect(find.text('Find it'), findsOneWidget);
+    // Its switches are on its settings page, behind the gear.
+    expect(find.text('Back up photos'), findsNothing);
+    await tester.tap(find.byTooltip('Settings'));
+    await tester.pumpAndSettle();
     expect(find.text('Back up photos'), findsOneWidget);
+    expect(find.text('Forget this device'), findsOneWidget);
   });
 
   testWidgets('incoming files ask first', (tester) async {

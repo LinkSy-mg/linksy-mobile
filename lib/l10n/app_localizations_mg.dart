@@ -1145,7 +1145,21 @@ class AppLocalizationsMg extends AppLocalizations {
   String get settingsTitle => 'Fikirana';
 
   @override
+  String get settingsSearch => 'Hikaroka ao amin\'ny fikirana';
+
+  @override
+  String settingsNothingMatches(String query) {
+    return 'Tsy misy mifanaraka amin\'ny « $query »';
+  }
+
+  @override
+  String get settingsRecommended => 'Soso-kevitra';
+
+  @override
   String get settingsReceiving => 'Fandraisana';
+
+  @override
+  String get settingsFiles => 'Rakitra';
 
   @override
   String get settingsSaveLocation => 'Toerana itahirizana';
@@ -1162,6 +1176,9 @@ class AppLocalizationsMg extends AppLocalizations {
 
   @override
   String get settingsConnection => 'Fifandraisana';
+
+  @override
+  String get settingsWays => 'Ny fomba hifandraisany amin\'ny solosainanao';
 
   @override
   String get settingsStayConnected => 'Mifandray foana';
@@ -1206,6 +1223,20 @@ class AppLocalizationsMg extends AppLocalizations {
 
   @override
   String get settingsBrowseFiles => 'Avelao hijery rakitra ny solosaina';
+
+  @override
+  String get settingsFilesFolder => 'Lahatahiry nofidinao';
+
+  @override
+  String get settingsFilesAll => 'Ny rakitra rehetra';
+
+  @override
+  String get settingsFilesAllCaption =>
+      'Afaka manokatra ny rakitra rehetra amin\'ity finday ity ny solosainanao.';
+
+  @override
+  String get settingsFilesAllAllow =>
+      'Avelao ny « Fidirana amin\'ny rakitra rehetra » ho an\'i Linksy ao amin\'ny fikirana Android.';
 
   @override
   String get settingsBrowseFilesChoose =>
@@ -2118,6 +2149,14 @@ class AppLocalizationsMg extends AppLocalizations {
 
   @override
   String get updateLater => 'Any aoriana';
+
+  @override
+  String updateWhatChanged(String version) {
+    return 'Ny niova ao amin\'ny $version';
+  }
+
+  @override
+  String get updateToInstall => 'Hapetraka';
 
   @override
   String updateDownloading(String percent) {

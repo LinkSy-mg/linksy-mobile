@@ -1145,7 +1145,21 @@ class AppLocalizationsIt extends AppLocalizations {
   String get settingsTitle => 'Impostazioni';
 
   @override
+  String get settingsSearch => 'Cerca nelle impostazioni';
+
+  @override
+  String settingsNothingMatches(String query) {
+    return 'Nessun risultato per «$query»';
+  }
+
+  @override
+  String get settingsRecommended => 'Consigliato';
+
+  @override
   String get settingsReceiving => 'Ricezione';
+
+  @override
+  String get settingsFiles => 'File';
 
   @override
   String get settingsSaveLocation => 'Posizione di salvataggio';
@@ -1162,6 +1176,9 @@ class AppLocalizationsIt extends AppLocalizations {
 
   @override
   String get settingsConnection => 'Connessione';
+
+  @override
+  String get settingsWays => 'Come raggiunge i tuoi computer';
 
   @override
   String get settingsStayConnected => 'Resta connesso';
@@ -1207,6 +1224,20 @@ class AppLocalizationsIt extends AppLocalizations {
 
   @override
   String get settingsBrowseFiles => 'Permetti ai computer di sfogliare i file';
+
+  @override
+  String get settingsFilesFolder => 'Una cartella a tua scelta';
+
+  @override
+  String get settingsFilesAll => 'Tutti i file';
+
+  @override
+  String get settingsFilesAllCaption =>
+      'I tuoi computer possono aprire ogni file di questo telefono.';
+
+  @override
+  String get settingsFilesAllAllow =>
+      'Consenti «Accesso a tutti i file» per Linksy nelle impostazioni di Android.';
 
   @override
   String get settingsBrowseFilesChoose =>
@@ -2121,6 +2152,14 @@ class AppLocalizationsIt extends AppLocalizations {
 
   @override
   String get updateLater => 'Più tardi';
+
+  @override
+  String updateWhatChanged(String version) {
+    return 'Cosa cambia nella $version';
+  }
+
+  @override
+  String get updateToInstall => 'Da installare';
 
   @override
   String updateDownloading(String percent) {

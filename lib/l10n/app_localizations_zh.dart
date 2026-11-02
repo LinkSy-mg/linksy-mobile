@@ -1107,7 +1107,21 @@ class AppLocalizationsZh extends AppLocalizations {
   String get settingsTitle => '设置';
 
   @override
+  String get settingsSearch => '搜索设置';
+
+  @override
+  String settingsNothingMatches(String query) {
+    return '没有与“$query”匹配的设置';
+  }
+
+  @override
+  String get settingsRecommended => '推荐';
+
+  @override
   String get settingsReceiving => '接收';
+
+  @override
+  String get settingsFiles => '文件';
 
   @override
   String get settingsSaveLocation => '保存位置';
@@ -1123,6 +1137,9 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get settingsConnection => '连接';
+
+  @override
+  String get settingsWays => '它如何连接你的电脑';
 
   @override
   String get settingsStayConnected => '保持连接';
@@ -1165,6 +1182,18 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get settingsBrowseFiles => '允许电脑浏览文件';
+
+  @override
+  String get settingsFilesFolder => '你选择的文件夹';
+
+  @override
+  String get settingsFilesAll => '所有文件';
+
+  @override
+  String get settingsFilesAllCaption => '你的电脑可以打开这部手机上的所有文件。';
+
+  @override
+  String get settingsFilesAllAllow => '在 Android 设置中允许 Linksy“访问所有文件”。';
 
   @override
   String get settingsBrowseFilesChoose =>
@@ -2044,6 +2073,14 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get updateLater => '稍后';
+
+  @override
+  String updateWhatChanged(String version) {
+    return '$version 的更新内容';
+  }
+
+  @override
+  String get updateToInstall => '将要安装';
 
   @override
   String updateDownloading(String percent) {

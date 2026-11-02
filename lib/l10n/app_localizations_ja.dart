@@ -1117,7 +1117,21 @@ class AppLocalizationsJa extends AppLocalizations {
   String get settingsTitle => '設定';
 
   @override
+  String get settingsSearch => '設定を検索';
+
+  @override
+  String settingsNothingMatches(String query) {
+    return '「$query」に一致する設定はありません';
+  }
+
+  @override
+  String get settingsRecommended => 'おすすめ';
+
+  @override
   String get settingsReceiving => '受信';
+
+  @override
+  String get settingsFiles => 'ファイル';
 
   @override
   String get settingsSaveLocation => '保存先';
@@ -1134,6 +1148,9 @@ class AppLocalizationsJa extends AppLocalizations {
 
   @override
   String get settingsConnection => '接続';
+
+  @override
+  String get settingsWays => 'パソコンとのつながり方';
 
   @override
   String get settingsStayConnected => '接続を維持';
@@ -1177,6 +1194,19 @@ class AppLocalizationsJa extends AppLocalizations {
 
   @override
   String get settingsBrowseFiles => 'コンピュータからファイルを閲覧';
+
+  @override
+  String get settingsFilesFolder => '選んだフォルダ';
+
+  @override
+  String get settingsFilesAll => 'すべてのファイル';
+
+  @override
+  String get settingsFilesAllCaption => 'パソコンからこのスマホのすべてのファイルを開けます。';
+
+  @override
+  String get settingsFilesAllAllow =>
+      'Android の設定で Linksy に「すべてのファイルへのアクセス」を許可してください。';
 
   @override
   String get settingsBrowseFilesChoose =>
@@ -2067,6 +2097,14 @@ class AppLocalizationsJa extends AppLocalizations {
 
   @override
   String get updateLater => '後で';
+
+  @override
+  String updateWhatChanged(String version) {
+    return '$version の変更点';
+  }
+
+  @override
+  String get updateToInstall => 'インストールされるもの';
 
   @override
   String updateDownloading(String percent) {

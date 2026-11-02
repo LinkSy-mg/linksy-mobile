@@ -1165,7 +1165,21 @@ class AppLocalizationsRu extends AppLocalizations {
   String get settingsTitle => 'Настройки';
 
   @override
+  String get settingsSearch => 'Поиск в настройках';
+
+  @override
+  String settingsNothingMatches(String query) {
+    return 'Ничего не найдено по запросу «$query»';
+  }
+
+  @override
+  String get settingsRecommended => 'Рекомендуем';
+
+  @override
   String get settingsReceiving => 'Получение';
+
+  @override
+  String get settingsFiles => 'Файлы';
 
   @override
   String get settingsSaveLocation => 'Куда сохранять';
@@ -1182,6 +1196,9 @@ class AppLocalizationsRu extends AppLocalizations {
 
   @override
   String get settingsConnection => 'Подключение';
+
+  @override
+  String get settingsWays => 'Как он связывается с компьютерами';
 
   @override
   String get settingsStayConnected => 'Оставаться на связи';
@@ -1226,6 +1243,20 @@ class AppLocalizationsRu extends AppLocalizations {
 
   @override
   String get settingsBrowseFiles => 'Доступ компьютеров к файлам';
+
+  @override
+  String get settingsFilesFolder => 'Выбранная папка';
+
+  @override
+  String get settingsFilesAll => 'Все файлы';
+
+  @override
+  String get settingsFilesAllCaption =>
+      'Ваши компьютеры могут открыть любой файл на этом телефоне.';
+
+  @override
+  String get settingsFilesAllAllow =>
+      'Разрешите Linksy «Доступ ко всем файлам» в настройках Android.';
 
   @override
   String get settingsBrowseFilesChoose =>
@@ -2142,6 +2173,14 @@ class AppLocalizationsRu extends AppLocalizations {
 
   @override
   String get updateLater => 'Позже';
+
+  @override
+  String updateWhatChanged(String version) {
+    return 'Что нового в $version';
+  }
+
+  @override
+  String get updateToInstall => 'Будет установлено';
 
   @override
   String updateDownloading(String percent) {

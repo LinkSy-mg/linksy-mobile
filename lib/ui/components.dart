@@ -1,6 +1,7 @@
 import 'dart:io';
 import 'dart:math';
 
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
@@ -601,15 +602,34 @@ class _Mark extends CustomPainter {
 
 /// Mark plus the "Linksy" name.
 class Wordmark extends StatelessWidget {
-  const Wordmark({super.key, this.onBlue = false});
+  const Wordmark({
+    super.key,
+    this.onBlue = false,
+    this.markKey,
+    this.markShown,
+  });
 
   final bool onBlue;
+
+  /// The launch intro's landing spot ([markKey]), and when the mark shows
+  /// ([markShown]: once the intro's mark has landed in it).
+  final Key? markKey;
+  final ValueListenable<bool>? markShown;
 
   @override
   Widget build(BuildContext context) => Row(
     mainAxisSize: MainAxisSize.min,
     children: [
-      LinksyMark(size: 30, onBlue: onBlue),
+      if (markShown case final shown?)
+        ValueListenableBuilder(
+          valueListenable: shown,
+          builder: (_, on, _) => Opacity(
+            opacity: on ? 1 : 0,
+            child: LinksyMark(key: markKey, size: 30, onBlue: onBlue),
+          ),
+        )
+      else
+        LinksyMark(key: markKey, size: 30, onBlue: onBlue),
       const SizedBox(width: 8),
       Text(
         'Linksy',
