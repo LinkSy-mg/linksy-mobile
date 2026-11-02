@@ -805,3 +805,79 @@ class SheetOption extends StatelessWidget {
     );
   }
 }
+
+/// Numbered steps to follow in Android's own settings: a blue number, then
+/// the step.
+class NumberedSteps extends StatelessWidget {
+  const NumberedSteps(this.steps, {super.key, this.fontSize = 14.5});
+
+  final List<String> steps;
+  final double fontSize;
+
+  @override
+  Widget build(BuildContext context) {
+    final s = Sig.of(context);
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        for (final (i, step) in steps.indexed)
+          Padding(
+            padding: EdgeInsets.only(top: i == 0 ? 0 : 12),
+            child: Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Container(
+                  width: 26,
+                  height: 26,
+                  alignment: Alignment.center,
+                  decoration: BoxDecoration(
+                    color: Sig.blue.withValues(alpha: 0.12),
+                    shape: BoxShape.circle,
+                  ),
+                  child: Text(
+                    '${i + 1}',
+                    style: const TextStyle(
+                      color: Sig.blue,
+                      fontSize: 13,
+                      fontWeight: FontWeight.w700,
+                    ),
+                  ),
+                ),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: Padding(
+                    padding: const EdgeInsets.only(top: 3),
+                    child: Text.rich(
+                      TextSpan(
+                        children: [
+                          // ⚙ is the gear Android draws: drawn as ours, not
+                          // as the font's emoji.
+                          for (final (j, part) in step.split('⚙').indexed) ...[
+                            if (j > 0)
+                              WidgetSpan(
+                                alignment: PlaceholderAlignment.middle,
+                                child: Icon(
+                                  Ph.gearSix,
+                                  size: fontSize + 2,
+                                  color: s.ink,
+                                ),
+                              ),
+                            TextSpan(text: part),
+                          ],
+                        ],
+                      ),
+                      style: TextStyle(
+                        color: s.ink,
+                        fontSize: fontSize,
+                        height: 1.4,
+                      ),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+      ],
+    );
+  }
+}
