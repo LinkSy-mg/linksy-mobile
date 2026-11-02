@@ -52,17 +52,19 @@ class _RingScreenState extends State<RingScreen> {
             child: Column(
               children: [
                 const Spacer(),
-                Container(
-                  width: 132,
-                  height: 132,
-                  decoration: const BoxDecoration(
-                    shape: BoxShape.circle,
-                    color: Sig.deep,
-                  ),
-                  child: const Icon(
-                    PhFill.bellRinging,
-                    color: Colors.white,
-                    size: 64,
+                _Halo(
+                  child: Container(
+                    width: 132,
+                    height: 132,
+                    decoration: const BoxDecoration(
+                      shape: BoxShape.circle,
+                      color: Sig.deep,
+                    ),
+                    child: const Icon(
+                      PhFill.bellRinging,
+                      color: Colors.white,
+                      size: 64,
+                    ),
                   ),
                 ),
                 const SizedBox(height: 32),
@@ -105,4 +107,58 @@ class _RingScreenState extends State<RingScreen> {
       ),
     ),
   );
+}
+
+/// A soft wave leaving the bell while it rings; still when motion is
+/// reduced.
+class _Halo extends StatefulWidget {
+  const _Halo({required this.child});
+
+  final Widget child;
+
+  @override
+  State<_Halo> createState() => _HaloState();
+}
+
+class _HaloState extends State<_Halo> with SingleTickerProviderStateMixin {
+  late final _wave = AnimationController(
+    vsync: this,
+    duration: const Duration(milliseconds: 1600),
+  );
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    loopUnlessReduced(context, _wave);
+  }
+
+  @override
+  void dispose() {
+    _wave.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) =>
+      CustomPaint(painter: _Wave(_wave), child: widget.child);
+}
+
+/// A disc behind the bell that grows half again and fades as it goes.
+class _Wave extends CustomPainter {
+  _Wave(this.t) : super(repaint: t);
+
+  final Animation<double> t;
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    final v = Curves.easeOut.transform(t.value);
+    canvas.drawCircle(
+      size.center(Offset.zero),
+      size.shortestSide / 2 * (1 + 0.5 * v),
+      Paint()..color = Colors.white.withValues(alpha: 0.22 * (1 - v)),
+    );
+  }
+
+  @override
+  bool shouldRepaint(_Wave old) => old.t != t;
 }

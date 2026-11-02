@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 
 import '../core/invite.dart';
 import '../core/models.dart';
@@ -185,9 +186,29 @@ class _LinksyAppState extends State<LinksyApp> {
     }
   }
 
-  void _say(String text) => _messenger.currentState
+  /// A snack bar; [icon] in cyan for what came in, so it reads at a glance.
+  void _say(String text, {IconData? icon}) => _messenger.currentState
     ?..hideCurrentSnackBar()
-    ..showSnackBar(SnackBar(content: Text(text)));
+    ..showSnackBar(
+      SnackBar(
+        content: icon == null
+            ? Text(text)
+            : Row(
+                children: [
+                  Icon(icon, color: Sig.cyan, size: 20),
+                  const SizedBox(width: 12),
+                  Expanded(child: Text(text)),
+                ],
+              ),
+      ),
+    );
+
+  /// A ping: two short buzzes, like a knock.
+  static Future<void> _knock() async {
+    await HapticFeedback.mediumImpact();
+    await Future<void>.delayed(const Duration(milliseconds: 140));
+    await HapticFeedback.mediumImpact();
+  }
 
   void _onPrompt(LinksyEvent e) {
     final context = _navigator.currentContext;
@@ -227,6 +248,7 @@ class _LinksyAppState extends State<LinksyApp> {
           builder: (_) => SessionRequestDialog(request: e),
         );
       case TransferRequest():
+        HapticFeedback.lightImpact();
         showModalBottomSheet<void>(
           context: context,
           isDismissible: false,
@@ -236,12 +258,26 @@ class _LinksyAppState extends State<LinksyApp> {
           builder: (_) => IncomingFilesSheet(request: e),
         );
       case NotificationReceived(:final from, :final title, :final body):
-        _say(tr.appNotification(from.name, body.isEmpty ? title : body));
+        _knock();
+        // A ping's body only says who it's from, which the line says first.
+        _say(
+          tr.appNotification(
+            from.name,
+            body.isEmpty || body.contains(from.name) ? title : body,
+          ),
+          icon: Ph.bellRinging,
+        );
       case ClipboardReceived(:final from):
-        _say(tr.appCopiedText(from.name));
+        HapticFeedback.lightImpact();
+        _say(tr.appCopiedText(from.name), icon: Ph.clipboardText);
       case ClipboardFileReceived(:final from, :final path):
-        _say(tr.appCopiedFile(path.split('/').last, from.name));
+        HapticFeedback.lightImpact();
+        _say(
+          tr.appCopiedFile(path.split('/').last, from.name),
+          icon: Ph.clipboardText,
+        );
       case OpenUrlReceived():
+        HapticFeedback.lightImpact();
         showDialog<void>(
           context: context,
           builder: (_) => LinkReceivedDialog(event: e),

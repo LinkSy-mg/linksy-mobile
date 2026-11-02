@@ -2,6 +2,7 @@
 <!-- Android's own text (notifications); the app's is in lib/l10n. -->
 <resources>
     <string name="channel_incoming_files">受信ファイル</string>
+    <string name="channel_arrived">コンピュータから</string>
     <string name="accept">受け入れる</string>
     <string name="decline">断る</string>
     <string name="keep_alive_default">Linksy は接続中です</string>

@@ -2,6 +2,7 @@
 <!-- Android's own text (notifications); the app's is in lib/l10n. -->
 <resources>
     <string name="channel_incoming_files">Rakitra miditra</string>
+    <string name="channel_arrived">Avy amin\'ny solosainao</string>
     <string name="accept">Ekena</string>
     <string name="decline">Lavina</string>
     <string name="keep_alive_default">Mifandray i Linksy</string>

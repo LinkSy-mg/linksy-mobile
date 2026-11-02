@@ -350,6 +350,10 @@ class LinksyController extends ChangeNotifier with WidgetsBindingObserver {
     );
   }
 
+  /// Linksy is what the phone shows; else what comes in needs a notification.
+  bool get _onScreen =>
+      WidgetsBinding.instance.lifecycleState == AppLifecycleState.resumed;
+
   /// Back in the app: new photos may be waiting, and maybe a new release.
   @override
   void didChangeAppLifecycleState(AppLifecycleState state) {
@@ -1483,6 +1487,13 @@ class LinksyController extends ChangeNotifier with WidgetsBindingObserver {
         refresh();
       case OpenUrlReceived(:final from, :final url):
         _addLocal(from.id, ActivityKind.link, incoming: true, text: url);
+        if (!_onScreen) {
+          LinksyPlatform.noticeArrived(
+            'link-${from.id}',
+            tr.shareSheetSentALink(from.name),
+            url,
+          );
+        }
       // Answers to this phone's notifications, from a computer showing them.
       case NotificationReplyRequested(:final key, :final text) when mirroring:
         LinksyPlatform.replyNotification(key, text);
@@ -1519,8 +1530,7 @@ class LinksyController extends ChangeNotifier with WidgetsBindingObserver {
         :final total,
       ):
         // Not on screen: Accept / Decline right in the notification.
-        if (WidgetsBinding.instance.lifecycleState !=
-            AppLifecycleState.resumed) {
+        if (!_onScreen) {
           LinksyPlatform.noticeTransfer(
             transfer,
             tr.ctlTransferRequest(files.length, from.name),
@@ -1602,6 +1612,10 @@ class LinksyController extends ChangeNotifier with WidgetsBindingObserver {
         _importEnded(transfer, ok: false, reason: reason);
       case TransferComplete(:final transfer, :final saved):
         LinksyPlatform.cancelNotice(transfer);
+        // Files that went or came: a light tick once they're all there.
+        if (_onScreen && _activity.any((a) => a.id == transfer)) {
+          HapticFeedback.lightImpact();
+        }
         _update(transfer, (a) {
           a
             ..status = ActivityStatus.done
@@ -1639,8 +1653,16 @@ class LinksyController extends ChangeNotifier with WidgetsBindingObserver {
           _activity.remove(last);
         }
         _addLocal(from.id, ActivityKind.clipboard, incoming: true, text: text);
-      case NotificationReceived(:final from, :final title):
+      case NotificationReceived(:final from, :final title, :final body):
         _addLocal(from.id, ActivityKind.ping, incoming: true, text: title);
+        // On screen the app says it; away, a notification does.
+        if (!_onScreen) {
+          LinksyPlatform.noticeArrived(
+            'ping-${from.id}',
+            title.isEmpty ? from.name : title,
+            body.isEmpty ? from.name : body,
+          );
+        }
       case SessionStarted(:final session, :final peer, :final kind)
           when e.sharing && kind != SessionKind.display:
         sharing[session] = e;

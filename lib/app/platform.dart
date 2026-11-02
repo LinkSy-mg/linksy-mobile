@@ -361,6 +361,11 @@ abstract final class LinksyPlatform {
     'body': body,
   });
 
+  /// A ping or a link from a computer while Linksy isn't on screen: a
+  /// notification that buzzes and opens the app.
+  static Future<void> noticeArrived(String id, String title, String body) =>
+      _call<void>('noticeArrived', {'id': id, 'title': title, 'body': body});
+
   static Future<void> cancelNotice(String transfer) =>
       _call<void>('cancelNotice', {'transfer': transfer});
 

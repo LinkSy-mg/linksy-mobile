@@ -2,6 +2,7 @@
 <!-- Android's own text (notifications); the app's is in lib/l10n. -->
 <resources>
     <string name="channel_incoming_files">Eingehende Dateien</string>
+    <string name="channel_arrived">Von deinen Computern</string>
     <string name="accept">Annehmen</string>
     <string name="decline">Ablehnen</string>
     <string name="keep_alive_default">Linksy ist verbunden</string>

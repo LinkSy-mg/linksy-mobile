@@ -270,6 +270,13 @@ class MainActivity : FlutterActivity() {
                         )
                         result.success(null)
                     }
+                    "noticeArrived" -> {
+                        ArrivedNotice.post(
+                            this@MainActivity, call.argument<String>("id")!!,
+                            call.argument<String>("title")!!, call.argument<String>("body") ?: "",
+                        )
+                        result.success(null)
+                    }
                     "cancelNotice" -> {
                         TransferNotice.cancel(this@MainActivity, call.argument<String>("transfer")!!)
                         result.success(null)
