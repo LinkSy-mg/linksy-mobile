@@ -28,7 +28,9 @@ class FileServer(private val context: Context) {
 
     private val resolver get() = context.contentResolver
 
-    fun start(workers: Int = 3) {
+    /// A computer copying keeps up to 4 reads in flight, and several copies
+    /// run at once: each request is answered on its own thread.
+    fun start(workers: Int = 8) {
         repeat(workers) { n -> Thread({ loop() }, "linksy-files-$n").apply { isDaemon = true; start() } }
     }
 
@@ -47,6 +49,14 @@ class FileServer(private val context: Context) {
     }
 
     private fun handle(id: Long, r: JSONObject) {
+        // Never outside what's shared, and never the shared folder itself gone.
+        val paths = listOfNotNull(r.optString("path", "/"), r.optString("to").takeIf { r.has("to") })
+        if (paths.any { p -> p.split('/').any { it == ".." || it == "." } }) {
+            return error(id, "That path leaves the shared folder.")
+        }
+        if (r.getString("op") in setOf("delete", "rename") && normalize(r.optString("path", "/")) == "/") {
+            return error(id, "The shared folder itself can't be deleted or moved.")
+        }
         everything?.let { return handlePlain(id, r, it) }
         val tree = root ?: return error(id, "No folder is shared.")
         val path = r.optString("path", "/")
