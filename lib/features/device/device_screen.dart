@@ -5,6 +5,7 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
+import '../deck/deck_screen.dart';
 import '../../app/activity.dart';
 import '../../app/linksy_controller.dart';
 import '../../app/platform.dart';
@@ -1224,6 +1225,14 @@ class _Control extends StatelessWidget {
             title: l10n.deviceSeeScreen,
             caption: l10n.deviceSeeScreenCaption,
             onTap: () => _watchScreen(context, view),
+          ),
+        // Only computers that announce it (§4.19).
+        if (computer && d.features.contains('deck'))
+          SettingRow(
+            icon: Ph.squaresFour,
+            title: l10n.deviceDeck,
+            caption: l10n.deviceDeckCaption(d.name),
+            onTap: () => push(DeckScreen(device: d)),
           ),
         // Only computers that announce it (desktop 0.7, §4.15).
         if (computer && d.features.contains('terminal'))
