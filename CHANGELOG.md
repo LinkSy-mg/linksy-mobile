@@ -2,6 +2,11 @@
 
 All notable changes to Linksy for Android. Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), versions follow [SemVer](https://semver.org/).
 
+## [0.3.1] - 2026-11-02
+
+### Changed
+- **Update check**: Linksy now looks for a new version each time you open it, at most once an hour, instead of once a day when it starts. Linksy keeps running in the background, so a new version could go unnoticed for days. It still never downloads anything by itself: "Linksy X Is Available" shows at the top of the home page, and closing it hides that version.
+
 ## [0.3.0] - 2026-11-02
 
 A new look across the app: calmer, with the same blue and the same island.
