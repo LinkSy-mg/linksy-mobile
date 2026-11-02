@@ -6,6 +6,9 @@ All notable changes to Linksy for Android. Format: [Keep a Changelog](https://ke
 
 ### Added
 
+- Deck: this phone as buttons for a computer (its page › Control › Deck, with Linksy for computers' next release). Play, skip, volume, mute, lock and the computer's own commands, on pages laid out as you like: sizes, colours, icons, and a tile moved by holding it.
+- Photos on your computers (Settings › Files): a computer's Gallery looks through this phone's photos and videos page by page, and saves the ones picked there. Asks Android for the photos the first time.
+- Messages on your computer: the conversation's earlier messages, mail subjects, your own answers on your side, and Reply still working for a day after the notification is gone. Turning notifications on the computers off forgets the messages kept for it.
 - Reduce motion (Settings › This app): screens fade instead of sliding, and buttons dim instead of shrinking. Linksy also follows the phone's own "Remove animations".
 
 ### Changed
@@ -21,6 +24,8 @@ All notable changes to Linksy for Android. Format: [Keep a Changelog](https://ke
 
 ### Fixed
 
+- A one-to-one chat answered on the phone showed on the computer under your own name ("You", "Vous"); it keeps the other person's.
+- A computer copying files to or from the phone no longer waits for each request in turn, and paths outside the shared folder are refused.
 - The transfer bubble's check vanished at once when files finished; it now stays while the bubble goes.
 
 ## [0.3.2] - 2026-11-02

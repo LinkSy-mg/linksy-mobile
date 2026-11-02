@@ -41,8 +41,14 @@ offer those features to Android phones.
 | Away from home | Done | `Config.away` on, relay from the service file (§4.12, cached, fetched at most daily; default `https://linksy-relay.diary.mg`). Settings switch (`Settings.away`), "Relay server" (`Settings.relay`, the user's own, wins over the service file), per computer "Allow everything from away" (`set_away_all`), "Connected away from home", "Reachable from away until <day>" |
 | USB cable (AOA) | Built, untested on hardware | Accessory filter `Linksy`/`Linksy`; Kotlin opens the accessory and hands `detachFd()` and `accessory.version` to `linksy_core::cable::phone_bridge` (framing version 2 when the computer announces it); then `connect_address(127.0.0.1:P)`, up to 3 tries, and pairing over the cable only if the computer says `not_paired` or nobody answers. "Connecting over the USB cable…" while it dials, then that computer's page (from the home screen). "Connected by USB" from `DeviceView.usb`. Each cable step (permission, open, bridge, unplugged) goes to the Logs page |
 | Service file (§4.12) | Done | `android` notices on the home screen, each until dismissed; "Update Linksy to keep connecting" when `protocol.minimum` > 1 |
-| `features` | Announced | `files clipboard open_url battery ring media_remote call_state heartbeat import fs input screen display camera watch clipboard_file microphone picture locate` |
+| `features` | Announced | `files clipboard open_url battery ring media_remote call_state heartbeat import fs input screen display camera watch clipboard_file microphone picture locate`, plus `notifications` and `inbox_history` while notifications go to the computers and `gallery` while it's on, changed live with `set_features` |
 | `fs` `info` | Done | `fs_info` with the picked folder's name |
+| Phone notifications on the computer (`notification_*`, §4.5) | Done (0.3.2) | A `NotificationListenerService` in the app, on once the user allows Notification access (Android 13+: guided through Allow restricted settings). Inbox fields: `category`, `conversation` (never the user's own name), `sender`, `mine`, `group`, `time`, `picture`, `messages` (up to 25, oldest first, from `getMessages` and `getHistoricMessages`), `subject` for mail (`CATEGORY_EMAIL`). Android 15 hides some content from listeners it doesn't trust (`Ranking.hasSensitiveContent`): those go as plain notifications |
+| Answering after the notification is gone (`reply_kept`) | Done | A conversation's reply action is kept for a day after its notification goes; `notification_reply` uses it, and forgets it once the app cancels the intent |
+| Earlier messages (`inbox_history`) | Done | What the listener saw, per app and `conversation`: the newest 300 messages of the 300 most recent conversations, in Linksy's own files; forgotten when the user turns notifications on the computers off. Announced with `notifications` |
+| Gallery (`gallery`, §4.18) | Done | Announced while Linksy may read photos (`READ_MEDIA_IMAGES`/`READ_MEDIA_VIDEO`, or All files access) and Settings › Files › Photos on your computers is on. Straight from MediaStore: newest first by `COALESCE(DATE_TAKEN, DATE_ADDED×1000)` then `_ID`; albums are MediaStore buckets ("Phone storage" for the root); thumbnails from `loadThumbnail`, JPEG ≤ 256 KiB; `send` reads the file itself when it may, else a cache copy; `gallery_changed` from a MediaStore observer, at most every 2 s |
+| Deck (`deck`, §4.19) | Done | Device page › Control › Deck, for computers that announce `deck`. Layout saved on the phone per computer: pages of tiles (small, wide, tall, big, full row), 8 colours, 32 icons; the first layout is made from the first `deck_actions`. `deck_open` while it shows, `deck_close` when it goes or the app leaves the screen; a slider's value at most every 80 ms while dragged, the last one always. A withdrawn action's tile greys out |
+| Files tab (§4.9) | Done | Eight threads answer `fs` streams at once; `..` or `.` in a path, and deleting or moving `/`, get `fs_error` |
 | **Phone watches the computer's screen** (`screen`, and `control` with touch) | **New** | The phone *requests* `screen` or `control`. Touch in `control`: one finger = absolute `pointer` + left button held, two fingers = `scroll`. Uses the same receiver as `display`. **Choose Screen** in the corner ends the session and requests it again with `"choose": true` (§4.8, desktop#15) |
 | Remote control *of the phone* (`control` asked by the computer) | Not possible | Answered with `decline_unsupported` at once; see §3 |
 | Push notifications | Done | Firebase project `linksy-mg`, topic `all`. Nothing for the desktop to do |
@@ -102,7 +108,6 @@ desktop side with a real phone:
 | Feature | Why not |
 |---|---|
 | **Texting from the computer** (`sms_list_threads`, `sms_list_messages`, `sms_send`, `sms_message`) | Needs READ_SMS / RECEIVE_SMS / SEND_SMS. Android's fraud protection blocks installing sideloaded apps that declare SMS permissions; Play also restricts them to default SMS apps |
-| **Phone notifications on the computer**, reply, actions, dismiss (`notification_*`) | Needs a NotificationListenerService (`BIND_NOTIFICATION_LISTENER_SERVICE`), on the same install-block list, and "restricted settings" blocks enabling it for sideloaded apps |
 | **The phone's own music on the computer** (`media_state` from the phone, `media_command` to it) | `MediaSessionManager.getActiveSessions` requires notification-listener access (see above) |
 | **Controlling the phone from the computer** (`control` requested by the computer) | Injecting touch needs an AccessibilityService, also on the install-block list (it's what blocked v0.1.3/0.1.4). Answered with `decline_unsupported`. Over the cable, desktop 0.11 drives a plain `screen` share through AOA 2.0's virtual touchscreen and keyboard instead, which needs nothing from the app; the phone says "Controlled from <computer>" in the share's notification while that touchscreen is there (an external `SOURCE_TOUCHSCREEN` in `InputManager`), and Stop ends the share |
 | **Caller's name in `call_state`** | Would need READ_CONTACTS plus call permissions; the phone reads only the audio mode, which has no number. `contact` is always absent |
@@ -123,6 +128,14 @@ default SMS app.
   works on the networks tested; pairing by QR or address covers the rest).
 
 ## Changelog
+
+- **2026-11-02** — Phone on core `07909c2` (desktop next release): the Inbox fields
+  (`messages`, `subject`, `mine`, a one-to-one chat named for the other person even when
+  the newest messages are the user's), `reply_kept` for a day, `inbox_history` from what
+  the listener kept; the Gallery (`gallery`: albums, items, thumbnails, `send` as the
+  computer's transfer, `gallery_changed`), with `READ_MEDIA_IMAGES`/`READ_MEDIA_VIDEO`
+  asked from Settings › Files; the Deck (`deck_open`/`deck_close`, `deck_run`, the layout
+  on the phone); `fs` streams answered on eight threads, `..` and deleting `/` refused.
 
 - **2026-11-01** — Phone 0.2.13: `H264Encoder` fits the size to each encoder's
   `VideoCapabilities` (same shape, width a multiple of 16) and, when `configure` refuses
