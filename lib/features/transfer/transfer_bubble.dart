@@ -61,21 +61,44 @@ class TransferBubble extends StatelessWidget {
         final visible = state != _BubbleState.idle;
         return AnimatedScale(
           scale: visible ? 1 : 0,
-          duration: const Duration(milliseconds: 220),
+          duration: motion(context, 220),
           curve: visible ? Curves.easeOutBack : Curves.easeIn,
-          child: visible
-              ? _Bubble(
-                  files: files,
-                  progress: progress,
-                  state: state,
-                  size: 60,
-                  raised: true,
-                )
-              : const SizedBox.square(dimension: 60),
+          child: _Last(
+            empty: const SizedBox.square(dimension: 60),
+            child: visible
+                ? _Bubble(
+                    files: files,
+                    progress: progress,
+                    state: state,
+                    size: 60,
+                    raised: true,
+                  )
+                : null,
+          ),
         );
       },
     ),
   );
+}
+
+/// [child], or once it's gone, the last one it was: so the check is still
+/// there to see while the bubble scales away.
+class _Last extends StatefulWidget {
+  const _Last({required this.empty, required this.child});
+
+  final Widget? child;
+  final Widget empty;
+
+  @override
+  State<_Last> createState() => _LastState();
+}
+
+class _LastState extends State<_Last> {
+  Widget? _last;
+
+  @override
+  Widget build(BuildContext context) =>
+      (_last = widget.child ?? _last) ?? widget.empty;
 }
 
 /// Home's way into Transfers, on the left of Add a device: the arrows when
@@ -267,16 +290,26 @@ class _Bubble extends StatelessWidget {
                       ),
                     ),
                     Center(
-                      child: done
-                          ? const Icon(PhBold.check, color: Sig.cyan, size: 22)
-                          : Text(
-                              '$files',
-                              style: sora(
-                                files > 99 ? 13 : 17,
-                                weight: FontWeight.w700,
-                                color: s.ink,
+                      child: AnimatedSwitcher(
+                        duration: motion(context),
+                        transitionBuilder: popIn,
+                        child: done
+                            ? const Icon(
+                                PhBold.check,
+                                key: ValueKey(true),
+                                color: Sig.cyan,
+                                size: 22,
+                              )
+                            : Text(
+                                '$files',
+                                key: const ValueKey(false),
+                                style: sora(
+                                  files > 99 ? 13 : 17,
+                                  weight: FontWeight.w700,
+                                  color: s.ink,
+                                ),
                               ),
-                            ),
+                      ),
                     ),
                   ],
                 ),
