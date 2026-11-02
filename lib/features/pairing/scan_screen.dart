@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 
 import '../../app/platform.dart';
 
@@ -71,10 +72,14 @@ class _ScanScreenState extends State<ScanScreen> {
     if (_done || !mounted) return;
     if (Invite.tryParse(value) != null) {
       _done = true;
+      HapticFeedback.mediumImpact();
       Navigator.of(context).pop(value);
       return;
     }
-    if (!_wrongCode) setState(() => _wrongCode = true);
+    if (!_wrongCode) {
+      HapticFeedback.lightImpact();
+      setState(() => _wrongCode = true);
+    }
   }
 
   /// The camera's picture, turned upright and filling the screen.

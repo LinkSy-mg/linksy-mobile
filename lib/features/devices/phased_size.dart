@@ -113,9 +113,16 @@ class RenderPhasedSize extends RenderProxyBox {
       _from = _now;
       _to = target;
       _shrinking = target.height < _from!.height;
-      _controller.duration = _shrinking ? shrink : grow;
-      _laidOutAt = 0;
-      _controller.forward(from: 0);
+      final duration = _shrinking ? shrink : grow;
+      if (duration == Duration.zero) {
+        // Motion reduced: at the new size in this same layout.
+        _laidOutAt = 1;
+        _controller.value = 1;
+      } else {
+        _controller.duration = duration;
+        _laidOutAt = 0;
+        _controller.forward(from: 0);
+      }
     }
     _laidOutAt = _controller.value;
     size = constraints.constrain(_now);

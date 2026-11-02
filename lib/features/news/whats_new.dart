@@ -229,9 +229,9 @@ class WhatsNewScreen extends StatelessWidget {
                 ),
               ),
             Center(
-              child: TextButton(
-                onPressed: () => LinksyPlatform.openUrl(notesUrl(version)),
-                child: Text(l10n.newsAllChanges(version)),
+              child: SmallAction(
+                label: l10n.newsAllChanges(version),
+                onTap: () => LinksyPlatform.openUrl(notesUrl(version)),
               ),
             ),
             const SizedBox(height: 20),

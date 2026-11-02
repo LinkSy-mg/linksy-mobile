@@ -29,7 +29,12 @@ class IncomingFilesSheet extends StatelessWidget {
       WidgetsBinding.instance.addPostFrameCallback((_) {
         final route = ModalRoute.of(context);
         if (context.mounted && route != null && route.isActive) {
-          Navigator.of(context).removeRoute(route);
+          // On top, it slides away as usual; under something, it just goes.
+          if (route.isCurrent) {
+            Navigator.of(context).pop();
+          } else {
+            Navigator.of(context).removeRoute(route);
+          }
         }
       });
     }

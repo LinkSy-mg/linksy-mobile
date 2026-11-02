@@ -103,13 +103,24 @@ class _UpdateSheet extends StatelessWidget {
                   _Apk(release: release, installed: u.installed),
                   const SizedBox(height: 10),
                   const _PlayProtect(),
-                  if (u.phase == UpdatePhase.failed) ...[
-                    const SizedBox(height: 12),
-                    Text(
-                      _failure(l10n, u.failure),
-                      style: TextStyle(color: s.red, fontSize: 13, height: 1.4),
-                    ),
-                  ],
+                  AnimatedSize(
+                    duration: motion(context, 200),
+                    curve: Curves.easeOutCubic,
+                    alignment: Alignment.topCenter,
+                    child: u.phase == UpdatePhase.failed
+                        ? Padding(
+                            padding: const EdgeInsets.only(top: 12),
+                            child: Text(
+                              _failure(l10n, u.failure),
+                              style: TextStyle(
+                                color: s.red,
+                                fontSize: 13,
+                                height: 1.4,
+                              ),
+                            ),
+                          )
+                        : const SizedBox(width: double.infinity),
+                  ),
                   const SizedBox(height: 22),
                   _Pill(
                     primary: true,
@@ -389,9 +400,14 @@ class _Pill extends StatelessWidget {
             children: [
               if (p != null)
                 Positioned.fill(
-                  child: FractionallySizedBox(
-                    alignment: Alignment.centerLeft,
-                    widthFactor: p.clamp(0.0, 1.0),
+                  child: TweenAnimationBuilder<double>(
+                    tween: Tween(end: p.clamp(0.0, 1.0)),
+                    duration: motion(context, 250),
+                    builder: (context, fill, child) => FractionallySizedBox(
+                      alignment: Alignment.centerLeft,
+                      widthFactor: fill,
+                      child: child,
+                    ),
                     child: const ColoredBox(color: Sig.deep),
                   ),
                 ),

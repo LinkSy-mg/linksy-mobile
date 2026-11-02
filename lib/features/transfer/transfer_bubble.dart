@@ -117,7 +117,7 @@ class TransfersButton extends StatelessWidget {
       final going = state == _BubbleState.going && progress != null;
       final wide = state != _BubbleState.idle;
       return AnimatedContainer(
-        duration: const Duration(milliseconds: 380),
+        duration: motion(context, 300),
         curve: Curves.easeOutCubic,
         decoration: BoxDecoration(
           color: wide
@@ -126,7 +126,7 @@ class TransfersButton extends StatelessWidget {
           borderRadius: BorderRadius.circular(99),
         ),
         child: AnimatedSize(
-          duration: const Duration(milliseconds: 380),
+          duration: motion(context, 300),
           curve: Curves.easeOutCubic,
           // The ring stays put; the percentage slides out beside it.
           alignment: AlignmentDirectional.centerStart,
@@ -265,7 +265,7 @@ class _Bubble extends StatelessWidget {
         ),
         padding: const EdgeInsets.all(4),
         child: AnimatedSwitcher(
-          duration: const Duration(milliseconds: 220),
+          duration: motion(context, 220),
           child: state == _BubbleState.idle
               ? Icon(
                   Ph.arrowsDownUp,
@@ -280,7 +280,7 @@ class _Bubble extends StatelessWidget {
                     // Turning while the other side hasn't accepted yet.
                     TweenAnimationBuilder<double>(
                       tween: Tween(end: progress ?? 0),
-                      duration: const Duration(milliseconds: 400),
+                      duration: motion(context, 400),
                       builder: (context, value, _) => CircularProgressIndicator(
                         value: progress == null ? null : value,
                         strokeWidth: size > 56 ? 4 : 3,
@@ -336,7 +336,7 @@ class TransfersPeek extends StatelessWidget {
     final batch = _Batch(c.liveTransfers);
     final recent = c.recentTransfers;
     final Widget more = Center(
-      child: TextButton(onPressed: onMore, child: Text(l.islandSeeMore)),
+      child: SmallAction(label: l.islandSeeMore, onTap: onMore),
     );
     if (batch.transfers.isEmpty) {
       return Column(
@@ -566,7 +566,7 @@ class _Speed extends StatelessWidget {
                       ),
                     ),
                     AnimatedSwitcher(
-                      duration: const Duration(milliseconds: 260),
+                      duration: motion(context, 260),
                       transitionBuilder: (child, a) => ScaleTransition(
                         scale: Tween(begin: 0.8, end: 1.0).animate(
                           CurvedAnimation(parent: a, curve: Curves.easeOutBack),
@@ -641,17 +641,25 @@ class _RoutePillState extends State<_RoutePill>
 
   bool get _settingUp => widget.stage != null && widget.stage != DirectStage.up;
 
+  /// Pulses while setting up, unless motion is reduced.
+  void _sync() {
+    if (_settingUp && !MediaQuery.disableAnimationsOf(context)) {
+      if (!_pulse.isAnimating) _pulse.repeat(reverse: true);
+    } else {
+      _pulse.stop();
+    }
+  }
+
   @override
-  void initState() {
-    super.initState();
-    if (_settingUp) _pulse.repeat(reverse: true);
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    _sync();
   }
 
   @override
   void didUpdateWidget(_RoutePill old) {
     super.didUpdateWidget(old);
-    if (_settingUp && !_pulse.isAnimating) _pulse.repeat(reverse: true);
-    if (!_settingUp) _pulse.stop();
+    _sync();
   }
 
   @override
@@ -682,7 +690,7 @@ class _RoutePillState extends State<_RoutePill>
         const SizedBox(width: 6),
         Flexible(
           child: AnimatedSwitcher(
-            duration: const Duration(milliseconds: 220),
+            duration: motion(context, 220),
             child: Text(
               switch (stage) {
                 DirectStage.find => l.transfersDirectFinding(widget.name),
@@ -830,6 +838,15 @@ class _FlowState extends State<_Flow> with SingleTickerProviderStateMixin {
   /// Where the sweep is, in lanes.
   double _scan = 0;
 
+  /// Motion is reduced: the lane stays still.
+  bool _still = false;
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    _still = MediaQuery.disableAnimationsOf(context);
+  }
+
   @override
   void initState() {
     super.initState();
@@ -839,6 +856,7 @@ class _FlowState extends State<_Flow> with SingleTickerProviderStateMixin {
   void _tick(Duration now) {
     final dt = (now - _last).inMicroseconds / 1e6;
     _last = now;
+    if (_still) return;
     // 1 MB/s crawls, 100 MB/s races; past that it stays readable.
     final mb = widget.speed / 1e6;
     final target = mb <= 0 ? 0.0 : (0.12 + mb / 80).clamp(0.12, 1.6);
@@ -994,7 +1012,7 @@ class _FeelsState extends State<_Feels> {
           const SizedBox(width: 7),
           Expanded(
             child: AnimatedSwitcher(
-              duration: const Duration(milliseconds: 300),
+              duration: motion(context, 300),
               layoutBuilder: (current, previous) => Stack(
                 alignment: AlignmentDirectional.centerStart,
                 children: [...previous, ?current],
@@ -1050,10 +1068,10 @@ class _Transfer extends StatelessWidget {
                   ),
                 ),
               ),
-              TextButton(
-                onPressed: () => c.cancel(a.id),
-                style: TextButton.styleFrom(foregroundColor: s.muted),
-                child: Text(l.commonCancel),
+              SmallAction(
+                label: l.commonCancel,
+                onTap: () => c.cancel(a.id),
+                color: s.muted,
               ),
             ],
           ),
@@ -1119,7 +1137,7 @@ class _Round extends StatelessWidget {
           if (going)
             TweenAnimationBuilder<double>(
               tween: Tween(end: progress ?? 0),
-              duration: const Duration(milliseconds: 400),
+              duration: motion(context, 400),
               builder: (context, v, _) => CircularProgressIndicator(
                 value: progress == null ? null : v,
                 strokeWidth: 2.5,
@@ -1258,9 +1276,12 @@ class _RecentState extends State<_Recent> {
         widget.c.device(a.deviceId)?.device.name ?? shortDeviceId(a.deviceId);
     final today = DateUtils.isSameDay(a.time, DateTime.now());
     final group = a.names.length > 1;
+    // A tap opens the group or the file; a single sent or failed file has
+    // nothing to open, so the row doesn't pretend to.
+    final opens = group || _saved(0) != null;
     final row = Pressable(
-      onTap: _tap,
-      scale: 0.99,
+      onTap: opens ? _tap : null,
+      scale: 0.98,
       semanticLabel: a.names.length == 1
           ? a.names.first
           : l.activityItems(a.names.length),
@@ -1313,7 +1334,7 @@ class _RecentState extends State<_Recent> {
               const SizedBox(width: 10),
               AnimatedRotation(
                 turns: _open ? 0.5 : 0,
-                duration: const Duration(milliseconds: 260),
+                duration: motion(context, 260),
                 curve: Curves.easeOutCubic,
                 child: Icon(Ph.caretDown, size: 16, color: s.faint),
               ),
@@ -1328,7 +1349,7 @@ class _RecentState extends State<_Recent> {
       children: [
         row,
         AnimatedSize(
-          duration: const Duration(milliseconds: 300),
+          duration: motion(context, 300),
           curve: Curves.easeOutCubic,
           alignment: Alignment.topCenter,
           child: !_open

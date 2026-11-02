@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 
 import '../../app/activity.dart';
@@ -196,15 +198,25 @@ class _Notices extends StatelessWidget {
           onDismiss: () => c.dismissNotice(n.id),
         ),
     ];
-    if (cards.isEmpty) return const SizedBox.shrink();
-    return Padding(
-      padding: const EdgeInsets.fromLTRB(16, 14, 16, 0),
-      child: Column(
-        children: [
-          for (final card in cards)
-            Padding(padding: const EdgeInsets.only(bottom: 8), child: card),
-        ],
-      ),
+    // Notices come and go: the list makes room, and closes up.
+    return AnimatedSize(
+      duration: motion(context, 220),
+      curve: Curves.easeOutCubic,
+      alignment: Alignment.topCenter,
+      child: cards.isEmpty
+          ? const SizedBox(width: double.infinity)
+          : Padding(
+              padding: const EdgeInsets.fromLTRB(16, 14, 16, 0),
+              child: Column(
+                children: [
+                  for (final card in cards)
+                    Padding(
+                      padding: const EdgeInsets.only(bottom: 8),
+                      child: card,
+                    ),
+                ],
+              ),
+            ),
     );
   }
 }
@@ -260,15 +272,22 @@ class _Notice extends StatelessWidget {
                   ),
                 ],
                 if (action != null)
-                  TextButton(onPressed: onAction, child: Text(action!)),
+                  SmallAction(label: action!, onTap: onAction),
               ],
             ),
           ),
           if (onDismiss != null)
-            IconButton(
-              tooltip: context.l10n.commonDismiss,
-              onPressed: onDismiss,
-              icon: Icon(Ph.x, size: 18, color: s.faint),
+            Tooltip(
+              message: context.l10n.commonDismiss,
+              child: Pressable(
+                onTap: onDismiss,
+                scale: 0.85,
+                semanticLabel: context.l10n.commonDismiss,
+                child: SizedBox.square(
+                  dimension: 48,
+                  child: Icon(Ph.x, size: 18, color: s.faint),
+                ),
+              ),
             ),
         ],
       ),
@@ -324,7 +343,8 @@ class _DeviceRow extends StatelessWidget {
                 const SizedBox(height: 3),
                 Row(
                   children: [
-                    Container(
+                    AnimatedContainer(
+                      duration: motion(context),
                       width: 6,
                       height: 6,
                       margin: const EdgeInsets.only(right: 6),
@@ -359,23 +379,49 @@ class _DeviceRow extends StatelessWidget {
                     ),
                   ],
                 ),
-                if (transferring) ...[
-                  const SizedBox(height: 8),
-                  LinearProgressIndicator(
-                    color: last.incoming ? Sig.incoming : Sig.outgoing,
-                    value: last.total == 0 || last.bytes == 0
-                        ? null
-                        : last.bytes / last.total,
-                  ),
-                ],
+                AnimatedSize(
+                  duration: motion(context),
+                  curve: Curves.easeOutCubic,
+                  alignment: Alignment.topCenter,
+                  child: transferring
+                      ? Padding(
+                          padding: const EdgeInsets.only(top: 8),
+                          child: last.total == 0 || last.bytes == 0
+                              ? LinearProgressIndicator(
+                                  color: last.incoming
+                                      ? Sig.incoming
+                                      : Sig.outgoing,
+                                )
+                              : TweenAnimationBuilder<double>(
+                                  tween: Tween(end: last.bytes / last.total),
+                                  duration: motion(context, 250),
+                                  builder: (context, value, _) =>
+                                      LinearProgressIndicator(
+                                        color: last.incoming
+                                            ? Sig.incoming
+                                            : Sig.outgoing,
+                                        value: value,
+                                      ),
+                                ),
+                        )
+                      : const SizedBox(width: double.infinity),
+                ),
               ],
             ),
           ),
           const SizedBox(width: 10),
-          if (away)
-            Icon(Ph.caretRight, color: s.faint, size: 18)
-          else
-            _QuickSend(deviceId: d.id),
+          AnimatedSwitcher(
+            duration: motion(context),
+            transitionBuilder: popIn,
+            child: away
+                ? Icon(
+                    Ph.caretRight,
+                    key: const ValueKey(true),
+                    color: s.faint,
+                    size: 18,
+                  )
+                : _QuickSend(key: const ValueKey(false), deviceId: d.id),
+          ),
         ],
       ),
     );
@@ -384,7 +430,7 @@ class _DeviceRow extends StatelessWidget {
 
 /// Send files without opening the device first.
 class _QuickSend extends StatelessWidget {
-  const _QuickSend({required this.deviceId});
+  const _QuickSend({super.key, required this.deviceId});
 
   final String deviceId;
 
@@ -433,16 +479,78 @@ class _NearbyRow extends StatelessWidget {
               ],
             ),
           ),
-          Pressable(
-            onTap: () => report(context, LinksyScope.read(context).pair(d.id)),
-            semanticLabel: context.l10n.homePair,
-            child: Container(
-              padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 9),
-              decoration: BoxDecoration(
-                color: Sig.blue.withValues(alpha: 0.12),
-                borderRadius: BorderRadius.circular(99),
-              ),
-              child: Text(
+          _PairPill(deviceId: d.id),
+        ],
+      ),
+    );
+  }
+}
+
+/// Pair: a small spinner beside it while the computer is asked, until its
+/// code comes up (or a few seconds pass), so the tap is seen.
+class _PairPill extends StatefulWidget {
+  const _PairPill({required this.deviceId});
+
+  final String deviceId;
+
+  @override
+  State<_PairPill> createState() => _PairPillState();
+}
+
+class _PairPillState extends State<_PairPill> {
+  Timer? _asking;
+
+  Future<void> _pair() async {
+    setState(() {
+      _asking = Timer(const Duration(seconds: 8), () {
+        if (mounted) setState(() => _asking = null);
+      });
+    });
+    final ok = await report(
+      context,
+      LinksyScope.read(context).pair(widget.deviceId),
+    );
+    if (!ok && mounted) {
+      _asking?.cancel();
+      setState(() => _asking = null);
+    }
+  }
+
+  @override
+  void dispose() {
+    _asking?.cancel();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final asking = _asking != null;
+    return Pressable(
+      onTap: asking ? null : _pair,
+      semanticLabel: context.l10n.homePair,
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 9),
+        decoration: BoxDecoration(
+          color: Sig.blue.withValues(alpha: 0.12),
+          borderRadius: BorderRadius.circular(99),
+        ),
+        child: AnimatedSize(
+          duration: motion(context, 180),
+          curve: Curves.easeOutCubic,
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              if (asking) ...[
+                const SizedBox.square(
+                  dimension: 14,
+                  child: CircularProgressIndicator(
+                    strokeWidth: 2,
+                    color: Sig.blue,
+                  ),
+                ),
+                const SizedBox(width: 8),
+              ],
+              Text(
                 context.l10n.homePair,
                 style: const TextStyle(
                   color: Sig.blue,
@@ -450,9 +558,9 @@ class _NearbyRow extends StatelessWidget {
                   fontWeight: FontWeight.w600,
                 ),
               ),
-            ),
+            ],
           ),
-        ],
+        ),
       ),
     );
   }

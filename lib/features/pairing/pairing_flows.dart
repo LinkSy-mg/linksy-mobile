@@ -116,6 +116,7 @@ Future<void> _pairByAddress(BuildContext context) async {
     builder: (_) => const _AddressDialog(),
   );
   if (address == null || address.isEmpty || !context.mounted) return;
+  showMessage(context, context.l10n.pairingWith(address));
   await report(context, c.pairAddress(address));
 }
 
@@ -130,12 +131,22 @@ class _AddressDialogState extends State<_AddressDialog> {
   final _text = TextEditingController();
 
   @override
+  void initState() {
+    super.initState();
+    // Pair only once there's an address.
+    _text.addListener(() => setState(() {}));
+  }
+
+  @override
   void dispose() {
     _text.dispose();
     super.dispose();
   }
 
-  void _submit() => Navigator.of(context).pop(_text.text.trim());
+  void _submit() {
+    if (_text.text.trim().isEmpty) return;
+    Navigator.of(context).pop(_text.text.trim());
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -186,7 +197,7 @@ class _AddressDialogState extends State<_AddressDialog> {
             SigButton(
               label: context.l10n.pairingPair,
               expand: true,
-              onTap: _submit,
+              onTap: _text.text.trim().isEmpty ? null : _submit,
             ),
             SigButton(
               label: context.l10n.commonCancel,
