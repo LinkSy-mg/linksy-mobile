@@ -68,10 +68,15 @@ class _LinksyAppState extends State<LinksyApp> {
     // First run: the language, then what Linksy may do.
     if (!widget.controller.onboarded) {
       WidgetsBinding.instance.addPostFrameCallback((_) {
+        // In place, not sliding over a home that was never seen.
         _navigator.currentState?.push(
-          MaterialPageRoute<void>(
+          PageRouteBuilder<void>(
             fullscreenDialog: true,
-            builder: (_) => const OnboardingScreen(),
+            transitionDuration: Duration.zero,
+            pageBuilder: (_, _, _) => const OnboardingScreen(),
+            // Done, it fades into home.
+            transitionsBuilder: (_, animation, _, child) =>
+                FadeTransition(opacity: animation, child: child),
           ),
         );
       });

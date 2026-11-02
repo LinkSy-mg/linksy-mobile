@@ -92,8 +92,8 @@ class _LanguageWheelState extends State<LanguageWheel> {
                       child: Column(
                         mainAxisSize: MainAxisSize.min,
                         children: [
-                          Text(
-                            l.name,
+                          AnimatedDefaultTextStyle(
+                            duration: motion(context, 150),
                             style: sora(
                               chosen ? 22 : 19,
                               weight: chosen
@@ -101,6 +101,7 @@ class _LanguageWheelState extends State<LanguageWheel> {
                                   : FontWeight.w500,
                               color: chosen ? s.ink : s.muted,
                             ),
+                            child: Text(l.name),
                           ),
                           if (l.english != l.name)
                             Text(

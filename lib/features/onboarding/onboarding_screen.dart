@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 
 import '../../app/platform.dart';
 import '../../app/scope.dart';
@@ -108,16 +109,26 @@ class _LanguagePage extends StatelessWidget {
         children: [
           const Center(child: LinksyMark(size: 52)),
           const SizedBox(height: 20),
-          Text(
-            t.onboardingWelcome,
-            textAlign: TextAlign.center,
-            style: sora(30, weight: FontWeight.w700, color: s.ink),
-          ),
-          const SizedBox(height: 8),
-          Text(
-            t.onboardingChooseLanguage,
-            textAlign: TextAlign.center,
-            style: TextStyle(fontSize: 16, color: s.muted),
+          // Each language crossfades into the next as the wheel turns.
+          AnimatedSwitcher(
+            duration: motion(context, 150),
+            child: Column(
+              key: ValueKey(t.localeName),
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                Text(
+                  t.onboardingWelcome,
+                  textAlign: TextAlign.center,
+                  style: sora(30, weight: FontWeight.w700, color: s.ink),
+                ),
+                const SizedBox(height: 8),
+                Text(
+                  t.onboardingChooseLanguage,
+                  textAlign: TextAlign.center,
+                  style: TextStyle(fontSize: 16, color: s.muted),
+                ),
+              ],
+            ),
           ),
           const Spacer(),
           LanguageWheel(
@@ -394,7 +405,20 @@ class _Item extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final s = Sig.of(context);
-    return Padding(
+    // A switch row toggles from anywhere on it, and clicks like a tap.
+    var trailing = this.trailing;
+    VoidCallback? onTap;
+    if (trailing case Switch(:final value, onChanged: final changed?)) {
+      trailing = Switch(
+        value: value,
+        onChanged: (v) {
+          HapticFeedback.selectionClick();
+          changed(v);
+        },
+      );
+      onTap = () => changed(!value);
+    }
+    final row = Padding(
       padding: const EdgeInsets.fromLTRB(16, 14, 14, 14),
       child: Row(
         children: [
@@ -421,10 +445,19 @@ class _Item extends StatelessWidget {
             ),
           ),
           const SizedBox(width: 10),
-          trailing,
+          // Allow turns into Allowed.
+          AnimatedSwitcher(
+            duration: motion(context),
+            transitionBuilder: popIn,
+            child: KeyedSubtree(
+              key: ValueKey(trailing.runtimeType),
+              child: trailing,
+            ),
+          ),
         ],
       ),
     );
+    return onTap == null ? row : Pressable(onTap: onTap, child: row);
   }
 }
 
@@ -435,19 +468,11 @@ class _SmallButton extends StatelessWidget {
   final VoidCallback onTap;
 
   @override
-  Widget build(BuildContext context) => SizedBox(
-    height: 40,
-    child: TextButton(
-      onPressed: onTap,
-      style: TextButton.styleFrom(
-        backgroundColor: Sig.blue,
-        foregroundColor: Colors.white,
-        shape: const StadiumBorder(),
-        padding: const EdgeInsets.symmetric(horizontal: 16),
-        textStyle: const TextStyle(fontWeight: FontWeight.w600),
-      ),
-      child: Text(label),
-    ),
+  Widget build(BuildContext context) => SmallAction(
+    label: label,
+    onTap: onTap,
+    color: Colors.white,
+    fill: Sig.blue,
   );
 }
 

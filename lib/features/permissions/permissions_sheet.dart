@@ -141,29 +141,46 @@ class _Permission extends StatelessWidget {
                   style: TextStyle(fontSize: 13, color: s.muted, height: 1.4),
                 ),
                 const SizedBox(height: 12),
-                if (allowed == true)
-                  Row(
-                    children: [
-                      const Icon(PhBold.check, size: 16, color: Sig.blue),
-                      const SizedBox(width: 6),
-                      Text(
-                        context.l10n.permissionsAllowed,
-                        style: TextStyle(
-                          fontWeight: FontWeight.w600,
-                          color: s.ink,
-                        ),
-                      ),
-                    ],
-                  )
-                else
-                  Align(
+                // Allow turns into Allowed when it comes back granted.
+                AnimatedSwitcher(
+                  duration: motion(context),
+                  transitionBuilder: popIn,
+                  layoutBuilder: (current, previous) => Stack(
                     alignment: Alignment.centerLeft,
-                    child: SigButton(
-                      label: action,
-                      height: 40,
-                      onTap: allowed == null ? null : onTap,
-                    ),
+                    children: [...previous, ?current],
                   ),
+                  child: allowed == true
+                      ? SizedBox(
+                          key: const ValueKey(true),
+                          height: 40,
+                          child: Row(
+                            children: [
+                              const Icon(
+                                PhBold.check,
+                                size: 16,
+                                color: Sig.blue,
+                              ),
+                              const SizedBox(width: 6),
+                              Text(
+                                context.l10n.permissionsAllowed,
+                                style: TextStyle(
+                                  fontWeight: FontWeight.w600,
+                                  color: s.ink,
+                                ),
+                              ),
+                            ],
+                          ),
+                        )
+                      : Align(
+                          key: const ValueKey(false),
+                          alignment: Alignment.centerLeft,
+                          child: SigButton(
+                            label: action,
+                            height: 40,
+                            onTap: allowed == null ? null : onTap,
+                          ),
+                        ),
+                ),
               ],
             ),
           ),
