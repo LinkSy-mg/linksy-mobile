@@ -396,7 +396,7 @@ class _Choice extends StatelessWidget {
       caption: caption,
       onTap: onTap,
       trailing: AnimatedContainer(
-        duration: const Duration(milliseconds: 150),
+        duration: motion(context, 150),
         width: 22,
         height: 22,
         alignment: Alignment.center,
@@ -404,16 +404,19 @@ class _Choice extends StatelessWidget {
           shape: BoxShape.circle,
           border: Border.all(color: selected ? Sig.blue : s.faint, width: 2),
         ),
-        child: selected
-            ? Container(
-                width: 10,
-                height: 10,
-                decoration: const BoxDecoration(
-                  color: Sig.blue,
-                  shape: BoxShape.circle,
-                ),
-              )
-            : null,
+        child: AnimatedScale(
+          scale: selected ? 1 : 0,
+          duration: motion(context, 150),
+          curve: Curves.easeOut,
+          child: Container(
+            width: 10,
+            height: 10,
+            decoration: const BoxDecoration(
+              color: Sig.blue,
+              shape: BoxShape.circle,
+            ),
+          ),
+        ),
       ),
     );
   }
@@ -894,7 +897,7 @@ class _Themes extends StatelessWidget {
                 child: Column(
                   children: [
                     AnimatedContainer(
-                      duration: const Duration(milliseconds: 180),
+                      duration: motion(context, 180),
                       padding: const EdgeInsets.all(3),
                       decoration: BoxDecoration(
                         borderRadius: BorderRadius.circular(19),
@@ -931,28 +934,32 @@ class _Themes extends StatelessWidget {
                       ),
                     ),
                     const SizedBox(height: 8),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Icon(
-                          icon,
-                          size: 15,
-                          color: m == mode ? Sig.blue : s.muted,
-                        ),
-                        const SizedBox(width: 5),
-                        Flexible(
-                          child: Text(
-                            label,
-                            maxLines: 1,
-                            overflow: TextOverflow.ellipsis,
-                            style: TextStyle(
-                              fontSize: 13.5,
-                              fontWeight: FontWeight.w600,
-                              color: m == mode ? s.ink : s.muted,
+                    TweenAnimationBuilder<double>(
+                      tween: Tween(end: m == mode ? 1 : 0),
+                      duration: motion(context, 180),
+                      builder: (context, on, _) => Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Icon(
+                            icon,
+                            size: 15,
+                            color: Color.lerp(s.muted, Sig.blue, on),
+                          ),
+                          const SizedBox(width: 5),
+                          Flexible(
+                            child: Text(
+                              label,
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                              style: TextStyle(
+                                fontSize: 13.5,
+                                fontWeight: FontWeight.w600,
+                                color: Color.lerp(s.muted, s.ink, on),
+                              ),
                             ),
                           ),
-                        ),
-                      ],
+                        ],
+                      ),
                     ),
                   ],
                 ),

@@ -2036,8 +2036,19 @@ class LinksyController extends ChangeNotifier with WidgetsBindingObserver {
     return error;
   }
 
-  Future<String?> updateSettings(NodeSettings s) =>
-      _run(() => node.updateSettings(s));
+  /// Shown at once, so a switch moves when it's tapped; put back if the
+  /// core refuses.
+  Future<String?> updateSettings(NodeSettings s) async {
+    final before = settings;
+    settings = s;
+    notifyListeners();
+    final error = await _run(() => node.updateSettings(s));
+    if (error != null && identical(settings, s)) {
+      settings = before;
+      notifyListeners();
+    }
+    return error;
+  }
 
   Future<String?> _run(Future<void> Function() action) async {
     try {

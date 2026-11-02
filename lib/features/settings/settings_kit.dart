@@ -245,6 +245,19 @@ class SettingRow extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final s = Sig.of(context);
+    // A switch row toggles from anywhere on it, and clicks like a tap.
+    var trailing = this.trailing;
+    var onTap = this.onTap;
+    if (trailing case Switch(:final value, onChanged: final changed?)) {
+      trailing = Switch(
+        value: value,
+        onChanged: (v) {
+          HapticFeedback.selectionClick();
+          changed(v);
+        },
+      );
+      onTap ??= () => changed(!value);
+    }
     final row = Padding(
       padding: const EdgeInsets.fromLTRB(14, 10, 12, 10),
       child: Row(
@@ -279,7 +292,7 @@ class SettingRow extends StatelessWidget {
               ],
             ),
           ),
-          if (trailing != null) ...[const SizedBox(width: 10), trailing!],
+          if (trailing != null) ...[const SizedBox(width: 10), trailing],
           if (onTap != null && trailing == null)
             Icon(Ph.caretRight, color: s.faint, size: 18),
         ],
@@ -300,22 +313,31 @@ class SubOptions extends StatelessWidget {
   final bool open;
   final List<Widget> children;
 
+  /// Opens by growing, then fading in; closes by fading out, then shrinking.
   @override
   Widget build(BuildContext context) => AnimatedSize(
-    duration: const Duration(milliseconds: 220),
+    duration: motion(context, 220),
     curve: Curves.easeOut,
     alignment: Alignment.topCenter,
-    child: open
-        ? Container(
-            margin: const EdgeInsets.fromLTRB(8, 0, 8, 6),
-            padding: const EdgeInsets.symmetric(vertical: 2),
-            decoration: BoxDecoration(
-              color: Sig.of(context).raised,
-              borderRadius: BorderRadius.circular(22),
-            ),
-            child: Column(children: children),
-          )
-        : const SizedBox(width: double.infinity),
+    child: AnimatedSwitcher(
+      duration: motion(context, 150),
+      layoutBuilder: (current, previous) => Stack(
+        alignment: Alignment.topCenter,
+        children: [...previous, ?current],
+      ),
+      child: open
+          ? Container(
+              key: const ValueKey(true),
+              margin: const EdgeInsets.fromLTRB(8, 0, 8, 6),
+              padding: const EdgeInsets.symmetric(vertical: 2),
+              decoration: BoxDecoration(
+                color: Sig.of(context).raised,
+                borderRadius: BorderRadius.circular(22),
+              ),
+              child: Column(children: children),
+            )
+          : const SizedBox(key: ValueKey(false), width: double.infinity),
+    ),
   );
 }
 

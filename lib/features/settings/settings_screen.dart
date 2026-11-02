@@ -91,110 +91,136 @@ class _SettingsScreenState extends State<SettingsScreen> {
       children: [
         const SizedBox(height: 8),
         _SearchField(controller: _search, onChanged: (_) => setState(() {})),
-        if (query.isNotEmpty) ...[
-          for (final hit in hits)
-            _Result(
-              hit: hit,
-              page: hit.area?.title(l) ?? l.settingsPermissions,
-              onTap: () => _open(hit),
-            ),
-          if (hits.isEmpty)
-            Padding(
-              padding: const EdgeInsets.fromLTRB(8, 24, 8, 0),
-              child: Text(
-                l.settingsNothingMatches(_search.text.trim()),
-                style: TextStyle(color: s.muted, fontSize: 15),
-              ),
-            ),
-        ] else ...[
-          const SizedBox(height: 16),
-          _ThisPhone(
-            name: st.name,
-            shortId: c.node.info.shortId,
-            picture: c.ownPicture,
-            pictureVersion: c.pictureVersion,
-            onRename: () async {
-              final name = await askPhoneName(context, st.name);
-              if (name != null && name.isNotEmpty && name != st.name) {
-                if (!context.mounted) return;
-                await report(
-                  context,
-                  c.updateSettings(st.copyWith(name: name)),
-                );
-              }
-            },
+        // The hub and the results fade into each other.
+        AnimatedSwitcher(
+          duration: motion(context, 150),
+          layoutBuilder: (current, previous) => Stack(
+            alignment: Alignment.topCenter,
+            children: [...previous, ?current],
           ),
-          const _Recommended(),
-          for (final area in SettingsArea.values)
-            CategoryBubble(
-              icon: area.icon,
-              title: area.title(l),
-              summary: settingsSummary(context, area),
-              onTap: () => openSettingsArea(context, area),
-            ),
-          // Always here, whatever page they'd belong to.
-          SettingsSection(
-            children: [
-              SettingRow(
-                icon: Ph.arrowCircleUp,
-                title: l.updateCheck,
-                onTap: _checking ? null : _checkUpdates,
-                trailing: _checking
-                    ? const SizedBox.square(
-                        dimension: 18,
-                        child: CircularProgressIndicator(strokeWidth: 2),
-                      )
-                    : null,
-              ),
-              SettingRow(
-                icon: Ph.fileText,
-                title: l.settingsLogs,
-                caption: l.settingsLogsCaption,
-                onTap: _logs,
-              ),
-            ],
-          ),
-          if (demo != null)
-            SettingsSection(
-              title: l.settingsDemo,
-              children: [
-                SettingRow(
-                  icon: Ph.downloadSimple,
-                  title: l.settingsDemoReceiveFiles,
-                  caption: l.settingsDemoCaption,
-                  onTap: demo.simulateIncomingFiles,
+          child: query.isNotEmpty
+              ? Column(
+                  key: const ValueKey('results'),
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: [
+                    for (final hit in hits)
+                      _Result(
+                        hit: hit,
+                        page: hit.area?.title(l) ?? l.settingsPermissions,
+                        onTap: () => _open(hit),
+                      ),
+                    if (hits.isEmpty)
+                      Padding(
+                        padding: const EdgeInsets.fromLTRB(8, 24, 8, 0),
+                        child: Text(
+                          l.settingsNothingMatches(_search.text.trim()),
+                          style: TextStyle(color: s.muted, fontSize: 15),
+                        ),
+                      ),
+                  ],
+                )
+              : Column(
+                  key: const ValueKey('hub'),
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: [
+                    const SizedBox(height: 16),
+                    _ThisPhone(
+                      name: st.name,
+                      shortId: c.node.info.shortId,
+                      picture: c.ownPicture,
+                      pictureVersion: c.pictureVersion,
+                      onRename: () async {
+                        final name = await askPhoneName(context, st.name);
+                        if (name != null &&
+                            name.isNotEmpty &&
+                            name != st.name) {
+                          if (!context.mounted) return;
+                          await report(
+                            context,
+                            c.updateSettings(st.copyWith(name: name)),
+                          );
+                        }
+                      },
+                    ),
+                    const _Recommended(),
+                    for (final area in SettingsArea.values)
+                      CategoryBubble(
+                        icon: area.icon,
+                        title: area.title(l),
+                        summary: settingsSummary(context, area),
+                        onTap: () => openSettingsArea(context, area),
+                      ),
+                    // Always here, whatever page they'd belong to.
+                    SettingsSection(
+                      children: [
+                        SettingRow(
+                          icon: Ph.arrowCircleUp,
+                          title: l.updateCheck,
+                          onTap: _checking ? null : _checkUpdates,
+                          trailing: _checking
+                              ? const SizedBox.square(
+                                  dimension: 18,
+                                  child: CircularProgressIndicator(
+                                    strokeWidth: 2,
+                                  ),
+                                )
+                              : null,
+                        ),
+                        SettingRow(
+                          icon: Ph.fileText,
+                          title: l.settingsLogs,
+                          caption: l.settingsLogsCaption,
+                          onTap: _logs,
+                        ),
+                      ],
+                    ),
+                    if (demo != null)
+                      SettingsSection(
+                        title: l.settingsDemo,
+                        children: [
+                          SettingRow(
+                            icon: Ph.downloadSimple,
+                            title: l.settingsDemoReceiveFiles,
+                            caption: l.settingsDemoCaption,
+                            onTap: demo.simulateIncomingFiles,
+                          ),
+                          SettingRow(
+                            icon: Ph.handshake,
+                            title: l.settingsDemoReceivePairing,
+                            onTap: demo.simulateIncomingPairing,
+                          ),
+                          SettingRow(
+                            icon: Ph.clipboardText,
+                            title: l.settingsDemoReceiveClipboard,
+                            onTap: demo.simulateClipboard,
+                          ),
+                        ],
+                      ),
+                    const SizedBox(height: 40),
+                    const Center(child: AppIcon(size: 52)),
+                    const SizedBox(height: 10),
+                    Text(
+                      l.settingsTagline,
+                      textAlign: TextAlign.center,
+                      style: TextStyle(
+                        color: s.faint,
+                        fontSize: 13,
+                        height: 1.5,
+                      ),
+                    ),
+                    const SizedBox(height: 6),
+                    // Which build is installed (updates from GitHub are manual).
+                    FutureBuilder<String?>(
+                      future: LinksyPlatform.appVersion(),
+                      builder: (context, v) => Text(
+                        v.data == null ? '' : 'Linksy ${v.data}',
+                        textAlign: TextAlign.center,
+                        style: TextStyle(color: s.faint, fontSize: 12),
+                      ),
+                    ),
+                  ],
                 ),
-                SettingRow(
-                  icon: Ph.handshake,
-                  title: l.settingsDemoReceivePairing,
-                  onTap: demo.simulateIncomingPairing,
-                ),
-                SettingRow(
-                  icon: Ph.clipboardText,
-                  title: l.settingsDemoReceiveClipboard,
-                  onTap: demo.simulateClipboard,
-                ),
-              ],
-            ),
-          const SizedBox(height: 40),
-          const Center(child: AppIcon(size: 52)),
-          const SizedBox(height: 10),
-          Text(
-            l.settingsTagline,
-            textAlign: TextAlign.center,
-            style: TextStyle(color: s.faint, fontSize: 13, height: 1.5),
-          ),
-          const SizedBox(height: 6),
-          // Which build is installed (updates from GitHub are manual).
-          FutureBuilder<String?>(
-            future: LinksyPlatform.appVersion(),
-            builder: (context, v) => Text(
-              v.data == null ? '' : 'Linksy ${v.data}',
-              textAlign: TextAlign.center,
-              style: TextStyle(color: s.faint, fontSize: 12),
-            ),
-          ),
-        ],
+        ),
       ],
     );
   }
@@ -369,14 +395,25 @@ class _SearchField extends StatelessWidget {
               ),
             ),
           ),
-          if (controller.text.isNotEmpty)
-            GestureDetector(
-              onTap: () {
-                controller.clear();
-                onChanged('');
-              },
-              child: Icon(Ph.x, color: s.muted, size: 18),
-            ),
+          AnimatedSwitcher(
+            duration: motion(context, 150),
+            transitionBuilder: popIn,
+            child: controller.text.isEmpty
+                ? const SizedBox.shrink()
+                : Pressable(
+                    onTap: () {
+                      controller.clear();
+                      onChanged('');
+                    },
+                    scale: 0.85,
+                    semanticLabel: MaterialLocalizations.of(context)
+                        .deleteButtonTooltip,
+                    child: SizedBox.square(
+                      dimension: 36,
+                      child: Icon(Ph.x, color: s.muted, size: 18),
+                    ),
+                  ),
+          ),
         ],
       ),
     );
@@ -423,7 +460,6 @@ class _RecommendedState extends State<_Recommended>
   @override
   Widget build(BuildContext context) {
     final c = LinksyScope.of(context);
-    final s = Sig.of(context);
     final l = context.l10n;
     final (IconData, String, String, VoidCallback)? next = switch (c) {
       _ when _allAllowed == false => (
@@ -449,7 +485,27 @@ class _RecommendedState extends State<_Recommended>
       ),
       _ => null,
     };
-    if (next == null) return const SizedBox(height: 4);
+    // Found after a check, and gone once done: it grows and fades.
+    return AnimatedSize(
+      duration: motion(context, 220),
+      curve: Curves.easeOutCubic,
+      alignment: Alignment.topCenter,
+      child: AnimatedSwitcher(
+        duration: motion(context, 180),
+        layoutBuilder: (current, previous) => Stack(
+          alignment: Alignment.topCenter,
+          children: [...previous, ?current],
+        ),
+        child: next == null
+            ? const SizedBox(width: double.infinity, height: 4)
+            : KeyedSubtree(key: ValueKey(next.$2), child: _card(next)),
+      ),
+    );
+  }
+
+  Widget _card((IconData, String, String, VoidCallback) next) {
+    final s = Sig.of(context);
+    final l = context.l10n;
     final (icon, title, section, onTap) = next;
     return Padding(
       padding: const EdgeInsets.only(top: 12),
