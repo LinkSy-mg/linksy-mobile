@@ -234,6 +234,10 @@ class MainActivity : FlutterActivity() {
                         updateScreenOn()
                         result.success(null)
                     }
+                    "dimScreen" -> {
+                        dimScreen(call.argument<Double>("level"))
+                        result.success(null)
+                    }
                     "screenSize" -> result.success(screenSize())
                     "shareProtections" -> result.success(shareProtections())
                     "developerOptions" -> result.success(openDeveloperOptions())
@@ -436,6 +440,26 @@ class MainActivity : FlutterActivity() {
     private fun updateScreenOn() {
         val flag = android.view.WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON
         if (presenting || screenOn.isNotEmpty()) window.addFlags(flag) else window.clearFlags(flag)
+    }
+
+    /// The deck, untouched a while (docs/protocol.md §4.20): this window at
+    /// [level] of full brightness, never brighter than the user's own when
+    /// it's set by hand; null gives the screen back to the phone.
+    private fun dimScreen(level: Double?) {
+        val attrs = window.attributes
+        attrs.screenBrightness = if (level == null) {
+            android.view.WindowManager.LayoutParams.BRIGHTNESS_OVERRIDE_NONE
+        } else {
+            val manual = runCatching {
+                Settings.System.getInt(contentResolver, Settings.System.SCREEN_BRIGHTNESS_MODE) ==
+                    Settings.System.SCREEN_BRIGHTNESS_MODE_MANUAL
+            }.getOrDefault(false)
+            val own = if (manual) {
+                runCatching { Settings.System.getInt(contentResolver, Settings.System.SCREEN_BRIGHTNESS) / 255f }.getOrNull()
+            } else null
+            minOf(level.toFloat(), own ?: 1f).coerceAtLeast(0.01f)
+        }
+        window.attributes = attrs
     }
 
     /// Android 15's screen share protections, which some phones (realme…)

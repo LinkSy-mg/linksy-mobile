@@ -555,6 +555,11 @@ abstract final class LinksyPlatform {
   static Future<void> keepScreenOn(String session, {required bool on}) =>
       _call<void>('keepScreenOn', {'session': session, 'on': on});
 
+  /// This window at [level] of full brightness (never brighter than the
+  /// user's own), or back to the phone's own with null.
+  static Future<void> dimScreen(double? level) =>
+      _call<void>('dimScreen', {'level': level});
+
   /// Android 15's screen share protections: `on`, `off`, `unknown`, or null
   /// before Android 15.
   static Future<String?> shareProtections() =>
