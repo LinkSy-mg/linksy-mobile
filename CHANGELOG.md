@@ -6,7 +6,7 @@ All notable changes to Linksy for Android. Format: [Keep a Changelog](https://ke
 
 ### Added
 
-- Deck: this phone as buttons for a computer (its page › Control › Deck, with Linksy for computers' next release). Play, skip, volume, mute, lock and the computer's own commands, on pages laid out as you like: sizes, colours, icons, and a tile moved by holding it.
+- Deck: this phone as buttons for a computer (its page › Control › Deck, with Linksy for computers' next release). Play, skip, volume, mute, lock, Wi-Fi, power profiles and the computer's own commands, laid out in the computer's deck editor: pages of tiles, the music playing there with its cover, a clock, a volume slider, a layout for each way the phone is held. Five looks from the computer (Standard, Dot Matrix, E-Ink, Terminal, Pixel) and three of the phone's own (Signal, Glass, Midnight): hold the deck's name to pick one. Restart, turn off, Wi-Fi and airplane mode ask first. The deck shows straight away, even while the computer is away; the screen stays on and dims after a minute untouched.
 - Photos on your computers (Settings › Files): a computer's Gallery looks through this phone's photos and videos page by page, and saves the ones picked there. Asks Android for the photos the first time.
 - Messages on your computer: the conversation's earlier messages, mail subjects, your own answers on your side, and Reply still working for a day after the notification is gone. Turning notifications on the computers off forgets the messages kept for it.
 - Reduce motion (Settings › This app): screens fade instead of sliding, and buttons dim instead of shrinking. Linksy also follows the phone's own "Remove animations".
