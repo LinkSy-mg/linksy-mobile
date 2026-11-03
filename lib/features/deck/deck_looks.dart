@@ -187,7 +187,8 @@ class DeckLook {
     fontFamily: font,
     fontSize: size,
     fontWeight: weight ?? this.weight,
-    letterSpacing: spacing == 0 ? null : spacing * size,
+    // Always set: the app's own text style would add its letter spacing.
+    letterSpacing: spacing * size,
     color: (color ?? ink).withValues(alpha: (color ?? ink).a * opacity),
     height: 1.2,
     // Terminal's glow, but under dark text on what's on.
