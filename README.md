@@ -1,4 +1,4 @@
-<img width="1800" height="900" alt="Linksy for Android: your Linux computer, in your pocket. Three phone screens: your devices, a computer's page, and the phone as a webcam." src="docs/banner.png" />
+<img width="1800" height="900" alt="Linksy for Android: your Linux computer, in your pocket. Three phone screens: your devices, a computer's page, and the deck of buttons in the Dot Matrix look." src="docs/banner.webp" />
 
 <div align="center">
 
