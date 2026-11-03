@@ -2613,4 +2613,69 @@ class AppLocalizationsPt extends AppLocalizations {
   @override
   String get settingsGalleryDenied =>
       'Permita que o Linksy veja suas fotos nas configurações do Android.';
+
+  @override
+  String get deckGroupNetwork => 'Rede';
+
+  @override
+  String get deckGroupPower => 'Energia';
+
+  @override
+  String get deckThemeTitle => 'Tema';
+
+  @override
+  String deckThemeAsMade(String name) {
+    return 'Como em $name';
+  }
+
+  @override
+  String get deckThemesShared => 'No computador também';
+
+  @override
+  String get deckThemesPhone => 'Só neste telefone';
+
+  @override
+  String get deckThemeStock => 'Padrão';
+
+  @override
+  String get deckThemeDots => 'Matriz de pontos';
+
+  @override
+  String get deckThemeEink => 'E-Ink';
+
+  @override
+  String get deckThemeTerm => 'Terminal';
+
+  @override
+  String get deckThemePixel => 'Pixel';
+
+  @override
+  String get deckThemeSignal => 'Signal';
+
+  @override
+  String get deckThemeGlass => 'Vidro';
+
+  @override
+  String get deckThemeMidnight => 'Meia-noite';
+
+  @override
+  String deckNotAvailable(String name) {
+    return 'Indisponível em $name';
+  }
+
+  @override
+  String get deckAwayShort => 'Não conectado';
+
+  @override
+  String deckAwayNote(String name) {
+    return '$name não está conectado. Os botões funcionam assim que estiver.';
+  }
+
+  @override
+  String get deckNothingPlaying => 'Nada tocando';
+
+  @override
+  String deckNoLayouts(String name) {
+    return '$name ainda não tem um deck para este telefone. Crie um no Linksy no computador.';
+  }
 }

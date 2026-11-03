@@ -2505,4 +2505,69 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get settingsGalleryDenied => '请在 Android 设置中允许 Linksy 查看你的照片。';
+
+  @override
+  String get deckGroupNetwork => '网络';
+
+  @override
+  String get deckGroupPower => '电源';
+
+  @override
+  String get deckThemeTitle => '主题';
+
+  @override
+  String deckThemeAsMade(String name) {
+    return '与 $name 上相同';
+  }
+
+  @override
+  String get deckThemesShared => '电脑上也有';
+
+  @override
+  String get deckThemesPhone => '仅限这部手机';
+
+  @override
+  String get deckThemeStock => '标准';
+
+  @override
+  String get deckThemeDots => '点阵';
+
+  @override
+  String get deckThemeEink => '墨水屏';
+
+  @override
+  String get deckThemeTerm => '终端';
+
+  @override
+  String get deckThemePixel => '像素';
+
+  @override
+  String get deckThemeSignal => 'Signal';
+
+  @override
+  String get deckThemeGlass => '玻璃';
+
+  @override
+  String get deckThemeMidnight => '午夜';
+
+  @override
+  String deckNotAvailable(String name) {
+    return '$name 上不可用';
+  }
+
+  @override
+  String get deckAwayShort => '未连接';
+
+  @override
+  String deckAwayNote(String name) {
+    return '$name 未连接。连接后这些按钮即可使用。';
+  }
+
+  @override
+  String get deckNothingPlaying => '没有正在播放的内容';
+
+  @override
+  String deckNoLayouts(String name) {
+    return '$name 还没有为这部手机设置控制面板。请在电脑上的 Linksy 中创建一个。';
+  }
 }

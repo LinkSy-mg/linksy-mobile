@@ -2620,4 +2620,69 @@ class AppLocalizationsIt extends AppLocalizations {
   @override
   String get settingsGalleryDenied =>
       'Consenti a Linksy di vedere le tue foto nelle impostazioni di Android.';
+
+  @override
+  String get deckGroupNetwork => 'Rete';
+
+  @override
+  String get deckGroupPower => 'Energia';
+
+  @override
+  String get deckThemeTitle => 'Tema';
+
+  @override
+  String deckThemeAsMade(String name) {
+    return 'Come su $name';
+  }
+
+  @override
+  String get deckThemesShared => 'Anche sul computer';
+
+  @override
+  String get deckThemesPhone => 'Solo su questo telefono';
+
+  @override
+  String get deckThemeStock => 'Standard';
+
+  @override
+  String get deckThemeDots => 'Matrice a punti';
+
+  @override
+  String get deckThemeEink => 'E-Ink';
+
+  @override
+  String get deckThemeTerm => 'Terminale';
+
+  @override
+  String get deckThemePixel => 'Pixel';
+
+  @override
+  String get deckThemeSignal => 'Signal';
+
+  @override
+  String get deckThemeGlass => 'Vetro';
+
+  @override
+  String get deckThemeMidnight => 'Mezzanotte';
+
+  @override
+  String deckNotAvailable(String name) {
+    return 'Non disponibile su $name';
+  }
+
+  @override
+  String get deckAwayShort => 'Non connesso';
+
+  @override
+  String deckAwayNote(String name) {
+    return '$name non è connesso. I riquadri funzionano appena lo è.';
+  }
+
+  @override
+  String get deckNothingPlaying => 'Niente in riproduzione';
+
+  @override
+  String deckNoLayouts(String name) {
+    return '$name non ha ancora un deck per questo telefono. Creane uno in Linksy sul computer.';
+  }
 }

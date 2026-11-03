@@ -2622,4 +2622,69 @@ class AppLocalizationsMg extends AppLocalizations {
   @override
   String get settingsGalleryDenied =>
       'Avelao ny Linksy hahita ny sarinao ao amin\'ny fikirana Android.';
+
+  @override
+  String get deckGroupNetwork => 'Tambajotra';
+
+  @override
+  String get deckGroupPower => 'Herinaratra';
+
+  @override
+  String get deckThemeTitle => 'Endrika';
+
+  @override
+  String deckThemeAsMade(String name) {
+    return 'Toy ny ao amin\'i $name';
+  }
+
+  @override
+  String get deckThemesShared => 'Ao amin\'ny solosaina koa';
+
+  @override
+  String get deckThemesPhone => 'Amin\'ity finday ity ihany';
+
+  @override
+  String get deckThemeStock => 'Fenitra';
+
+  @override
+  String get deckThemeDots => 'Teboka';
+
+  @override
+  String get deckThemeEink => 'E-Ink';
+
+  @override
+  String get deckThemeTerm => 'Terminal';
+
+  @override
+  String get deckThemePixel => 'Pixel';
+
+  @override
+  String get deckThemeSignal => 'Signal';
+
+  @override
+  String get deckThemeGlass => 'Fitaratra';
+
+  @override
+  String get deckThemeMidnight => 'Misasakalina';
+
+  @override
+  String deckNotAvailable(String name) {
+    return 'Tsy misy ao amin\'i $name';
+  }
+
+  @override
+  String get deckAwayShort => 'Tsy mifandray';
+
+  @override
+  String deckAwayNote(String name) {
+    return 'Tsy mifandray i $name. Mandeha ny bokotra rehefa mifandray izy.';
+  }
+
+  @override
+  String get deckNothingPlaying => 'Tsy misy mandeha';
+
+  @override
+  String deckNoLayouts(String name) {
+    return 'Mbola tsy manana deck ho an\'ity finday ity i $name. Mamorona iray ao amin\'ny Linksy eo amin\'ny solosaina.';
+  }
 }

@@ -3484,5 +3484,101 @@
   "settingsGalleryDenied": "Allow Linksy to see your photos in Android's settings.",
   "@settingsGalleryDenied": {
     "description": "Snack bar when Android didn't allow photo access"
+  },
+  "deckGroupNetwork": "Network",
+  "@deckGroupNetwork": {
+    "description": "Group of deck actions the computer offers (Wi-Fi, Bluetooth, airplane mode); the computer sends the group in English"
+  },
+  "deckGroupPower": "Power",
+  "@deckGroupPower": {
+    "description": "Group of deck actions the computer offers (power profiles)"
+  },
+  "deckThemeTitle": "Theme",
+  "@deckThemeTitle": {
+    "description": "Sheet title: the deck's look, picked by holding the deck's name"
+  },
+  "deckThemeAsMade": "As on {name}",
+  "@deckThemeAsMade": {
+    "description": "First choice of the theme sheet: the theme picked in the computer's deck editor; name is the computer",
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "deckThemesShared": "On the computer too",
+  "@deckThemesShared": {
+    "description": "Theme sheet section: the five themes the computer's editor also has"
+  },
+  "deckThemesPhone": "Only on this phone",
+  "@deckThemesPhone": {
+    "description": "Theme sheet section: themes only the phone has; the choice stays on the phone"
+  },
+  "deckThemeStock": "Stock",
+  "@deckThemeStock": {
+    "description": "Deck theme: the GNOME look (the desktop's own translation)"
+  },
+  "deckThemeDots": "Dot Matrix",
+  "@deckThemeDots": {
+    "description": "Deck theme: black with lit dots (the desktop's own translation)"
+  },
+  "deckThemeEink": "E-Ink",
+  "@deckThemeEink": {
+    "description": "Deck theme: paper and ink (the desktop's own translation)"
+  },
+  "deckThemeTerm": "Terminal",
+  "@deckThemeTerm": {
+    "description": "Deck theme: green terminal (the desktop's own translation)"
+  },
+  "deckThemePixel": "Pixel",
+  "@deckThemePixel": {
+    "description": "Deck theme: 16-colour pixel art (the desktop's own translation)"
+  },
+  "deckThemeSignal": "Signal",
+  "@deckThemeSignal": {
+    "description": "Deck theme of the phone: Linksy's own colours (Signal is the name of Linksy's design)"
+  },
+  "deckThemeGlass": "Glass",
+  "@deckThemeGlass": {
+    "description": "Deck theme of the phone: frosted glass tiles"
+  },
+  "deckThemeMidnight": "Midnight",
+  "@deckThemeMidnight": {
+    "description": "Deck theme of the phone: black, for a screen kept on at night"
+  },
+  "deckNotAvailable": "Not available on {name}",
+  "@deckNotAvailable": {
+    "description": "Shown a moment after tapping a deck tile whose action the computer doesn't offer; name is the computer",
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "deckAwayShort": "Not connected",
+  "@deckAwayShort": {
+    "description": "Pill at the top of the deck while the computer isn't connected"
+  },
+  "deckAwayNote": "{name} isn't connected. The tiles work once it is.",
+  "@deckAwayNote": {
+    "description": "Shown a moment after tapping a deck tile while the computer isn't connected",
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "deckNothingPlaying": "Nothing playing",
+  "@deckNothingPlaying": {
+    "description": "The deck's music tile when the computer plays nothing"
+  },
+  "deckNoLayouts": "{name} has no deck for this phone yet. Make one in Linksy on the computer.",
+  "@deckNoLayouts": {
+    "description": "Deck screen when the computer sent layouts but none for this phone",
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
   }
 }

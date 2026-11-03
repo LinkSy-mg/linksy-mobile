@@ -2641,4 +2641,69 @@ class AppLocalizationsRu extends AppLocalizations {
   @override
   String get settingsGalleryDenied =>
       'Разрешите Linksy видеть ваши фото в настройках Android.';
+
+  @override
+  String get deckGroupNetwork => 'Сеть';
+
+  @override
+  String get deckGroupPower => 'Питание';
+
+  @override
+  String get deckThemeTitle => 'Тема';
+
+  @override
+  String deckThemeAsMade(String name) {
+    return 'Как на $name';
+  }
+
+  @override
+  String get deckThemesShared => 'И на компьютере';
+
+  @override
+  String get deckThemesPhone => 'Только на этом телефоне';
+
+  @override
+  String get deckThemeStock => 'Стандартная';
+
+  @override
+  String get deckThemeDots => 'Точечная матрица';
+
+  @override
+  String get deckThemeEink => 'E-Ink';
+
+  @override
+  String get deckThemeTerm => 'Терминал';
+
+  @override
+  String get deckThemePixel => 'Пиксели';
+
+  @override
+  String get deckThemeSignal => 'Signal';
+
+  @override
+  String get deckThemeGlass => 'Стекло';
+
+  @override
+  String get deckThemeMidnight => 'Полночь';
+
+  @override
+  String deckNotAvailable(String name) {
+    return 'Недоступно на $name';
+  }
+
+  @override
+  String get deckAwayShort => 'Не подключён';
+
+  @override
+  String deckAwayNote(String name) {
+    return '$name не подключён. Кнопки заработают, как только он подключится.';
+  }
+
+  @override
+  String get deckNothingPlaying => 'Ничего не играет';
+
+  @override
+  String deckNoLayouts(String name) {
+    return 'У $name пока нет пульта для этого телефона. Создайте его в Linksy на компьютере.';
+  }
 }

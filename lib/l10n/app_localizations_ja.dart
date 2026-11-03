@@ -2541,4 +2541,69 @@ class AppLocalizationsJa extends AppLocalizations {
 
   @override
   String get settingsGalleryDenied => 'Android の設定で Linksy に写真へのアクセスを許可してください。';
+
+  @override
+  String get deckGroupNetwork => 'ネットワーク';
+
+  @override
+  String get deckGroupPower => '電源';
+
+  @override
+  String get deckThemeTitle => 'テーマ';
+
+  @override
+  String deckThemeAsMade(String name) {
+    return '$name と同じ';
+  }
+
+  @override
+  String get deckThemesShared => 'コンピュータにもあり';
+
+  @override
+  String get deckThemesPhone => 'このスマホのみ';
+
+  @override
+  String get deckThemeStock => '標準';
+
+  @override
+  String get deckThemeDots => 'ドットマトリックス';
+
+  @override
+  String get deckThemeEink => 'E-Ink';
+
+  @override
+  String get deckThemeTerm => 'ターミナル';
+
+  @override
+  String get deckThemePixel => 'ピクセル';
+
+  @override
+  String get deckThemeSignal => 'Signal';
+
+  @override
+  String get deckThemeGlass => 'ガラス';
+
+  @override
+  String get deckThemeMidnight => 'ミッドナイト';
+
+  @override
+  String deckNotAvailable(String name) {
+    return '$name では利用できません';
+  }
+
+  @override
+  String get deckAwayShort => '未接続';
+
+  @override
+  String deckAwayNote(String name) {
+    return '$name は接続されていません。接続するとタイルが使えます。';
+  }
+
+  @override
+  String get deckNothingPlaying => '再生中のものはありません';
+
+  @override
+  String deckNoLayouts(String name) {
+    return '$name にはまだこのスマホ用のデッキがありません。コンピュータの Linksy で作成してください。';
+  }
 }

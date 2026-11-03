@@ -4307,6 +4307,120 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Allow Linksy to see your photos in Android\'s settings.'**
   String get settingsGalleryDenied;
+
+  /// Group of deck actions the computer offers (Wi-Fi, Bluetooth, airplane mode); the computer sends the group in English
+  ///
+  /// In en, this message translates to:
+  /// **'Network'**
+  String get deckGroupNetwork;
+
+  /// Group of deck actions the computer offers (power profiles)
+  ///
+  /// In en, this message translates to:
+  /// **'Power'**
+  String get deckGroupPower;
+
+  /// Sheet title: the deck's look, picked by holding the deck's name
+  ///
+  /// In en, this message translates to:
+  /// **'Theme'**
+  String get deckThemeTitle;
+
+  /// First choice of the theme sheet: the theme picked in the computer's deck editor; name is the computer
+  ///
+  /// In en, this message translates to:
+  /// **'As on {name}'**
+  String deckThemeAsMade(String name);
+
+  /// Theme sheet section: the five themes the computer's editor also has
+  ///
+  /// In en, this message translates to:
+  /// **'On the computer too'**
+  String get deckThemesShared;
+
+  /// Theme sheet section: themes only the phone has; the choice stays on the phone
+  ///
+  /// In en, this message translates to:
+  /// **'Only on this phone'**
+  String get deckThemesPhone;
+
+  /// Deck theme: the GNOME look (the desktop's own translation)
+  ///
+  /// In en, this message translates to:
+  /// **'Stock'**
+  String get deckThemeStock;
+
+  /// Deck theme: black with lit dots (the desktop's own translation)
+  ///
+  /// In en, this message translates to:
+  /// **'Dot Matrix'**
+  String get deckThemeDots;
+
+  /// Deck theme: paper and ink (the desktop's own translation)
+  ///
+  /// In en, this message translates to:
+  /// **'E-Ink'**
+  String get deckThemeEink;
+
+  /// Deck theme: green terminal (the desktop's own translation)
+  ///
+  /// In en, this message translates to:
+  /// **'Terminal'**
+  String get deckThemeTerm;
+
+  /// Deck theme: 16-colour pixel art (the desktop's own translation)
+  ///
+  /// In en, this message translates to:
+  /// **'Pixel'**
+  String get deckThemePixel;
+
+  /// Deck theme of the phone: Linksy's own colours (Signal is the name of Linksy's design)
+  ///
+  /// In en, this message translates to:
+  /// **'Signal'**
+  String get deckThemeSignal;
+
+  /// Deck theme of the phone: frosted glass tiles
+  ///
+  /// In en, this message translates to:
+  /// **'Glass'**
+  String get deckThemeGlass;
+
+  /// Deck theme of the phone: black, for a screen kept on at night
+  ///
+  /// In en, this message translates to:
+  /// **'Midnight'**
+  String get deckThemeMidnight;
+
+  /// Shown a moment after tapping a deck tile whose action the computer doesn't offer; name is the computer
+  ///
+  /// In en, this message translates to:
+  /// **'Not available on {name}'**
+  String deckNotAvailable(String name);
+
+  /// Pill at the top of the deck while the computer isn't connected
+  ///
+  /// In en, this message translates to:
+  /// **'Not connected'**
+  String get deckAwayShort;
+
+  /// Shown a moment after tapping a deck tile while the computer isn't connected
+  ///
+  /// In en, this message translates to:
+  /// **'{name} isn\'t connected. The tiles work once it is.'**
+  String deckAwayNote(String name);
+
+  /// The deck's music tile when the computer plays nothing
+  ///
+  /// In en, this message translates to:
+  /// **'Nothing playing'**
+  String get deckNothingPlaying;
+
+  /// Deck screen when the computer sent layouts but none for this phone
+  ///
+  /// In en, this message translates to:
+  /// **'{name} has no deck for this phone yet. Make one in Linksy on the computer.'**
+  String deckNoLayouts(String name);
 }
 
 class _AppLocalizationsDelegate
