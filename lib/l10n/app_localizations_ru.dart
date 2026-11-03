@@ -2706,4 +2706,25 @@ class AppLocalizationsRu extends AppLocalizations {
   String deckNoLayouts(String name) {
     return 'У $name пока нет пульта для этого телефона. Создайте его в Linksy на компьютере.';
   }
+
+  @override
+  String get news033DeckTitle => 'Пульт: кнопки для компьютера';
+
+  @override
+  String get news033DeckBody =>
+      'Воспроизведение, громкость, без звука, Wi-Fi и ваши команды, расставленные в Linksy на компьютере, под рукой здесь: его страница › Управлять › Пульт. Удерживайте название пульта, чтобы сменить его вид. Нужен новейший Linksy на компьютере.';
+
+  @override
+  String get news033PhotosTitle => 'Ваши фото на компьютере';
+
+  @override
+  String get news033PhotosBody =>
+      'Галерея компьютера листает фото и видео этого телефона постранично и сохраняет выбранные. Настройки › Файлы › Фото на ваших компьютерах.';
+
+  @override
+  String get news033MessagesTitle => 'Прежние сообщения';
+
+  @override
+  String get news033MessagesBody =>
+      'На компьютере переписка показывает и прежние сообщения, а «Ответить» работает ещё сутки после того, как уведомление исчезло.';
 }

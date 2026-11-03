@@ -2606,4 +2606,25 @@ class AppLocalizationsJa extends AppLocalizations {
   String deckNoLayouts(String name) {
     return '$name にはまだこのスマホ用のデッキがありません。コンピュータの Linksy で作成してください。';
   }
+
+  @override
+  String get news033DeckTitle => 'デッキ：コンピュータ用のボタン';
+
+  @override
+  String get news033DeckBody =>
+      '再生、音量、ミュート、Wi-Fi、自分のコマンドをコンピュータの Linksy で並べ、ここから使えます：そのページ › 操作 › デッキ。デッキの名前を長押しすると見た目を変えられます。コンピュータに最新の Linksy が必要です。';
+
+  @override
+  String get news033PhotosTitle => 'コンピュータであなたの写真を';
+
+  @override
+  String get news033PhotosBody =>
+      'コンピュータのギャラリーがこのスマホの写真と動画を 1 ページずつ表示し、選んだものを保存します。設定 › ファイル › コンピュータで写真を見る。';
+
+  @override
+  String get news033MessagesTitle => '以前のメッセージ';
+
+  @override
+  String get news033MessagesBody =>
+      'コンピュータで、会話に以前のメッセージも表示され、通知が消えてから 1 日は返信できます。';
 }

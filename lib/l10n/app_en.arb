@@ -3580,5 +3580,29 @@
         "type": "String"
       }
     }
+  },
+  "news033DeckTitle": "Deck: buttons for your computer",
+  "@news033DeckTitle": {
+    "description": "What's New 0.3.3: the deck, the phone as buttons for the computer, laid out on the computer"
+  },
+  "news033DeckBody": "Play, volume, mute, Wi-Fi and your own commands, laid out in Linksy on the computer and used from here: its page › Control › Deck. Hold the deck's name to change its look. Needs the newest Linksy on the computer.",
+  "@news033DeckBody": {
+    "description": "Its page › Control › Deck are the app's own labels"
+  },
+  "news033PhotosTitle": "Your photos on your computer",
+  "@news033PhotosTitle": {
+    "description": "What's New 0.3.3: the computer's Gallery shows this phone's photos"
+  },
+  "news033PhotosBody": "A computer's Gallery looks through this phone's photos and videos, page by page, and saves the ones you pick. Settings › Files › Photos on your computers.",
+  "@news033PhotosBody": {
+    "description": "Settings › Files › Photos on your computers are the app's own labels"
+  },
+  "news033MessagesTitle": "Earlier messages",
+  "@news033MessagesTitle": {
+    "description": "What's New 0.3.3: earlier messages of a conversation, on the computer"
+  },
+  "news033MessagesBody": "On the computer, a conversation shows its earlier messages too, and Reply still works for a day after the notification is gone.",
+  "@news033MessagesBody": {
+    "description": "What's New 0.3.3"
   }
 }

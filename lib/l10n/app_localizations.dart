@@ -4421,6 +4421,42 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'{name} has no deck for this phone yet. Make one in Linksy on the computer.'**
   String deckNoLayouts(String name);
+
+  /// What's New 0.3.3: the deck, the phone as buttons for the computer, laid out on the computer
+  ///
+  /// In en, this message translates to:
+  /// **'Deck: buttons for your computer'**
+  String get news033DeckTitle;
+
+  /// Its page › Control › Deck are the app's own labels
+  ///
+  /// In en, this message translates to:
+  /// **'Play, volume, mute, Wi-Fi and your own commands, laid out in Linksy on the computer and used from here: its page › Control › Deck. Hold the deck\'s name to change its look. Needs the newest Linksy on the computer.'**
+  String get news033DeckBody;
+
+  /// What's New 0.3.3: the computer's Gallery shows this phone's photos
+  ///
+  /// In en, this message translates to:
+  /// **'Your photos on your computer'**
+  String get news033PhotosTitle;
+
+  /// Settings › Files › Photos on your computers are the app's own labels
+  ///
+  /// In en, this message translates to:
+  /// **'A computer\'s Gallery looks through this phone\'s photos and videos, page by page, and saves the ones you pick. Settings › Files › Photos on your computers.'**
+  String get news033PhotosBody;
+
+  /// What's New 0.3.3: earlier messages of a conversation, on the computer
+  ///
+  /// In en, this message translates to:
+  /// **'Earlier messages'**
+  String get news033MessagesTitle;
+
+  /// What's New 0.3.3
+  ///
+  /// In en, this message translates to:
+  /// **'On the computer, a conversation shows its earlier messages too, and Reply still works for a day after the notification is gone.'**
+  String get news033MessagesBody;
 }
 
 class _AppLocalizationsDelegate

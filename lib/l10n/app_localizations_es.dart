@@ -2685,4 +2685,25 @@ class AppLocalizationsEs extends AppLocalizations {
   String deckNoLayouts(String name) {
     return '$name aún no tiene un deck para este teléfono. Crea uno en Linksy en la computadora.';
   }
+
+  @override
+  String get news033DeckTitle => 'Deck: botones para tu computadora';
+
+  @override
+  String get news033DeckBody =>
+      'Reproducir, volumen, silencio, Wi-Fi y tus propios comandos, organizados en Linksy en la computadora y usados desde aquí: su página › Controlar › Deck. Mantén pulsado el nombre del deck para cambiar su aspecto. Necesita el Linksy más reciente en la computadora.';
+
+  @override
+  String get news033PhotosTitle => 'Tus fotos en tu computadora';
+
+  @override
+  String get news033PhotosBody =>
+      'La Galería de una computadora recorre las fotos y videos de este teléfono, página a página, y guarda las que elijas. Ajustes › Archivos › Fotos en tus computadoras.';
+
+  @override
+  String get news033MessagesTitle => 'Mensajes anteriores';
+
+  @override
+  String get news033MessagesBody =>
+      'En la computadora, una conversación también muestra sus mensajes anteriores, y Responder sigue funcionando un día después de que la notificación desaparezca.';
 }

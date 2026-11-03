@@ -2664,4 +2664,25 @@ class AppLocalizationsEn extends AppLocalizations {
   String deckNoLayouts(String name) {
     return '$name has no deck for this phone yet. Make one in Linksy on the computer.';
   }
+
+  @override
+  String get news033DeckTitle => 'Deck: buttons for your computer';
+
+  @override
+  String get news033DeckBody =>
+      'Play, volume, mute, Wi-Fi and your own commands, laid out in Linksy on the computer and used from here: its page › Control › Deck. Hold the deck\'s name to change its look. Needs the newest Linksy on the computer.';
+
+  @override
+  String get news033PhotosTitle => 'Your photos on your computer';
+
+  @override
+  String get news033PhotosBody =>
+      'A computer\'s Gallery looks through this phone\'s photos and videos, page by page, and saves the ones you pick. Settings › Files › Photos on your computers.';
+
+  @override
+  String get news033MessagesTitle => 'Earlier messages';
+
+  @override
+  String get news033MessagesBody =>
+      'On the computer, a conversation shows its earlier messages too, and Reply still works for a day after the notification is gone.';
 }

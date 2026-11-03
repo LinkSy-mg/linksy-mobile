@@ -717,5 +717,11 @@
   "deckAwayShort": "Não conectado",
   "deckAwayNote": "{name} não está conectado. Os botões funcionam assim que estiver.",
   "deckNothingPlaying": "Nada tocando",
-  "deckNoLayouts": "{name} ainda não tem um deck para este telefone. Crie um no Linksy no computador."
+  "deckNoLayouts": "{name} ainda não tem um deck para este telefone. Crie um no Linksy no computador.",
+  "news033DeckTitle": "Deck: botões para o seu computador",
+  "news033DeckBody": "Reproduzir, volume, mudo, Wi-Fi e seus próprios comandos, organizados no Linksy no computador e usados daqui: a página dele › Controlar › Deck. Toque e segure o nome do deck para mudar a aparência. Precisa do Linksy mais recente no computador.",
+  "news033PhotosTitle": "Suas fotos no seu computador",
+  "news033PhotosBody": "A Galeria de um computador navega pelas fotos e vídeos deste telefone, página por página, e salva as que você escolher. Configurações › Arquivos › Fotos nos seus computadores.",
+  "news033MessagesTitle": "Mensagens anteriores",
+  "news033MessagesBody": "No computador, uma conversa mostra também as mensagens anteriores, e Responder ainda funciona por um dia depois que a notificação some."
 }

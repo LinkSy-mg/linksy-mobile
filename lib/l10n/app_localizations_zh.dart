@@ -2570,4 +2570,24 @@ class AppLocalizationsZh extends AppLocalizations {
   String deckNoLayouts(String name) {
     return '$name 还没有为这部手机设置控制面板。请在电脑上的 Linksy 中创建一个。';
   }
+
+  @override
+  String get news033DeckTitle => '控制面板：电脑的按钮';
+
+  @override
+  String get news033DeckBody =>
+      '播放、音量、静音、Wi-Fi 和你自己的命令，在电脑上的 Linksy 中布置，在这里使用：电脑页面 › 控制 › 控制面板。长按控制面板的名称可更换外观。需要电脑上最新版的 Linksy。';
+
+  @override
+  String get news033PhotosTitle => '在电脑上查看你的照片';
+
+  @override
+  String get news033PhotosBody =>
+      '电脑的图库可以逐页浏览这部手机的照片和视频，并保存你选中的。设置 › 文件 › 在电脑上查看照片。';
+
+  @override
+  String get news033MessagesTitle => '更早的消息';
+
+  @override
+  String get news033MessagesBody => '在电脑上，对话也会显示更早的消息，通知消失后一天内仍可回复。';
 }

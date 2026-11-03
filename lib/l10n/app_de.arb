@@ -717,5 +717,11 @@
   "deckAwayShort": "Nicht verbunden",
   "deckAwayNote": "{name} ist nicht verbunden. Die Kacheln gehen, sobald es verbunden ist.",
   "deckNothingPlaying": "Es läuft nichts",
-  "deckNoLayouts": "{name} hat noch kein Deck für dieses Telefon. Erstelle eins in Linksy auf dem Computer."
+  "deckNoLayouts": "{name} hat noch kein Deck für dieses Telefon. Erstelle eins in Linksy auf dem Computer.",
+  "news033DeckTitle": "Deck: Tasten für deinen Computer",
+  "news033DeckBody": "Wiedergabe, Lautstärke, Stumm, WLAN und deine eigenen Befehle, in Linksy auf dem Computer angeordnet und von hier aus bedient: seine Seite › Steuern › Deck. Halte den Namen des Decks gedrückt, um sein Aussehen zu ändern. Braucht das neueste Linksy auf dem Computer.",
+  "news033PhotosTitle": "Deine Fotos auf deinem Computer",
+  "news033PhotosBody": "Die Galerie eines Computers blättert Seite für Seite durch die Fotos und Videos dieses Telefons und speichert die, die du auswählst. Einstellungen › Dateien › Fotos auf deinen Computern.",
+  "news033MessagesTitle": "Frühere Nachrichten",
+  "news033MessagesBody": "Auf dem Computer zeigt ein Gespräch auch seine früheren Nachrichten, und Antworten geht noch einen Tag, nachdem die Benachrichtigung verschwunden ist."
 }

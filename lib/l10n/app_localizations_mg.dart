@@ -2687,4 +2687,25 @@ class AppLocalizationsMg extends AppLocalizations {
   String deckNoLayouts(String name) {
     return 'Mbola tsy manana deck ho an\'ity finday ity i $name. Mamorona iray ao amin\'ny Linksy eo amin\'ny solosaina.';
   }
+
+  @override
+  String get news033DeckTitle => 'Deck: bokotra ho an\'ny solosainao';
+
+  @override
+  String get news033DeckBody =>
+      'Alefa, feo, mangina, Wi-Fi ary ny baikonao manokana, alahatra ao amin\'ny Linksy eo amin\'ny solosaina ary ampiasaina avy eto: ny pejiny › Fehezo › Deck. Tazony ny anaran\'ny deck raha hanova ny endriny. Mila ny Linksy farany eo amin\'ny solosaina.';
+
+  @override
+  String get news033PhotosTitle => 'Ny sarinao ao amin\'ny solosainao';
+
+  @override
+  String get news033PhotosBody =>
+      'Mijery ny sary sy horonan-tsarin\'ity finday ity pejy tsirairay ny Galerie an\'ny solosaina, ary mitahiry izay fidinao. Fikirana › Rakitra › Sary ao amin\'ny solosainao.';
+
+  @override
+  String get news033MessagesTitle => 'Hafatra teo aloha';
+
+  @override
+  String get news033MessagesBody =>
+      'Ao amin\'ny solosaina, asehon\'ny resaka koa ny hafatra teo aloha, ary mbola mandeha mandritra ny iray andro ny Valio na efa lasa aza ny fampandrenesana.';
 }
