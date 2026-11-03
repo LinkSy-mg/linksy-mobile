@@ -47,6 +47,9 @@ String formatDay(DateTime t, {DateTime? now}) {
       : DateFormat.yMMMMd(locale).format(day);
 }
 
+/// A day in short, as a clock shows it: "Tue, 3 Nov".
+String shortDate(DateTime t) => DateFormat.MMMEd(_dateLocale()).format(t);
+
 /// The app's language for dates: British English for English (day before
 /// month, as the app writes it), French where intl has no data (Malagasy),
 /// else intl's built-in English (all intl has before Flutter's localizations

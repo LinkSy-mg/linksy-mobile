@@ -1,18 +1,24 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
 import '../../app/linksy_controller.dart';
+import '../../app/platform.dart';
 import '../../app/scope.dart';
 import '../../core/deck.dart';
 import '../../core/models.dart';
 import '../../ui/components.dart';
 import '../../ui/l10n.dart';
 import '../../ui/sig.dart';
+import 'laid_deck.dart';
 
 /// The deck (docs/protocol.md §4.19): this phone as buttons for a computer.
-/// Pages of tiles the user lays out (Edit), each running what the computer
-/// lets it; toggles and sliders show the computer's state. While it shows,
-/// the computer keeps it current; it stops when the screen goes.
+/// The layouts the computer makes and sends (§4.20, [LaidDeck]), or, from a
+/// computer that sends none, pages of tiles the user lays out here (Edit);
+/// toggles and sliders show the computer's state. While it shows, the
+/// computer keeps it current and the screen stays on, dimmed after a
+/// minute untouched; it stops when the deck goes.
 class DeckScreen extends StatefulWidget {
   const DeckScreen({super.key, required this.device});
 
@@ -30,6 +36,15 @@ class _DeckScreenState extends State<DeckScreen> with WidgetsBindingObserver {
   bool _open = false;
   bool _connected = false;
 
+  /// Untouched a minute: the screen dims until a touch.
+  Timer? _idle;
+  bool _dim = false;
+
+  /// A computer that offers actions but sends no layouts: its deck is laid
+  /// out here, once it's had a moment to send them.
+  Timer? _grace;
+  bool _waited = false;
+
   String get _id => widget.device.id;
 
   @override
@@ -39,12 +54,21 @@ class _DeckScreenState extends State<DeckScreen> with WidgetsBindingObserver {
     _connected = _c.device(_id)?.connected ?? false;
     WidgetsBinding.instance.addObserver(this);
     _show(true);
+    _c.watchMedia(_id);
+    LinksyPlatform.keepScreenOn('deck', on: true);
+    _touched();
   }
 
   @override
   void dispose() {
     WidgetsBinding.instance.removeObserver(this);
     _show(false);
+    _c.unwatchMedia(_id);
+    _idle?.cancel();
+    _grace?.cancel();
+    // The screen is the phone's again.
+    LinksyPlatform.keepScreenOn('deck', on: false);
+    LinksyPlatform.dimScreen(null);
     _pages.dispose();
     super.dispose();
   }
@@ -52,8 +76,32 @@ class _DeckScreenState extends State<DeckScreen> with WidgetsBindingObserver {
   /// Out of sight, the computer stops sending; back, it starts again.
   @override
   void didChangeAppLifecycleState(AppLifecycleState state) {
-    if (state == AppLifecycleState.resumed) _show(true);
-    if (state == AppLifecycleState.hidden) _show(false);
+    if (state == AppLifecycleState.resumed) {
+      _show(true);
+      _touched();
+    }
+    if (state == AppLifecycleState.hidden) {
+      _show(false);
+      _idle?.cancel();
+      if (_dim) {
+        _dim = false;
+        LinksyPlatform.dimScreen(null);
+      }
+    }
+  }
+
+  /// A touch: full brightness, and another minute before dimming.
+  void _touched() {
+    if (_dim) {
+      LinksyPlatform.dimScreen(null);
+      setState(() => _dim = false);
+    }
+    _idle?.cancel();
+    _idle = Timer(const Duration(seconds: 60), () {
+      if (!mounted) return;
+      LinksyPlatform.dimScreen(0.2);
+      setState(() => _dim = true);
+    });
   }
 
   void _show(bool open) {
@@ -78,18 +126,63 @@ class _DeckScreenState extends State<DeckScreen> with WidgetsBindingObserver {
 
   @override
   Widget build(BuildContext context) {
-    final s = Sig.of(context);
     final c = LinksyScope.of(context);
-    final l = context.l10n;
-    final view = c.device(_id);
-    final connected = view?.connected ?? false;
+    final connected = c.device(_id)?.connected ?? false;
     // Connected again: the computer needs telling the deck shows.
     if (connected && !_connected && _open) {
       WidgetsBinding.instance.addPostFrameCallback((_) => _c.openDeck(_id));
     }
     _connected = connected;
+    final layouts = c.deckLayouts(_id);
     final actions = c.deckActions[_id];
-    final layout = c.phoneDeck(_id);
+    if (layouts == null && actions != null && _grace == null) {
+      _grace = Timer(const Duration(milliseconds: 1500), () {
+        if (mounted) setState(() => _waited = true);
+      });
+    }
+    final Widget deck;
+    if (layouts != null) {
+      deck = LaidDeck(
+        device: widget.device,
+        layouts: layouts,
+        connected: connected,
+      );
+    } else {
+      deck = _ownDeck(context, connected, waiting: connected && !_waited);
+    }
+    return Listener(
+      onPointerDown: (_) {
+        if (!_dim) _touched();
+      },
+      child: Stack(
+        fit: StackFit.expand,
+        children: [
+          deck,
+          // Dimmed, a touch only brings the screen back.
+          if (_dim)
+            Positioned.fill(
+              child: GestureDetector(
+                behavior: HitTestBehavior.opaque,
+                onTapDown: (_) => _touched(),
+                onPanDown: (_) => _touched(),
+              ),
+            ),
+        ],
+      ),
+    );
+  }
+
+  /// The deck laid out on the phone, for a computer that sends no layouts.
+  Widget _ownDeck(
+    BuildContext context,
+    bool connected, {
+    required bool waiting,
+  }) {
+    final s = Sig.of(context);
+    final c = LinksyScope.of(context);
+    final l = context.l10n;
+    final actions = c.deckActions[_id];
+    final layout = waiting ? null : c.phoneDeck(_id);
     final pages = layout?.pages ?? const <PhoneDeckPage>[];
     if (_page >= pages.length && pages.isNotEmpty) _page = pages.length - 1;
     final name = widget.device.name;
@@ -97,10 +190,10 @@ class _DeckScreenState extends State<DeckScreen> with WidgetsBindingObserver {
     Widget body;
     if (layout == null || pages.isEmpty) {
       body = _Message(
-        busy: connected && actions == null,
+        busy: connected && (actions == null || waiting),
         text: !connected
             ? l.deckAway(name)
-            : actions == null
+            : actions == null || waiting
             ? l.deckAsking(name)
             : l.deckNothingOffered(name),
       );
@@ -824,6 +917,8 @@ String deckGroupName(BuildContext context, String group) {
     'Media' => l.deckGroupMedia,
     'Sound' => l.deckGroupSound,
     'System' => l.deckGroupSystem,
+    'Network' => l.deckGroupNetwork,
+    'Power' => l.deckGroupPower,
     'Commands' => l.deckGroupCommands,
     _ => group,
   };

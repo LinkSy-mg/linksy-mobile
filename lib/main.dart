@@ -45,6 +45,7 @@ const _features = [
   'microphone',
   'picture',
   'locate',
+  'deck_layout',
 ];
 
 Future<void> main() async {
