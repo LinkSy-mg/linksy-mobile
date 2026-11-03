@@ -4,6 +4,11 @@ All notable changes to Linksy for Android. Format: [Keep a Changelog](https://ke
 
 ## [Unreleased]
 
+## [0.3.3] - 2026-11-03
+
+> [!IMPORTANT]
+> **If Play Protect stops the install,** pause **Scan apps with Play Protect** while installing (Play Store › your picture › Play Protect › the gear at the top right), then turn it back on. Linksy now asks for your photos too, for Photos on your computers.
+
 ### Added
 
 - Deck: this phone as buttons for a computer (its page › Control › Deck, with Linksy for computers' next release). Play, skip, volume, mute, lock, Wi-Fi, power profiles and the computer's own commands, laid out in the computer's deck editor: pages of tiles, the music playing there with its cover, a clock, a volume slider, a layout for each way the phone is held. Five looks from the computer (Standard, Dot Matrix, E-Ink, Terminal, Pixel) and three of the phone's own (Signal, Glass, Midnight): hold the deck's name to pick one. Restart, turn off, Wi-Fi and airplane mode ask first. The deck shows straight away, even while the computer is away; the screen stays on and dims after a minute untouched.
