@@ -548,19 +548,24 @@ class InboxHistoryRequested extends LinksyEvent {
 }
 
 /// What a computer lets this phone's deck do (§4.19), in its [group]:
-/// `Media`, `Sound`, `System` or `Commands`, in English whatever the
-/// language ([name] is in the computer's).
+/// `Media`, `Sound`, `System`, `Network`, `Power` or `Commands`, in English
+/// whatever the language ([name] is in the computer's).
 class DeckAction {
   const DeckAction({
     required this.id,
     required this.name,
     required this.kind,
     this.group = '',
+    this.confirm,
   });
   final String id;
   final String name;
   final DeckKind kind;
   final String group;
+
+  /// The question to ask before running it ("Restart Office PC?"), in the
+  /// computer's language.
+  final String? confirm;
 }
 
 /// A tap runs a button, flips a toggle (its state says [DeckState.on]), and
@@ -579,10 +584,13 @@ enum DeckKind {
 
 /// An action's state now, for its tile.
 class DeckState {
-  const DeckState({required this.id, this.on, this.value});
+  const DeckState({required this.id, this.on, this.value, this.text});
   final String id;
   final bool? on;
   final double? value;
+
+  /// What the tile shows besides, like the sound output's name.
+  final String? text;
 }
 
 /// A computer's deck actions, on `deck_open` and whenever they change there.
@@ -597,6 +605,14 @@ class DeckStateReceived extends LinksyEvent {
   const DeckStateReceived({required this.from, required this.states});
   final DeviceInfo from;
   final List<DeckState> states;
+}
+
+/// The deck's layouts a computer keeps for this phone (§4.20), as it sent
+/// them: on `deck_open`, and whenever they're saved there while it shows.
+class DeckLayoutReceived extends LinksyEvent {
+  const DeckLayoutReceived({required this.from, required this.layouts});
+  final DeviceInfo from;
+  final Map<String, Object?> layouts;
 }
 
 /// A computer answers one of this phone's notifications it shows (§4.5):

@@ -62,14 +62,14 @@ class _DeckScreenState extends State<DeckScreen> with WidgetsBindingObserver {
     open ? _c.openDeck(_id) : _c.closeDeck(_id);
   }
 
-  DeckLayout? get _layout => _c.deckLayout(_id);
+  PhoneDeck? get _layout => _c.phoneDeck(_id);
 
   void _save() {
     final layout = _layout;
     if (layout != null) _c.saveDeck(_id, layout);
   }
 
-  void _edit(void Function(DeckLayout layout) change) {
+  void _edit(void Function(PhoneDeck layout) change) {
     final layout = _layout;
     if (layout == null) return;
     setState(() => change(layout));
@@ -89,8 +89,8 @@ class _DeckScreenState extends State<DeckScreen> with WidgetsBindingObserver {
     }
     _connected = connected;
     final actions = c.deckActions[_id];
-    final layout = c.deckLayout(_id);
-    final pages = layout?.pages ?? const <DeckPage>[];
+    final layout = c.phoneDeck(_id);
+    final pages = layout?.pages ?? const <PhoneDeckPage>[];
     if (_page >= pages.length && pages.isNotEmpty) _page = pages.length - 1;
     final name = widget.device.name;
 
@@ -148,7 +148,7 @@ class _DeckScreenState extends State<DeckScreen> with WidgetsBindingObserver {
                               label: l.deckNewPage,
                               icon: PhBold.plus,
                               onTap: () {
-                                _edit((d) => d.pages.add(DeckPage()));
+                                _edit((d) => d.pages.add(PhoneDeckPage()));
                                 _pages.animateToPage(
                                   pages.length - 1,
                                   duration: motion(context, 260),
@@ -234,7 +234,7 @@ class _DeckScreenState extends State<DeckScreen> with WidgetsBindingObserver {
     );
   }
 
-  Future<void> _addTile(DeckPage page) async {
+  Future<void> _addTile(PhoneDeckPage page) async {
     final actions = _c.deckActions[_id] ?? const <DeckAction>[];
     final picked = await showModalBottomSheet<DeckAction>(
       context: context,
@@ -245,7 +245,7 @@ class _DeckScreenState extends State<DeckScreen> with WidgetsBindingObserver {
     if (picked == null) return;
     _edit(
       (_) => page.tiles.add(
-        DeckTile(
+        PhoneDeckTile(
           action: picked.id,
           name: picked.name,
           kind: picked.kind,
@@ -261,7 +261,7 @@ class _DeckScreenState extends State<DeckScreen> with WidgetsBindingObserver {
     );
   }
 
-  Future<void> _editTile(DeckPage page, DeckTile tile) =>
+  Future<void> _editTile(PhoneDeckPage page, PhoneDeckTile tile) =>
       showModalBottomSheet<void>(
         context: context,
         isScrollControlled: true,
@@ -360,13 +360,13 @@ class _Grid extends StatelessWidget {
   });
 
   final String deviceId;
-  final DeckPage page;
+  final PhoneDeckPage page;
   final List<DeckAction>? actions;
   final Map<String, DeckState> states;
   final bool editing;
   final bool enabled;
   final VoidCallback onChanged;
-  final ValueChanged<DeckTile> onTileEdit;
+  final ValueChanged<PhoneDeckTile> onTileEdit;
   final VoidCallback onAdd;
 
   static const _gap = 10.0;
@@ -514,7 +514,7 @@ class _Tile extends StatelessWidget {
   });
 
   final String deviceId;
-  final DeckTile tile;
+  final PhoneDeckTile tile;
   final DeckState? state;
   final bool available;
   final bool offered;
@@ -664,7 +664,7 @@ class _Slider extends StatefulWidget {
   });
 
   final String deviceId;
-  final DeckTile tile;
+  final PhoneDeckTile tile;
   final double value;
   final Color accent;
   final IconData icon;
@@ -922,7 +922,7 @@ class _EditSheet extends StatefulWidget {
     required this.onRemove,
   });
 
-  final DeckTile tile;
+  final PhoneDeckTile tile;
   final VoidCallback onChanged;
   final VoidCallback onRemove;
 
@@ -931,7 +931,7 @@ class _EditSheet extends StatefulWidget {
 }
 
 class _EditSheetState extends State<_EditSheet> {
-  void _change(void Function(DeckTile t) f) {
+  void _change(void Function(PhoneDeckTile t) f) {
     setState(() => f(widget.tile));
     widget.onChanged();
   }

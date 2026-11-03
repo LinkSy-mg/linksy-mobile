@@ -9,6 +9,7 @@ import 'package:flutter/widgets.dart';
 import 'package:flutter/services.dart';
 
 import '../core/deck.dart';
+import '../core/deck_layouts.dart';
 import '../core/linksy_node.dart';
 import 'app_log.dart';
 import '../core/models.dart';
@@ -34,6 +35,7 @@ class LinksyController extends ChangeNotifier with WidgetsBindingObserver {
        _peerPictures = dir == null
            ? null
            : Directory('${dir.path}/peer_pictures'),
+       _decks = dir == null ? null : Directory('${dir.path}/decks'),
        log = AppLog(dir == null ? null : File('${dir.path}/logs.txt'));
 
   final LinksyNode node;
@@ -54,6 +56,9 @@ class LinksyController extends ChangeNotifier with WidgetsBindingObserver {
 
   /// Pictures computers sent of themselves (§4.5 `picture`), by device.
   final Directory? _peerPictures;
+
+  /// The deck layouts each computer sent last (§4.20), by device.
+  final Directory? _decks;
   final Map<String, String> _received = {};
 
   /// Computers this phone has told its picture since they connected.
@@ -1581,6 +1586,8 @@ class LinksyController extends ChangeNotifier with WidgetsBindingObserver {
           now[st.id] = st;
         }
         notifyListeners();
+      case DeckLayoutReceived(:final from, :final layouts):
+        _onDeckLayouts(from.id, layouts);
       // Turned off here since: nothing to answer.
       case NotificationReplyRequested() ||
           NotificationActionRequested() ||
@@ -2001,24 +2008,26 @@ class LinksyController extends ChangeNotifier with WidgetsBindingObserver {
   /// Their state now, by device id and action.
   final deckStates = <String, Map<String, DeckState>>{};
 
-  final _deckLayouts = <String, DeckLayout?>{};
+  final _phoneDecks = <String, PhoneDeck?>{};
 
   /// The deck's layout for [id], saved on the phone; none until that
   /// computer first offers something.
-  DeckLayout? deckLayout(String id) =>
-      _deckLayouts[id] ??= DeckLayout.decode(prefs['deck.$id']);
+  PhoneDeck? phoneDeck(String id) =>
+      _phoneDecks[id] ??= PhoneDeck.decode(prefs['deck.$id']);
 
-  Future<void> saveDeck(String id, DeckLayout layout) async {
-    _deckLayouts[id] = layout;
+  Future<void> saveDeck(String id, PhoneDeck layout) async {
+    _phoneDecks[id] = layout;
     await _setPref('deck.$id', layout.encode());
   }
 
   /// The first time a computer offers actions, a deck made of them; after
   /// that, tiles keep the names and kinds it says now.
   void _deckFirstLayout(String id, List<DeckAction> actions) {
-    final layout = deckLayout(id);
+    // A computer that lays the deck out itself needs none here.
+    if (deckLayouts(id) != null) return;
+    final layout = phoneDeck(id);
     if (layout == null) {
-      if (actions.isNotEmpty) saveDeck(id, DeckLayout.first(actions));
+      if (actions.isNotEmpty) saveDeck(id, PhoneDeck.first(actions));
       return;
     }
     var changed = false;
@@ -2036,6 +2045,60 @@ class LinksyController extends ChangeNotifier with WidgetsBindingObserver {
     if (changed) saveDeck(id, layout);
   }
 
+  final _laid = <String, DeckLayouts?>{};
+
+  /// The layouts [id] keeps for this phone's deck (§4.20): the last it
+  /// sent, kept on the phone; none until it sends some.
+  DeckLayouts? deckLayouts(String id) {
+    if (_laid.containsKey(id)) return _laid[id];
+    String? saved;
+    try {
+      saved = _deckFile(id)?.readAsStringSync();
+    } on FileSystemException {
+      saved = null;
+    }
+    return _laid[id] = DeckLayouts.decode(saved);
+  }
+
+  File? _deckFile(String id) =>
+      _decks == null ? null : File('${_decks.path}/$id.json');
+
+  /// Each set the computer sends is its current one: shown, and kept.
+  void _onDeckLayouts(String id, Map<String, Object?> json) {
+    final layouts = DeckLayouts.parse(json);
+    if (layouts == null) return;
+    _laid[id] = layouts;
+    notifyListeners();
+    final file = _deckFile(id);
+    if (file == null) return;
+    file.parent
+        .create(recursive: true)
+        .then((_) => file.writeAsString(jsonEncode(json)))
+        .catchError((Object e) {
+          log.add('Deck layouts not kept: $e');
+          return file;
+        });
+  }
+
+  /// The theme picked on the phone for [layout] on [id], drawn instead of
+  /// the layout's own; none: the layout's.
+  String? deckTheme(String id, String layout) =>
+      prefs['deck_theme.$id.$layout'];
+
+  Future<void> setDeckTheme(String id, String layout, String? theme) =>
+      _setPref('deck_theme.$id.$layout', theme);
+
+  Future<void> _forgetDeck(String id) async {
+    _laid.remove(id);
+    _phoneDecks.remove(id);
+    await _deckFile(id)?.delete().catchError((Object _) => File(''));
+    for (final key in [...prefs.keys]) {
+      if (key == 'deck.$id' || key.startsWith('deck_theme.$id.')) {
+        await _setPref(key, null);
+      }
+    }
+  }
+
   /// The deck shows: the computer sends what it may do, then its state.
   Future<void> openDeck(String id) =>
       node.deckOpen(id, open: true).catchError((Object _) {});
@@ -2051,6 +2114,19 @@ class LinksyController extends ChangeNotifier with WidgetsBindingObserver {
   /// dragged its newest value goes at most every 80 ms, the last one always.
   void runDeck(String id, String action, {double? value}) {
     if (value == null) {
+      // A toggle flips at once; the computer's state follows.
+      final offered = deckActions[id]?.where((a) => a.id == action).firstOrNull;
+      if (offered?.kind == DeckKind.toggle) {
+        final states = deckStates.putIfAbsent(id, () => {});
+        final was = states[action];
+        states[action] = DeckState(
+          id: action,
+          on: !(was?.on ?? false),
+          value: was?.value,
+          text: was?.text,
+        );
+        notifyListeners();
+      }
       node.deckRun(id, action).catchError((Object _) {});
       return;
     }
@@ -2218,6 +2294,7 @@ class LinksyController extends ChangeNotifier with WidgetsBindingObserver {
 
   Future<String?> forget(String deviceId) async {
     if (pictures.containsKey(deviceId)) await removePicture(deviceId);
+    await _forgetDeck(deviceId);
     final error = await _run(() => node.forget(deviceId));
     _activity.removeWhere((a) => a.deviceId == deviceId);
     _changed();

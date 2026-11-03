@@ -1,7 +1,8 @@
 /// The deck (docs/protocol.md §4.19): this phone as buttons for a computer.
-/// The phone owns the layout, one per computer, saved here: pages of tiles,
-/// each an action the computer offers, with its size, colour and icon. The
-/// computer only says what it lets this phone do, and runs it.
+/// A computer that makes the layouts sends them (deck_layouts.dart); for one
+/// that doesn't, the phone lays its deck out itself, one per computer, saved
+/// here: pages of tiles, each an action the computer offers, with its size,
+/// colour and icon.
 library;
 
 import 'dart:convert';
@@ -29,8 +30,8 @@ enum DeckSize {
 /// One tile: [action] (the computer's id), and the [name] and [kind] it had
 /// when last offered, so a tile whose action left the list still says what
 /// it was.
-class DeckTile {
-  DeckTile({
+class PhoneDeckTile {
+  PhoneDeckTile({
     required this.action,
     required this.name,
     required this.kind,
@@ -59,7 +60,7 @@ class DeckTile {
     if (icon != null) 'icon': icon,
   };
 
-  static DeckTile fromJson(Map<String, Object?> j) => DeckTile(
+  static PhoneDeckTile fromJson(Map<String, Object?> j) => PhoneDeckTile(
     action: j['action'] as String,
     name: j['name'] as String? ?? '',
     kind: DeckKind.parse(j['kind'] as String?),
@@ -69,14 +70,14 @@ class DeckTile {
   );
 }
 
-class DeckPage {
-  DeckPage([List<DeckTile>? tiles]) : tiles = tiles ?? [];
-  final List<DeckTile> tiles;
+class PhoneDeckPage {
+  PhoneDeckPage([List<PhoneDeckTile>? tiles]) : tiles = tiles ?? [];
+  final List<PhoneDeckTile> tiles;
 }
 
-class DeckLayout {
-  DeckLayout(this.pages);
-  final List<DeckPage> pages;
+class PhoneDeck {
+  PhoneDeck(this.pages);
+  final List<PhoneDeckPage> pages;
 
   String encode() => jsonEncode({
     'pages': [
@@ -84,15 +85,15 @@ class DeckLayout {
     ],
   });
 
-  static DeckLayout? decode(String? s) {
+  static PhoneDeck? decode(String? s) {
     if (s == null) return null;
     try {
       final j = jsonDecode(s) as Map<String, Object?>;
-      return DeckLayout([
+      return PhoneDeck([
         for (final p in j['pages'] as List)
-          DeckPage([
+          PhoneDeckPage([
             for (final t in (p as List).cast<Map<String, Object?>>())
-              DeckTile.fromJson(t),
+              PhoneDeckTile.fromJson(t),
           ]),
       ]);
     } on Object {
@@ -102,15 +103,19 @@ class DeckLayout {
 
   /// A first deck from what the computer offers: media up front, the volume
   /// along a row, then the rest of each group.
-  static DeckLayout first(List<DeckAction> actions) {
-    DeckTile tile(DeckAction a, {DeckSize? size, int? color}) => DeckTile(
+  static PhoneDeck first(List<DeckAction> actions) {
+    PhoneDeckTile tile(
+      DeckAction a, {
+      DeckSize? size,
+      int? color,
+    }) => PhoneDeckTile(
       action: a.id,
       name: a.name,
       kind: a.kind,
       size: size ?? (a.kind == DeckKind.slider ? DeckSize.row : DeckSize.small),
       color: color ?? _groupColor(a.group),
     );
-    final tiles = <DeckTile>[];
+    final tiles = <PhoneDeckTile>[];
     final byId = {for (final a in actions) a.id: a};
     final play = byId['media.play_pause'];
     if (play != null) tiles.add(tile(play, size: DeckSize.big));
@@ -121,7 +126,7 @@ class DeckLayout {
       if (tiles.any((t) => t.action == a.id)) continue;
       tiles.add(tile(a));
     }
-    return DeckLayout([DeckPage(tiles)]);
+    return PhoneDeck([PhoneDeckPage(tiles)]);
   }
 
   static int _groupColor(String group) => switch (group) {

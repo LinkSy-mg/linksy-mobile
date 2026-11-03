@@ -244,6 +244,7 @@ LinksyEvent? eventFromJson(Json j) {
             name: a['name'] as String? ?? '',
             kind: DeckKind.parse(a['kind'] as String?),
             group: a['group'] as String? ?? '',
+            confirm: a['confirm'] as String?,
           ),
       ],
     ),
@@ -255,8 +256,13 @@ LinksyEvent? eventFromJson(Json j) {
             id: d['id'] as String,
             on: d['on'] as bool?,
             value: (d['value'] as num?)?.toDouble(),
+            text: d['text'] as String?,
           ),
       ],
+    ),
+    'deck_layout' => DeckLayoutReceived(
+      from: device('from'),
+      layouts: j['layouts'] as Json? ?? const {},
     ),
     _ => null,
   };
