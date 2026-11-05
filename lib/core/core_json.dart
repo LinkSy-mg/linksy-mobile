@@ -237,6 +237,19 @@ LinksyEvent? eventFromJson(Json j) {
       image: j['image'] as String? ?? '',
     ),
     'locate_request' => LocateRequested(device('from')),
+    'usb_plugged' => UsbPlugged(
+      from: device('from'),
+      phones: [
+        for (final p
+            in (j['phones'] as List? ?? const []).cast<Map<String, Object?>>())
+          PluggedPhone(
+            key: p['key'] as String? ?? '',
+            manufacturer: p['manufacturer'] as String? ?? '',
+            product: p['product'] as String? ?? '',
+            state: p['state'] as String? ?? '',
+          ),
+      ],
+    ),
     'turn_on_request' => TurnOnRequested(
       from: device('from'),
       feature: j['feature'] as String? ?? '',

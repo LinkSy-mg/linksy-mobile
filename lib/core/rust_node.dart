@@ -295,6 +295,12 @@ class RustNode implements LinksyNode {
   );
 
   @override
+  Future<void> usbConnect(String id, String key) => _guard(
+    () => _node.usbConnect(id: id, key: key),
+    name: _nameOf(id),
+  );
+
+  @override
   Future<void> ring(String id, {required bool on}) => _guard(
     () => _node.ring(id: id, on_: on),
     name: _nameOf(id),

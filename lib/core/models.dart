@@ -730,6 +730,30 @@ class NotificationDismissRequested extends LinksyEvent {
 /// A computer asks where this phone is, once (§4.14).
 /// A computer asks to turn on what its tab needs here: `notifications` (its
 /// Inbox) or `gallery` (its Gallery).
+/// A phone plugged into a computer by USB (§4.11).
+class PluggedPhone {
+  const PluggedPhone({
+    required this.key,
+    required this.manufacturer,
+    required this.product,
+    required this.state,
+  });
+
+  final String key;
+  final String manufacturer;
+  final String product;
+
+  /// `plugged`, `switching`, `accessory` or `failed`.
+  final String state;
+}
+
+/// What's plugged into a computer now, whenever that changes.
+class UsbPlugged extends LinksyEvent {
+  const UsbPlugged({required this.from, required this.phones});
+  final DeviceInfo from;
+  final List<PluggedPhone> phones;
+}
+
 class TurnOnRequested extends LinksyEvent {
   const TurnOnRequested({required this.from, required this.feature});
   final DeviceInfo from;

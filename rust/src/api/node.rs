@@ -295,6 +295,13 @@ impl LinksyNode {
         run(async move { node.send_battery(&id, Battery { level, charging }).await }).await
     }
 
+    /// Asks the computer to use the cable for the plugged-in phone `key` (§4.11).
+    pub async fn usb_connect(&self, id: String, key: String) -> Result<(), String> {
+        let id = fingerprint(&id)?;
+        let node = self.node.clone();
+        run(async move { node.usb_connect(&id, &key).await }).await
+    }
+
     /// "Find my computer": makes it ring (`on`), or stops it.
     pub async fn ring(&self, id: String, on: bool) -> Result<(), String> {
         let id = fingerprint(&id)?;

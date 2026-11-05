@@ -625,6 +625,9 @@ class DemoNode implements LinksyNode {
   Future<void> watchClipboard(String id, {required bool on}) async {}
 
   @override
+  Future<void> usbConnect(String id, String key) async {}
+
+  @override
   Future<String> sendClipboardFile(String id, String path) =>
       sendFiles(id, [path]);
 

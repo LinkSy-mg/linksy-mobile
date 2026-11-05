@@ -302,6 +302,9 @@ abstract class LinksyNode implements RustOpaqueInterface {
 
   Future<void> updateSettings({required String settingsJson});
 
+  /// Asks the computer to use the cable for the plugged-in phone `key` (§4.11).
+  Future<void> usbConnect({required String id, required String key});
+
   /// Ask a computer to send its clipboard text as it changes (or stop).
   Future<void> watchClipboard({required String id, required bool on_});
 

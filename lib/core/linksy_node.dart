@@ -41,6 +41,9 @@ abstract interface class LinksyNode {
   /// it isn't connected.
   SendPlan? planSend(String id, int bytes);
 
+  /// Asks computer [id] to use the cable for plugged-in phone [key] (§4.11).
+  Future<void> usbConnect(String id, String key);
+
   /// Gets the fastest route ready for [bytes], while the user chooses, and
   /// says how it looks. Sends nothing and does nothing twice.
   Future<SendPlan?> prepareSend(String id, int bytes);
