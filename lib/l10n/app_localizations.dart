@@ -1416,18 +1416,6 @@ abstract class AppLocalizations {
   /// **'Straight over your Wi-Fi. No account, no cloud.'**
   String get homeConnectSubtitle;
 
-  /// Main button on the empty home screen that opens the QR scanner.
-  ///
-  /// In en, this message translates to:
-  /// **'Scan QR code'**
-  String get homeScanQr;
-
-  /// Secondary button on the empty home screen: pair by typing the computer's IP address.
-  ///
-  /// In en, this message translates to:
-  /// **'Pair by address instead'**
-  String get homePairByAddress;
-
   /// Title of the 'Add a device' bottom sheet.
   ///
   /// In en, this message translates to:
@@ -4559,6 +4547,420 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Open Notification access'**
   String get noticeAccessOpen;
+
+  /// Phone to phone (§4.22)
+  ///
+  /// In en, this message translates to:
+  /// **'Send clipboard'**
+  String get phoneClipboard;
+
+  /// Phone to phone (§4.22)
+  ///
+  /// In en, this message translates to:
+  /// **'What\'s copied here goes to {name}'**
+  String phoneClipboardCaption(String name);
+
+  /// Phone to phone (§4.22)
+  ///
+  /// In en, this message translates to:
+  /// **'A note or a link'**
+  String get phoneNoteHint;
+
+  /// Phone to phone (§4.22)
+  ///
+  /// In en, this message translates to:
+  /// **'Send'**
+  String get phoneSend;
+
+  /// Phone to phone (§4.22)
+  ///
+  /// In en, this message translates to:
+  /// **'Find {name}'**
+  String phoneFind(String name);
+
+  /// Phone to phone (§4.22)
+  ///
+  /// In en, this message translates to:
+  /// **'It rings loud, even on silent'**
+  String get phoneFindCaption;
+
+  /// Phone to phone (§4.22)
+  ///
+  /// In en, this message translates to:
+  /// **'Where is it?'**
+  String get phoneWhere;
+
+  /// Phone to phone (§4.22)
+  ///
+  /// In en, this message translates to:
+  /// **'Asks for its location, once'**
+  String get phoneWhereCaption;
+
+  /// Phone to phone (§4.22)
+  ///
+  /// In en, this message translates to:
+  /// **'{name} didn\'t say where it is: {reason}'**
+  String phoneWhereRefused(String name, String reason);
+
+  /// Phone to phone (§4.22)
+  ///
+  /// In en, this message translates to:
+  /// **'From this phone'**
+  String get phoneFromThis;
+
+  /// Phone to phone (§4.22)
+  ///
+  /// In en, this message translates to:
+  /// **'Photos and videos'**
+  String get phonePhotos;
+
+  /// Phone to phone (§4.22)
+  ///
+  /// In en, this message translates to:
+  /// **'By day or album'**
+  String get phonePhotosCaption;
+
+  /// Phone to phone (§4.22)
+  ///
+  /// In en, this message translates to:
+  /// **'Allow photos'**
+  String get phoneAllowPhotos;
+
+  /// Phone to phone (§4.22)
+  ///
+  /// In en, this message translates to:
+  /// **'Linksy needs this to show your photos here. Nothing goes until you send it.'**
+  String get phoneAllowPhotosCaption;
+
+  /// Phone to phone (§4.22)
+  ///
+  /// In en, this message translates to:
+  /// **'Files and folders'**
+  String get phoneFiles;
+
+  /// Phone to phone (§4.22)
+  ///
+  /// In en, this message translates to:
+  /// **'With Android\'s file picker'**
+  String get phoneFilesCaption;
+
+  /// Phone to phone (§4.22)
+  ///
+  /// In en, this message translates to:
+  /// **'Choose files'**
+  String get phoneChooseFiles;
+
+  /// Phone to phone (§4.22)
+  ///
+  /// In en, this message translates to:
+  /// **'Choose a folder'**
+  String get phoneChooseFolder;
+
+  /// Phone to phone (§4.22)
+  ///
+  /// In en, this message translates to:
+  /// **'Apps'**
+  String get phoneApps;
+
+  /// Phone to phone (§4.22)
+  ///
+  /// In en, this message translates to:
+  /// **'Send an app, or update one'**
+  String get phoneAppsCaption;
+
+  /// Phone to phone (§4.22)
+  ///
+  /// In en, this message translates to:
+  /// **'An app\'s data and logins don\'t move. Apps that check a licence or an account may refuse to run.'**
+  String get phoneAppsNote;
+
+  /// Phone to phone (§4.22)
+  ///
+  /// In en, this message translates to:
+  /// **'Search apps'**
+  String get phoneAppsSearch;
+
+  /// Phone to phone (§4.22)
+  ///
+  /// In en, this message translates to:
+  /// **'Name'**
+  String get phoneSortName;
+
+  /// Phone to phone (§4.22)
+  ///
+  /// In en, this message translates to:
+  /// **'Size'**
+  String get phoneSortSize;
+
+  /// Phone to phone (§4.22)
+  ///
+  /// In en, this message translates to:
+  /// **'Not on {name}'**
+  String phoneAppNotThere(String name);
+
+  /// Phone to phone (§4.22)
+  ///
+  /// In en, this message translates to:
+  /// **'Update (older there)'**
+  String get phoneAppUpdate;
+
+  /// Phone to phone (§4.22)
+  ///
+  /// In en, this message translates to:
+  /// **'Already there'**
+  String get phoneAppSame;
+
+  /// Phone to phone (§4.22)
+  ///
+  /// In en, this message translates to:
+  /// **'Newer there'**
+  String get phoneAppNewer;
+
+  /// Phone to phone (§4.22)
+  ///
+  /// In en, this message translates to:
+  /// **'{name} has it from another developer. Android can\'t update it, only replace it, and that deletes its data.'**
+  String phoneAppOtherSigner(String name);
+
+  /// Phone to phone (§4.22)
+  ///
+  /// In en, this message translates to:
+  /// **'All'**
+  String get phoneAllAlbums;
+
+  /// Phone to phone (§4.22)
+  ///
+  /// In en, this message translates to:
+  /// **'No photos here yet'**
+  String get phoneNoPhotos;
+
+  /// Phone to phone (§4.22)
+  ///
+  /// In en, this message translates to:
+  /// **'No apps to send'**
+  String get phoneNoApps;
+
+  /// Phone to phone (§4.22)
+  ///
+  /// In en, this message translates to:
+  /// **'{count} selected · {size}'**
+  String phoneSelected(int count, String size);
+
+  /// Phone to phone (§4.22)
+  ///
+  /// In en, this message translates to:
+  /// **'Send to {name}'**
+  String phoneSendTo(String name);
+
+  /// Phone to phone (§4.22)
+  ///
+  /// In en, this message translates to:
+  /// **'Clear'**
+  String get phoneClear;
+
+  /// Phone to phone (§4.22)
+  ///
+  /// In en, this message translates to:
+  /// **'Direct link'**
+  String get routeDirect;
+
+  /// Phone to phone (§4.22)
+  ///
+  /// In en, this message translates to:
+  /// **'Same network'**
+  String get routeLan;
+
+  /// Phone to phone (§4.22)
+  ///
+  /// In en, this message translates to:
+  /// **'Over the internet · uses mobile data'**
+  String get routeAway;
+
+  /// Phone to phone (§4.22)
+  ///
+  /// In en, this message translates to:
+  /// **'Cable'**
+  String get routeUsb;
+
+  /// Phone to phone (§4.22)
+  ///
+  /// In en, this message translates to:
+  /// **'about {time}'**
+  String routeAbout(String time);
+
+  /// Phone to phone (§4.22)
+  ///
+  /// In en, this message translates to:
+  /// **'Setting up a direct link…'**
+  String get routeSettingUp;
+
+  /// Phone to phone (§4.22)
+  ///
+  /// In en, this message translates to:
+  /// **'Couldn\'t go direct: {reason}. Sending over the network.'**
+  String routeNotDirect(String reason);
+
+  /// Phone to phone (§4.22)
+  ///
+  /// In en, this message translates to:
+  /// **'{name} has {free} free and this is {size}'**
+  String warnNoRoom(String name, String free, String size);
+
+  /// Phone to phone (§4.22)
+  ///
+  /// In en, this message translates to:
+  /// **'{name} will ask before taking it'**
+  String warnWillAsk(String name);
+
+  /// Phone to phone (§4.22)
+  ///
+  /// In en, this message translates to:
+  /// **'{name} needs to allow installs from Linksy first'**
+  String warnCantInstall(String name);
+
+  /// Phone to phone (§4.22)
+  ///
+  /// In en, this message translates to:
+  /// **'On {name}: Android\'s Settings › Apps › Special app access › Install unknown apps › Linksy.'**
+  String warnCantInstallHow(String name);
+
+  /// Phone to phone (§4.22)
+  ///
+  /// In en, this message translates to:
+  /// **'Send over the internet?'**
+  String get mobileDataTitle;
+
+  /// Phone to phone (§4.22)
+  ///
+  /// In en, this message translates to:
+  /// **'This goes over the internet and uses about {size} of mobile data.'**
+  String mobileDataAsk(String size);
+
+  /// Phone to phone (§4.22)
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, =1{Install an app from {name}?} other{Install {count} apps from {name}?}}'**
+  String phoneInstallAsk(int count, String name);
+
+  /// Phone to phone (§4.22)
+  ///
+  /// In en, this message translates to:
+  /// **'New'**
+  String get phoneAppNew;
+
+  /// Phone to phone (§4.22)
+  ///
+  /// In en, this message translates to:
+  /// **'Update'**
+  String get phoneAppUpdateShort;
+
+  /// Phone to phone (§4.22)
+  ///
+  /// In en, this message translates to:
+  /// **'Install'**
+  String get phoneInstall;
+
+  /// Phone to phone (§4.22)
+  ///
+  /// In en, this message translates to:
+  /// **'Android needs your OK once before Linksy can install apps. Turn on Allow from this source, then come back.'**
+  String get phoneInstallAllowBody;
+
+  /// Phone to phone (§4.22)
+  ///
+  /// In en, this message translates to:
+  /// **'Allow installs'**
+  String get phoneInstallAllow;
+
+  /// Phone to phone (§4.22)
+  ///
+  /// In en, this message translates to:
+  /// **'{app} is installed'**
+  String phoneInstalled(String app);
+
+  /// Phone to phone (§4.22)
+  ///
+  /// In en, this message translates to:
+  /// **'{app} wasn\'t installed'**
+  String phoneInstallCancelled(String app);
+
+  /// Phone to phone (§4.22)
+  ///
+  /// In en, this message translates to:
+  /// **'{app} isn\'t what {name} said it was, so it wasn\'t installed.'**
+  String phoneInstallMismatch(String app, String name);
+
+  /// Phone to phone (§4.22)
+  ///
+  /// In en, this message translates to:
+  /// **'{app} on this phone is from another developer. Android can\'t update it.'**
+  String phoneInstallOtherSigner(String app);
+
+  /// Phone to phone (§4.22)
+  ///
+  /// In en, this message translates to:
+  /// **'{app} wasn\'t installed: {reason}'**
+  String phoneInstallFailed(String app, String reason);
+
+  /// What's New 0.3.5
+  ///
+  /// In en, this message translates to:
+  /// **'Two phones, no computer'**
+  String get news035PhonesTitle;
+
+  /// What's New 0.3.5
+  ///
+  /// In en, this message translates to:
+  /// **'Open a paired phone: send what you copied, a note or a link, make it ring, or pick photos and files by day.'**
+  String get news035PhonesBody;
+
+  /// What's New 0.3.5
+  ///
+  /// In en, this message translates to:
+  /// **'Send apps to another phone'**
+  String get news035AppsTitle;
+
+  /// What's New 0.3.5
+  ///
+  /// In en, this message translates to:
+  /// **'Linksy shows what\'s missing or older there, and Android asks before installing. An app\'s data and logins stay behind.'**
+  String get news035AppsBody;
+
+  /// Phone to phone page
+  ///
+  /// In en, this message translates to:
+  /// **'Note'**
+  String get phoneNote;
+
+  /// Phone to phone page
+  ///
+  /// In en, this message translates to:
+  /// **'Where'**
+  String get phoneWhereShort;
+
+  /// Phone to phone page
+  ///
+  /// In en, this message translates to:
+  /// **'Photos'**
+  String get phoneShelfPhotos;
+
+  /// Phone to phone page
+  ///
+  /// In en, this message translates to:
+  /// **'See all'**
+  String get phoneSeeAll;
+
+  /// Phone to phone page
+  ///
+  /// In en, this message translates to:
+  /// **'Select day'**
+  String get phoneSelectDay;
+
+  /// Phone to phone page
+  ///
+  /// In en, this message translates to:
+  /// **'History'**
+  String get phoneHistory;
 }
 
 class _AppLocalizationsDelegate

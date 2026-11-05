@@ -782,12 +782,6 @@ class AppLocalizationsZh extends AppLocalizations {
   String get homeConnectSubtitle => '直接通过你的 Wi-Fi。无需账号，无需云端。';
 
   @override
-  String get homeScanQr => '扫描二维码';
-
-  @override
-  String get homePairByAddress => '改用地址配对';
-
-  @override
   String get pairingAddDevice => '添加设备';
 
   @override
@@ -2649,4 +2643,258 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get noticeAccessOpen => '打开通知使用权';
+
+  @override
+  String get phoneClipboard => '发送剪贴板';
+
+  @override
+  String phoneClipboardCaption(String name) {
+    return '此处复制的内容会发送到 $name';
+  }
+
+  @override
+  String get phoneNoteHint => '便条或链接';
+
+  @override
+  String get phoneSend => '发送';
+
+  @override
+  String phoneFind(String name) {
+    return '查找 $name';
+  }
+
+  @override
+  String get phoneFindCaption => '即使静音也会大声响铃';
+
+  @override
+  String get phoneWhere => '它在哪里?';
+
+  @override
+  String get phoneWhereCaption => '询问一次它的位置';
+
+  @override
+  String phoneWhereRefused(String name, String reason) {
+    return '$name 未告知位置:$reason';
+  }
+
+  @override
+  String get phoneFromThis => '来自此手机';
+
+  @override
+  String get phonePhotos => '照片和视频';
+
+  @override
+  String get phonePhotosCaption => '按日期或相册';
+
+  @override
+  String get phoneAllowPhotos => '允许访问照片';
+
+  @override
+  String get phoneAllowPhotosCaption => 'Linksy 需要此权限才能在此显示照片。在你发送之前不会传出任何内容。';
+
+  @override
+  String get phoneFiles => '文件和文件夹';
+
+  @override
+  String get phoneFilesCaption => '使用 Android 文件选择器';
+
+  @override
+  String get phoneChooseFiles => '选择文件';
+
+  @override
+  String get phoneChooseFolder => '选择文件夹';
+
+  @override
+  String get phoneApps => '应用';
+
+  @override
+  String get phoneAppsCaption => '发送或更新应用';
+
+  @override
+  String get phoneAppsNote => '应用的数据和登录信息不会迁移。检查许可或账户的应用可能无法运行。';
+
+  @override
+  String get phoneAppsSearch => '搜索应用';
+
+  @override
+  String get phoneSortName => '名称';
+
+  @override
+  String get phoneSortSize => '大小';
+
+  @override
+  String phoneAppNotThere(String name) {
+    return '$name 上没有';
+  }
+
+  @override
+  String get phoneAppUpdate => '更新 (那边版本较旧)';
+
+  @override
+  String get phoneAppSame => '已存在';
+
+  @override
+  String get phoneAppNewer => '那边版本更新';
+
+  @override
+  String phoneAppOtherSigner(String name) {
+    return '$name 上的来自其他开发者。Android 无法更新,只能替换,这会删除其数据。';
+  }
+
+  @override
+  String get phoneAllAlbums => '全部';
+
+  @override
+  String get phoneNoPhotos => '这里还没有照片';
+
+  @override
+  String get phoneNoApps => '没有可发送的应用';
+
+  @override
+  String phoneSelected(int count, String size) {
+    return '已选 $count 项 · $size';
+  }
+
+  @override
+  String phoneSendTo(String name) {
+    return '发送到 $name';
+  }
+
+  @override
+  String get phoneClear => '清除';
+
+  @override
+  String get routeDirect => '直连';
+
+  @override
+  String get routeLan => '同一网络';
+
+  @override
+  String get routeAway => '通过互联网 · 使用移动数据';
+
+  @override
+  String get routeUsb => '数据线';
+
+  @override
+  String routeAbout(String time) {
+    return '约 $time';
+  }
+
+  @override
+  String get routeSettingUp => '正在建立直连…';
+
+  @override
+  String routeNotDirect(String reason) {
+    return '无法直连:$reason。正在通过网络发送。';
+  }
+
+  @override
+  String warnNoRoom(String name, String free, String size) {
+    return '$name 剩余 $free,而这需要 $size';
+  }
+
+  @override
+  String warnWillAsk(String name) {
+    return '$name 接收前会询问';
+  }
+
+  @override
+  String warnCantInstall(String name) {
+    return '$name 需要先允许 Linksy 安装应用';
+  }
+
+  @override
+  String warnCantInstallHow(String name) {
+    return '在 $name 上:Android 设置 › 应用 › 特殊应用权限 › 安装未知应用 › Linksy。';
+  }
+
+  @override
+  String get mobileDataTitle => '通过互联网发送?';
+
+  @override
+  String mobileDataAsk(String size) {
+    return '这将通过互联网发送,约使用 $size 移动数据。';
+  }
+
+  @override
+  String phoneInstallAsk(int count, String name) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '从 $name 安装 $count 个应用?',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get phoneAppNew => '新应用';
+
+  @override
+  String get phoneAppUpdateShort => '更新';
+
+  @override
+  String get phoneInstall => '安装';
+
+  @override
+  String get phoneInstallAllowBody =>
+      'Linksy 安装应用前需要你在 Android 中同意一次。请打开“允许来自此来源”,然后返回。';
+
+  @override
+  String get phoneInstallAllow => '允许安装';
+
+  @override
+  String phoneInstalled(String app) {
+    return '$app 已安装';
+  }
+
+  @override
+  String phoneInstallCancelled(String app) {
+    return '$app 未安装';
+  }
+
+  @override
+  String phoneInstallMismatch(String app, String name) {
+    return '$app 与 $name 所述不符,因此未安装。';
+  }
+
+  @override
+  String phoneInstallOtherSigner(String app) {
+    return '此手机上的 $app 来自其他开发者。Android 无法更新。';
+  }
+
+  @override
+  String phoneInstallFailed(String app, String reason) {
+    return '$app 未安装:$reason';
+  }
+
+  @override
+  String get news035PhonesTitle => '两部手机,无需电脑';
+
+  @override
+  String get news035PhonesBody => '打开已配对的手机:发送复制的内容、便条或链接,让它响铃,或按日期选择照片和文件。';
+
+  @override
+  String get news035AppsTitle => '将应用发送到另一部手机';
+
+  @override
+  String get news035AppsBody =>
+      'Linksy 会显示那边缺少或较旧的应用,安装前 Android 会询问。应用数据和登录信息不会迁移。';
+
+  @override
+  String get phoneNote => '便条';
+
+  @override
+  String get phoneWhereShort => '位置';
+
+  @override
+  String get phoneShelfPhotos => '照片';
+
+  @override
+  String get phoneSeeAll => '查看全部';
+
+  @override
+  String get phoneSelectDay => '选择当天';
+
+  @override
+  String get phoneHistory => '历史记录';
 }

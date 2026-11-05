@@ -1053,14 +1053,6 @@
   "@homeConnectSubtitle": {
     "description": "Subtitle under 'Connect your first device'."
   },
-  "homeScanQr": "Scan QR code",
-  "@homeScanQr": {
-    "description": "Main button on the empty home screen that opens the QR scanner."
-  },
-  "homePairByAddress": "Pair by address instead",
-  "@homePairByAddress": {
-    "description": "Secondary button on the empty home screen: pair by typing the computer's IP address."
-  },
   "pairingAddDevice": "Add a device",
   "@pairingAddDevice": {
     "description": "Title of the 'Add a device' bottom sheet."
@@ -3687,5 +3679,402 @@
   },
   "@noticeAccessOpen": {
     "description": "Button opening Android's Notification access page for Linksy"
+  },
+  "phoneClipboard": "Send clipboard",
+  "@phoneClipboard": {
+    "description": "Phone to phone (\u00a74.22)"
+  },
+  "phoneClipboardCaption": "What's copied here goes to {name}",
+  "@phoneClipboardCaption": {
+    "description": "Phone to phone (\u00a74.22)",
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "phoneNoteHint": "A note or a link",
+  "@phoneNoteHint": {
+    "description": "Phone to phone (\u00a74.22)"
+  },
+  "phoneSend": "Send",
+  "@phoneSend": {
+    "description": "Phone to phone (\u00a74.22)"
+  },
+  "phoneFind": "Find {name}",
+  "@phoneFind": {
+    "description": "Phone to phone (\u00a74.22)",
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "phoneFindCaption": "It rings loud, even on silent",
+  "@phoneFindCaption": {
+    "description": "Phone to phone (\u00a74.22)"
+  },
+  "phoneWhere": "Where is it?",
+  "@phoneWhere": {
+    "description": "Phone to phone (\u00a74.22)"
+  },
+  "phoneWhereCaption": "Asks for its location, once",
+  "@phoneWhereCaption": {
+    "description": "Phone to phone (\u00a74.22)"
+  },
+  "phoneWhereRefused": "{name} didn't say where it is: {reason}",
+  "@phoneWhereRefused": {
+    "description": "Phone to phone (\u00a74.22)",
+    "placeholders": {
+      "name": {
+        "type": "String"
+      },
+      "reason": {
+        "type": "String"
+      }
+    }
+  },
+  "phoneFromThis": "From this phone",
+  "@phoneFromThis": {
+    "description": "Phone to phone (\u00a74.22)"
+  },
+  "phonePhotos": "Photos and videos",
+  "@phonePhotos": {
+    "description": "Phone to phone (\u00a74.22)"
+  },
+  "phonePhotosCaption": "By day or album",
+  "@phonePhotosCaption": {
+    "description": "Phone to phone (\u00a74.22)"
+  },
+  "phoneAllowPhotos": "Allow photos",
+  "@phoneAllowPhotos": {
+    "description": "Phone to phone (\u00a74.22)"
+  },
+  "phoneAllowPhotosCaption": "Linksy needs this to show your photos here. Nothing goes until you send it.",
+  "@phoneAllowPhotosCaption": {
+    "description": "Phone to phone (\u00a74.22)"
+  },
+  "phoneFiles": "Files and folders",
+  "@phoneFiles": {
+    "description": "Phone to phone (\u00a74.22)"
+  },
+  "phoneFilesCaption": "With Android's file picker",
+  "@phoneFilesCaption": {
+    "description": "Phone to phone (\u00a74.22)"
+  },
+  "phoneChooseFiles": "Choose files",
+  "@phoneChooseFiles": {
+    "description": "Phone to phone (\u00a74.22)"
+  },
+  "phoneChooseFolder": "Choose a folder",
+  "@phoneChooseFolder": {
+    "description": "Phone to phone (\u00a74.22)"
+  },
+  "phoneApps": "Apps",
+  "@phoneApps": {
+    "description": "Phone to phone (\u00a74.22)"
+  },
+  "phoneAppsCaption": "Send an app, or update one",
+  "@phoneAppsCaption": {
+    "description": "Phone to phone (\u00a74.22)"
+  },
+  "phoneAppsNote": "An app's data and logins don't move. Apps that check a licence or an account may refuse to run.",
+  "@phoneAppsNote": {
+    "description": "Phone to phone (\u00a74.22)"
+  },
+  "phoneAppsSearch": "Search apps",
+  "@phoneAppsSearch": {
+    "description": "Phone to phone (\u00a74.22)"
+  },
+  "phoneSortName": "Name",
+  "@phoneSortName": {
+    "description": "Phone to phone (\u00a74.22)"
+  },
+  "phoneSortSize": "Size",
+  "@phoneSortSize": {
+    "description": "Phone to phone (\u00a74.22)"
+  },
+  "phoneAppNotThere": "Not on {name}",
+  "@phoneAppNotThere": {
+    "description": "Phone to phone (\u00a74.22)",
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "phoneAppUpdate": "Update (older there)",
+  "@phoneAppUpdate": {
+    "description": "Phone to phone (\u00a74.22)"
+  },
+  "phoneAppSame": "Already there",
+  "@phoneAppSame": {
+    "description": "Phone to phone (\u00a74.22)"
+  },
+  "phoneAppNewer": "Newer there",
+  "@phoneAppNewer": {
+    "description": "Phone to phone (\u00a74.22)"
+  },
+  "phoneAppOtherSigner": "{name} has it from another developer. Android can't update it, only replace it, and that deletes its data.",
+  "@phoneAppOtherSigner": {
+    "description": "Phone to phone (\u00a74.22)",
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "phoneAllAlbums": "All",
+  "@phoneAllAlbums": {
+    "description": "Phone to phone (\u00a74.22)"
+  },
+  "phoneNoPhotos": "No photos here yet",
+  "@phoneNoPhotos": {
+    "description": "Phone to phone (\u00a74.22)"
+  },
+  "phoneNoApps": "No apps to send",
+  "@phoneNoApps": {
+    "description": "Phone to phone (\u00a74.22)"
+  },
+  "phoneSelected": "{count} selected · {size}",
+  "@phoneSelected": {
+    "description": "Phone to phone (\u00a74.22)",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      },
+      "size": {
+        "type": "String"
+      }
+    }
+  },
+  "phoneSendTo": "Send to {name}",
+  "@phoneSendTo": {
+    "description": "Phone to phone (\u00a74.22)",
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "phoneClear": "Clear",
+  "@phoneClear": {
+    "description": "Phone to phone (\u00a74.22)"
+  },
+  "routeDirect": "Direct link",
+  "@routeDirect": {
+    "description": "Phone to phone (\u00a74.22)"
+  },
+  "routeLan": "Same network",
+  "@routeLan": {
+    "description": "Phone to phone (\u00a74.22)"
+  },
+  "routeAway": "Over the internet · uses mobile data",
+  "@routeAway": {
+    "description": "Phone to phone (\u00a74.22)"
+  },
+  "routeUsb": "Cable",
+  "@routeUsb": {
+    "description": "Phone to phone (\u00a74.22)"
+  },
+  "routeAbout": "about {time}",
+  "@routeAbout": {
+    "description": "Phone to phone (\u00a74.22)",
+    "placeholders": {
+      "time": {
+        "type": "String"
+      }
+    }
+  },
+  "routeSettingUp": "Setting up a direct link…",
+  "@routeSettingUp": {
+    "description": "Phone to phone (\u00a74.22)"
+  },
+  "routeNotDirect": "Couldn't go direct: {reason}. Sending over the network.",
+  "@routeNotDirect": {
+    "description": "Phone to phone (\u00a74.22)",
+    "placeholders": {
+      "reason": {
+        "type": "String"
+      }
+    }
+  },
+  "warnNoRoom": "{name} has {free} free and this is {size}",
+  "@warnNoRoom": {
+    "description": "Phone to phone (\u00a74.22)",
+    "placeholders": {
+      "name": {
+        "type": "String"
+      },
+      "free": {
+        "type": "String"
+      },
+      "size": {
+        "type": "String"
+      }
+    }
+  },
+  "warnWillAsk": "{name} will ask before taking it",
+  "@warnWillAsk": {
+    "description": "Phone to phone (\u00a74.22)",
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "warnCantInstall": "{name} needs to allow installs from Linksy first",
+  "@warnCantInstall": {
+    "description": "Phone to phone (\u00a74.22)",
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "warnCantInstallHow": "On {name}: Android's Settings › Apps › Special app access › Install unknown apps › Linksy.",
+  "@warnCantInstallHow": {
+    "description": "Phone to phone (\u00a74.22)",
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "mobileDataTitle": "Send over the internet?",
+  "@mobileDataTitle": {
+    "description": "Phone to phone (\u00a74.22)"
+  },
+  "mobileDataAsk": "This goes over the internet and uses about {size} of mobile data.",
+  "@mobileDataAsk": {
+    "description": "Phone to phone (\u00a74.22)",
+    "placeholders": {
+      "size": {
+        "type": "String"
+      }
+    }
+  },
+  "phoneInstallAsk": "{count, plural, =1{Install an app from {name}?} other{Install {count} apps from {name}?}}",
+  "@phoneInstallAsk": {
+    "description": "Phone to phone (\u00a74.22)",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      },
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "phoneAppNew": "New",
+  "@phoneAppNew": {
+    "description": "Phone to phone (\u00a74.22)"
+  },
+  "phoneAppUpdateShort": "Update",
+  "@phoneAppUpdateShort": {
+    "description": "Phone to phone (\u00a74.22)"
+  },
+  "phoneInstall": "Install",
+  "@phoneInstall": {
+    "description": "Phone to phone (\u00a74.22)"
+  },
+  "phoneInstallAllowBody": "Android needs your OK once before Linksy can install apps. Turn on Allow from this source, then come back.",
+  "@phoneInstallAllowBody": {
+    "description": "Phone to phone (\u00a74.22)"
+  },
+  "phoneInstallAllow": "Allow installs",
+  "@phoneInstallAllow": {
+    "description": "Phone to phone (\u00a74.22)"
+  },
+  "phoneInstalled": "{app} is installed",
+  "@phoneInstalled": {
+    "description": "Phone to phone (\u00a74.22)",
+    "placeholders": {
+      "app": {
+        "type": "String"
+      }
+    }
+  },
+  "phoneInstallCancelled": "{app} wasn't installed",
+  "@phoneInstallCancelled": {
+    "description": "Phone to phone (\u00a74.22)",
+    "placeholders": {
+      "app": {
+        "type": "String"
+      }
+    }
+  },
+  "phoneInstallMismatch": "{app} isn't what {name} said it was, so it wasn't installed.",
+  "@phoneInstallMismatch": {
+    "description": "Phone to phone (\u00a74.22)",
+    "placeholders": {
+      "app": {
+        "type": "String"
+      },
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "phoneInstallOtherSigner": "{app} on this phone is from another developer. Android can't update it.",
+  "@phoneInstallOtherSigner": {
+    "description": "Phone to phone (\u00a74.22)",
+    "placeholders": {
+      "app": {
+        "type": "String"
+      }
+    }
+  },
+  "phoneInstallFailed": "{app} wasn't installed: {reason}",
+  "@phoneInstallFailed": {
+    "description": "Phone to phone (\u00a74.22)",
+    "placeholders": {
+      "app": {
+        "type": "String"
+      },
+      "reason": {
+        "type": "String"
+      }
+    }
+  },
+  "news035PhonesTitle": "Two phones, no computer",
+  "@news035PhonesTitle": {
+    "description": "What's New 0.3.5"
+  },
+  "news035PhonesBody": "Open a paired phone: send what you copied, a note or a link, make it ring, or pick photos and files by day.",
+  "@news035PhonesBody": {
+    "description": "What's New 0.3.5"
+  },
+  "news035AppsTitle": "Send apps to another phone",
+  "@news035AppsTitle": {
+    "description": "What's New 0.3.5"
+  },
+  "news035AppsBody": "Linksy shows what's missing or older there, and Android asks before installing. An app's data and logins stay behind.",
+  "@news035AppsBody": {
+    "description": "What's New 0.3.5"
+  },
+  "phoneNote": "Note",
+  "@phoneNote": {
+    "description": "Phone to phone page"
+  },
+  "phoneWhereShort": "Where",
+  "@phoneWhereShort": {
+    "description": "Phone to phone page"
+  },
+  "phoneShelfPhotos": "Photos",
+  "@phoneShelfPhotos": {
+    "description": "Phone to phone page"
+  },
+  "phoneSeeAll": "See all",
+  "@phoneSeeAll": {
+    "description": "Phone to phone page"
+  },
+  "phoneSelectDay": "Select day",
+  "@phoneSelectDay": {
+    "description": "Phone to phone page"
+  },
+  "phoneHistory": "History",
+  "@phoneHistory": {
+    "description": "Phone to phone page"
   }
 }

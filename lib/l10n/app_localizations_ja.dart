@@ -789,12 +789,6 @@ class AppLocalizationsJa extends AppLocalizations {
   String get homeConnectSubtitle => 'Wi-Fi で直接つながります。アカウントもクラウドも不要です。';
 
   @override
-  String get homeScanQr => 'QR コードを読み取る';
-
-  @override
-  String get homePairByAddress => 'アドレスでペアリング';
-
-  @override
   String get pairingAddDevice => 'デバイスを追加';
 
   @override
@@ -2688,4 +2682,260 @@ class AppLocalizationsJa extends AppLocalizations {
 
   @override
   String get noticeAccessOpen => '「通知へのアクセス」を開く';
+
+  @override
+  String get phoneClipboard => 'クリップボードを送る';
+
+  @override
+  String phoneClipboardCaption(String name) {
+    return 'ここでコピーした内容を $name に送ります';
+  }
+
+  @override
+  String get phoneNoteHint => 'メモまたはリンク';
+
+  @override
+  String get phoneSend => '送信';
+
+  @override
+  String phoneFind(String name) {
+    return '$name を探す';
+  }
+
+  @override
+  String get phoneFindCaption => 'マナーモードでも大きな音で鳴ります';
+
+  @override
+  String get phoneWhere => 'どこにある?';
+
+  @override
+  String get phoneWhereCaption => '位置情報を一度だけ尋ねます';
+
+  @override
+  String phoneWhereRefused(String name, String reason) {
+    return '$name は位置を教えませんでした: $reason';
+  }
+
+  @override
+  String get phoneFromThis => 'このスマートフォンから';
+
+  @override
+  String get phonePhotos => '写真と動画';
+
+  @override
+  String get phonePhotosCaption => '日付やアルバムで';
+
+  @override
+  String get phoneAllowPhotos => '写真を許可';
+
+  @override
+  String get phoneAllowPhotosCaption => 'ここに写真を表示するために必要です。送信するまで何も送られません。';
+
+  @override
+  String get phoneFiles => 'ファイルとフォルダ';
+
+  @override
+  String get phoneFilesCaption => 'Android のファイル選択から';
+
+  @override
+  String get phoneChooseFiles => 'ファイルを選ぶ';
+
+  @override
+  String get phoneChooseFolder => 'フォルダを選ぶ';
+
+  @override
+  String get phoneApps => 'アプリ';
+
+  @override
+  String get phoneAppsCaption => 'アプリを送る、または更新する';
+
+  @override
+  String get phoneAppsNote =>
+      'アプリのデータとログイン情報は移動しません。ライセンスやアカウントを確認するアプリは起動しないことがあります。';
+
+  @override
+  String get phoneAppsSearch => 'アプリを検索';
+
+  @override
+  String get phoneSortName => '名前';
+
+  @override
+  String get phoneSortSize => 'サイズ';
+
+  @override
+  String phoneAppNotThere(String name) {
+    return '$name にはありません';
+  }
+
+  @override
+  String get phoneAppUpdate => '更新 (あちらは古い版)';
+
+  @override
+  String get phoneAppSame => 'すでにあります';
+
+  @override
+  String get phoneAppNewer => 'あちらの方が新しい';
+
+  @override
+  String phoneAppOtherSigner(String name) {
+    return '$name には別の開発者のものがあります。Android は更新できず置き換えのみ可能で、データは削除されます。';
+  }
+
+  @override
+  String get phoneAllAlbums => 'すべて';
+
+  @override
+  String get phoneNoPhotos => 'まだ写真はありません';
+
+  @override
+  String get phoneNoApps => '送れるアプリはありません';
+
+  @override
+  String phoneSelected(int count, String size) {
+    return '$count 件選択 · $size';
+  }
+
+  @override
+  String phoneSendTo(String name) {
+    return '$name に送る';
+  }
+
+  @override
+  String get phoneClear => 'クリア';
+
+  @override
+  String get routeDirect => 'ダイレクトリンク';
+
+  @override
+  String get routeLan => '同じネットワーク';
+
+  @override
+  String get routeAway => 'インターネット経由 · モバイルデータを使用';
+
+  @override
+  String get routeUsb => 'ケーブル';
+
+  @override
+  String routeAbout(String time) {
+    return '約 $time';
+  }
+
+  @override
+  String get routeSettingUp => 'ダイレクトリンクを準備中…';
+
+  @override
+  String routeNotDirect(String reason) {
+    return '直接接続できませんでした: $reason。ネットワーク経由で送信します。';
+  }
+
+  @override
+  String warnNoRoom(String name, String free, String size) {
+    return '$name の空きは $free、これは $size です';
+  }
+
+  @override
+  String warnWillAsk(String name) {
+    return '$name は受け取る前に確認します';
+  }
+
+  @override
+  String warnCantInstall(String name) {
+    return '$name で先に Linksy からのインストールを許可してください';
+  }
+
+  @override
+  String warnCantInstallHow(String name) {
+    return '$name で: Android の設定 › アプリ › 特別なアプリアクセス › 不明なアプリのインストール › Linksy。';
+  }
+
+  @override
+  String get mobileDataTitle => 'インターネット経由で送りますか?';
+
+  @override
+  String mobileDataAsk(String size) {
+    return 'インターネット経由で、モバイルデータを約 $size 使用します。';
+  }
+
+  @override
+  String phoneInstallAsk(int count, String name) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$name から $count 個のアプリをインストールしますか?',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get phoneAppNew => '新規';
+
+  @override
+  String get phoneAppUpdateShort => '更新';
+
+  @override
+  String get phoneInstall => 'インストール';
+
+  @override
+  String get phoneInstallAllowBody =>
+      'Linksy がアプリをインストールするには、一度だけ許可が必要です。「この提供元を許可」をオンにして戻ってください。';
+
+  @override
+  String get phoneInstallAllow => 'インストールを許可';
+
+  @override
+  String phoneInstalled(String app) {
+    return '$app をインストールしました';
+  }
+
+  @override
+  String phoneInstallCancelled(String app) {
+    return '$app はインストールされませんでした';
+  }
+
+  @override
+  String phoneInstallMismatch(String app, String name) {
+    return '$app は $name の説明と異なるため、インストールしませんでした。';
+  }
+
+  @override
+  String phoneInstallOtherSigner(String app) {
+    return 'このスマートフォンの $app は別の開発者のものです。Android は更新できません。';
+  }
+
+  @override
+  String phoneInstallFailed(String app, String reason) {
+    return '$app をインストールできませんでした: $reason';
+  }
+
+  @override
+  String get news035PhonesTitle => '2 台のスマートフォン、コンピュータなしで';
+
+  @override
+  String get news035PhonesBody =>
+      'ペアリング済みのスマートフォンを開くと、コピーした内容やメモ、リンクを送ったり、鳴らしたり、写真やファイルを日付で選べます。';
+
+  @override
+  String get news035AppsTitle => 'アプリを別のスマートフォンへ';
+
+  @override
+  String get news035AppsBody =>
+      'あちらにないものや古いものを表示し、インストール前に Android が確認します。データとログイン情報は移動しません。';
+
+  @override
+  String get phoneNote => 'メモ';
+
+  @override
+  String get phoneWhereShort => '場所';
+
+  @override
+  String get phoneShelfPhotos => '写真';
+
+  @override
+  String get phoneSeeAll => 'すべて見る';
+
+  @override
+  String get phoneSelectDay => 'この日を選択';
+
+  @override
+  String get phoneHistory => '履歴';
 }

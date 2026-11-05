@@ -815,12 +815,6 @@ class AppLocalizationsRu extends AppLocalizations {
       'Напрямую через ваш Wi-Fi. Без аккаунта и облака.';
 
   @override
-  String get homeScanQr => 'Сканировать QR-код';
-
-  @override
-  String get homePairByAddress => 'Связать по адресу';
-
-  @override
   String get pairingAddDevice => 'Добавить устройство';
 
   @override
@@ -2790,4 +2784,262 @@ class AppLocalizationsRu extends AppLocalizations {
 
   @override
   String get noticeAccessOpen => 'Открыть «Доступ к уведомлениям»';
+
+  @override
+  String get phoneClipboard => 'Отправить буфер обмена';
+
+  @override
+  String phoneClipboardCaption(String name) {
+    return 'Скопированное здесь попадёт на $name';
+  }
+
+  @override
+  String get phoneNoteHint => 'Заметка или ссылка';
+
+  @override
+  String get phoneSend => 'Отправить';
+
+  @override
+  String phoneFind(String name) {
+    return 'Найти $name';
+  }
+
+  @override
+  String get phoneFindCaption => 'Громко звонит, даже в беззвучном режиме';
+
+  @override
+  String get phoneWhere => 'Где он?';
+
+  @override
+  String get phoneWhereCaption => 'Запрашивает местоположение один раз';
+
+  @override
+  String phoneWhereRefused(String name, String reason) {
+    return '$name не сообщил, где он: $reason';
+  }
+
+  @override
+  String get phoneFromThis => 'С этого телефона';
+
+  @override
+  String get phonePhotos => 'Фото и видео';
+
+  @override
+  String get phonePhotosCaption => 'По дням или альбомам';
+
+  @override
+  String get phoneAllowPhotos => 'Разрешить фото';
+
+  @override
+  String get phoneAllowPhotosCaption =>
+      'Это нужно Linksy, чтобы показать здесь ваши фото. Ничего не уйдёт, пока вы не отправите.';
+
+  @override
+  String get phoneFiles => 'Файлы и папки';
+
+  @override
+  String get phoneFilesCaption => 'Через выбор файлов Android';
+
+  @override
+  String get phoneChooseFiles => 'Выбрать файлы';
+
+  @override
+  String get phoneChooseFolder => 'Выбрать папку';
+
+  @override
+  String get phoneApps => 'Приложения';
+
+  @override
+  String get phoneAppsCaption => 'Отправить или обновить приложение';
+
+  @override
+  String get phoneAppsNote =>
+      'Данные и входы приложения не переносятся. Приложения, проверяющие лицензию или аккаунт, могут не запуститься.';
+
+  @override
+  String get phoneAppsSearch => 'Поиск приложений';
+
+  @override
+  String get phoneSortName => 'Имя';
+
+  @override
+  String get phoneSortSize => 'Размер';
+
+  @override
+  String phoneAppNotThere(String name) {
+    return 'Нет на $name';
+  }
+
+  @override
+  String get phoneAppUpdate => 'Обновить (там старее)';
+
+  @override
+  String get phoneAppSame => 'Уже там';
+
+  @override
+  String get phoneAppNewer => 'Там новее';
+
+  @override
+  String phoneAppOtherSigner(String name) {
+    return 'На $name оно от другого разработчика. Android не может его обновить, только заменить, а это удалит его данные.';
+  }
+
+  @override
+  String get phoneAllAlbums => 'Все';
+
+  @override
+  String get phoneNoPhotos => 'Здесь пока нет фото';
+
+  @override
+  String get phoneNoApps => 'Нет приложений для отправки';
+
+  @override
+  String phoneSelected(int count, String size) {
+    return 'Выбрано: $count · $size';
+  }
+
+  @override
+  String phoneSendTo(String name) {
+    return 'Отправить на $name';
+  }
+
+  @override
+  String get phoneClear => 'Очистить';
+
+  @override
+  String get routeDirect => 'Прямая связь';
+
+  @override
+  String get routeLan => 'Та же сеть';
+
+  @override
+  String get routeAway => 'Через интернет · расходует мобильные данные';
+
+  @override
+  String get routeUsb => 'Кабель';
+
+  @override
+  String routeAbout(String time) {
+    return 'около $time';
+  }
+
+  @override
+  String get routeSettingUp => 'Настройка прямой связи…';
+
+  @override
+  String routeNotDirect(String reason) {
+    return 'Прямая связь не удалась: $reason. Отправка через сеть.';
+  }
+
+  @override
+  String warnNoRoom(String name, String free, String size) {
+    return 'На $name свободно $free, а это $size';
+  }
+
+  @override
+  String warnWillAsk(String name) {
+    return '$name спросит, прежде чем принять';
+  }
+
+  @override
+  String warnCantInstall(String name) {
+    return '$name должен сначала разрешить установку из Linksy';
+  }
+
+  @override
+  String warnCantInstallHow(String name) {
+    return 'На $name: Настройки Android › Приложения › Специальный доступ › Установка неизвестных приложений › Linksy.';
+  }
+
+  @override
+  String get mobileDataTitle => 'Отправить через интернет?';
+
+  @override
+  String mobileDataAsk(String size) {
+    return 'Отправка пойдёт через интернет и израсходует около $size мобильных данных.';
+  }
+
+  @override
+  String phoneInstallAsk(int count, String name) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'Установить приложения ($count) с $name?',
+      one: 'Установить приложение с $name?',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get phoneAppNew => 'Новое';
+
+  @override
+  String get phoneAppUpdateShort => 'Обновление';
+
+  @override
+  String get phoneInstall => 'Установить';
+
+  @override
+  String get phoneInstallAllowBody =>
+      'Android один раз спросит разрешение, чтобы Linksy мог устанавливать приложения. Включите «Разрешить из этого источника» и вернитесь.';
+
+  @override
+  String get phoneInstallAllow => 'Разрешить установку';
+
+  @override
+  String phoneInstalled(String app) {
+    return '$app установлено';
+  }
+
+  @override
+  String phoneInstallCancelled(String app) {
+    return '$app не установлено';
+  }
+
+  @override
+  String phoneInstallMismatch(String app, String name) {
+    return '$app не соответствует описанию от $name, поэтому не установлено.';
+  }
+
+  @override
+  String phoneInstallOtherSigner(String app) {
+    return '$app на этом телефоне от другого разработчика. Android не может его обновить.';
+  }
+
+  @override
+  String phoneInstallFailed(String app, String reason) {
+    return '$app не установлено: $reason';
+  }
+
+  @override
+  String get news035PhonesTitle => 'Два телефона, без компьютера';
+
+  @override
+  String get news035PhonesBody =>
+      'Откройте сопряжённый телефон: отправьте скопированное, заметку или ссылку, заставьте его зазвонить или выберите фото и файлы по дням.';
+
+  @override
+  String get news035AppsTitle => 'Отправляйте приложения на другой телефон';
+
+  @override
+  String get news035AppsBody =>
+      'Linksy покажет, чего там нет или что устарело, а Android спросит перед установкой. Данные и входы не переносятся.';
+
+  @override
+  String get phoneNote => 'Заметка';
+
+  @override
+  String get phoneWhereShort => 'Где';
+
+  @override
+  String get phoneShelfPhotos => 'Фото';
+
+  @override
+  String get phoneSeeAll => 'Показать все';
+
+  @override
+  String get phoneSelectDay => 'Выбрать день';
+
+  @override
+  String get phoneHistory => 'История';
 }

@@ -801,12 +801,6 @@ class AppLocalizationsEn extends AppLocalizations {
       'Straight over your Wi-Fi. No account, no cloud.';
 
   @override
-  String get homeScanQr => 'Scan QR code';
-
-  @override
-  String get homePairByAddress => 'Pair by address instead';
-
-  @override
   String get pairingAddDevice => 'Add a device';
 
   @override
@@ -2747,4 +2741,262 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get noticeAccessOpen => 'Open Notification access';
+
+  @override
+  String get phoneClipboard => 'Send clipboard';
+
+  @override
+  String phoneClipboardCaption(String name) {
+    return 'What\'s copied here goes to $name';
+  }
+
+  @override
+  String get phoneNoteHint => 'A note or a link';
+
+  @override
+  String get phoneSend => 'Send';
+
+  @override
+  String phoneFind(String name) {
+    return 'Find $name';
+  }
+
+  @override
+  String get phoneFindCaption => 'It rings loud, even on silent';
+
+  @override
+  String get phoneWhere => 'Where is it?';
+
+  @override
+  String get phoneWhereCaption => 'Asks for its location, once';
+
+  @override
+  String phoneWhereRefused(String name, String reason) {
+    return '$name didn\'t say where it is: $reason';
+  }
+
+  @override
+  String get phoneFromThis => 'From this phone';
+
+  @override
+  String get phonePhotos => 'Photos and videos';
+
+  @override
+  String get phonePhotosCaption => 'By day or album';
+
+  @override
+  String get phoneAllowPhotos => 'Allow photos';
+
+  @override
+  String get phoneAllowPhotosCaption =>
+      'Linksy needs this to show your photos here. Nothing goes until you send it.';
+
+  @override
+  String get phoneFiles => 'Files and folders';
+
+  @override
+  String get phoneFilesCaption => 'With Android\'s file picker';
+
+  @override
+  String get phoneChooseFiles => 'Choose files';
+
+  @override
+  String get phoneChooseFolder => 'Choose a folder';
+
+  @override
+  String get phoneApps => 'Apps';
+
+  @override
+  String get phoneAppsCaption => 'Send an app, or update one';
+
+  @override
+  String get phoneAppsNote =>
+      'An app\'s data and logins don\'t move. Apps that check a licence or an account may refuse to run.';
+
+  @override
+  String get phoneAppsSearch => 'Search apps';
+
+  @override
+  String get phoneSortName => 'Name';
+
+  @override
+  String get phoneSortSize => 'Size';
+
+  @override
+  String phoneAppNotThere(String name) {
+    return 'Not on $name';
+  }
+
+  @override
+  String get phoneAppUpdate => 'Update (older there)';
+
+  @override
+  String get phoneAppSame => 'Already there';
+
+  @override
+  String get phoneAppNewer => 'Newer there';
+
+  @override
+  String phoneAppOtherSigner(String name) {
+    return '$name has it from another developer. Android can\'t update it, only replace it, and that deletes its data.';
+  }
+
+  @override
+  String get phoneAllAlbums => 'All';
+
+  @override
+  String get phoneNoPhotos => 'No photos here yet';
+
+  @override
+  String get phoneNoApps => 'No apps to send';
+
+  @override
+  String phoneSelected(int count, String size) {
+    return '$count selected · $size';
+  }
+
+  @override
+  String phoneSendTo(String name) {
+    return 'Send to $name';
+  }
+
+  @override
+  String get phoneClear => 'Clear';
+
+  @override
+  String get routeDirect => 'Direct link';
+
+  @override
+  String get routeLan => 'Same network';
+
+  @override
+  String get routeAway => 'Over the internet · uses mobile data';
+
+  @override
+  String get routeUsb => 'Cable';
+
+  @override
+  String routeAbout(String time) {
+    return 'about $time';
+  }
+
+  @override
+  String get routeSettingUp => 'Setting up a direct link…';
+
+  @override
+  String routeNotDirect(String reason) {
+    return 'Couldn\'t go direct: $reason. Sending over the network.';
+  }
+
+  @override
+  String warnNoRoom(String name, String free, String size) {
+    return '$name has $free free and this is $size';
+  }
+
+  @override
+  String warnWillAsk(String name) {
+    return '$name will ask before taking it';
+  }
+
+  @override
+  String warnCantInstall(String name) {
+    return '$name needs to allow installs from Linksy first';
+  }
+
+  @override
+  String warnCantInstallHow(String name) {
+    return 'On $name: Android\'s Settings › Apps › Special app access › Install unknown apps › Linksy.';
+  }
+
+  @override
+  String get mobileDataTitle => 'Send over the internet?';
+
+  @override
+  String mobileDataAsk(String size) {
+    return 'This goes over the internet and uses about $size of mobile data.';
+  }
+
+  @override
+  String phoneInstallAsk(int count, String name) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'Install $count apps from $name?',
+      one: 'Install an app from $name?',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get phoneAppNew => 'New';
+
+  @override
+  String get phoneAppUpdateShort => 'Update';
+
+  @override
+  String get phoneInstall => 'Install';
+
+  @override
+  String get phoneInstallAllowBody =>
+      'Android needs your OK once before Linksy can install apps. Turn on Allow from this source, then come back.';
+
+  @override
+  String get phoneInstallAllow => 'Allow installs';
+
+  @override
+  String phoneInstalled(String app) {
+    return '$app is installed';
+  }
+
+  @override
+  String phoneInstallCancelled(String app) {
+    return '$app wasn\'t installed';
+  }
+
+  @override
+  String phoneInstallMismatch(String app, String name) {
+    return '$app isn\'t what $name said it was, so it wasn\'t installed.';
+  }
+
+  @override
+  String phoneInstallOtherSigner(String app) {
+    return '$app on this phone is from another developer. Android can\'t update it.';
+  }
+
+  @override
+  String phoneInstallFailed(String app, String reason) {
+    return '$app wasn\'t installed: $reason';
+  }
+
+  @override
+  String get news035PhonesTitle => 'Two phones, no computer';
+
+  @override
+  String get news035PhonesBody =>
+      'Open a paired phone: send what you copied, a note or a link, make it ring, or pick photos and files by day.';
+
+  @override
+  String get news035AppsTitle => 'Send apps to another phone';
+
+  @override
+  String get news035AppsBody =>
+      'Linksy shows what\'s missing or older there, and Android asks before installing. An app\'s data and logins stay behind.';
+
+  @override
+  String get phoneNote => 'Note';
+
+  @override
+  String get phoneWhereShort => 'Where';
+
+  @override
+  String get phoneShelfPhotos => 'Photos';
+
+  @override
+  String get phoneSeeAll => 'See all';
+
+  @override
+  String get phoneSelectDay => 'Select day';
+
+  @override
+  String get phoneHistory => 'History';
 }

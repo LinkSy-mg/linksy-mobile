@@ -807,12 +807,6 @@ class AppLocalizationsMg extends AppLocalizations {
       'Mivantana amin\'ny Wi-Fi-nao. Tsy mila kaonty, tsy misy cloud.';
 
   @override
-  String get homeScanQr => 'Vakio ny QR code';
-
-  @override
-  String get homePairByAddress => 'Ampifandraiso amin\'ny adiresy';
-
-  @override
   String get pairingAddDevice => 'Hanampy fitaovana';
 
   @override
@@ -2772,4 +2766,264 @@ class AppLocalizationsMg extends AppLocalizations {
 
   @override
   String get noticeAccessOpen => 'Sokafy ny Fidirana amin\'ny fampandrenesana';
+
+  @override
+  String get phoneClipboard => 'Alefaso ny clipboard';
+
+  @override
+  String phoneClipboardCaption(String name) {
+    return 'Izay nadika eto dia mankany amin\'i $name';
+  }
+
+  @override
+  String get phoneNoteHint => 'Fanamarihana na rohy';
+
+  @override
+  String get phoneSend => 'Alefaso';
+
+  @override
+  String phoneFind(String name) {
+    return 'Tadiavo i $name';
+  }
+
+  @override
+  String get phoneFindCaption => 'Maneno mafy, na dia mangina aza';
+
+  @override
+  String get phoneWhere => 'Aiza izy?';
+
+  @override
+  String get phoneWhereCaption =>
+      'Manontany ny toerana misy azy, indray mandeha';
+
+  @override
+  String phoneWhereRefused(String name, String reason) {
+    return 'Tsy nilaza ny toerana misy azy i $name: $reason';
+  }
+
+  @override
+  String get phoneFromThis => 'Avy amin\'ity finday ity';
+
+  @override
+  String get phonePhotos => 'Sary sy horonan-tsary';
+
+  @override
+  String get phonePhotosCaption => 'Isan\'andro na isaky ny album';
+
+  @override
+  String get phoneAllowPhotos => 'Avelao ny sary';
+
+  @override
+  String get phoneAllowPhotosCaption =>
+      'Ilain\'i Linksy izany mba hasehoana ny sarinao eto. Tsy misy lasa raha tsy alefanao.';
+
+  @override
+  String get phoneFiles => 'Rakitra sy lahatahiry';
+
+  @override
+  String get phoneFilesCaption => 'Amin\'ny mpisafidy rakitra an\'i Android';
+
+  @override
+  String get phoneChooseFiles => 'Misafidiana rakitra';
+
+  @override
+  String get phoneChooseFolder => 'Misafidiana lahatahiry';
+
+  @override
+  String get phoneApps => 'Fampiharana';
+
+  @override
+  String get phoneAppsCaption => 'Alefaso na havaozy ny fampiharana';
+
+  @override
+  String get phoneAppsNote =>
+      'Tsy mifindra ny angon-drakitra sy ny fidirana. Mety tsy handeha ny fampiharana manamarina lisansa na kaonty.';
+
+  @override
+  String get phoneAppsSearch => 'Karohy ny fampiharana';
+
+  @override
+  String get phoneSortName => 'Anarana';
+
+  @override
+  String get phoneSortSize => 'Habe';
+
+  @override
+  String phoneAppNotThere(String name) {
+    return 'Tsy ao amin\'i $name';
+  }
+
+  @override
+  String get phoneAppUpdate => 'Fanavaozana (taloha kokoa any)';
+
+  @override
+  String get phoneAppSame => 'Efa any';
+
+  @override
+  String get phoneAppNewer => 'Vaovao kokoa any';
+
+  @override
+  String phoneAppOtherSigner(String name) {
+    return 'Avy amin\'ny mpamorona hafa no an\'i $name. Tsy afaka manavao azy i Android, afaka manolo fotsiny, ary mamafa ny angon-drakiny izany.';
+  }
+
+  @override
+  String get phoneAllAlbums => 'Rehetra';
+
+  @override
+  String get phoneNoPhotos => 'Mbola tsy misy sary eto';
+
+  @override
+  String get phoneNoApps => 'Tsy misy fampiharana halefa';
+
+  @override
+  String phoneSelected(int count, String size) {
+    return '$count voafidy · $size';
+  }
+
+  @override
+  String phoneSendTo(String name) {
+    return 'Alefaso any amin\'i $name';
+  }
+
+  @override
+  String get phoneClear => 'Fafao';
+
+  @override
+  String get routeDirect => 'Rohy mivantana';
+
+  @override
+  String get routeLan => 'Tambajotra iray ihany';
+
+  @override
+  String get routeAway => 'Amin\'ny aterineto · mampiasa angona finday';
+
+  @override
+  String get routeUsb => 'Tariby';
+
+  @override
+  String routeAbout(String time) {
+    return 'manodidina ny $time';
+  }
+
+  @override
+  String get routeSettingUp => 'Manomana rohy mivantana…';
+
+  @override
+  String routeNotDirect(String reason) {
+    return 'Tsy afaka nivantana: $reason. Alefa amin\'ny tambajotra.';
+  }
+
+  @override
+  String warnNoRoom(String name, String free, String size) {
+    return '$free no malalaka ao amin\'i $name ary $size ity';
+  }
+
+  @override
+  String warnWillAsk(String name) {
+    return 'Hanontany i $name alohan\'ny handraisana azy';
+  }
+
+  @override
+  String warnCantInstall(String name) {
+    return 'Mila avelan\'i $name aloha ny fametrahana avy amin\'i Linksy';
+  }
+
+  @override
+  String warnCantInstallHow(String name) {
+    return 'Ao amin\'i $name: Fikirana Android › Fampiharana › Fidirana manokana › Fametrahana fampiharana tsy fantatra › Linksy.';
+  }
+
+  @override
+  String get mobileDataTitle => 'Halefa amin\'ny aterineto ve?';
+
+  @override
+  String mobileDataAsk(String size) {
+    return 'Mandeha amin\'ny aterineto izy ary mampiasa angona finday manodidina ny $size.';
+  }
+
+  @override
+  String phoneInstallAsk(int count, String name) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'Hametraka fampiharana $count avy amin\'i $name?',
+      one: 'Hametraka fampiharana avy amin\'i $name?',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get phoneAppNew => 'Vaovao';
+
+  @override
+  String get phoneAppUpdateShort => 'Fanavaozana';
+
+  @override
+  String get phoneInstall => 'Apetraho';
+
+  @override
+  String get phoneInstallAllowBody =>
+      'Mila ny fanekenao indray mandeha i Android vao afaka mametraka fampiharana i Linksy. Alefaso ny Avelao avy amin\'ity loharano ity, dia miverena.';
+
+  @override
+  String get phoneInstallAllow => 'Avelao ny fametrahana';
+
+  @override
+  String phoneInstalled(String app) {
+    return 'Tafapetraka i $app';
+  }
+
+  @override
+  String phoneInstallCancelled(String app) {
+    return 'Tsy tafapetraka i $app';
+  }
+
+  @override
+  String phoneInstallMismatch(String app, String name) {
+    return 'Tsy mitovy amin\'izay nolazain\'i $name i $app, ka tsy napetraka.';
+  }
+
+  @override
+  String phoneInstallOtherSigner(String app) {
+    return 'Avy amin\'ny mpamorona hafa i $app amin\'ity finday ity. Tsy afaka manavao azy i Android.';
+  }
+
+  @override
+  String phoneInstallFailed(String app, String reason) {
+    return 'Tsy tafapetraka i $app: $reason';
+  }
+
+  @override
+  String get news035PhonesTitle => 'Finday roa, tsy mila solosaina';
+
+  @override
+  String get news035PhonesBody =>
+      'Sokafy ny finday mifandray: alefaso izay nadikanao, fanamarihana na rohy, ampanenoy, na misafidiana sary sy rakitra isan\'andro.';
+
+  @override
+  String get news035AppsTitle =>
+      'Alefaso any amin\'ny finday hafa ny fampiharana';
+
+  @override
+  String get news035AppsBody =>
+      'Asehon\'i Linksy izay tsy ao na taloha kokoa any, ary manontany i Android alohan\'ny hametrahana. Tsy mifindra ny angon-drakitra sy ny fidirana.';
+
+  @override
+  String get phoneNote => 'Fanamarihana';
+
+  @override
+  String get phoneWhereShort => 'Aiza';
+
+  @override
+  String get phoneShelfPhotos => 'Sary';
+
+  @override
+  String get phoneSeeAll => 'Jereo daholo';
+
+  @override
+  String get phoneSelectDay => 'Fidio ilay andro';
+
+  @override
+  String get phoneHistory => 'Tantara';
 }
