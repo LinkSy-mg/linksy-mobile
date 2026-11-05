@@ -13,6 +13,13 @@ All notable changes to Linksy for Android. Format: [Keep a Changelog](https://ke
 - History with a phone reads as a conversation, newest first: photos, apps, files, links and what you copied, each shown as itself, with Open on an app that came and Copy on text that came.
 - A computer's Ask the Phone: a sheet when Linksy is open, a notification when it isn't, for the Inbox or the Gallery.
 
+- **Snap to Computer**: from a computer's page or a Quick Settings tile, the camera opens and the picture goes to that computer, as a file and on its clipboard. It stays in Pictures/Linksy here too.
+- **Copy to Computer** in Android's menu over selected text, and Settings › Connection › Send what you copy (off by default) for what you copied when you come back to Linksy.
+- **Why can't I see my computer?** in Settings › Connection, and on a computer that isn't connected: Wi-Fi, a VPN, battery saving, Data Saver and whether anything is heard on the network, each with what to do.
+- **Connect by USB Cable** on a computer's page while this phone is plugged into it.
+- The terminal's key bar has Home, End, PgUp, PgDn and Ctrl-C.
+- A computer's screen shows at the phone's fastest refresh rate.
+
 ### Changed
 
 - Files on their way: a bar along the bottom of a device's page, with the way they go, instead of the circle. Tap it to open it up, to the speed, each file and Cancel.

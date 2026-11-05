@@ -34,3 +34,12 @@ is hidden, and covers decode at the size shown. Device pictures are stored downs
 (`Pictures.kt`).
 
 Still to measure on a real phone (Graphics, which the emulator doesn't report).
+
+## 2026-11-05, before 0.3.5 (emulator, demo build, arm64)
+
+| | Open, idle 20 s | Background 30 s |
+|---|---|---|
+| Total PSS | 81 MB | 84 MB |
+| Total RSS | 188 MB | 192 MB |
+
+Under the 100 MB target on the emulator. Still to measure on a real phone.
