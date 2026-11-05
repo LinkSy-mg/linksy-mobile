@@ -144,15 +144,34 @@ class _LinksyAppState extends State<LinksyApp> {
   }
 
   Future<void> _shareOut(SharedIn shared) async {
-    final context = _navigator.currentContext;
-    if (context == null) return;
     // A device picked in Android's share sheet: no need to ask which.
-    final to = shared.device;
-    if (to != null && widget.controller.device(to)?.trusted == true) {
-      final message = await sendShared(widget.controller, to, shared);
+    final c = widget.controller;
+    List<String> near() => [
+      for (final v in c.paired)
+        if (v.presence != Presence.notNearby &&
+            v.device.kind != DeviceKind.phone &&
+            v.device.kind != DeviceKind.tablet)
+          v.device.id,
+    ];
+    // Opened by this very snap or copy, Linksy needs a moment to find it.
+    for (var i = 0; shared.quick && near().isEmpty && i < 8; i++) {
+      await Future<void>.delayed(const Duration(milliseconds: 250));
+    }
+    final live = near();
+    final to =
+        shared.device ??
+        (shared.quick && live.length == 1 ? live.single : null);
+    if (to != null && c.device(to)?.trusted == true) {
+      final message = await sendShared(c, to, shared);
       if (message != null) _say(message);
+      // Back to what was on screen, for a snap or text from another app.
+      if (shared.quick && shared.device == null) {
+        await LinksyPlatform.toBackground();
+      }
       return;
     }
+    final context = _navigator.currentContext;
+    if (context == null || !context.mounted) return;
     showModalBottomSheet<void>(
       context: context,
       isScrollControlled: true,

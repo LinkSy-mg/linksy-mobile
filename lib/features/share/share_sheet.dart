@@ -33,7 +33,7 @@ class ShareSheet extends StatefulWidget {
 
 class _ShareSheetState extends State<ShareSheet> {
   /// For a link: open it, or send the text to the clipboard instead.
-  bool _asText = false;
+  late bool _asText = widget.shared.quick;
 
   /// For one file: onto the computer's clipboard instead of its Downloads.
   bool _toClipboard = false;
@@ -265,8 +265,12 @@ Future<String?> sendShared(
     await Future<void>.delayed(const Duration(milliseconds: 500));
   }
   switch (shared) {
+    case SharedFiles(:final paths) when shared.quick:
+      return await c.snap(deviceId, paths.single) ?? tr.snapSent(name);
     case SharedFiles(:final paths):
       return c.sendFiles(deviceId, paths);
+    case SharedText(:final text) when shared.quick:
+      return await c.sendText(deviceId, text) ?? tr.copySent(name);
     case SharedText(:final text):
       final link = findWebLink(text);
       if (link != null) {

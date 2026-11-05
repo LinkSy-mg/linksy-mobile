@@ -13,6 +13,7 @@ abstract final class Ph {
     fontFamily: 'PhosphorRegular',
   );
   static const bellRinging = IconData(0xe5e8, fontFamily: 'PhosphorRegular');
+  static const camera = IconData(0xe10e, fontFamily: 'PhosphorRegular');
   static const cameraSlash = IconData(0xe110, fontFamily: 'PhosphorRegular');
   static const caretRight = IconData(0xe13a, fontFamily: 'PhosphorRegular');
   static const caretDown = IconData(0xe136, fontFamily: 'PhosphorRegular');

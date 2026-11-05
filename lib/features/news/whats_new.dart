@@ -41,6 +41,12 @@ final List<(String, List<Highlight>)> _releases = [
         (l) => l.news035AppsTitle,
         (l) => l.news035AppsBody,
       ),
+      Highlight(Ph.camera, (l) => l.news035SnapTitle, (l) => l.news035SnapBody),
+      Highlight(
+        Ph.clipboardText,
+        (l) => l.news035CopyTitle,
+        (l) => l.news035CopyBody,
+      ),
     ],
   ),
   (

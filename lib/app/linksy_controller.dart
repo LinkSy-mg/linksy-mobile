@@ -232,6 +232,77 @@ class LinksyController extends ChangeNotifier with WidgetsBindingObserver {
   String? get ownPicture => prefs['own_picture'];
   bool watchesClipboard(String id) => prefs['clip_watch.$id'] == 'on';
 
+  /// What's copied goes to connected computers while Linksy is open. Off
+  /// until asked for: what's copied can be a password, and Android says so
+  /// with a toast each time it's read.
+  bool get sendsCopied => prefs['send_copied'] == 'on';
+
+  /// The last text seen on either side, so it isn't sent back or sent twice.
+  String? _lastCopied;
+
+  Future<void> setSendsCopied(bool on) async {
+    await setPref('send_copied', on ? 'on' : 'off');
+    // What's there already isn't news.
+    if (on) _lastCopied = await _copiedNow();
+    notifyListeners();
+  }
+
+  Future<String> _copiedNow() async =>
+      (await Clipboard.getData(Clipboard.kTextPlain))?.text ?? '';
+
+  Future<void> _sendCopied() async {
+    if (!sendsCopied) return;
+    // Android lets the app read it once it has the focus.
+    await Future<void>.delayed(const Duration(milliseconds: 300));
+    final text = await _copiedNow();
+    final last = _lastCopied;
+    _lastCopied = text;
+    if (last == null || text.isEmpty || text == last) return;
+    for (final v in devices) {
+      if (v.trusted && v.connected && _isComputer(v.device)) {
+        await sendText(v.device.id, text);
+      }
+    }
+  }
+
+  /// A picture just taken, for [id]: as a file, and on its clipboard when it
+  /// takes one, ready to paste.
+  Future<String?> snap(String id, String path) async {
+    final error = await sendFiles(id, [path]);
+    if (error != null) return error;
+    final view = device(id);
+    final file = File(path);
+    if ((view?.device.features.contains('clipboard_file') ?? false) &&
+        file.existsSync() &&
+        file.lengthSync() <= 10 * 1024 * 1024) {
+      await _run(() => node.sendClipboardFile(id, path));
+    }
+    return null;
+  }
+
+  /// The computers saying what's plugged into them.
+  final _plugged = <String, List<PluggedPhone>>{};
+  bool _onUsbHost = false;
+  (String, String) _model = ('', '');
+
+  Future<void> _readUsbHost() async {
+    final now = await LinksyPlatform.usbPlugged();
+    if (_model.$1.isEmpty) _model = await LinksyPlatform.phoneModel();
+    if (now == _onUsbHost) return;
+    _onUsbHost = now;
+    notifyListeners();
+  }
+
+  /// The plugged-in phone to ask [id] to use the cable for, if this one is
+  /// plugged in and not on the cable yet (§4.11).
+  String? usbOffer(String id) {
+    if (!_onUsbHost || (device(id)?.usb ?? false)) return null;
+    return usbKeyFor(_plugged[id] ?? const [], _model.$1, _model.$2);
+  }
+
+  Future<String?> connectUsb(String id, String key) =>
+      _run(() => node.usbConnect(id, key));
+
   /// The picture to show for [id]: the one chosen here, else its own.
   String? pictureOf(String id) => pictures[id] ?? _received[id];
 
@@ -574,6 +645,8 @@ class LinksyController extends ChangeNotifier with WidgetsBindingObserver {
   void didChangeAppLifecycleState(AppLifecycleState state) {
     if (state == AppLifecycleState.resumed) {
       _importAll();
+      unawaited(_sendCopied());
+      unawaited(_readUsbHost());
       unawaited(updates.recheck());
       // Back from Notification access or App info, maybe.
       unawaited(refreshNotificationAccess());
@@ -1756,6 +1829,7 @@ class LinksyController extends ChangeNotifier with WidgetsBindingObserver {
   }
 
   void _onEvent(LinksyEvent e) {
+    if (e is ClipboardReceived) _lastCopied = e.text;
     _logEvent(e);
     switch (e) {
       case Connected(:final id):
@@ -1779,6 +1853,10 @@ class LinksyController extends ChangeNotifier with WidgetsBindingObserver {
         _onPicture(from, image);
       case LocateRequested(:final from):
         _onLocate(from);
+      case UsbPlugged(:final from, :final phones):
+        _plugged[from.id] = phones;
+        unawaited(_readUsbHost());
+        notifyListeners();
       case ClipboardFileReceived(:final from, :final path):
         _onClipboardFile(from, path);
       case ClipboardWatchChanged():
@@ -2741,3 +2819,17 @@ class UsbPairOffer extends UsbNews {
 /// How far a direct link got: finding the computer, connecting to it, the
 /// link coming up over the new network, and up.
 enum DirectStage { find, connect, link, up }
+
+/// Which of [phones] is this one (§4.11): the one with its maker and model, or
+/// the only one that could be. Only one that isn't on the cable already.
+String? usbKeyFor(List<PluggedPhone> phones, String maker, String model) {
+  final free = [
+    for (final p in phones)
+      if (p.state == 'plugged' || p.state == 'failed') p,
+  ];
+  bool same(String a, String b) => a.toLowerCase() == b.toLowerCase();
+  for (final p in free) {
+    if (same(p.manufacturer, maker) && same(p.product, model)) return p.key;
+  }
+  return free.length == 1 ? free.single.key : null;
+}

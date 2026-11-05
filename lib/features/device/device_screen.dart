@@ -17,6 +17,7 @@ import '../../ui/l10n.dart';
 import '../../ui/sig.dart';
 import '../phones/phone_page.dart';
 import '../remote/remote_screen.dart';
+import '../settings/doctor.dart';
 import '../settings/settings_kit.dart';
 import '../sharing/sharing.dart';
 import '../sharing/webcam_screen.dart';
@@ -631,10 +632,41 @@ class _Actions extends StatelessWidget {
                     onTap: () => c.ping(id),
                   ),
                 ),
+                Expanded(
+                  child: QuickAction(
+                    icon: Ph.camera,
+                    label: context.l10n.deviceSnap,
+                    onTap: () async {
+                      await LinksyPlatform.snap(id);
+                      return null;
+                    },
+                  ),
+                ),
                 Expanded(child: FindAction(view: view)),
               ],
             ),
           ),
+          if (c.usbOffer(id) case final key?)
+            Padding(
+              padding: const EdgeInsets.only(bottom: 10),
+              child: SmallAction(
+                label: context.l10n.usbConnectCable,
+                icon: Ph.usb,
+                onTap: () => c.connectUsb(id, key),
+              ),
+            ),
+          if (view.presence == Presence.notNearby)
+            Padding(
+              padding: const EdgeInsets.only(bottom: 10),
+              child: SmallAction(
+                label: context.l10n.doctorTitle,
+                onTap: () => Navigator.of(context).push(
+                  MaterialPageRoute<void>(
+                    builder: (_) => const ConnectionDoctor(),
+                  ),
+                ),
+              ),
+            ),
         ],
       ),
     );

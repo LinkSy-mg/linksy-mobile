@@ -44,6 +44,7 @@ class _DisplayScreenState extends State<DisplayScreen> {
   @override
   void initState() {
     super.initState();
+    LinksyPlatform.highRefresh(on: true);
     SystemChrome.setPreferredOrientations([
       DeviceOrientation.landscapeLeft,
       DeviceOrientation.landscapeRight,
@@ -81,6 +82,7 @@ class _DisplayScreenState extends State<DisplayScreen> {
 
   @override
   void dispose() {
+    LinksyPlatform.highRefresh(on: false);
     for (final s in _subs) {
       s.cancel();
     }

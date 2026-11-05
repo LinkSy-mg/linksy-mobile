@@ -13,6 +13,7 @@ import '../news/whats_new.dart';
 import '../onboarding/language_wheel.dart';
 import '../permissions/permissions_sheet.dart';
 import 'battery_guide.dart';
+import 'doctor.dart';
 import 'phone_notifications.dart';
 import 'turn_on.dart';
 import 'settings_kit.dart';
@@ -572,6 +573,27 @@ class ConnectionSettings extends StatelessWidget {
               trailing: Switch(
                 value: c.stayRunning,
                 onChanged: c.setStayRunning,
+              ),
+            ),
+            SettingRow(
+              id: 'doctor',
+              icon: Ph.wifiHigh,
+              title: l.doctorTitle,
+              caption: l.doctorCaption,
+              onTap: () => Navigator.of(context).push(
+                MaterialPageRoute<void>(
+                  builder: (_) => const ConnectionDoctor(),
+                ),
+              ),
+            ),
+            SettingRow(
+              id: 'copied',
+              icon: Ph.clipboardText,
+              title: l.settingsSendCopied,
+              caption: l.settingsSendCopiedCaption,
+              trailing: Switch(
+                value: c.sendsCopied,
+                onChanged: c.setSendsCopied,
               ),
             ),
             SettingRow(

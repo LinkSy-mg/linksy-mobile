@@ -7,20 +7,24 @@ import '../core/models.dart';
 
 /// Something another app shared to Linksy: text (maybe a link) or files.
 sealed class SharedIn {
-  const SharedIn({this.device});
+  const SharedIn({this.device, this.quick = false});
 
   /// The device picked in Android's share sheet, if one was: send straight
   /// to it, without asking.
   final String? device;
+
+  /// A snap or copied text: to the one connected computer without asking,
+  /// then back to what was on screen.
+  final bool quick;
 }
 
 class SharedText extends SharedIn {
-  const SharedText(this.text, {super.device});
+  const SharedText(this.text, {super.device, super.quick});
   final String text;
 }
 
 class SharedFiles extends SharedIn {
-  const SharedFiles(this.paths, {super.device});
+  const SharedFiles(this.paths, {super.device, super.quick});
 
   /// Copies in the app's cache.
   final List<String> paths;
@@ -144,13 +148,14 @@ abstract final class LinksyPlatform {
   static SharedIn? _shared(Object? args) {
     if (args is! Map) return null;
     final device = args['device'] as String?;
+    final quick = args['quick'] == true;
     final files = (args['files'] as List?)?.cast<String>();
     if (files != null && files.isNotEmpty) {
-      return SharedFiles(files, device: device);
+      return SharedFiles(files, device: device, quick: quick);
     }
     final text = args['text'];
     return text is String && text.trim().isNotEmpty
-        ? SharedText(text, device: device)
+        ? SharedText(text, device: device, quick: quick)
         : null;
   }
 
@@ -515,6 +520,34 @@ abstract final class LinksyPlatform {
   /// A small JPEG of one of them.
   static Future<Uint8List?> phoneThumb(int id, {required bool video}) =>
       _call<Uint8List>('phoneThumb', {'id': id, 'video': video});
+
+  /// Opens the camera, and sends the picture to [device], or asks where.
+  static Future<void> snap([String? device]) => _call<void>('snap', device);
+
+  /// The display at its fastest while a screen is shown.
+  static Future<void> highRefresh({required bool on}) =>
+      _call<void>('highRefresh', on);
+
+  /// Plugged into something by USB that isn't only a charger, as far as
+  /// Android says.
+  static Future<bool> usbPlugged() async =>
+      await _call<bool>('usbPlugged') ?? false;
+
+  /// Who made this phone, and its model.
+  static Future<(String, String)> phoneModel() async {
+    final m = await _call<Map<Object?, Object?>>('phoneModel');
+    return (m?['maker'] as String? ?? '', m?['model'] as String? ?? '');
+  }
+
+  /// What the Connection Doctor looks at.
+  static Future<Map<String, bool>> connectionFacts() async =>
+      (await _call<Map<Object?, Object?>>('connectionFacts'))
+          ?.cast<String, bool>() ??
+      const {};
+
+  /// A page of Android's settings: `wifi`, `vpn`, `saver` or `data`.
+  static Future<void> openSystem(String page) =>
+      _call<void>('openSystem', page);
 
   /// A small JPEG of a file, by its path or `content://` URI; null if gone.
   static Future<Uint8List?> thumbOf(String ref) =>
