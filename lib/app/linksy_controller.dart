@@ -21,6 +21,20 @@ import 'activity.dart';
 import 'platform.dart';
 import 'terminals.dart';
 
+/// The Inbox is on by default since 0.3.4; until then the switch was off
+/// unless turned on, so no pref with Android's access already given means it
+/// was turned off. What to write, once.
+Map<String, String> inboxDefaultPrefs(
+  Map<String, String> prefs, {
+  required bool access,
+}) => {
+  if (prefs['inbox_default'] == null) ...{
+    'inbox_default': 'done',
+    if (prefs['phone_notifications'] == null && access)
+      'phone_notifications': 'off',
+  },
+};
+
 /// App state on top of a [LinksyNode]: the device list, settings and every
 /// device's activity. Consent prompts and notices go out on [prompts] for the
 /// UI to show.
@@ -980,8 +994,12 @@ class LinksyController extends ChangeNotifier with WidgetsBindingObserver {
 
   // This phone's notifications on its computers (§4.5).
 
-  /// Wanted, in Settings; they go once Android allows [notificationAccess].
-  bool get phoneNotifications => prefs['phone_notifications'] == 'on';
+  /// On unless turned off; they go once Android allows [notificationAccess].
+  bool get phoneNotifications => prefs['phone_notifications'] != 'off';
+
+  /// Turned on here, and Android hasn't allowed it yet.
+  bool get notificationAccessMissing =>
+      prefs['phone_notifications'] == 'on' && !notificationAccess;
 
   /// Android lets Linksy read notifications (Notification access).
   bool notificationAccess = false;
@@ -999,7 +1017,7 @@ class LinksyController extends ChangeNotifier with WidgetsBindingObserver {
   bool get notificationAccessAsked => prefs['notification_asked'] == 'on';
 
   Future<void> setPhoneNotifications(bool on) async {
-    await _setPref('phone_notifications', on ? 'on' : null);
+    await _setPref('phone_notifications', on ? 'on' : 'off');
     // Turned off: the conversations kept for the computers go too.
     if (!on) await LinksyPlatform.forgetInbox();
     await _mirror();

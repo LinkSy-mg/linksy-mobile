@@ -71,9 +71,15 @@ Future<void> main() async {
   final direct = prefs['direct'] != 'off' && await LinksyPlatform.directHost();
   // This phone's notifications on its computers (§4.5), told at the start;
   // the controller tells them again when they're turned on or off.
-  final notifications =
-      prefs['phone_notifications'] == 'on' &&
-      await LinksyPlatform.notificationAccess();
+  final access = await LinksyPlatform.notificationAccess();
+  for (final MapEntry(:key, :value) in inboxDefaultPrefs(
+    prefs,
+    access: access,
+  ).entries) {
+    prefs[key] = value;
+    await LinksyPlatform.setPref(key, value);
+  }
+  final notifications = prefs['phone_notifications'] != 'off' && access;
 
   final LinksyNode node;
   if (_demo) {

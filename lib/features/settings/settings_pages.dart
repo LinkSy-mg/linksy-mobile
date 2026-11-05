@@ -775,11 +775,11 @@ class ComputersSettings extends StatelessWidget {
               id: 'notifications',
               icon: Ph.bellRinging,
               title: l.settingsPhoneNotifications,
-              caption: c.phoneNotifications && !c.notificationAccess
+              caption: c.notificationAccessMissing
                   ? l.settingsPhoneNotificationsAllow
                   : l.settingsPhoneNotificationsCaption,
-              warn: c.phoneNotifications && !c.notificationAccess,
-              onTap: c.phoneNotifications && !c.notificationAccess
+              warn: c.notificationAccessMissing,
+              onTap: c.notificationAccessMissing
                   ? () => allowPhoneNotifications(context)
                   : null,
               trailing: Switch(
