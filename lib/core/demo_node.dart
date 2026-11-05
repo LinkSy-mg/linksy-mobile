@@ -33,6 +33,11 @@ class DemoNode implements LinksyNode {
   DeviceInfo info;
 
   NodeSettings _settings;
+  static const _step = int.fromEnvironment(
+    'LINKSY_DEMO_STEP',
+    defaultValue: 300,
+  );
+
   final _events = StreamController<LinksyEvent>.broadcast();
   final _devices = <String, DeviceView>{};
   final _random = Random();
@@ -327,9 +332,12 @@ class DemoNode implements LinksyNode {
         total: total,
       ),
     );
-    // About three seconds whatever the size, in ten steps.
+    // About three seconds whatever the size, in ten steps; a longer look with
+    // `--dart-define=LINKSY_DEMO_STEP=<ms>`.
     var sent = 0;
-    _timers[transfer] = Timer.periodic(const Duration(milliseconds: 300), (t) {
+    _timers[transfer] = Timer.periodic(const Duration(milliseconds: _step), (
+      t,
+    ) {
       sent = min(total, sent + (total / 10).ceil());
       _emit(TransferProgress(transfer: transfer, bytes: sent, total: total));
       if (sent >= total) {
