@@ -4961,6 +4961,180 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'History'**
   String get phoneHistory;
+
+  /// Snap, Copy to Computer, Connection Doctor or USB button.
+  ///
+  /// In en, this message translates to:
+  /// **'Snap'**
+  String get deviceSnap;
+
+  /// Snap, Copy to Computer, Connection Doctor or USB button.
+  ///
+  /// In en, this message translates to:
+  /// **'Picture sent to {name}'**
+  String snapSent(String name);
+
+  /// Snap, Copy to Computer, Connection Doctor or USB button.
+  ///
+  /// In en, this message translates to:
+  /// **'Copied to {name}'**
+  String copySent(String name);
+
+  /// Snap, Copy to Computer, Connection Doctor or USB button.
+  ///
+  /// In en, this message translates to:
+  /// **'Connect by USB Cable'**
+  String get usbConnectCable;
+
+  /// Snap, Copy to Computer, Connection Doctor or USB button.
+  ///
+  /// In en, this message translates to:
+  /// **'Send what you copy'**
+  String get settingsSendCopied;
+
+  /// Snap, Copy to Computer, Connection Doctor or USB button.
+  ///
+  /// In en, this message translates to:
+  /// **'Each time you come back to Linksy, what you copied goes to connected computers. Passwords too, so leave it off if unsure.'**
+  String get settingsSendCopiedCaption;
+
+  /// Snap, Copy to Computer, Connection Doctor or USB button.
+  ///
+  /// In en, this message translates to:
+  /// **'Why can\'t I see my computer?'**
+  String get doctorTitle;
+
+  /// Snap, Copy to Computer, Connection Doctor or USB button.
+  ///
+  /// In en, this message translates to:
+  /// **'Finds what\'s in the way, and what to do about it'**
+  String get doctorCaption;
+
+  /// Snap, Copy to Computer, Connection Doctor or USB button.
+  ///
+  /// In en, this message translates to:
+  /// **'Nothing wrong on this phone'**
+  String get doctorAllGood;
+
+  /// Snap, Copy to Computer, Connection Doctor or USB button.
+  ///
+  /// In en, this message translates to:
+  /// **'If your computer still doesn\'t show, its firewall may be in the way, or Linksy isn\'t running there.'**
+  String get doctorAllGoodDetail;
+
+  /// Snap, Copy to Computer, Connection Doctor or USB button.
+  ///
+  /// In en, this message translates to:
+  /// **'Wi-Fi isn\'t connected'**
+  String get doctorWifi;
+
+  /// Snap, Copy to Computer, Connection Doctor or USB button.
+  ///
+  /// In en, this message translates to:
+  /// **'Join the same network as your computer.'**
+  String get doctorWifiDetail;
+
+  /// Snap, Copy to Computer, Connection Doctor or USB button.
+  ///
+  /// In en, this message translates to:
+  /// **'No device heard on this network'**
+  String get doctorHeard;
+
+  /// Snap, Copy to Computer, Connection Doctor or USB button.
+  ///
+  /// In en, this message translates to:
+  /// **'Your computer may be asleep or on another network, or this router keeps devices apart, as guest networks do.'**
+  String get doctorHeardDetail;
+
+  /// Snap, Copy to Computer, Connection Doctor or USB button.
+  ///
+  /// In en, this message translates to:
+  /// **'A VPN is on'**
+  String get doctorVpn;
+
+  /// Snap, Copy to Computer, Connection Doctor or USB button.
+  ///
+  /// In en, this message translates to:
+  /// **'It can hide your computer from this phone. Turn it off, or let it allow local networks.'**
+  String get doctorVpnDetail;
+
+  /// Snap, Copy to Computer, Connection Doctor or USB button.
+  ///
+  /// In en, this message translates to:
+  /// **'Battery saving can stop Linksy'**
+  String get doctorBattery;
+
+  /// Snap, Copy to Computer, Connection Doctor or USB button.
+  ///
+  /// In en, this message translates to:
+  /// **'{maker} phones can close Linksy in the background.'**
+  String doctorBatteryDetail(String maker);
+
+  /// Snap, Copy to Computer, Connection Doctor or USB button.
+  ///
+  /// In en, this message translates to:
+  /// **'Battery Saver is on'**
+  String get doctorPowerSave;
+
+  /// Snap, Copy to Computer, Connection Doctor or USB button.
+  ///
+  /// In en, this message translates to:
+  /// **'It limits what Linksy can do while the screen is off.'**
+  String get doctorPowerSaveDetail;
+
+  /// Snap, Copy to Computer, Connection Doctor or USB button.
+  ///
+  /// In en, this message translates to:
+  /// **'Data Saver is on'**
+  String get doctorDataSaver;
+
+  /// Snap, Copy to Computer, Connection Doctor or USB button.
+  ///
+  /// In en, this message translates to:
+  /// **'It can stop Linksy from connecting in the background.'**
+  String get doctorDataSaverDetail;
+
+  /// Snap, Copy to Computer, Connection Doctor or USB button.
+  ///
+  /// In en, this message translates to:
+  /// **'Open settings'**
+  String get doctorOpenSettings;
+
+  /// Snap, Copy to Computer, Connection Doctor or USB button.
+  ///
+  /// In en, this message translates to:
+  /// **'Show me how'**
+  String get doctorShowHow;
+
+  /// Snap, Copy to Computer, Connection Doctor or USB button.
+  ///
+  /// In en, this message translates to:
+  /// **'Check again'**
+  String get doctorCheckAgain;
+
+  /// Snap, Copy to Computer, Connection Doctor or USB button.
+  ///
+  /// In en, this message translates to:
+  /// **'Snap to Computer'**
+  String get news035SnapTitle;
+
+  /// Snap, Copy to Computer, Connection Doctor or USB button.
+  ///
+  /// In en, this message translates to:
+  /// **'Take a picture from a computer\'s page or the Quick Settings tile, and it goes straight there, ready to paste.'**
+  String get news035SnapBody;
+
+  /// Snap, Copy to Computer, Connection Doctor or USB button.
+  ///
+  /// In en, this message translates to:
+  /// **'Copy to Computer'**
+  String get news035CopyTitle;
+
+  /// Snap, Copy to Computer, Connection Doctor or USB button.
+  ///
+  /// In en, this message translates to:
+  /// **'Select text in any app and pick Copy to Computer. And when something won\'t connect, Settings › Connection says why.'**
+  String get news035CopyBody;
 }
 
 class _AppLocalizationsDelegate

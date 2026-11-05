@@ -3026,4 +3026,107 @@ class AppLocalizationsMg extends AppLocalizations {
 
   @override
   String get phoneHistory => 'Tantara';
+
+  @override
+  String get deviceSnap => 'Sary';
+
+  @override
+  String snapSent(String name) {
+    return 'Nalefa any amin\'i $name ny sary';
+  }
+
+  @override
+  String copySent(String name) {
+    return 'Voadika any amin\'i $name';
+  }
+
+  @override
+  String get usbConnectCable => 'Ampifandraiso amin\'ny tariby USB';
+
+  @override
+  String get settingsSendCopied => 'Alefaso izay adika';
+
+  @override
+  String get settingsSendCopiedCaption =>
+      'Isaky ny miverina amin\'i Linksy ianao dia alefa any amin\'ny solosaina mifandray izay nadikanao. Tafiditra ao ny teny miafina, koa avelao ho maty raha misalasala.';
+
+  @override
+  String get doctorTitle => 'Nahoana no tsy hitako ny solosainako?';
+
+  @override
+  String get doctorCaption => 'Mitady izay manakana sy izay atao';
+
+  @override
+  String get doctorAllGood => 'Tsy misy olana amin\'ity finday ity';
+
+  @override
+  String get doctorAllGoodDetail =>
+      'Raha mbola tsy miseho ny solosainao, mety manakana ny firewall-ny, na tsy mandeha ao aminy i Linksy.';
+
+  @override
+  String get doctorWifi => 'Tsy mifandray ny Wi-Fi';
+
+  @override
+  String get doctorWifiDetail =>
+      'Midira amin\'ny tambajotra iray amin\'ny solosainao.';
+
+  @override
+  String get doctorHeard => 'Tsy misy fitaovana re amin\'ity tambajotra ity';
+
+  @override
+  String get doctorHeardDetail =>
+      'Mety matory na amin\'ny tambajotra hafa ny solosainao, na mampisaraka ny fitaovana ity router ity, toy ny tambajotra ho an\'ny vahiny.';
+
+  @override
+  String get doctorVpn => 'Mandeha ny VPN';
+
+  @override
+  String get doctorVpnDetail =>
+      'Mety hanafina ny solosainao amin\'ity finday ity izy. Vonoy, na avelao hanaiky tambajotra eo an-toerana.';
+
+  @override
+  String get doctorBattery =>
+      'Mety hampiato an\'i Linksy ny fitsitsiana bateria';
+
+  @override
+  String doctorBatteryDetail(String maker) {
+    return 'Mety hanidy an\'i Linksy ao ambadika ny finday $maker.';
+  }
+
+  @override
+  String get doctorPowerSave => 'Mandeha ny Battery Saver';
+
+  @override
+  String get doctorPowerSaveDetail =>
+      'Mametra izay azon\'i Linksy atao rehefa maty ny efijery izy.';
+
+  @override
+  String get doctorDataSaver => 'Mandeha ny Data Saver';
+
+  @override
+  String get doctorDataSaverDetail =>
+      'Mety hanakana an\'i Linksy tsy hifandray ao ambadika izy.';
+
+  @override
+  String get doctorOpenSettings => 'Sokafy ny fikirana';
+
+  @override
+  String get doctorShowHow => 'Asehoy ahy';
+
+  @override
+  String get doctorCheckAgain => 'Hamarino indray';
+
+  @override
+  String get news035SnapTitle => 'Sary mankany amin\'ny solosaina';
+
+  @override
+  String get news035SnapBody =>
+      'Maka sary avy amin\'ny pejin\'ny solosaina na ny tile Quick Settings, ary mankany avy hatrany, vonona hapetaka.';
+
+  @override
+  String get news035CopyTitle => 'Adikao any amin\'ny solosaina';
+
+  @override
+  String get news035CopyBody =>
+      'Fidio ny soratra amin\'ny app rehetra ary safidio ny Adikao any amin\'ny solosaina. Ary raha tsy mifandray, lazain\'ny Fikirana › Fifandraisana ny antony.';
 }

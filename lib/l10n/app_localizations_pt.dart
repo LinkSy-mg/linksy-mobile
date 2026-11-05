@@ -3014,4 +3014,105 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get phoneHistory => 'Histórico';
+
+  @override
+  String get deviceSnap => 'Foto';
+
+  @override
+  String snapSent(String name) {
+    return 'Foto enviada para $name';
+  }
+
+  @override
+  String copySent(String name) {
+    return 'Copiado para $name';
+  }
+
+  @override
+  String get usbConnectCable => 'Conectar por cabo USB';
+
+  @override
+  String get settingsSendCopied => 'Enviar o que você copia';
+
+  @override
+  String get settingsSendCopiedCaption =>
+      'Sempre que você volta ao Linksy, o que copiou vai para os computadores conectados. Senhas também, então deixe desligado se tiver dúvida.';
+
+  @override
+  String get doctorTitle => 'Por que não vejo meu computador?';
+
+  @override
+  String get doctorCaption => 'Encontra o que atrapalha e o que fazer';
+
+  @override
+  String get doctorAllGood => 'Nada de errado neste telefone';
+
+  @override
+  String get doctorAllGoodDetail =>
+      'Se o computador ainda não aparecer, o firewall dele pode estar bloqueando, ou o Linksy não está rodando lá.';
+
+  @override
+  String get doctorWifi => 'O Wi-Fi não está conectado';
+
+  @override
+  String get doctorWifiDetail => 'Entre na mesma rede do computador.';
+
+  @override
+  String get doctorHeard => 'Nenhum dispositivo ouvido nesta rede';
+
+  @override
+  String get doctorHeardDetail =>
+      'O computador pode estar em repouso ou em outra rede, ou este roteador separa os dispositivos, como redes de convidados.';
+
+  @override
+  String get doctorVpn => 'Uma VPN está ligada';
+
+  @override
+  String get doctorVpnDetail =>
+      'Ela pode esconder o computador deste telefone. Desligue ou permita redes locais.';
+
+  @override
+  String get doctorBattery => 'A economia de bateria pode parar o Linksy';
+
+  @override
+  String doctorBatteryDetail(String maker) {
+    return 'Telefones $maker podem fechar o Linksy em segundo plano.';
+  }
+
+  @override
+  String get doctorPowerSave => 'A economia de bateria está ligada';
+
+  @override
+  String get doctorPowerSaveDetail =>
+      'Limita o que o Linksy pode fazer com a tela desligada.';
+
+  @override
+  String get doctorDataSaver => 'A economia de dados está ligada';
+
+  @override
+  String get doctorDataSaverDetail =>
+      'Pode impedir o Linksy de se conectar em segundo plano.';
+
+  @override
+  String get doctorOpenSettings => 'Abrir ajustes';
+
+  @override
+  String get doctorShowHow => 'Mostre como';
+
+  @override
+  String get doctorCheckAgain => 'Verificar de novo';
+
+  @override
+  String get news035SnapTitle => 'Foto para o computador';
+
+  @override
+  String get news035SnapBody =>
+      'Tire uma foto na página de um computador ou no bloco de ajustes rápidos, e ela vai direto, pronta para colar.';
+
+  @override
+  String get news035CopyTitle => 'Copiar para o computador';
+
+  @override
+  String get news035CopyBody =>
+      'Selecione texto em qualquer app e escolha Copiar para o computador. E se algo não conectar, Ajustes › Conexão diz por quê.';
 }

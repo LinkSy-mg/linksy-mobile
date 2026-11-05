@@ -2897,4 +2897,98 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get phoneHistory => '历史记录';
+
+  @override
+  String get deviceSnap => '拍照';
+
+  @override
+  String snapSent(String name) {
+    return '照片已发送到 $name';
+  }
+
+  @override
+  String copySent(String name) {
+    return '已复制到 $name';
+  }
+
+  @override
+  String get usbConnectCable => '通过 USB 线连接';
+
+  @override
+  String get settingsSendCopied => '发送你复制的内容';
+
+  @override
+  String get settingsSendCopiedCaption =>
+      '每次回到 Linksy，你复制的内容都会发送到已连接的电脑。密码也会发送，如不确定请保持关闭。';
+
+  @override
+  String get doctorTitle => '为什么看不到我的电脑?';
+
+  @override
+  String get doctorCaption => '找出原因和解决方法';
+
+  @override
+  String get doctorAllGood => '这台手机没有问题';
+
+  @override
+  String get doctorAllGoodDetail => '如果电脑仍未显示，可能是防火墙阻止了连接，或电脑上没有运行 Linksy。';
+
+  @override
+  String get doctorWifi => '未连接 Wi-Fi';
+
+  @override
+  String get doctorWifiDetail => '请连接到与电脑相同的网络。';
+
+  @override
+  String get doctorHeard => '在此网络上未发现设备';
+
+  @override
+  String get doctorHeardDetail => '电脑可能处于睡眠状态或在其他网络上，或此路由器像访客网络一样隔离了设备。';
+
+  @override
+  String get doctorVpn => 'VPN 已开启';
+
+  @override
+  String get doctorVpnDetail => '它可能使这台手机看不到电脑。请关闭它，或允许本地网络。';
+
+  @override
+  String get doctorBattery => '省电功能可能会停止 Linksy';
+
+  @override
+  String doctorBatteryDetail(String maker) {
+    return '$maker 手机可能会在后台关闭 Linksy。';
+  }
+
+  @override
+  String get doctorPowerSave => '省电模式已开启';
+
+  @override
+  String get doctorPowerSaveDetail => '它会限制 Linksy 在屏幕关闭时的工作。';
+
+  @override
+  String get doctorDataSaver => '流量节省模式已开启';
+
+  @override
+  String get doctorDataSaverDetail => '它可能阻止 Linksy 在后台连接。';
+
+  @override
+  String get doctorOpenSettings => '打开设置';
+
+  @override
+  String get doctorShowHow => '查看方法';
+
+  @override
+  String get doctorCheckAgain => '再次检查';
+
+  @override
+  String get news035SnapTitle => '拍照到电脑';
+
+  @override
+  String get news035SnapBody => '在电脑页面或快捷设置磁贴拍照，照片会直接发送过去，可立即粘贴。';
+
+  @override
+  String get news035CopyTitle => '复制到电脑';
+
+  @override
+  String get news035CopyBody => '在任意应用中选择文本，然后选“复制到电脑”。如果无法连接，设置 › 连接会告诉你原因。';
 }

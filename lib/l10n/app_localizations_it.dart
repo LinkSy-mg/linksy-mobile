@@ -3021,4 +3021,105 @@ class AppLocalizationsIt extends AppLocalizations {
 
   @override
   String get phoneHistory => 'Cronologia';
+
+  @override
+  String get deviceSnap => 'Foto';
+
+  @override
+  String snapSent(String name) {
+    return 'Foto inviata a $name';
+  }
+
+  @override
+  String copySent(String name) {
+    return 'Copiato su $name';
+  }
+
+  @override
+  String get usbConnectCable => 'Connetti con cavo USB';
+
+  @override
+  String get settingsSendCopied => 'Invia ciò che copi';
+
+  @override
+  String get settingsSendCopiedCaption =>
+      'Ogni volta che torni su Linksy, ciò che hai copiato va ai computer connessi. Anche le password, quindi lascialo disattivato se hai dubbi.';
+
+  @override
+  String get doctorTitle => 'Perché non vedo il mio computer?';
+
+  @override
+  String get doctorCaption => 'Trova cosa lo impedisce e cosa fare';
+
+  @override
+  String get doctorAllGood => 'Nessun problema su questo telefono';
+
+  @override
+  String get doctorAllGoodDetail =>
+      'Se il computer continua a non apparire, potrebbe bloccarlo il firewall, oppure Linksy non è in esecuzione lì.';
+
+  @override
+  String get doctorWifi => 'Il Wi-Fi non è connesso';
+
+  @override
+  String get doctorWifiDetail => 'Connettiti alla stessa rete del computer.';
+
+  @override
+  String get doctorHeard => 'Nessun dispositivo rilevato su questa rete';
+
+  @override
+  String get doctorHeardDetail =>
+      'Il computer potrebbe essere in sospensione o su un\'altra rete, oppure questo router separa i dispositivi, come le reti ospiti.';
+
+  @override
+  String get doctorVpn => 'Una VPN è attiva';
+
+  @override
+  String get doctorVpnDetail =>
+      'Può nascondere il computer a questo telefono. Disattivala o consenti le reti locali.';
+
+  @override
+  String get doctorBattery => 'Il risparmio batteria può fermare Linksy';
+
+  @override
+  String doctorBatteryDetail(String maker) {
+    return 'I telefoni $maker possono chiudere Linksy in background.';
+  }
+
+  @override
+  String get doctorPowerSave => 'Il risparmio energetico è attivo';
+
+  @override
+  String get doctorPowerSaveDetail =>
+      'Limita ciò che Linksy può fare a schermo spento.';
+
+  @override
+  String get doctorDataSaver => 'Il risparmio dati è attivo';
+
+  @override
+  String get doctorDataSaverDetail =>
+      'Può impedire a Linksy di connettersi in background.';
+
+  @override
+  String get doctorOpenSettings => 'Apri impostazioni';
+
+  @override
+  String get doctorShowHow => 'Mostrami come';
+
+  @override
+  String get doctorCheckAgain => 'Controlla di nuovo';
+
+  @override
+  String get news035SnapTitle => 'Foto al computer';
+
+  @override
+  String get news035SnapBody =>
+      'Scatta una foto dalla pagina di un computer o dal riquadro delle impostazioni rapide: arriva lì, pronta da incollare.';
+
+  @override
+  String get news035CopyTitle => 'Copia sul computer';
+
+  @override
+  String get news035CopyBody =>
+      'Seleziona il testo in un\'app e scegli Copia sul computer. E se qualcosa non si connette, Impostazioni › Connessione spiega perché.';
 }

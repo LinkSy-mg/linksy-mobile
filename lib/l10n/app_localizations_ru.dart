@@ -3042,4 +3042,105 @@ class AppLocalizationsRu extends AppLocalizations {
 
   @override
   String get phoneHistory => 'История';
+
+  @override
+  String get deviceSnap => 'Снимок';
+
+  @override
+  String snapSent(String name) {
+    return 'Снимок отправлен на $name';
+  }
+
+  @override
+  String copySent(String name) {
+    return 'Скопировано на $name';
+  }
+
+  @override
+  String get usbConnectCable => 'Подключить по USB-кабелю';
+
+  @override
+  String get settingsSendCopied => 'Отправлять скопированное';
+
+  @override
+  String get settingsSendCopiedCaption =>
+      'Каждый раз, когда вы возвращаетесь в Linksy, скопированное уходит на подключённые компьютеры. Пароли тоже, поэтому при сомнениях оставьте выключенным.';
+
+  @override
+  String get doctorTitle => 'Почему не виден компьютер?';
+
+  @override
+  String get doctorCaption => 'Находит причину и подсказывает, что делать';
+
+  @override
+  String get doctorAllGood => 'На этом телефоне всё в порядке';
+
+  @override
+  String get doctorAllGoodDetail =>
+      'Если компьютер всё равно не виден, возможно, мешает его брандмауэр или на нём не запущен Linksy.';
+
+  @override
+  String get doctorWifi => 'Wi-Fi не подключён';
+
+  @override
+  String get doctorWifiDetail => 'Подключитесь к той же сети, что и компьютер.';
+
+  @override
+  String get doctorHeard => 'В этой сети не слышно устройств';
+
+  @override
+  String get doctorHeardDetail =>
+      'Компьютер может спать или быть в другой сети, либо этот роутер разделяет устройства, как гостевые сети.';
+
+  @override
+  String get doctorVpn => 'Включён VPN';
+
+  @override
+  String get doctorVpnDetail =>
+      'Он может скрывать компьютер от телефона. Выключите его или разрешите локальные сети.';
+
+  @override
+  String get doctorBattery => 'Экономия заряда может останавливать Linksy';
+
+  @override
+  String doctorBatteryDetail(String maker) {
+    return 'Телефоны $maker могут закрывать Linksy в фоне.';
+  }
+
+  @override
+  String get doctorPowerSave => 'Включена экономия заряда';
+
+  @override
+  String get doctorPowerSaveDetail =>
+      'Она ограничивает работу Linksy при выключенном экране.';
+
+  @override
+  String get doctorDataSaver => 'Включена экономия трафика';
+
+  @override
+  String get doctorDataSaverDetail =>
+      'Она может мешать Linksy подключаться в фоне.';
+
+  @override
+  String get doctorOpenSettings => 'Открыть настройки';
+
+  @override
+  String get doctorShowHow => 'Показать как';
+
+  @override
+  String get doctorCheckAgain => 'Проверить снова';
+
+  @override
+  String get news035SnapTitle => 'Снимок на компьютер';
+
+  @override
+  String get news035SnapBody =>
+      'Сделайте снимок со страницы компьютера или из быстрых настроек, и он сразу окажется там, готовый к вставке.';
+
+  @override
+  String get news035CopyTitle => 'Копировать на компьютер';
+
+  @override
+  String get news035CopyBody =>
+      'Выделите текст в любом приложении и выберите «Копировать на компьютер». А если что-то не подключается, Настройки › Подключение объяснят почему.';
 }

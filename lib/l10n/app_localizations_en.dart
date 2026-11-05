@@ -2999,4 +2999,106 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get phoneHistory => 'History';
+
+  @override
+  String get deviceSnap => 'Snap';
+
+  @override
+  String snapSent(String name) {
+    return 'Picture sent to $name';
+  }
+
+  @override
+  String copySent(String name) {
+    return 'Copied to $name';
+  }
+
+  @override
+  String get usbConnectCable => 'Connect by USB Cable';
+
+  @override
+  String get settingsSendCopied => 'Send what you copy';
+
+  @override
+  String get settingsSendCopiedCaption =>
+      'Each time you come back to Linksy, what you copied goes to connected computers. Passwords too, so leave it off if unsure.';
+
+  @override
+  String get doctorTitle => 'Why can\'t I see my computer?';
+
+  @override
+  String get doctorCaption =>
+      'Finds what\'s in the way, and what to do about it';
+
+  @override
+  String get doctorAllGood => 'Nothing wrong on this phone';
+
+  @override
+  String get doctorAllGoodDetail =>
+      'If your computer still doesn\'t show, its firewall may be in the way, or Linksy isn\'t running there.';
+
+  @override
+  String get doctorWifi => 'Wi-Fi isn\'t connected';
+
+  @override
+  String get doctorWifiDetail => 'Join the same network as your computer.';
+
+  @override
+  String get doctorHeard => 'No device heard on this network';
+
+  @override
+  String get doctorHeardDetail =>
+      'Your computer may be asleep or on another network, or this router keeps devices apart, as guest networks do.';
+
+  @override
+  String get doctorVpn => 'A VPN is on';
+
+  @override
+  String get doctorVpnDetail =>
+      'It can hide your computer from this phone. Turn it off, or let it allow local networks.';
+
+  @override
+  String get doctorBattery => 'Battery saving can stop Linksy';
+
+  @override
+  String doctorBatteryDetail(String maker) {
+    return '$maker phones can close Linksy in the background.';
+  }
+
+  @override
+  String get doctorPowerSave => 'Battery Saver is on';
+
+  @override
+  String get doctorPowerSaveDetail =>
+      'It limits what Linksy can do while the screen is off.';
+
+  @override
+  String get doctorDataSaver => 'Data Saver is on';
+
+  @override
+  String get doctorDataSaverDetail =>
+      'It can stop Linksy from connecting in the background.';
+
+  @override
+  String get doctorOpenSettings => 'Open settings';
+
+  @override
+  String get doctorShowHow => 'Show me how';
+
+  @override
+  String get doctorCheckAgain => 'Check again';
+
+  @override
+  String get news035SnapTitle => 'Snap to Computer';
+
+  @override
+  String get news035SnapBody =>
+      'Take a picture from a computer\'s page or the Quick Settings tile, and it goes straight there, ready to paste.';
+
+  @override
+  String get news035CopyTitle => 'Copy to Computer';
+
+  @override
+  String get news035CopyBody =>
+      'Select text in any app and pick Copy to Computer. And when something won\'t connect, Settings › Connection says why.';
 }

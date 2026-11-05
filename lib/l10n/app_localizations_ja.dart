@@ -2938,4 +2938,102 @@ class AppLocalizationsJa extends AppLocalizations {
 
   @override
   String get phoneHistory => '履歴';
+
+  @override
+  String get deviceSnap => '撮影';
+
+  @override
+  String snapSent(String name) {
+    return '$name に写真を送信しました';
+  }
+
+  @override
+  String copySent(String name) {
+    return '$name にコピーしました';
+  }
+
+  @override
+  String get usbConnectCable => 'USB ケーブルで接続';
+
+  @override
+  String get settingsSendCopied => 'コピーした内容を送信';
+
+  @override
+  String get settingsSendCopiedCaption =>
+      'Linksy に戻るたびに、コピーした内容が接続中のコンピュータに送られます。パスワードも送られるため、不安な場合はオフのままにしてください。';
+
+  @override
+  String get doctorTitle => 'コンピュータが表示されないのはなぜ?';
+
+  @override
+  String get doctorCaption => '原因と対処方法を調べます';
+
+  @override
+  String get doctorAllGood => 'このスマートフォンに問題はありません';
+
+  @override
+  String get doctorAllGoodDetail =>
+      'それでも表示されない場合は、コンピュータのファイアウォールが妨げているか、Linksy が動作していない可能性があります。';
+
+  @override
+  String get doctorWifi => 'Wi-Fi に接続されていません';
+
+  @override
+  String get doctorWifiDetail => 'コンピュータと同じネットワークに接続してください。';
+
+  @override
+  String get doctorHeard => 'このネットワークでデバイスが見つかりません';
+
+  @override
+  String get doctorHeardDetail =>
+      'コンピュータがスリープ中か別のネットワークにあるか、ゲストネットワークのようにルーターがデバイスを分離している可能性があります。';
+
+  @override
+  String get doctorVpn => 'VPN がオンです';
+
+  @override
+  String get doctorVpnDetail =>
+      'コンピュータがこのスマートフォンから見えなくなることがあります。オフにするか、ローカルネットワークを許可してください。';
+
+  @override
+  String get doctorBattery => 'バッテリー節約で Linksy が停止することがあります';
+
+  @override
+  String doctorBatteryDetail(String maker) {
+    return '$maker のスマートフォンはバックグラウンドで Linksy を閉じることがあります。';
+  }
+
+  @override
+  String get doctorPowerSave => 'バッテリーセーバーがオンです';
+
+  @override
+  String get doctorPowerSaveDetail => '画面がオフの間、Linksy の動作が制限されます。';
+
+  @override
+  String get doctorDataSaver => 'データセーバーがオンです';
+
+  @override
+  String get doctorDataSaverDetail => 'バックグラウンドで Linksy が接続できなくなることがあります。';
+
+  @override
+  String get doctorOpenSettings => '設定を開く';
+
+  @override
+  String get doctorShowHow => '方法を見る';
+
+  @override
+  String get doctorCheckAgain => 'もう一度確認';
+
+  @override
+  String get news035SnapTitle => 'コンピュータへ撮影';
+
+  @override
+  String get news035SnapBody => 'コンピュータのページやクイック設定タイルから撮影すると、すぐに届いて貼り付けられます。';
+
+  @override
+  String get news035CopyTitle => 'コンピュータへコピー';
+
+  @override
+  String get news035CopyBody =>
+      '任意のアプリでテキストを選択して「コンピュータへコピー」を選びます。接続できないときは、設定 › 接続で理由がわかります。';
 }
