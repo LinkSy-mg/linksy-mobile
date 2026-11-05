@@ -4,6 +4,24 @@ All notable changes to Linksy for Android. Format: [Keep a Changelog](https://ke
 
 ## [Unreleased]
 
+### Added
+
+- A page for another phone or tablet, with no computer between them: send what you copied, a note or a link, and find it; then your latest photos and your apps right there to tap, files and folders, and what went between them. See all has photos by day and album, and every app.
+- Apps between phones. Each is marked against the other phone: not there, older there (an update), already there, newer, or from another developer. Android asks before installing; a package that isn't what the other phone said is refused. An app's data and logins don't move.
+- Before a send: how it will go and about how long, room on the other phone, and whether it will ask first. A direct link comes up while you choose.
+- Transfers say which way they go, and why not direct when a direct link failed.
+- History with a phone reads as a conversation, newest first: photos, apps, files, links and what you copied, each shown as itself, with Open on an app that came and Copy on text that came.
+- A computer's Ask the Phone: a sheet when Linksy is open, a notification when it isn't, for the Inbox or the Gallery.
+
+### Changed
+
+- The home screen before your first device: an arrow leads from the steps to Add a device, instead of a second set of buttons for the same thing.
+
+### Fixed
+
+- A file that arrived after leaving Linksy with Back stayed in Linksy's private folder, out of reach of other apps. Back now leaves Linksy running, like Home, and anything left there moves to your Save location when Linksy opens.
+- Linksy could crash when a small file finished arriving just as it opened.
+
 ## [0.3.4] - 2026-11-05
 
 > [!IMPORTANT]
