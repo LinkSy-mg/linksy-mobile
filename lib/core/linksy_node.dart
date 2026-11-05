@@ -37,6 +37,40 @@ abstract interface class LinksyNode {
   /// Returns the transfer id.
   Future<String> sendFiles(String id, List<String> paths);
 
+  /// How a send of [bytes] to [id] would go now, without sending; null when
+  /// it isn't connected.
+  SendPlan? planSend(String id, int bytes);
+
+  /// Gets the fastest route ready for [bytes], while the user chooses, and
+  /// says how it looks. Sends nothing and does nothing twice.
+  Future<SendPlan?> prepareSend(String id, int bytes);
+
+  /// Asks [id] about a send; null from a device that can't answer, which
+  /// means skip the checks and send.
+  Future<PreflightReply?> preflight(
+    String id,
+    int bytes,
+    int files,
+    List<AppProbe> probes,
+  );
+
+  /// Other devices' preflights (§4.22), to answer with [answerPreflight]
+  /// within about two seconds, or the core does.
+  Stream<PreflightCall> get preflightCalls;
+
+  /// [facts] as [LinksyPlatform.preflightFacts] gives them.
+  void answerPreflight(int call, Map<Object?, Object?> facts);
+
+  /// Asks [id] where it is, once (§4.14).
+  Future<void> locate(String id);
+
+  /// [paths] and [apps] as one offer, so the other device asks once.
+  Future<String> sendBundle(
+    String id,
+    List<String> paths,
+    List<AppBundle> apps,
+  );
+
   Future<void> cancel(String transferId);
 
   Future<void> sendClipboard(String id, String text);

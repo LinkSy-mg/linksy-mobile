@@ -40,7 +40,7 @@ flutter_rust_bridge::frb_generated_boilerplate!(
     default_rust_auto_opaque = RustAutoOpaqueMoi,
 );
 pub(crate) const FLUTTER_RUST_BRIDGE_CODEGEN_VERSION: &str = "2.13.0";
-pub(crate) const FLUTTER_RUST_BRIDGE_CODEGEN_CONTENT_HASH: i32 = 577877704;
+pub(crate) const FLUTTER_RUST_BRIDGE_CODEGEN_CONTENT_HASH: i32 = 872570141;
 
 // Section: executor
 
@@ -48,6 +48,58 @@ flutter_rust_bridge::frb_generated_default_handler!();
 
 // Section: wire_funcs
 
+fn wire__crate__api__node__LinksyNode_answer_preflight_impl(
+    ptr_: flutter_rust_bridge::for_generated::PlatformGeneralizedUint8ListPtr,
+    rust_vec_len_: i32,
+    data_len_: i32,
+) -> flutter_rust_bridge::for_generated::WireSyncRust2DartSse {
+    FLUTTER_RUST_BRIDGE_HANDLER.wrap_sync::<flutter_rust_bridge::for_generated::SseCodec, _>(
+        flutter_rust_bridge::for_generated::TaskInfo {
+            debug_name: "LinksyNode_answer_preflight",
+            port: None,
+            mode: flutter_rust_bridge::for_generated::FfiCallMode::Sync,
+        },
+        move || {
+            let message = unsafe {
+                flutter_rust_bridge::for_generated::Dart2RustMessageSse::from_wire(
+                    ptr_,
+                    rust_vec_len_,
+                    data_len_,
+                )
+            };
+            let mut deserializer =
+                flutter_rust_bridge::for_generated::SseDeserializer::new(message);
+            let api_that = <RustOpaqueMoi<
+                flutter_rust_bridge::for_generated::RustAutoOpaqueInner<LinksyNode>,
+            >>::sse_decode(&mut deserializer);
+            let api_call = <u64>::sse_decode(&mut deserializer);
+            let api_answer_json = <String>::sse_decode(&mut deserializer);
+            deserializer.end();
+            transform_result_sse::<_, String>((move || {
+                let mut api_that_guard = None;
+                let decode_indices_ =
+                    flutter_rust_bridge::for_generated::lockable_compute_decode_order(vec![
+                        flutter_rust_bridge::for_generated::LockableOrderInfo::new(
+                            &api_that, 0, false,
+                        ),
+                    ]);
+                for i in decode_indices_ {
+                    match i {
+                        0 => api_that_guard = Some(api_that.lockable_decode_sync_ref()),
+                        _ => unreachable!(),
+                    }
+                }
+                let api_that_guard = api_that_guard.unwrap();
+                let output_ok = crate::api::node::LinksyNode::answer_preflight(
+                    &*api_that_guard,
+                    api_call,
+                    api_answer_json,
+                )?;
+                std::result::Result::Ok(output_ok)
+            })())
+        },
+    )
+}
 fn wire__crate__api__node__LinksyNode_cancel_impl(
     ptr_: flutter_rust_bridge::for_generated::PlatformGeneralizedUint8ListPtr,
     rust_vec_len_: i32,
@@ -997,6 +1049,63 @@ fn wire__crate__api__node__LinksyNode_link_impl(
         },
     )
 }
+fn wire__crate__api__node__LinksyNode_locate_impl(
+    port_: flutter_rust_bridge::for_generated::MessagePort,
+    ptr_: flutter_rust_bridge::for_generated::PlatformGeneralizedUint8ListPtr,
+    rust_vec_len_: i32,
+    data_len_: i32,
+) {
+    FLUTTER_RUST_BRIDGE_HANDLER.wrap_async::<flutter_rust_bridge::for_generated::SseCodec, _, _, _>(
+        flutter_rust_bridge::for_generated::TaskInfo {
+            debug_name: "LinksyNode_locate",
+            port: Some(port_),
+            mode: flutter_rust_bridge::for_generated::FfiCallMode::Normal,
+        },
+        move || {
+            let message = unsafe {
+                flutter_rust_bridge::for_generated::Dart2RustMessageSse::from_wire(
+                    ptr_,
+                    rust_vec_len_,
+                    data_len_,
+                )
+            };
+            let mut deserializer =
+                flutter_rust_bridge::for_generated::SseDeserializer::new(message);
+            let api_that = <RustOpaqueMoi<
+                flutter_rust_bridge::for_generated::RustAutoOpaqueInner<LinksyNode>,
+            >>::sse_decode(&mut deserializer);
+            let api_id = <String>::sse_decode(&mut deserializer);
+            deserializer.end();
+            move |context| async move {
+                transform_result_sse::<_, String>(
+                    (move || async move {
+                        let mut api_that_guard = None;
+                        let decode_indices_ =
+                            flutter_rust_bridge::for_generated::lockable_compute_decode_order(
+                                vec![flutter_rust_bridge::for_generated::LockableOrderInfo::new(
+                                    &api_that, 0, false,
+                                )],
+                            );
+                        for i in decode_indices_ {
+                            match i {
+                                0 => {
+                                    api_that_guard =
+                                        Some(api_that.lockable_decode_async_ref().await)
+                                }
+                                _ => unreachable!(),
+                            }
+                        }
+                        let api_that_guard = api_that_guard.unwrap();
+                        let output_ok =
+                            crate::api::node::LinksyNode::locate(&*api_that_guard, api_id).await?;
+                        std::result::Result::Ok(output_ok)
+                    })()
+                    .await,
+                )
+            }
+        },
+    )
+}
 fn wire__crate__api__node__LinksyNode_media_command_impl(
     port_: flutter_rust_bridge::for_generated::MessagePort,
     ptr_: flutter_rust_bridge::for_generated::PlatformGeneralizedUint8ListPtr,
@@ -1533,6 +1642,55 @@ fn wire__crate__api__node__LinksyNode_pairing_mode_impl(
         },
     )
 }
+fn wire__crate__api__node__LinksyNode_plan_send_impl(
+    ptr_: flutter_rust_bridge::for_generated::PlatformGeneralizedUint8ListPtr,
+    rust_vec_len_: i32,
+    data_len_: i32,
+) -> flutter_rust_bridge::for_generated::WireSyncRust2DartSse {
+    FLUTTER_RUST_BRIDGE_HANDLER.wrap_sync::<flutter_rust_bridge::for_generated::SseCodec, _>(
+        flutter_rust_bridge::for_generated::TaskInfo {
+            debug_name: "LinksyNode_plan_send",
+            port: None,
+            mode: flutter_rust_bridge::for_generated::FfiCallMode::Sync,
+        },
+        move || {
+            let message = unsafe {
+                flutter_rust_bridge::for_generated::Dart2RustMessageSse::from_wire(
+                    ptr_,
+                    rust_vec_len_,
+                    data_len_,
+                )
+            };
+            let mut deserializer =
+                flutter_rust_bridge::for_generated::SseDeserializer::new(message);
+            let api_that = <RustOpaqueMoi<
+                flutter_rust_bridge::for_generated::RustAutoOpaqueInner<LinksyNode>,
+            >>::sse_decode(&mut deserializer);
+            let api_id = <String>::sse_decode(&mut deserializer);
+            let api_bytes = <u64>::sse_decode(&mut deserializer);
+            deserializer.end();
+            transform_result_sse::<_, String>((move || {
+                let mut api_that_guard = None;
+                let decode_indices_ =
+                    flutter_rust_bridge::for_generated::lockable_compute_decode_order(vec![
+                        flutter_rust_bridge::for_generated::LockableOrderInfo::new(
+                            &api_that, 0, false,
+                        ),
+                    ]);
+                for i in decode_indices_ {
+                    match i {
+                        0 => api_that_guard = Some(api_that.lockable_decode_sync_ref()),
+                        _ => unreachable!(),
+                    }
+                }
+                let api_that_guard = api_that_guard.unwrap();
+                let output_ok =
+                    crate::api::node::LinksyNode::plan_send(&*api_that_guard, api_id, api_bytes)?;
+                std::result::Result::Ok(output_ok)
+            })())
+        },
+    )
+}
 fn wire__crate__api__node__LinksyNode_port_impl(
     ptr_: flutter_rust_bridge::for_generated::PlatformGeneralizedUint8ListPtr,
     rust_vec_len_: i32,
@@ -1631,6 +1789,189 @@ fn wire__crate__api__node__LinksyNode_post_notification_impl(
                             &*api_that_guard,
                             api_id,
                             api_notification_json,
+                        )
+                        .await?;
+                        std::result::Result::Ok(output_ok)
+                    })()
+                    .await,
+                )
+            }
+        },
+    )
+}
+fn wire__crate__api__node__LinksyNode_preflight_impl(
+    port_: flutter_rust_bridge::for_generated::MessagePort,
+    ptr_: flutter_rust_bridge::for_generated::PlatformGeneralizedUint8ListPtr,
+    rust_vec_len_: i32,
+    data_len_: i32,
+) {
+    FLUTTER_RUST_BRIDGE_HANDLER.wrap_async::<flutter_rust_bridge::for_generated::SseCodec, _, _, _>(
+        flutter_rust_bridge::for_generated::TaskInfo {
+            debug_name: "LinksyNode_preflight",
+            port: Some(port_),
+            mode: flutter_rust_bridge::for_generated::FfiCallMode::Normal,
+        },
+        move || {
+            let message = unsafe {
+                flutter_rust_bridge::for_generated::Dart2RustMessageSse::from_wire(
+                    ptr_,
+                    rust_vec_len_,
+                    data_len_,
+                )
+            };
+            let mut deserializer =
+                flutter_rust_bridge::for_generated::SseDeserializer::new(message);
+            let api_that = <RustOpaqueMoi<
+                flutter_rust_bridge::for_generated::RustAutoOpaqueInner<LinksyNode>,
+            >>::sse_decode(&mut deserializer);
+            let api_id = <String>::sse_decode(&mut deserializer);
+            let api_bytes = <u64>::sse_decode(&mut deserializer);
+            let api_files = <u32>::sse_decode(&mut deserializer);
+            let api_probes_json = <String>::sse_decode(&mut deserializer);
+            deserializer.end();
+            move |context| async move {
+                transform_result_sse::<_, String>(
+                    (move || async move {
+                        let mut api_that_guard = None;
+                        let decode_indices_ =
+                            flutter_rust_bridge::for_generated::lockable_compute_decode_order(
+                                vec![flutter_rust_bridge::for_generated::LockableOrderInfo::new(
+                                    &api_that, 0, false,
+                                )],
+                            );
+                        for i in decode_indices_ {
+                            match i {
+                                0 => {
+                                    api_that_guard =
+                                        Some(api_that.lockable_decode_async_ref().await)
+                                }
+                                _ => unreachable!(),
+                            }
+                        }
+                        let api_that_guard = api_that_guard.unwrap();
+                        let output_ok = crate::api::node::LinksyNode::preflight(
+                            &*api_that_guard,
+                            api_id,
+                            api_bytes,
+                            api_files,
+                            api_probes_json,
+                        )
+                        .await?;
+                        std::result::Result::Ok(output_ok)
+                    })()
+                    .await,
+                )
+            }
+        },
+    )
+}
+fn wire__crate__api__node__LinksyNode_preflight_calls_impl(
+    port_: flutter_rust_bridge::for_generated::MessagePort,
+    ptr_: flutter_rust_bridge::for_generated::PlatformGeneralizedUint8ListPtr,
+    rust_vec_len_: i32,
+    data_len_: i32,
+) {
+    FLUTTER_RUST_BRIDGE_HANDLER.wrap_normal::<flutter_rust_bridge::for_generated::SseCodec, _, _>(
+        flutter_rust_bridge::for_generated::TaskInfo {
+            debug_name: "LinksyNode_preflight_calls",
+            port: Some(port_),
+            mode: flutter_rust_bridge::for_generated::FfiCallMode::Normal,
+        },
+        move || {
+            let message = unsafe {
+                flutter_rust_bridge::for_generated::Dart2RustMessageSse::from_wire(
+                    ptr_,
+                    rust_vec_len_,
+                    data_len_,
+                )
+            };
+            let mut deserializer =
+                flutter_rust_bridge::for_generated::SseDeserializer::new(message);
+            let api_that = <RustOpaqueMoi<
+                flutter_rust_bridge::for_generated::RustAutoOpaqueInner<LinksyNode>,
+            >>::sse_decode(&mut deserializer);
+            let api_sink =
+                <StreamSink<String, flutter_rust_bridge::for_generated::SseCodec>>::sse_decode(
+                    &mut deserializer,
+                );
+            deserializer.end();
+            move |context| {
+                transform_result_sse::<_, ()>((move || {
+                    let mut api_that_guard = None;
+                    let decode_indices_ =
+                        flutter_rust_bridge::for_generated::lockable_compute_decode_order(vec![
+                            flutter_rust_bridge::for_generated::LockableOrderInfo::new(
+                                &api_that, 0, false,
+                            ),
+                        ]);
+                    for i in decode_indices_ {
+                        match i {
+                            0 => api_that_guard = Some(api_that.lockable_decode_sync_ref()),
+                            _ => unreachable!(),
+                        }
+                    }
+                    let api_that_guard = api_that_guard.unwrap();
+                    let output_ok = Ok::<_, ()>({
+                        crate::api::node::LinksyNode::preflight_calls(&*api_that_guard, api_sink);
+                    })?;
+                    std::result::Result::Ok(output_ok)
+                })())
+            }
+        },
+    )
+}
+fn wire__crate__api__node__LinksyNode_prepare_send_impl(
+    port_: flutter_rust_bridge::for_generated::MessagePort,
+    ptr_: flutter_rust_bridge::for_generated::PlatformGeneralizedUint8ListPtr,
+    rust_vec_len_: i32,
+    data_len_: i32,
+) {
+    FLUTTER_RUST_BRIDGE_HANDLER.wrap_async::<flutter_rust_bridge::for_generated::SseCodec, _, _, _>(
+        flutter_rust_bridge::for_generated::TaskInfo {
+            debug_name: "LinksyNode_prepare_send",
+            port: Some(port_),
+            mode: flutter_rust_bridge::for_generated::FfiCallMode::Normal,
+        },
+        move || {
+            let message = unsafe {
+                flutter_rust_bridge::for_generated::Dart2RustMessageSse::from_wire(
+                    ptr_,
+                    rust_vec_len_,
+                    data_len_,
+                )
+            };
+            let mut deserializer =
+                flutter_rust_bridge::for_generated::SseDeserializer::new(message);
+            let api_that = <RustOpaqueMoi<
+                flutter_rust_bridge::for_generated::RustAutoOpaqueInner<LinksyNode>,
+            >>::sse_decode(&mut deserializer);
+            let api_id = <String>::sse_decode(&mut deserializer);
+            let api_bytes = <u64>::sse_decode(&mut deserializer);
+            deserializer.end();
+            move |context| async move {
+                transform_result_sse::<_, String>(
+                    (move || async move {
+                        let mut api_that_guard = None;
+                        let decode_indices_ =
+                            flutter_rust_bridge::for_generated::lockable_compute_decode_order(
+                                vec![flutter_rust_bridge::for_generated::LockableOrderInfo::new(
+                                    &api_that, 0, false,
+                                )],
+                            );
+                        for i in decode_indices_ {
+                            match i {
+                                0 => {
+                                    api_that_guard =
+                                        Some(api_that.lockable_decode_async_ref().await)
+                                }
+                                _ => unreachable!(),
+                            }
+                        }
+                        let api_that_guard = api_that_guard.unwrap();
+                        let output_ok = crate::api::node::LinksyNode::prepare_send(
+                            &*api_that_guard,
+                            api_id,
+                            api_bytes,
                         )
                         .await?;
                         std::result::Result::Ok(output_ok)
@@ -1934,6 +2275,53 @@ fn wire__crate__api__node__LinksyNode_ring_impl(
         },
     )
 }
+fn wire__crate__api__node__LinksyNode_route_impl(
+    ptr_: flutter_rust_bridge::for_generated::PlatformGeneralizedUint8ListPtr,
+    rust_vec_len_: i32,
+    data_len_: i32,
+) -> flutter_rust_bridge::for_generated::WireSyncRust2DartSse {
+    FLUTTER_RUST_BRIDGE_HANDLER.wrap_sync::<flutter_rust_bridge::for_generated::SseCodec, _>(
+        flutter_rust_bridge::for_generated::TaskInfo {
+            debug_name: "LinksyNode_route",
+            port: None,
+            mode: flutter_rust_bridge::for_generated::FfiCallMode::Sync,
+        },
+        move || {
+            let message = unsafe {
+                flutter_rust_bridge::for_generated::Dart2RustMessageSse::from_wire(
+                    ptr_,
+                    rust_vec_len_,
+                    data_len_,
+                )
+            };
+            let mut deserializer =
+                flutter_rust_bridge::for_generated::SseDeserializer::new(message);
+            let api_that = <RustOpaqueMoi<
+                flutter_rust_bridge::for_generated::RustAutoOpaqueInner<LinksyNode>,
+            >>::sse_decode(&mut deserializer);
+            let api_id = <String>::sse_decode(&mut deserializer);
+            deserializer.end();
+            transform_result_sse::<_, String>((move || {
+                let mut api_that_guard = None;
+                let decode_indices_ =
+                    flutter_rust_bridge::for_generated::lockable_compute_decode_order(vec![
+                        flutter_rust_bridge::for_generated::LockableOrderInfo::new(
+                            &api_that, 0, false,
+                        ),
+                    ]);
+                for i in decode_indices_ {
+                    match i {
+                        0 => api_that_guard = Some(api_that.lockable_decode_sync_ref()),
+                        _ => unreachable!(),
+                    }
+                }
+                let api_that_guard = api_that_guard.unwrap();
+                let output_ok = crate::api::node::LinksyNode::route(&*api_that_guard, api_id)?;
+                std::result::Result::Ok(output_ok)
+            })())
+        },
+    )
+}
 fn wire__crate__api__node__LinksyNode_send_battery_impl(
     port_: flutter_rust_bridge::for_generated::MessagePort,
     ptr_: flutter_rust_bridge::for_generated::PlatformGeneralizedUint8ListPtr,
@@ -1988,6 +2376,70 @@ fn wire__crate__api__node__LinksyNode_send_battery_impl(
                             api_id,
                             api_level,
                             api_charging,
+                        )
+                        .await?;
+                        std::result::Result::Ok(output_ok)
+                    })()
+                    .await,
+                )
+            }
+        },
+    )
+}
+fn wire__crate__api__node__LinksyNode_send_bundle_impl(
+    port_: flutter_rust_bridge::for_generated::MessagePort,
+    ptr_: flutter_rust_bridge::for_generated::PlatformGeneralizedUint8ListPtr,
+    rust_vec_len_: i32,
+    data_len_: i32,
+) {
+    FLUTTER_RUST_BRIDGE_HANDLER.wrap_async::<flutter_rust_bridge::for_generated::SseCodec, _, _, _>(
+        flutter_rust_bridge::for_generated::TaskInfo {
+            debug_name: "LinksyNode_send_bundle",
+            port: Some(port_),
+            mode: flutter_rust_bridge::for_generated::FfiCallMode::Normal,
+        },
+        move || {
+            let message = unsafe {
+                flutter_rust_bridge::for_generated::Dart2RustMessageSse::from_wire(
+                    ptr_,
+                    rust_vec_len_,
+                    data_len_,
+                )
+            };
+            let mut deserializer =
+                flutter_rust_bridge::for_generated::SseDeserializer::new(message);
+            let api_that = <RustOpaqueMoi<
+                flutter_rust_bridge::for_generated::RustAutoOpaqueInner<LinksyNode>,
+            >>::sse_decode(&mut deserializer);
+            let api_id = <String>::sse_decode(&mut deserializer);
+            let api_paths = <Vec<String>>::sse_decode(&mut deserializer);
+            let api_apps_json = <String>::sse_decode(&mut deserializer);
+            deserializer.end();
+            move |context| async move {
+                transform_result_sse::<_, String>(
+                    (move || async move {
+                        let mut api_that_guard = None;
+                        let decode_indices_ =
+                            flutter_rust_bridge::for_generated::lockable_compute_decode_order(
+                                vec![flutter_rust_bridge::for_generated::LockableOrderInfo::new(
+                                    &api_that, 0, false,
+                                )],
+                            );
+                        for i in decode_indices_ {
+                            match i {
+                                0 => {
+                                    api_that_guard =
+                                        Some(api_that.lockable_decode_async_ref().await)
+                                }
+                                _ => unreachable!(),
+                            }
+                        }
+                        let api_that_guard = api_that_guard.unwrap();
+                        let output_ok = crate::api::node::LinksyNode::send_bundle(
+                            &*api_that_guard,
+                            api_id,
+                            api_paths,
+                            api_apps_json,
                         )
                         .await?;
                         std::result::Result::Ok(output_ok)
@@ -3523,144 +3975,160 @@ fn pde_ffi_dispatcher_primary_impl(
 ) {
     // Codec=Pde (Serialization + dispatch), see doc to use other codecs
     match func_id {
-        2 => wire__crate__api__node__LinksyNode_connect_address_impl(
+        3 => wire__crate__api__node__LinksyNode_connect_address_impl(
             port,
             ptr,
             rust_vec_len,
             data_len,
         ),
-        3 => {
+        4 => {
             wire__crate__api__node__LinksyNode_connect_away_impl(port, ptr, rust_vec_len, data_len)
         }
-        4 => wire__crate__api__node__LinksyNode_deck_open_impl(port, ptr, rust_vec_len, data_len),
-        5 => wire__crate__api__node__LinksyNode_deck_run_impl(port, ptr, rust_vec_len, data_len),
-        8 => wire__crate__api__node__LinksyNode_direct_dial_impl(port, ptr, rust_vec_len, data_len),
-        9 => wire__crate__api__node__LinksyNode_direct_link_impl(port, ptr, rust_vec_len, data_len),
+        5 => wire__crate__api__node__LinksyNode_deck_open_impl(port, ptr, rust_vec_len, data_len),
+        6 => wire__crate__api__node__LinksyNode_deck_run_impl(port, ptr, rust_vec_len, data_len),
+        9 => wire__crate__api__node__LinksyNode_direct_dial_impl(port, ptr, rust_vec_len, data_len),
         10 => {
+            wire__crate__api__node__LinksyNode_direct_link_impl(port, ptr, rust_vec_len, data_len)
+        }
+        11 => {
             wire__crate__api__node__LinksyNode_direct_send_impl(port, ptr, rust_vec_len, data_len)
         }
-        12 => wire__crate__api__node__LinksyNode_events_impl(port, ptr, rust_vec_len, data_len),
-        14 => {
+        13 => wire__crate__api__node__LinksyNode_events_impl(port, ptr, rust_vec_len, data_len),
+        15 => {
             wire__crate__api__node__LinksyNode_import_files_impl(port, ptr, rust_vec_len, data_len)
         }
-        15 => wire__crate__api__node__LinksyNode_inbox_history_page_impl(
+        16 => wire__crate__api__node__LinksyNode_inbox_history_page_impl(
             port,
             ptr,
             rust_vec_len,
             data_len,
         ),
-        18 => {
+        19 => wire__crate__api__node__LinksyNode_locate_impl(port, ptr, rust_vec_len, data_len),
+        20 => {
             wire__crate__api__node__LinksyNode_media_command_impl(port, ptr, rust_vec_len, data_len)
         }
-        19 => wire__crate__api__node__LinksyNode_network_changed_impl(
+        21 => wire__crate__api__node__LinksyNode_network_changed_impl(
             port,
             ptr,
             rust_vec_len,
             data_len,
         ),
-        20 => wire__crate__api__node__LinksyNode_notify_impl(port, ptr, rust_vec_len, data_len),
-        21 => {
+        22 => wire__crate__api__node__LinksyNode_notify_impl(port, ptr, rust_vec_len, data_len),
+        23 => {
             wire__crate__api__node__LinksyNode_open_terminal_impl(port, ptr, rust_vec_len, data_len)
         }
-        22 => wire__crate__api__node__LinksyNode_open_url_impl(port, ptr, rust_vec_len, data_len),
-        23 => {
+        24 => wire__crate__api__node__LinksyNode_open_url_impl(port, ptr, rust_vec_len, data_len),
+        25 => {
             wire__crate__api__node__LinksyNode_pair_address_impl(port, ptr, rust_vec_len, data_len)
         }
-        24 => {
+        26 => {
             wire__crate__api__node__LinksyNode_pair_device_impl(port, ptr, rust_vec_len, data_len)
         }
-        25 => wire__crate__api__node__LinksyNode_pair_with_invite_impl(
+        27 => wire__crate__api__node__LinksyNode_pair_with_invite_impl(
             port,
             ptr,
             rust_vec_len,
             data_len,
         ),
-        28 => wire__crate__api__node__LinksyNode_post_notification_impl(
+        31 => wire__crate__api__node__LinksyNode_post_notification_impl(
             port,
             ptr,
             rust_vec_len,
             data_len,
         ),
-        29 => wire__crate__api__node__LinksyNode_refuse_location_impl(
+        32 => wire__crate__api__node__LinksyNode_preflight_impl(port, ptr, rust_vec_len, data_len),
+        33 => wire__crate__api__node__LinksyNode_preflight_calls_impl(
             port,
             ptr,
             rust_vec_len,
             data_len,
         ),
-        30 => wire__crate__api__node__LinksyNode_remove_notification_impl(
-            port,
-            ptr,
-            rust_vec_len,
-            data_len,
-        ),
-        33 => wire__crate__api__node__LinksyNode_ring_impl(port, ptr, rust_vec_len, data_len),
         34 => {
+            wire__crate__api__node__LinksyNode_prepare_send_impl(port, ptr, rust_vec_len, data_len)
+        }
+        35 => wire__crate__api__node__LinksyNode_refuse_location_impl(
+            port,
+            ptr,
+            rust_vec_len,
+            data_len,
+        ),
+        36 => wire__crate__api__node__LinksyNode_remove_notification_impl(
+            port,
+            ptr,
+            rust_vec_len,
+            data_len,
+        ),
+        39 => wire__crate__api__node__LinksyNode_ring_impl(port, ptr, rust_vec_len, data_len),
+        41 => {
             wire__crate__api__node__LinksyNode_send_battery_impl(port, ptr, rust_vec_len, data_len)
         }
-        35 => wire__crate__api__node__LinksyNode_send_call_state_impl(
+        42 => {
+            wire__crate__api__node__LinksyNode_send_bundle_impl(port, ptr, rust_vec_len, data_len)
+        }
+        43 => wire__crate__api__node__LinksyNode_send_call_state_impl(
             port,
             ptr,
             rust_vec_len,
             data_len,
         ),
-        36 => wire__crate__api__node__LinksyNode_send_clipboard_impl(
+        44 => wire__crate__api__node__LinksyNode_send_clipboard_impl(
             port,
             ptr,
             rust_vec_len,
             data_len,
         ),
-        37 => wire__crate__api__node__LinksyNode_send_clipboard_file_impl(
+        45 => wire__crate__api__node__LinksyNode_send_clipboard_file_impl(
             port,
             ptr,
             rust_vec_len,
             data_len,
         ),
-        38 => wire__crate__api__node__LinksyNode_send_files_impl(port, ptr, rust_vec_len, data_len),
-        39 => {
+        46 => wire__crate__api__node__LinksyNode_send_files_impl(port, ptr, rust_vec_len, data_len),
+        47 => {
             wire__crate__api__node__LinksyNode_send_location_impl(port, ptr, rust_vec_len, data_len)
         }
-        40 => {
+        48 => {
             wire__crate__api__node__LinksyNode_send_picture_impl(port, ptr, rust_vec_len, data_len)
         }
-        41 => {
+        49 => {
             wire__crate__api__node__LinksyNode_session_write_impl(port, ptr, rust_vec_len, data_len)
         }
-        43 => {
+        51 => {
             wire__crate__api__node__LinksyNode_set_features_impl(port, ptr, rust_vec_len, data_len)
         }
-        44 => wire__crate__api__node__LinksyNode_set_volume_impl(port, ptr, rust_vec_len, data_len),
-        47 => wire__crate__api__node__LinksyNode_shutdown_impl(port, ptr, rust_vec_len, data_len),
-        48 => {
+        52 => wire__crate__api__node__LinksyNode_set_volume_impl(port, ptr, rust_vec_len, data_len),
+        55 => wire__crate__api__node__LinksyNode_shutdown_impl(port, ptr, rust_vec_len, data_len),
+        56 => {
             wire__crate__api__node__LinksyNode_start_input_impl(port, ptr, rust_vec_len, data_len)
         }
-        49 => wire__crate__api__node__LinksyNode_start_view_impl(port, ptr, rust_vec_len, data_len),
-        50 => wire__crate__api__node__LinksyNode_terminal_output_impl(
+        57 => wire__crate__api__node__LinksyNode_start_view_impl(port, ptr, rust_vec_len, data_len),
+        58 => wire__crate__api__node__LinksyNode_terminal_output_impl(
             port,
             ptr,
             rust_vec_len,
             data_len,
         ),
-        51 => wire__crate__api__node__LinksyNode_terminals_impl(port, ptr, rust_vec_len, data_len),
-        52 => wire__crate__api__node__LinksyNode_update_settings_impl(
+        59 => wire__crate__api__node__LinksyNode_terminals_impl(port, ptr, rust_vec_len, data_len),
+        60 => wire__crate__api__node__LinksyNode_update_settings_impl(
             port,
             ptr,
             rust_vec_len,
             data_len,
         ),
-        53 => wire__crate__api__node__LinksyNode_watch_clipboard_impl(
+        61 => wire__crate__api__node__LinksyNode_watch_clipboard_impl(
             port,
             ptr,
             rust_vec_len,
             data_len,
         ),
-        54 => {
+        62 => {
             wire__crate__api__node__LinksyNode_watch_media_impl(port, ptr, rust_vec_len, data_len)
         }
-        55 => {
+        63 => {
             wire__crate__api__node__LinksyNode_watch_volume_impl(port, ptr, rust_vec_len, data_len)
         }
-        56 => wire__crate__api__node__init_app_impl(port, ptr, rust_vec_len, data_len),
-        57 => wire__crate__api__node__start_node_impl(port, ptr, rust_vec_len, data_len),
+        64 => wire__crate__api__node__init_app_impl(port, ptr, rust_vec_len, data_len),
+        65 => wire__crate__api__node__start_node_impl(port, ptr, rust_vec_len, data_len),
         _ => unreachable!(),
     }
 }
@@ -3673,22 +4141,25 @@ fn pde_ffi_dispatcher_sync_impl(
 ) -> flutter_rust_bridge::for_generated::WireSyncRust2DartSse {
     // Codec=Pde (Serialization + dispatch), see doc to use other codecs
     match func_id {
-        1 => wire__crate__api__node__LinksyNode_cancel_impl(ptr, rust_vec_len, data_len),
-        6 => {
+        1 => wire__crate__api__node__LinksyNode_answer_preflight_impl(ptr, rust_vec_len, data_len),
+        2 => wire__crate__api__node__LinksyNode_cancel_impl(ptr, rust_vec_len, data_len),
+        7 => {
             wire__crate__api__node__LinksyNode_decline_unsupported_impl(ptr, rust_vec_len, data_len)
         }
-        7 => wire__crate__api__node__LinksyNode_devices_json_impl(ptr, rust_vec_len, data_len),
-        11 => wire__crate__api__node__LinksyNode_end_session_impl(ptr, rust_vec_len, data_len),
-        13 => wire__crate__api__node__LinksyNode_forget_impl(ptr, rust_vec_len, data_len),
-        16 => wire__crate__api__node__LinksyNode_info_json_impl(ptr, rust_vec_len, data_len),
-        17 => wire__crate__api__node__LinksyNode_link_impl(ptr, rust_vec_len, data_len),
-        26 => wire__crate__api__node__LinksyNode_pairing_mode_impl(ptr, rust_vec_len, data_len),
-        27 => wire__crate__api__node__LinksyNode_port_impl(ptr, rust_vec_len, data_len),
-        31 => wire__crate__api__node__LinksyNode_respond_impl(ptr, rust_vec_len, data_len),
-        32 => wire__crate__api__node__LinksyNode_respond_display_impl(ptr, rust_vec_len, data_len),
-        42 => wire__crate__api__node__LinksyNode_set_away_all_impl(ptr, rust_vec_len, data_len),
-        45 => wire__crate__api__node__LinksyNode_settings_json_impl(ptr, rust_vec_len, data_len),
-        46 => wire__crate__api__node__LinksyNode_share_files_impl(ptr, rust_vec_len, data_len),
+        8 => wire__crate__api__node__LinksyNode_devices_json_impl(ptr, rust_vec_len, data_len),
+        12 => wire__crate__api__node__LinksyNode_end_session_impl(ptr, rust_vec_len, data_len),
+        14 => wire__crate__api__node__LinksyNode_forget_impl(ptr, rust_vec_len, data_len),
+        17 => wire__crate__api__node__LinksyNode_info_json_impl(ptr, rust_vec_len, data_len),
+        18 => wire__crate__api__node__LinksyNode_link_impl(ptr, rust_vec_len, data_len),
+        28 => wire__crate__api__node__LinksyNode_pairing_mode_impl(ptr, rust_vec_len, data_len),
+        29 => wire__crate__api__node__LinksyNode_plan_send_impl(ptr, rust_vec_len, data_len),
+        30 => wire__crate__api__node__LinksyNode_port_impl(ptr, rust_vec_len, data_len),
+        37 => wire__crate__api__node__LinksyNode_respond_impl(ptr, rust_vec_len, data_len),
+        38 => wire__crate__api__node__LinksyNode_respond_display_impl(ptr, rust_vec_len, data_len),
+        40 => wire__crate__api__node__LinksyNode_route_impl(ptr, rust_vec_len, data_len),
+        50 => wire__crate__api__node__LinksyNode_set_away_all_impl(ptr, rust_vec_len, data_len),
+        53 => wire__crate__api__node__LinksyNode_settings_json_impl(ptr, rust_vec_len, data_len),
+        54 => wire__crate__api__node__LinksyNode_share_files_impl(ptr, rust_vec_len, data_len),
         _ => unreachable!(),
     }
 }

@@ -1736,14 +1736,15 @@ checksum = "65cd87c9a6d60536580b316ad985726104730a5151c99845f2490428ef91240a"
 
 [[package]]
 name = "linksy-core"
-version = "0.11.4"
-source = "git+ssh://git@github.com/LinkSy-mg/linksy-desktop.git?rev=760cb9823dd64201e1c125cd8acedc6e7aa6fc13#760cb9823dd64201e1c125cd8acedc6e7aa6fc13"
+version = "0.12.4"
+source = "git+ssh://git@github.com/LinkSy-mg/linksy-desktop.git?rev=db766a1e08a45306520069d9fd887385d90b0e79#db766a1e08a45306520069d9fd887385d90b0e79"
 dependencies = [
  "blake3",
  "getrandom 0.4.3",
  "hex",
  "if-addrs",
  "iroh",
+ "libc",
  "mdns-sd",
  "quinn",
  "rcgen",

@@ -31,6 +31,7 @@ DeviceView deviceViewFromJson(Json j) => DeviceView(
     final num s => DateTime.fromMillisecondsSinceEpoch(s.toInt() * 1000),
     _ => null,
   },
+  direct: j['direct'] as bool? ?? false,
 );
 
 MediaState mediaStateFromJson(Json j) => MediaState(
@@ -83,6 +84,10 @@ Json settingsToJson(NodeSettings s) => {
   'relay': s.relay,
 };
 
+List<AppInfo> _apps(Object? list) => [
+  for (final a in (list as List? ?? const []).cast<Json>()) AppInfo.fromJson(a),
+];
+
 List<OfferedFile> _files(Object? list) => [
   for (final f in (list as List? ?? const []).cast<Json>())
     OfferedFile(path: f['path'] as String, size: (f['size'] as num).toInt()),
@@ -115,6 +120,7 @@ LinksyEvent? eventFromJson(Json j) {
       from: device('from'),
       files: _files(j['files']),
       total: _int(j['total']),
+      apps: _apps(j['apps']),
     ),
     'transfer_started' => TransferStarted(
       j['transfer'] as String,
@@ -122,6 +128,30 @@ LinksyEvent? eventFromJson(Json j) {
       incoming: j['direction'] == 'incoming',
       files: _files(j['files']),
       total: _int(j['total']),
+      apps: _apps(j['apps']),
+    ),
+    'transfer_route' => TransferRouted(
+      transfer: j['transfer'] as String,
+      route: j['route'] as String? ?? 'lan',
+      settingUpDirect: j['setting_up_direct'] as bool? ?? false,
+      whyNotDirect: j['why_not_direct'] as String?,
+    ),
+    'location' => LocationReceived(
+      from: device('from'),
+      lat: (j['lat'] as num?)?.toDouble(),
+      lon: (j['lon'] as num?)?.toDouble(),
+    ),
+    'location_refused' => LocationReceived(
+      from: device('from'),
+      refused: j['reason'] as String? ?? '',
+    ),
+    'apps_received' => AppsReceived(
+      transfer: j['transfer'] as String,
+      from: device('from'),
+      apps: [
+        for (final a in (j['apps'] as List? ?? const []).cast<Json>())
+          ReceivedApp.fromJson(a),
+      ],
     ),
     'transfer_progress' => TransferProgress(
       transfer: j['transfer'] as String,

@@ -91,6 +91,7 @@ class DeviceView {
     this.away = false,
     this.awayAll = false,
     this.awayUntil,
+    this.direct = false,
   });
 
   final DeviceInfo device;
@@ -113,6 +114,9 @@ class DeviceView {
   /// Until when it may connect from away: a week after it was last on the
   /// same network or cable.
   final DateTime? awayUntil;
+
+  /// A direct link (Wi-Fi Direct, §4.17) to it is up.
+  final bool direct;
 
   Presence get presence => connected
       ? Presence.connected
@@ -257,12 +261,84 @@ class TransferRequest extends LinksyEvent {
     required this.from,
     required this.files,
     required this.total,
+    this.apps = const [],
   });
 
   final String transfer;
   final DeviceInfo from;
   final List<OfferedFile> files;
   final int total;
+
+  /// The apps among [files], when they say what they are (§4.22).
+  final List<AppInfo> apps;
+
+  /// What isn't an app's APK.
+  Iterable<OfferedFile> get plainFiles =>
+      files.where((f) => !apps.any((a) => f.path.startsWith('${a.dir}/')));
+}
+
+/// The way a transfer goes (§4.22), on both ends.
+class TransferRouted extends LinksyEvent {
+  const TransferRouted({
+    required this.transfer,
+    required this.route,
+    this.settingUpDirect = false,
+    this.whyNotDirect,
+  });
+
+  final String transfer;
+
+  /// `usb`, `direct`, `lan` or `away`.
+  final String route;
+
+  /// It's waiting for a direct link, up to 45 s.
+  final bool settingUpDirect;
+
+  /// A link was tried and failed, and it goes the usual way.
+  final String? whyNotDirect;
+}
+
+/// Where a device says it is, or why not (§4.14).
+class LocationReceived extends LinksyEvent {
+  const LocationReceived({
+    required this.from,
+    this.lat,
+    this.lon,
+    this.refused,
+  });
+
+  final DeviceInfo from;
+  final double? lat;
+  final double? lon;
+  final String? refused;
+}
+
+/// How installing an app went, for the user to read.
+class AppInstalled extends LinksyEvent {
+  const AppInstalled({
+    required this.label,
+    required this.from,
+    required this.status,
+  });
+
+  final String label;
+  final String from;
+
+  /// `installed`, `cancelled`, `mismatch`, `other_signer` or `failed:…`.
+  final String status;
+}
+
+/// Apps arrived, after their transfer's [TransferComplete]: to install.
+class AppsReceived extends LinksyEvent {
+  const AppsReceived({
+    required this.transfer,
+    required this.from,
+    required this.apps,
+  });
+
+  final String transfer;
+  final DeviceInfo from;
+  final List<ReceivedApp> apps;
 }
 
 class TransferStarted extends LinksyEvent {
@@ -272,7 +348,11 @@ class TransferStarted extends LinksyEvent {
     this.incoming = false,
     this.files = const [],
     this.total = 0,
+    this.apps = const [],
   });
+
+  /// The apps among [files].
+  final List<AppInfo> apps;
 
   final String transfer;
 
@@ -736,4 +816,219 @@ abstract interface class TerminalChannel {
   /// Leaves it running on the computer: ends the stream without
   /// `term_close`, to `resume` later.
   Future<void> detach();
+}
+
+// Phone to phone (docs/protocol.md §4.22).
+
+/// How a send would go now (`plan_send`).
+class SendPlan {
+  const SendPlan({required this.route, this.direct = 'not', this.seconds});
+
+  factory SendPlan.fromJson(Map<String, Object?> j) => SendPlan(
+    route: j['route'] as String? ?? 'lan',
+    direct: switch (j['direct']) {
+      {'state': final String state} => state,
+      _ => 'not',
+    },
+    seconds: j['seconds'] as int?,
+  );
+
+  /// `usb`, `direct`, `lan` or `away`, as things stand.
+  final String route;
+
+  /// A direct link: `up`, `will` come up first, or `not`.
+  final String direct;
+
+  /// A guess, from how fast each route has been to this device.
+  final int? seconds;
+
+  /// The way it would really go.
+  String get goes => direct == 'not' ? route : 'direct';
+
+  bool get overTheInternet => goes == 'away';
+}
+
+/// How the other phone's copy of an app compares with the one to be sent.
+enum AppThere {
+  /// Not installed there.
+  none,
+
+  /// The same version, from the same developer.
+  same,
+
+  /// Older there: sending it is an update.
+  older,
+
+  /// Newer there.
+  newer,
+
+  /// Installed there from another developer.
+  otherSigner,
+
+  /// Something a newer Linksy says, or no answer: don't know.
+  unknown;
+
+  static AppThere parse(String? value) => switch (value) {
+    'none' => none,
+    'same' => same,
+    'older' => older,
+    'newer' => newer,
+    'other_signer' => otherSigner,
+    _ => unknown,
+  };
+}
+
+/// An app to compare with the other phone's copy.
+class AppProbe {
+  const AppProbe({
+    required this.package,
+    required this.versionCode,
+    required this.signer,
+  });
+
+  final String package;
+  final int versionCode;
+  final String signer;
+
+  Map<String, Object?> toJson() => {
+    'package': package,
+    'version_code': versionCode,
+    'signer': signer,
+  };
+}
+
+/// What the other phone says before a send.
+class PreflightReply {
+  const PreflightReply({
+    this.free,
+    this.auto = true,
+    this.canInstall = true,
+    this.direct,
+    this.apps = const {},
+  });
+
+  factory PreflightReply.fromJson(Map<String, Object?> j) => PreflightReply(
+    free: j['free'] as int?,
+    auto: j['auto'] as bool? ?? true,
+    canInstall: j['can_install'] as bool? ?? true,
+    direct: j['direct'] as String?,
+    apps: {
+      for (final a in (j['apps'] as List? ?? const []).cast<Map>())
+        a['package'] as String: AppThere.parse(a['have'] as String?),
+    },
+  );
+
+  /// What it can take at once; null when it didn't say.
+  final int? free;
+
+  /// It takes this without asking.
+  final bool auto;
+
+  /// Linksy may install apps there.
+  final bool canInstall;
+
+  /// `ready`, `wifi_off`, `no_permission` or `unsupported`.
+  final String? direct;
+
+  /// By package.
+  final Map<String, AppThere> apps;
+}
+
+/// An app among the files of an offer: only a description, Android checks
+/// what it installs.
+class AppInfo {
+  const AppInfo({
+    required this.package,
+    required this.label,
+    required this.versionCode,
+    required this.dir,
+    this.versionName,
+    this.signer,
+    this.icon,
+  });
+
+  factory AppInfo.fromJson(Map<String, Object?> j) => AppInfo(
+    package: j['package'] as String,
+    label: j['label'] as String? ?? '',
+    versionCode: j['version_code'] as int? ?? 0,
+    dir: j['dir'] as String? ?? '',
+    versionName: j['version_name'] as String?,
+    signer: j['signer'] as String?,
+    icon: j['icon'] as String?,
+  );
+
+  final String package;
+  final String label;
+  final int versionCode;
+
+  /// The folder of the offer holding its APKs.
+  final String dir;
+  final String? versionName;
+  final String? signer;
+
+  /// A small PNG, base64.
+  final String? icon;
+}
+
+/// An app that arrived, with exactly the files of this transfer.
+class ReceivedApp {
+  const ReceivedApp({required this.info, required this.apks});
+
+  factory ReceivedApp.fromJson(Map<String, Object?> j) => ReceivedApp(
+    info: AppInfo.fromJson((j['info'] as Map).cast()),
+    apks: (j['apks'] as List? ?? const []).cast<String>(),
+  );
+
+  final AppInfo info;
+  final List<String> apks;
+}
+
+/// Another device asks before sending here.
+class PreflightCall {
+  const PreflightCall({required this.call, required this.probes});
+
+  factory PreflightCall.fromJson(Map<String, Object?> j) => PreflightCall(
+    call: j['call'] as int,
+    probes: (j['apps'] as List? ?? const []).cast<Map<String, Object?>>(),
+  );
+
+  final int call;
+
+  /// The apps it's about to send, `{package, version_code, signer}`.
+  final List<Map<String, Object?>> probes;
+}
+
+/// An app that travels in a send: what the other phone shows and checks.
+class AppBundle {
+  const AppBundle({
+    required this.package,
+    required this.label,
+    required this.versionCode,
+    required this.versionName,
+    required this.signer,
+    required this.icon,
+    required this.apks,
+  });
+
+  final String package;
+  final String label;
+  final int versionCode;
+  final String versionName;
+  final String signer;
+
+  /// A small PNG, base64.
+  final String? icon;
+
+  /// Its files, base first.
+  final List<String> apks;
+
+  Map<String, Object?> toJson() => {
+    'package': package,
+    'label': label,
+    'version_code': versionCode,
+    'version_name': versionName,
+    'signer': signer,
+    'icon': icon,
+    'apks': apks,
+  };
 }

@@ -178,6 +178,83 @@ class RustNode implements LinksyNode {
     name: tr.errorComputerOnCable,
   );
 
+  static SendPlan? _plan(String? json) =>
+      json == null ? null : SendPlan.fromJson((jsonDecode(json) as Map).cast());
+
+  @override
+  SendPlan? planSend(String id, int bytes) {
+    try {
+      return _plan(_node.planSend(id: id, bytes: BigInt.from(bytes)));
+    } on Object {
+      return null;
+    }
+  }
+
+  @override
+  Future<SendPlan?> prepareSend(String id, int bytes) async {
+    try {
+      return _plan(await _node.prepareSend(id: id, bytes: BigInt.from(bytes)));
+    } on Object {
+      return null;
+    }
+  }
+
+  @override
+  Future<PreflightReply?> preflight(
+    String id,
+    int bytes,
+    int files,
+    List<AppProbe> probes,
+  ) async {
+    try {
+      final json = await _node.preflight(
+        id: id,
+        bytes: BigInt.from(bytes),
+        files: files,
+        probesJson: jsonEncode([for (final p in probes) p.toJson()]),
+      );
+      return PreflightReply.fromJson((jsonDecode(json) as Map).cast());
+    } on Object {
+      // An older device, or no answer in time: send anyway.
+      return null;
+    }
+  }
+
+  @override
+  Stream<PreflightCall> get preflightCalls => _node.preflightCalls().map(
+    (json) => PreflightCall.fromJson((jsonDecode(json) as Map).cast()),
+  );
+
+  @override
+  void answerPreflight(int call, Map<Object?, Object?> facts) {
+    try {
+      _node.answerPreflight(
+        call: BigInt.from(call),
+        answerJson: jsonEncode(facts),
+      );
+    } on Object {
+      // Gone: the core has answered.
+    }
+  }
+
+  @override
+  Future<void> locate(String id) =>
+      _guard(() => _node.locate(id: id), name: _nameOf(id));
+
+  @override
+  Future<String> sendBundle(
+    String id,
+    List<String> paths,
+    List<AppBundle> apps,
+  ) => _guard(
+    () => _node.sendBundle(
+      id: id,
+      paths: paths,
+      appsJson: jsonEncode([for (final a in apps) a.toJson()]),
+    ),
+    name: _nameOf(id),
+  );
+
   @override
   Future<String> sendFiles(String id, List<String> paths) => _guard(
     () => _node.sendFiles(id: id, paths: paths),

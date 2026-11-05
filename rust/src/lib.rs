@@ -6,5 +6,6 @@ mod frb_generated;
 mod cable;
 mod files;
 mod gallery;
+mod preflight;
 mod heartbeats;
 mod sessions;

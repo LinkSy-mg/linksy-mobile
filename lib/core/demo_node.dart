@@ -87,6 +87,28 @@ class DemoNode implements LinksyNode {
       connected: false,
       nearby: true,
     ),
+    // A second phone, to see the phone-to-phone page without hardware.
+    DeviceView(
+      device: DeviceInfo(
+        id: _fakeId('Pixel of Sam'),
+        name: 'Pixel of Sam',
+        kind: DeviceKind.phone,
+        os: 'android',
+        features: [
+          'files',
+          'clipboard',
+          'open_url',
+          'ring',
+          'locate',
+          'preflight',
+          'apps',
+        ],
+      ),
+      trusted: true,
+      connected: true,
+      nearby: true,
+      battery: const Battery(level: 64, charging: false),
+    ),
   ];
 
   static String _fakeId(String seed) {
@@ -229,6 +251,56 @@ class DemoNode implements LinksyNode {
     });
     return transfer;
   }
+
+  /// A big send is worth a direct link; the rest stays on the Wi-Fi.
+  @override
+  SendPlan? planSend(String id, int bytes) {
+    final direct = bytes > 256 * 1024 * 1024;
+    return SendPlan(
+      route: 'lan',
+      direct: direct ? 'will' : 'not',
+      seconds: (10 * (direct ? 1 : 0) + bytes / (direct ? 75e6 : 20e6)).ceil(),
+    );
+  }
+
+  @override
+  Future<SendPlan?> prepareSend(String id, int bytes) async =>
+      planSend(id, bytes);
+
+  /// The second phone has 3 GB, asks first and doesn't take apps yet. What it
+  /// has of each app goes by its name, to show every mark.
+  @override
+  Future<PreflightReply?> preflight(
+    String id,
+    int bytes,
+    int files,
+    List<AppProbe> probes,
+  ) async => PreflightReply(
+    free: 3 * 1000 * 1000 * 1000,
+    auto: false,
+    canInstall: false,
+    direct: 'ready',
+    apps: {
+      for (final (i, p) in probes.indexed)
+        p.package: AppThere.values[i % (AppThere.values.length - 1)],
+    },
+  );
+
+  @override
+  Stream<PreflightCall> get preflightCalls => const Stream.empty();
+
+  @override
+  void answerPreflight(int call, Map<Object?, Object?> facts) {}
+
+  @override
+  Future<void> locate(String id) async {}
+
+  @override
+  Future<String> sendBundle(
+    String id,
+    List<String> paths,
+    List<AppBundle> apps,
+  ) => sendFiles(id, [...paths, for (final a in apps) ...a.apks]);
 
   int _sizeOf(String path) {
     try {

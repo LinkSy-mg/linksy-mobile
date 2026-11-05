@@ -7,7 +7,8 @@ import '../frb_generated.dart';
 
 import 'package:flutter_rust_bridge/flutter_rust_bridge_for_generated.dart';
 
-// These functions are ignored because they are not marked as `pub`: `fingerprint`, `json`, `kind`, `rt`, `run`, `running`
+// These functions are ignored because they are not marked as `pub`: `fingerprint`, `json`, `kind`, `rt`, `run`, `running`, `send`
+// These types are ignored because they are neither used by any `pub` functions nor (for structs and enums) marked `#[frb(unignore)]`: `AppJson`
 
 /// `features`: what this phone can do (docs/protocol.md §4.10). `away`: reach paired
 /// computers over the internet through `relay` (§4.13).
@@ -29,6 +30,11 @@ Future<LinksyNode> startNode({
 
 // Rust type: RustOpaqueMoi<flutter_rust_bridge::for_generated::RustAutoOpaqueInner<LinksyNode>>
 abstract class LinksyNode implements RustOpaqueInterface {
+  /// Answers a preflight within about two seconds, or the core does.
+  /// `answer_json`: `{"free","direct","can_install","apps":[{"package",
+  /// "have","version_code"}]}`.
+  void answerPreflight({required BigInt call, required String answerJson});
+
   bool cancel({required String transfer});
 
   /// Dials a paired computer at `addr` (the USB cable's bridge, §4.11).
@@ -95,6 +101,9 @@ abstract class LinksyNode implements RustOpaqueInterface {
   /// How a device is connected: `usb`, `lan`, `away`, or empty.
   String link({required String id});
 
+  /// Asks a device where it is, once (§4.14).
+  Future<void> locate({required String id});
+
   /// `command_json` in the core's shape: `{"action":"play_pause"}`.
   Future<void> mediaCommand({
     required String id,
@@ -141,6 +150,10 @@ abstract class LinksyNode implements RustOpaqueInterface {
   /// its invite, as on the computer.
   void pairingMode({required bool on_});
 
+  /// What sending `bytes` would do now, without sending: a `SendPlan` as
+  /// JSON, or nothing when it isn't connected (§4.22).
+  String? planSend({required String id, required BigInt bytes});
+
   /// The port this node listens on, for "pair by address" from elsewhere.
   int port();
 
@@ -153,6 +166,25 @@ abstract class LinksyNode implements RustOpaqueInterface {
     required String id,
     required String notificationJson,
   });
+
+  /// Asks a device about a send (§4.22): a `PreflightReply` as JSON.
+  /// `probes_json`: `[{"package","version_code","signer"}]`. Fails with
+  /// `unsupported` for a device without the feature: send anyway.
+  Future<String> preflight({
+    required String id,
+    required BigInt bytes,
+    required int files,
+    required String probesJson,
+  });
+
+  /// Preflights from other devices (§4.22), as JSON with the `call` to
+  /// answer: `{"call":n,"from":{…},"bytes":…,"files":…,"apps":[probes]}`.
+  /// A later listener takes over from an earlier one.
+  Stream<String> preflightCalls();
+
+  /// The user is choosing what to send, `bytes` of it so far: gets the best
+  /// route ready (§4.22). Sends nothing and does nothing twice.
+  Future<String?> prepareSend({required String id, required BigInt bytes});
 
   /// Answers `locate` with why not.
   Future<void> refuseLocation({required String id, required String reason});
@@ -180,11 +212,24 @@ abstract class LinksyNode implements RustOpaqueInterface {
   /// "Find my computer": makes it ring (`on`), or stops it.
   Future<void> ring({required String id, required bool on_});
 
+  /// How a connected device is reached now: `usb`, `direct`, `lan` or `away`
+  /// (§4.22); nothing when it isn't connected.
+  String? route({required String id});
+
   /// This phone's battery, `level` in percent.
   Future<void> sendBattery({
     required String id,
     required int level,
     required bool charging,
+  });
+
+  /// Files, folders and apps as one offer (§4.22). `apps_json`:
+  /// `[{"package","label","version_code","version_name","signer","icon",
+  /// "apks":[paths]}]`; the core names the folders.
+  Future<String> sendBundle({
+    required String id,
+    required List<String> paths,
+    required String appsJson,
   });
 
   /// `ringing`, `active` or `idle`.
