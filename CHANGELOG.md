@@ -4,6 +4,11 @@ All notable changes to Linksy for Android. Format: [Keep a Changelog](https://ke
 
 ## [Unreleased]
 
+## [0.3.4] - 2026-11-05
+
+> [!IMPORTANT]
+> **If Play Protect stops the install,** pause **Scan apps with Play Protect** while installing (Play Store › your picture › Play Protect › the gear at the top right), then turn it back on.
+
 ### Added
 
 - First-run setup offers Messages on your computers (the computer's Inbox) and Photos on your computers (its Gallery), with an Allow button each.
