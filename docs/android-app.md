@@ -44,6 +44,7 @@ offer those features to Android phones.
 | `features` | Announced | `files clipboard open_url battery ring media_remote call_state heartbeat import fs input screen display camera watch clipboard_file microphone picture locate deck_layout`, plus `notifications` and `inbox_history` while notifications go to the computers and `gallery` while it's on, changed live with `set_features` |
 | `fs` `info` | Done | `fs_info` with the picked folder's name |
 | Phone notifications on the computer (`notification_*`, §4.5) | Done (0.3.2) | A `NotificationListenerService` in the app, on once the user allows Notification access (Android 13+: guided through Allow restricted settings). Inbox fields: `category`, `conversation` (never the user's own name), `sender`, `mine`, `group`, `time`, `picture`, `messages` (up to 25, oldest first, from `getMessages` and `getHistoricMessages`), `subject` for mail (`CATEGORY_EMAIL`). Android 15 hides some content from listeners it doesn't trust (`Ranking.hasSensitiveContent`): those go as plain notifications |
+| Turning on the Inbox and Gallery | Done | Without digging through Settings: the first-run setup page's rows "Messages on your computers" and "Photos on your computers", and a one-time home card for people updating (pref `turn_on_card`: gone when dismissed or both are on; setup marks it done). `phone_notifications` is on unless `off`; nothing goes until Notification access is allowed. Once, at start (`inbox_default`): no pref with access already given means the switch was turned off, so it's written `off`. On Android 13+ the restricted-settings steps come first, and start with tapping the greyed-out switch: App info only has ⋮ › Allow restricted settings after Android refused once (the app op goes `deny`/default → `ignore` → `allow`) |
 | Answering after the notification is gone (`reply_kept`) | Done | A conversation's reply action is kept for a day after its notification goes; `notification_reply` uses it, and forgets it once the app cancels the intent |
 | Earlier messages (`inbox_history`) | Done | What the listener saw, per app and `conversation`: the newest 300 messages of the 300 most recent conversations, in Linksy's own files; forgotten when the user turns notifications on the computers off. Announced with `notifications` |
 | Gallery (`gallery`, §4.18) | Done | Announced while Linksy may read photos (`READ_MEDIA_IMAGES`/`READ_MEDIA_VIDEO`, or All files access) and Settings › Files › Photos on your computers is on. Straight from MediaStore: newest first by `COALESCE(DATE_TAKEN, DATE_ADDED×1000)` then `_ID`; albums are MediaStore buckets ("Phone storage" for the root); thumbnails from `loadThumbnail`, JPEG ≤ 256 KiB; `send` reads the file itself when it may, else a cache copy; `gallery_changed` from a MediaStore observer, at most every 2 s |
@@ -129,6 +130,15 @@ default SMS app.
   works on the networks tested; pairing by QR or address covers the rest).
 
 ## Changelog
+
+- **2026-11-05** — Inbox on by default (`phone_notifications` != `off`, migrated once), rows
+  for the Inbox and Gallery on the first-run setup page, a one-time home card for people
+  updating, the restricted-settings steps first on Android 13+. A computer's ask
+  (`turn_on_request`): a sheet with Linksy open, a notification opening that sheet when
+  not, at most once a minute per computer and feature; already on, the features are told
+  again (backwards then back, since the core only tells a list that changed). Waiting on
+  the core: `turn_on` goes in `features` (lib/main.dart) with the pin that has the message,
+  so computers don't show Ask the Phone before the phone can hear it.
 
 - **2026-11-03** — Phone on core `760cb98` (desktop next release): deck layouts made on the
   computer (`deck_layout`, announced always): kept per computer with their `version`,

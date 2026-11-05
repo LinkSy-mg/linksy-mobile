@@ -4,6 +4,21 @@ All notable changes to Linksy for Android. Format: [Keep a Changelog](https://ke
 
 ## [Unreleased]
 
+### Added
+
+- First-run setup offers Messages on your computers (the computer's Inbox) and Photos on your computers (its Gallery), with an Allow button each.
+- A one-time card on the home screen, for people updating: "Your messages and photos on your computers", with a Turn On button for whichever is off.
+
+### Changed
+
+- Show this phone's notifications is on by default: nothing is sent until Android's Notification access is allowed. If you turned it off, it stays off.
+- On Android 13 and later, the steps for Android's greyed-out switch now come first, starting with tapping that switch: App info only shows ⋮ › Allow restricted settings after Android has refused once. They close by themselves once it's allowed.
+- If Android won't ask for your photos again, the message has a button to App info.
+
+### Fixed
+
+- A one-cell deck label like "Bluetooth" could break mid-word in Stock, Signal, Glass and Midnight.
+
 ## [0.3.3] - 2026-11-03
 
 > [!IMPORTANT]
