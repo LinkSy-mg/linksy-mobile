@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
 
@@ -13,7 +14,6 @@ import '../../ui/l10n.dart';
 import '../../ui/sig.dart';
 import '../device/activity_tile.dart';
 import '../device/device_screen.dart';
-import '../pairing/pairing_flows.dart';
 import '../sharing/sharing.dart';
 import '../settings/settings_screen.dart';
 import '../settings/turn_on.dart';
@@ -106,7 +106,7 @@ class HomeScreen extends StatelessWidget {
                   ),
                 ),
               ],
-              const SliverToBoxAdapter(child: SizedBox(height: 120)),
+              _PageEnd(arrow: paired.isEmpty),
             ],
           ),
           // Transfers, Send files and Add a device, growing in place.
@@ -675,25 +675,142 @@ class _GetStarted extends StatelessWidget {
               ],
             ),
           ),
-          const SizedBox(height: 22),
-          SigButton(
-            label: l10n.homeScanQr,
-            icon: PhBold.scan,
-            expand: true,
-            height: 54,
-            onTap: () => scanAndPair(context),
-          ),
-          const SizedBox(height: 2),
-          SigButton(
-            label: l10n.homePairByAddress,
-            kind: SigButtonKind.quiet,
-            expand: true,
-            onTap: () => pairByAddress(context),
-          ),
         ],
       ),
     );
   }
+}
+
+/// Room for the island under the page. Before the first device, an arrow to
+/// it too, if the page leaves enough: on a small phone, or under a card, it
+/// would end up behind the island.
+class _PageEnd extends StatelessWidget {
+  const _PageEnd({required this.arrow});
+
+  final bool arrow;
+
+  @override
+  Widget build(BuildContext context) => SliverLayoutBuilder(
+    builder: (context, constraints) {
+      final room =
+          constraints.viewportMainAxisExtent -
+          constraints.precedingScrollExtent;
+      return arrow && room >= _PointToAdd.needs(context)
+          ? const SliverFillRemaining(
+              hasScrollBody: false,
+              child: _PointToAdd(),
+            )
+          : const SliverToBoxAdapter(child: SizedBox(height: 120));
+    },
+  );
+}
+
+/// Under the steps, an arrow down to the island's Add a device, where they
+/// start. It fills what's left of the page over the pill.
+class _PointToAdd extends StatefulWidget {
+  const _PointToAdd();
+
+  /// The pill's height with its margin, and the air left over it.
+  static double over(BuildContext context) =>
+      76 + 14 + MediaQuery.paddingOf(context).bottom;
+
+  /// With the least arrow worth drawing.
+  static double needs(BuildContext context) => over(context) + 110;
+
+  @override
+  State<_PointToAdd> createState() => _PointToAddState();
+}
+
+class _PointToAddState extends State<_PointToAdd>
+    with SingleTickerProviderStateMixin {
+  late final _bob = AnimationController(
+    vsync: this,
+    duration: const Duration(milliseconds: 2000),
+  );
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    loopUnlessReduced(context, _bob);
+  }
+
+  @override
+  void dispose() {
+    _bob.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: EdgeInsets.only(top: 12, bottom: _PointToAdd.over(context)),
+      child: ExcludeSemantics(
+        child: AnimatedBuilder(
+          animation: _bob,
+          builder: (_, child) {
+            final there = 1 - (2 * _bob.value - 1).abs();
+            return Transform.translate(
+              offset: Offset(0, 6 * Curves.easeInOut.transform(there) - 6),
+              child: child,
+            );
+          },
+          child: const CustomPaint(
+            painter: _ArrowPainter(Sig.blue),
+            size: Size.infinite,
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+/// A dashed swoop from the right, straight down at its tip.
+class _ArrowPainter extends CustomPainter {
+  const _ArrowPainter(this.color);
+
+  final Color color;
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    final height = math.min(size.height, 210.0);
+    final top = size.height - height;
+    final tip = Offset(size.width / 2, size.height);
+    final from = size.width * 0.7;
+    final line = Paint()
+      ..color = color.withValues(alpha: 0.5)
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = 2.4
+      ..strokeCap = StrokeCap.round;
+    final swoop = Path()
+      ..moveTo(from, top)
+      ..cubicTo(
+        from,
+        top + height * 0.62,
+        tip.dx,
+        top + height * 0.34,
+        tip.dx,
+        tip.dy - 5,
+      );
+    for (final metric in swoop.computeMetrics()) {
+      for (var at = 0.0; at < metric.length; at += 15) {
+        final end = math.min(at + 7, metric.length);
+        canvas.drawPath(metric.extractPath(at, end), line);
+      }
+    }
+    canvas.drawPath(
+      Path()
+        ..moveTo(tip.dx - 10, tip.dy - 12)
+        ..lineTo(tip.dx, tip.dy)
+        ..lineTo(tip.dx + 10, tip.dy - 12),
+      line
+        ..color = color
+        ..strokeWidth = 2.8
+        ..strokeJoin = StrokeJoin.round,
+    );
+  }
+
+  @override
+  bool shouldRepaint(_ArrowPainter old) => old.color != color;
 }
 
 /// A quiet heading over a list, as in Settings: sentence case, no shouting.
