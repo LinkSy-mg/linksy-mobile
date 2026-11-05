@@ -498,8 +498,15 @@ class _Speed extends StatelessWidget {
     final device = c.device(first.deviceId);
     final other = device?.device.kind ?? DeviceKind.desktop;
     final going = !batch.waiting && batch.speed > 0;
-    final stage = c.direct[first.deviceId];
-    final settingUp = stage != null && stage != DirectStage.up;
+    // The way it goes: both ends hear it (§4.22). This phone's own Wi-Fi steps
+    // say more while there are some.
+    final routed = c.routeOf(first.id);
+    final stage =
+        c.direct[first.deviceId] ??
+        (routed?.route == 'direct' ? DirectStage.up : null);
+    final settingUp =
+        routed?.settingUpDirect == true ||
+        stage != null && stage != DirectStage.up;
     final computer = _End(kindIcon(other), Sig.incoming);
     const phone = _End(Ph.deviceMobile, Sig.outgoing);
     final speed = formatSpeed(batch.speed).split(' ');
@@ -597,6 +604,14 @@ class _Speed extends StatelessWidget {
             if (first.incoming) phone else computer,
           ],
         ),
+        if (routed?.whyNotDirect case final why?)
+          Padding(
+            padding: const EdgeInsets.only(top: 8),
+            child: Text(
+              l.routeNotDirect(why),
+              style: TextStyle(fontSize: 13.5, color: s.muted),
+            ),
+          ),
       ],
     );
     return flat

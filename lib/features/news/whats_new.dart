@@ -29,6 +29,21 @@ const _most = 5;
 /// Newest first.
 final List<(String, List<Highlight>)> _releases = [
   (
+    '0.3.5',
+    [
+      Highlight(
+        Ph.deviceMobile,
+        (l) => l.news035PhonesTitle,
+        (l) => l.news035PhonesBody,
+      ),
+      Highlight(
+        Ph.squaresFour,
+        (l) => l.news035AppsTitle,
+        (l) => l.news035AppsBody,
+      ),
+    ],
+  ),
+  (
     '0.3.4',
     [
       Highlight(

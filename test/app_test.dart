@@ -154,9 +154,13 @@ void main() {
     await c.sendFiles(id, ['/x/a.jpg', '/x/b.jpg', '/x/c.jpg']);
     await tester.pump();
     // Waiting for the computer: the count, ring turning.
-    expect(find.text('3'), findsOneWidget);
+    final count = find.descendant(
+      of: find.byType(TransfersButton),
+      matching: find.text('3'),
+    );
+    expect(count, findsOneWidget);
     await tester.pump(const Duration(milliseconds: 2400));
-    await tester.tap(find.text('3'));
+    await tester.tap(count);
     await frames(tester);
     // The island grows in place: the files still on their way.
     expect(find.text('b.jpg'), findsOneWidget);
@@ -176,7 +180,7 @@ void main() {
     await tester.pageBack();
     await tester.pump(const Duration(seconds: 3));
     await frames(tester);
-    expect(find.text('3'), findsNothing);
+    expect(count, findsNothing);
   });
 
   testWidgets('a device picked in the share sheet gets the files at once', (

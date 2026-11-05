@@ -29,6 +29,7 @@ class Pressable extends StatefulWidget {
     super.key,
     required Widget this.child,
     this.onTap,
+    this.onLongPress,
     this.scale = 0.97,
     this.semanticLabel,
   }) : builder = null;
@@ -38,6 +39,7 @@ class Pressable extends StatefulWidget {
     super.key,
     required Widget Function(BuildContext context, bool down) this.builder,
     this.onTap,
+    this.onLongPress,
     this.scale = 0.97,
     this.semanticLabel,
   }) : child = null;
@@ -45,6 +47,7 @@ class Pressable extends StatefulWidget {
   final Widget? child;
   final Widget Function(BuildContext context, bool down)? builder;
   final VoidCallback? onTap;
+  final VoidCallback? onLongPress;
   final double scale;
   final String? semanticLabel;
 
@@ -86,7 +89,7 @@ class _PressableState extends State<Pressable> {
 
   @override
   Widget build(BuildContext context) {
-    final enabled = widget.onTap != null;
+    final enabled = widget.onTap != null || widget.onLongPress != null;
     final reduced = MediaQuery.disableAnimationsOf(context);
     return Semantics(
       button: enabled,
@@ -96,12 +99,19 @@ class _PressableState extends State<Pressable> {
         onTapDown: enabled ? (_) => _press() : null,
         onTapUp: enabled ? (_) => _lift() : null,
         onTapCancel: enabled ? _up : null,
-        onTap: enabled
-            ? () {
+        onTap: widget.onTap == null
+            ? null
+            : () {
                 HapticFeedback.selectionClick();
                 widget.onTap!();
-              }
-            : null,
+              },
+        onLongPress: widget.onLongPress == null
+            ? null
+            : () {
+                _up();
+                HapticFeedback.mediumImpact();
+                widget.onLongPress!();
+              },
         child: Opacity(
           opacity: reduced && _down ? 0.6 : 1,
           child: AnimatedScale(
@@ -484,6 +494,7 @@ String presenceLabel(Presence p) => switch (p) {
 /// network.
 String linkWords(DeviceView v) => switch (v) {
   DeviceView(connected: true, usb: true) => tr.commonUsbCable,
+  DeviceView(connected: true, direct: true) => tr.routeDirect,
   DeviceView(connected: true, away: true) => tr.commonAwayFromHome,
   DeviceView(presence: Presence.notNearby) => tr.commonNotNearby,
   _ => tr.commonSameWifi,

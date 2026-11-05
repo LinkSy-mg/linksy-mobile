@@ -7,6 +7,7 @@ import '../../ui/components.dart';
 import '../../ui/format.dart';
 import '../../ui/l10n.dart';
 import '../../ui/sig.dart';
+import '../phones/install_sheet.dart';
 
 /// "Studio Desktop is sending you 3 files": names, sizes, Accept / Decline.
 class IncomingFilesSheet extends StatelessWidget {
@@ -38,11 +39,14 @@ class IncomingFilesSheet extends StatelessWidget {
         }
       });
     }
-    final files = request.files;
+    final apps = request.apps;
+    final files = request.plainFiles.toList();
     final l10n = context.l10n;
     // The sender's name in ink, the rest of the sentence muted.
     final name = request.from.name;
-    final sentence = l10n.incomingSendingYou(name, files.length);
+    final sentence = apps.isNotEmpty
+        ? l10n.phoneInstallAsk(apps.length, name)
+        : l10n.incomingSendingYou(name, files.length);
     final at = name.isEmpty ? -1 : sentence.indexOf(name);
     final muted = TextStyle(color: s.muted);
     return SafeArea(
@@ -103,6 +107,15 @@ class IncomingFilesSheet extends StatelessWidget {
               style: TextStyle(fontSize: 14, color: s.muted),
             ),
             const SizedBox(height: 18),
+            for (final a in apps.take(_shown)) AppLine(info: a),
+            if (apps.length > _shown)
+              Padding(
+                padding: const EdgeInsets.only(left: 4, bottom: 8),
+                child: Text(
+                  l10n.incomingMore(apps.length - _shown),
+                  style: TextStyle(color: s.muted),
+                ),
+              ),
             for (final f in files.take(_shown))
               Padding(
                 padding: const EdgeInsets.only(bottom: 8),

@@ -47,6 +47,20 @@ String formatDay(DateTime t, {DateTime? now}) {
       : DateFormat.yMMMMd(locale).format(day);
 }
 
+/// A heading for what was taken that day: "Today", "Yesterday", "Nov 2", and
+/// the year for earlier years.
+String formatDayHeading(DateTime t, {DateTime? now}) {
+  final today = _date(now ?? DateTime.now());
+  final day = _date(t);
+  final diff = today.difference(day).inDays;
+  if (diff == 0) return tr.formatToday;
+  if (diff == 1) return tr.formatYesterday;
+  final locale = _dateLocale();
+  return day.year == today.year
+      ? DateFormat.MMMd(locale).format(day)
+      : DateFormat.yMMMd(locale).format(day);
+}
+
 /// A day in short, as a clock shows it: "Tue, 3 Nov".
 String shortDate(DateTime t) => DateFormat.MMMEd(_dateLocale()).format(t);
 

@@ -46,6 +46,9 @@ const _features = [
   'picture',
   'locate',
   'deck_layout',
+  'turn_on',
+  'preflight',
+  'apps',
 ];
 
 Future<void> main() async {

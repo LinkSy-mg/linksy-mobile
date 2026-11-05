@@ -18,6 +18,8 @@ class Activity {
     this.saved = const [],
     this.text,
     this.reason,
+    this.thumbs = const [],
+    this.packages = const {},
   });
 
   /// Transfer id for files, otherwise a local id.
@@ -37,6 +39,15 @@ class Activity {
   int total;
   int bytes;
   List<String> saved;
+
+  /// Up to a few of the photos sent, for showing them later.
+  final List<String> thumbs;
+
+  /// The apps among [names]: name to package.
+  final Map<String, String> packages;
+
+  /// What to picture it with: what was sent, or where it was saved.
+  List<String> get pictures => thumbs.isNotEmpty ? thumbs : saved;
 
   /// Clipboard text, ping title or link. Clipboard text is never written to disk:
   /// it may be a password.
@@ -62,6 +73,8 @@ class Activity {
     'total': total,
     'bytes': bytes,
     'saved': saved,
+    if (thumbs.isNotEmpty) 'thumbs': thumbs,
+    if (packages.isNotEmpty) 'packages': packages,
     // Links are kept; clipboard text never is (it may be a password).
     if (kind == ActivityKind.ping ||
         kind == ActivityKind.link ||
@@ -84,6 +97,8 @@ class Activity {
     saved: (j['saved'] as List).cast<String>(),
     text: j['text'] as String?,
     reason: j['reason'] as String?,
+    thumbs: (j['thumbs'] as List?)?.cast<String>() ?? const [],
+    packages: (j['packages'] as Map?)?.cast<String, String>() ?? const {},
   );
 }
 

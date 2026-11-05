@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
+import 'dart:math' as math;
 import 'dart:typed_data';
 
 import 'package:flutter/foundation.dart' show mapEquals;
@@ -14,6 +15,7 @@ import '../core/linksy_node.dart';
 import 'app_log.dart';
 import '../core/models.dart';
 import '../core/service_info.dart';
+import '../features/phones/selection.dart';
 import 'app_update.dart';
 import '../ui/format.dart';
 import '../ui/l10n.dart';
@@ -288,6 +290,8 @@ class LinksyController extends ChangeNotifier with WidgetsBindingObserver {
     _batterySub = LinksyPlatform.batteryChanges.listen(_onBattery);
     _callSub = LinksyPlatform.callStates.listen(_onCall);
     _noticeSub = LinksyPlatform.phoneNotifications.listen(_onPhoneNotification);
+    _preflightSub = node.preflightCalls.listen(_onPreflight);
+    _installSub = LinksyPlatform.appInstalls.listen(_onAppInstall);
     _noticeGoneSub = LinksyPlatform.phoneNotificationsGone.listen(
       _onPhoneNotificationGone,
     );
@@ -377,6 +381,190 @@ class LinksyController extends ChangeNotifier with WidgetsBindingObserver {
     );
   }
 
+  // Phone to phone (docs/protocol.md §4.22).
+
+  /// The way each transfer goes, while it does.
+  StreamSubscription<PreflightCall>? _preflightSub;
+  StreamSubscription<(String?, String)>? _installSub;
+
+  final _routes = <String, TransferRouted>{};
+  TransferRouted? routeOf(String transfer) => _routes[transfer];
+
+  /// The apps among each transfer that's going on: their files don't belong
+  /// in Downloads.
+  final _transferApps = <String, List<AppInfo>>{};
+
+  /// Apps that arrived, for the user to install or not.
+  final pendingApps = <AppsReceived>[];
+
+  /// Asked about already: one sheet each.
+  final _offeredApps = <String>{};
+
+  SendPlan? planSend(String id, int bytes) => node.planSend(id, bytes);
+  Future<SendPlan?> prepareSend(String id, int bytes) =>
+      node.prepareSend(id, bytes);
+  Future<PreflightReply?> preflight(
+    String id,
+    int bytes,
+    int files,
+    List<AppProbe> probes,
+  ) => node.preflight(id, bytes, files, probes);
+
+  /// Everything chosen as one offer, so the other phone asks once: several
+  /// only past what an offer holds, and those are asked about together.
+  Future<String?> sendSelection(String deviceId, SendSelection chosen) async {
+    final batches = sendBatches(chosen.paths);
+    final apps = [for (final a in chosen.apps) a.bundle];
+    final sizes = {
+      for (final m in chosen.media) m.path: m.size,
+      for (final f in chosen.files) f.path: f.size,
+    };
+    LinksyPlatform.sharedTo(deviceId);
+    try {
+      for (var i = 0; i < math.max(batches.length, 1); i++) {
+        final paths = i < batches.length ? batches[i] : const <String>[];
+        final with_ = i == 0 ? chosen.apps.toList() : const <PhoneApp>[];
+        final transfer = await node.sendBundle(
+          deviceId,
+          paths,
+          i == 0 ? apps : const [],
+        );
+        if (_activity.every((a) => a.id != transfer)) {
+          _add(
+            Activity(
+              id: transfer,
+              deviceId: deviceId,
+              kind: ActivityKind.files,
+              incoming: false,
+              time: DateTime.now(),
+              status: ActivityStatus.waiting,
+              names: [
+                for (final p in paths) p.split('/').last,
+                for (final a in with_) a.label,
+              ],
+              sizes: [
+                for (final p in paths) sizes[p] ?? 0,
+                for (final a in with_) a.size,
+              ],
+              thumbs: [for (final m in chosen.media.take(3)) m.path],
+              packages: {for (final a in with_) a.label: a.package},
+            ),
+          );
+        }
+      }
+      return null;
+    } on LinksyException catch (e) {
+      return e.message;
+    }
+  }
+
+  /// Android's photo permission, without turning on the Gallery for computers.
+  Future<void> allowPhotos() async {
+    await LinksyPlatform.requestPermission('photos');
+    await _refreshGallery();
+    notifyListeners();
+  }
+
+  /// A note goes to the clipboard there; a link opens there.
+  Future<String?> sendNote(String deviceId, String text) {
+    final note = text.trim();
+    final uri = Uri.tryParse(note);
+    final link =
+        uri?.isScheme('https') == true || uri?.isScheme('http') == true;
+    return link && !note.contains(' ')
+        ? openUrl(deviceId, note)
+        : sendText(deviceId, note);
+  }
+
+  /// Asks where it is; the answer comes as an event.
+  Future<String?> locate(String deviceId) => _run(() async {
+    await node.locate(deviceId);
+    _addLocal(deviceId, ActivityKind.locate, incoming: false);
+  });
+
+  /// Answers another device: what only this phone knows, quickly.
+  Future<void> _onPreflight(PreflightCall call) async {
+    node.answerPreflight(
+      call.call,
+      await LinksyPlatform.preflightFacts(call.probes),
+    );
+  }
+
+  /// [files] as a person reads them: an app is its name, not its APKs.
+  (List<String>, List<int>) _offered(
+    List<OfferedFile> files,
+    List<AppInfo> apps,
+  ) {
+    bool inApp(OfferedFile f, AppInfo a) => f.path.startsWith('${a.dir}/');
+    final plain = files.where((f) => !apps.any((a) => inApp(f, a)));
+    return (
+      [for (final f in plain) f.name, for (final a in apps) a.label],
+      [
+        for (final f in plain) f.size,
+        for (final a in apps)
+          files.where((f) => inApp(f, a)).fold(0, (n, f) => n + f.size),
+      ],
+    );
+  }
+
+  /// What's being installed, for saying how it went: its name and whose it was.
+  final _installing = <String, (String, String)>{};
+
+  void _onAppInstall((String?, String) outcome) {
+    final (package, status) = outcome;
+    final what = _installing.remove(package);
+    if (what == null) return;
+    _prompts.add(AppInstalled(label: what.$1, from: what.$2, status: status));
+  }
+
+  /// Shows what's waiting to be installed, once each.
+  void _offerApps() {
+    for (final e in pendingApps) {
+      if (_offeredApps.add(e.transfer)) _prompts.add(e);
+    }
+  }
+
+  /// The user answered: installs [apps] of [offer], or with none lets go of
+  /// its files.
+  Future<void> finishApps(AppsReceived offer, {required bool install}) async {
+    pendingApps.remove(offer);
+    notifyListeners();
+    if (install) {
+      for (final a in offer.apps) {
+        _installing[a.info.package] = (a.info.label, offer.from.name);
+      }
+      await LinksyPlatform.installApps([
+        for (final a in offer.apps)
+          {
+            'package': a.info.package,
+            'version_code': a.info.versionCode,
+            'signer': a.info.signer,
+            'apks': a.apks,
+          },
+      ]);
+    } else {
+      await LinksyPlatform.deleteFiles([for (final a in offer.apps) ...a.apks]);
+    }
+  }
+
+  /// Files the core finished while Flutter wasn't there to move them, as when
+  /// Linksy was swiped away but kept running. Not while files are arriving:
+  /// those are moved as they finish.
+  Future<void> _moveLeftovers() async {
+    if (_transferApps.isNotEmpty ||
+        _activity.any((a) => a.incoming && a.status == ActivityStatus.active)) {
+      return;
+    }
+    final moved = await LinksyPlatform.publishLeftovers([
+      for (final a in _activity) ...a.saved,
+      for (final e in pendingApps)
+        for (final a in e.apps) ...a.apks,
+    ]);
+    if (moved.isNotEmpty) {
+      log.add('Moved ${moved.length} file(s) that arrived with Linksy closed');
+    }
+  }
+
   /// Linksy is what the phone shows; else what comes in needs a notification.
   bool get _onScreen =>
       WidgetsBinding.instance.lifecycleState == AppLifecycleState.resumed;
@@ -390,6 +578,8 @@ class LinksyController extends ChangeNotifier with WidgetsBindingObserver {
       // Back from Notification access or App info, maybe.
       unawaited(refreshNotificationAccess());
       unawaited(_refreshGallery());
+      unawaited(_moveLeftovers());
+      _offerApps();
       // Back from Developer options, maybe.
       _readShareProtections();
     } else if (state == AppLifecycleState.hidden) {
@@ -433,6 +623,7 @@ class LinksyController extends ChangeNotifier with WidgetsBindingObserver {
     await refreshNotificationAccess();
     await _refreshGallery();
     _accessRead.complete();
+    unawaited(_moveLeftovers());
     final phone = await LinksyPlatform.phoneMaker();
     maker = phone.maker;
     sdk = phone.sdk;
@@ -1699,6 +1890,9 @@ class LinksyController extends ChangeNotifier with WidgetsBindingObserver {
         LinksyPlatform.dismissNotification(key);
       case InboxHistoryRequested():
         _answerHistory(e);
+      case LocationReceived() || AppInstalled():
+        // Shown from the prompts.
+        break;
       case TurnOnRequested():
         unawaited(_onTurnOnRequest(e));
       case DeckActionsReceived(:final from, :final actions):
@@ -1739,18 +1933,23 @@ class LinksyController extends ChangeNotifier with WidgetsBindingObserver {
         :final from,
         :final files,
         :final total,
+        :final apps,
       ):
         // Not on screen: Accept / Decline right in the notification.
         if (!_onScreen) {
           LinksyPlatform.noticeTransfer(
             transfer,
-            tr.ctlTransferRequest(files.length, from.name),
+            apps.isEmpty
+                ? tr.ctlTransferRequest(files.length, from.name)
+                : tr.phoneInstallAsk(apps.length, from.name),
             [
-              if (files.length == 1) files.single.name,
+              if (apps.isEmpty && files.length == 1) files.single.name,
+              if (apps.isNotEmpty) apps.map((a) => a.label).join(', '),
               formatBytes(total),
             ].join(' · '),
           );
         }
+        if (apps.isNotEmpty) _transferApps[transfer] = apps;
         _add(
           Activity(
             id: transfer,
@@ -1759,18 +1958,37 @@ class LinksyController extends ChangeNotifier with WidgetsBindingObserver {
             incoming: true,
             time: DateTime.now(),
             status: ActivityStatus.waiting,
-            names: [for (final f in files) f.name],
-            sizes: [for (final f in files) f.size],
+            names: _offered(files, apps).$1,
+            sizes: _offered(files, apps).$2,
             total: total,
+            packages: {for (final a in apps) a.label: a.package},
           ),
         );
+      case TransferRouted(:final transfer, :final whyNotDirect):
+        _routes[transfer] = e;
+        if (whyNotDirect != null) log.add('No direct link: $whyNotDirect');
+        notifyListeners();
+      case AppsReceived():
+        _transferApps.remove(e.transfer);
+        pendingApps.add(e);
+        if (_onScreen) {
+          _offerApps();
+        } else {
+          LinksyPlatform.noticeArrived(
+            'apps-${e.transfer}',
+            tr.phoneInstallAsk(e.apps.length, e.from.name),
+            e.apps.map((a) => a.info.label).join(', '),
+          );
+        }
       case TransferStarted(
         :final transfer,
         :final peer,
         :final incoming,
         :final files,
         :final total,
+        :final apps,
       ):
+        if (incoming && apps.isNotEmpty) _transferApps[transfer] = apps;
         // Outgoing transfers start when offered: they wait for the other side
         // until bytes flow. Incoming ones start once accepted.
         if (_activity.any((a) => a.id == transfer)) {
@@ -1791,9 +2009,10 @@ class LinksyController extends ChangeNotifier with WidgetsBindingObserver {
               incoming: incoming,
               time: DateTime.now(),
               status: incoming ? ActivityStatus.active : ActivityStatus.waiting,
-              names: [for (final f in files) f.name],
-              sizes: [for (final f in files) f.size],
+              names: _offered(files, apps).$1,
+              sizes: _offered(files, apps).$2,
               total: total,
+              packages: {for (final a in apps) a.label: a.package},
             ),
           );
         }
@@ -1823,6 +2042,12 @@ class LinksyController extends ChangeNotifier with WidgetsBindingObserver {
         _importEnded(transfer, ok: false, reason: reason);
       case TransferComplete(:final transfer, :final saved):
         LinksyPlatform.cancelNotice(transfer);
+        // An app's files stay where they are, to be installed from there.
+        final apps = _transferApps[transfer] ?? const <AppInfo>[];
+        final plain = [
+          for (final p in saved)
+            if (!apps.any((a) => p.contains('/${a.dir}/'))) p,
+        ];
         // Files that went or came: a light tick once they're all there.
         if (_onScreen && _activity.any((a) => a.id == transfer)) {
           HapticFeedback.lightImpact();
@@ -1831,18 +2056,25 @@ class LinksyController extends ChangeNotifier with WidgetsBindingObserver {
           a
             ..status = ActivityStatus.done
             ..bytes = a.total
-            ..saved = saved;
+            ..saved = plain;
         });
         // Where other apps find them: Downloads/Linksy, or the chosen folder.
         // Not a file put on the clipboard: no timeline entry was made for its transfer.
-        if (saved.isNotEmpty && _activity.any((a) => a.id == transfer)) {
-          LinksyPlatform.publishDownloads(saved).then((moved) {
+        if (plain.isNotEmpty && _activity.any((a) => a.id == transfer)) {
+          LinksyPlatform.publishDownloads(plain).then((moved) {
             _update(transfer, (a) => a.saved = moved);
           });
         }
         _lastSample.remove(transfer);
+        _routes.remove(transfer);
       case TransferFailed(:final transfer, :final reason):
         LinksyPlatform.cancelNotice(transfer);
+        _routes.remove(transfer);
+        // An app's files have nothing left to be: they go.
+        for (final a in _transferApps.remove(transfer) ?? const <AppInfo>[]) {
+          final dir = Directory('${settings?.downloadDir}/${a.dir}');
+          dir.delete(recursive: true).ignore();
+        }
         _update(transfer, (a) {
           final declined = reason.toLowerCase().contains('declin');
           a
@@ -1915,7 +2147,8 @@ class LinksyController extends ChangeNotifier with WidgetsBindingObserver {
           TransferRequest() ||
           NotificationReceived() ||
           ClipboardFileReceived() ||
-          OpenUrlReceived():
+          OpenUrlReceived() ||
+          LocationReceived():
         _prompts.add(e);
       // Each change of a watched clipboard would be a snack bar too many.
       case ClipboardReceived(:final from) when !_clipWatching.contains(from.id):
@@ -2457,6 +2690,8 @@ class LinksyController extends ChangeNotifier with WidgetsBindingObserver {
     _batterySub?.cancel();
     _callSub?.cancel();
     _noticeSub?.cancel();
+    _preflightSub?.cancel();
+    _installSub?.cancel();
     _noticeGoneSub?.cancel();
     _answerSub?.cancel();
     _directSub?.cancel();

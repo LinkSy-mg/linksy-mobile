@@ -209,7 +209,7 @@ class TimelineEntry extends StatelessWidget {
                           builder: (_) => WebcamScreen(share: webcam),
                         ),
                       )
-                    : () => _open(context, a),
+                    : () => open(context, a),
                 child: Row(
                   children: [
                     Icon(activityIcon(a), color: color, size: 22),
@@ -336,7 +336,8 @@ class TimelineEntry extends StatelessWidget {
     ActivityKind.watch,
   ].contains(a.kind);
 
-  static Future<void> _open(BuildContext context, Activity a) async {
+  /// Opens what it holds: its link, its file, or a choice of its files.
+  static Future<void> open(BuildContext context, Activity a) async {
     if (a.kind == ActivityKind.link) {
       if (!await LinksyPlatform.openUrl(a.text!) && context.mounted) {
         showMessage(context, context.l10n.activityNoAppForLink);

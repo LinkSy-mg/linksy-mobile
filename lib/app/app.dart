@@ -8,6 +8,7 @@ import '../core/models.dart';
 import '../features/device/device_screen.dart';
 import '../features/devices/home_screen.dart';
 import '../features/news/whats_new.dart';
+import '../features/phones/install_sheet.dart';
 import '../features/pairing/pairing_flows.dart';
 import '../features/onboarding/onboarding_screen.dart';
 import '../features/ring/ring_screen.dart';
@@ -271,6 +272,33 @@ class _LinksyAppState extends State<LinksyApp> {
           barrierDismissible: false,
           builder: (_) => SessionRequestDialog(request: e),
         );
+      case AppsReceived():
+        HapticFeedback.lightImpact();
+        showModalBottomSheet<void>(
+          context: context,
+          isDismissible: false,
+          enableDrag: false,
+          isScrollControlled: true,
+          showDragHandle: true,
+          builder: (_) => InstallSheet(offer: e),
+        );
+      case AppInstalled(:final label, :final from, :final status):
+        _say(switch (status) {
+          'installed' => tr.phoneInstalled(label),
+          'cancelled' => tr.phoneInstallCancelled(label),
+          'mismatch' => tr.phoneInstallMismatch(label, from),
+          'other_signer' => tr.phoneInstallOtherSigner(label),
+          _ => tr.phoneInstallFailed(
+            label,
+            status.split(':').skip(1).join(':'),
+          ),
+        });
+      case LocationReceived(:final from, :final lat, :final lon):
+        if (lat != null && lon != null) {
+          LinksyPlatform.openMap(lat, lon);
+        } else {
+          _say(tr.phoneWhereRefused(from.name, e.refused ?? ''));
+        }
       case TransferRequest():
         HapticFeedback.lightImpact();
         showModalBottomSheet<void>(

@@ -15,6 +15,7 @@ import '../../ui/components.dart';
 import '../../ui/format.dart';
 import '../../ui/l10n.dart';
 import '../../ui/sig.dart';
+import '../phones/phone_page.dart';
 import '../remote/remote_screen.dart';
 import '../settings/settings_kit.dart';
 import '../sharing/sharing.dart';
@@ -142,6 +143,7 @@ class _DeviceScreenState extends State<DeviceScreen> {
       // Forgotten while open.
       return const Scaffold(body: SizedBox.shrink());
     }
+    if (!_isComputer(view.device)) return PhonePage(deviceId: deviceId);
     final volume = view.connected ? c.volume[deviceId] : null;
     final front = ModalRoute.of(context)?.isCurrent ?? false;
     scheduleMicrotask(() {
@@ -442,26 +444,8 @@ class _Hero extends StatelessWidget {
                 gaplessPlayback: true,
               )
             else
-              const _GridBanner(),
-            // An inner shadow: deep at the bottom, where the name sits, and
-            // light at the top, under the buttons; the picture or the grid
-            // fades into it. (The one gradient in the app, on purpose.)
-            const DecoratedBox(
-              decoration: BoxDecoration(
-                gradient: LinearGradient(
-                  begin: Alignment.topCenter,
-                  end: Alignment.bottomCenter,
-                  colors: [
-                    Color(0x590A1024),
-                    Color(0x000A1024),
-                    Color(0x000A1024),
-                    Color(0xCC0A1024),
-                    Color(0xF20A1024),
-                  ],
-                  stops: [0, 0.22, 0.38, 0.72, 1],
-                ),
-              ),
-            ),
+              const GridBanner(),
+            const HeroFade(),
             // Back and settings are on [_Bar], over this.
             Positioned(
               left: 16,
@@ -627,7 +611,7 @@ class _Actions extends StatelessWidget {
             child: Row(
               children: [
                 Expanded(
-                  child: _Quick(
+                  child: QuickAction(
                     icon: Ph.clipboardText,
                     label: context.l10n.deviceClipboard,
                     confirms: true,
@@ -635,14 +619,14 @@ class _Actions extends StatelessWidget {
                   ),
                 ),
                 Expanded(
-                  child: _Quick(
+                  child: QuickAction(
                     icon: Ph.bellRinging,
                     label: context.l10n.devicePing,
                     confirms: true,
                     onTap: () => c.ping(id),
                   ),
                 ),
-                Expanded(child: _FindAction(view: view)),
+                Expanded(child: FindAction(view: view)),
               ],
             ),
           ),
@@ -655,8 +639,9 @@ class _Actions extends StatelessWidget {
 /// A quick action: its icon in a soft circle over its name. Solid blue while
 /// it's going on (ringing); when it [confirms], a check and "Sent" for a
 /// moment once it went.
-class _Quick extends StatefulWidget {
-  const _Quick({
+class QuickAction extends StatefulWidget {
+  const QuickAction({
+    super.key,
     required this.icon,
     required this.label,
     required this.onTap,
@@ -671,10 +656,10 @@ class _Quick extends StatefulWidget {
   final bool confirms;
 
   @override
-  State<_Quick> createState() => _QuickState();
+  State<QuickAction> createState() => _QuickActionState();
 }
 
-class _QuickState extends State<_Quick> {
+class _QuickActionState extends State<QuickAction> {
   Timer? _sent;
 
   Future<void> _tap() async {
@@ -734,10 +719,35 @@ class _QuickState extends State<_Quick> {
   }
 }
 
+/// An inner shadow: deep at the bottom, where the name sits, and light at the
+/// top, under the buttons; the picture or the grid fades into it. (The one
+/// gradient in the app, on purpose.)
+class HeroFade extends StatelessWidget {
+  const HeroFade({super.key});
+
+  @override
+  Widget build(BuildContext context) => const DecoratedBox(
+    decoration: BoxDecoration(
+      gradient: LinearGradient(
+        begin: Alignment.topCenter,
+        end: Alignment.bottomCenter,
+        colors: [
+          Color(0x590A1024),
+          Color(0x000A1024),
+          Color(0x000A1024),
+          Color(0xCC0A1024),
+          Color(0xF20A1024),
+        ],
+        stops: [0, 0.22, 0.38, 0.72, 1],
+      ),
+    ),
+  );
+}
+
 /// The banner without a picture: deep blue with a fine grid, which the
 /// banner's shadow fades out toward the name.
-class _GridBanner extends StatelessWidget {
-  const _GridBanner();
+class GridBanner extends StatelessWidget {
+  const GridBanner({super.key});
 
   @override
   Widget build(BuildContext context) =>
@@ -770,8 +780,8 @@ class _Grid extends CustomPainter {
 }
 
 /// "Find my computer": rings it until stopped (or 30 s), so it can be found.
-class _FindAction extends StatelessWidget {
-  const _FindAction({required this.view});
+class FindAction extends StatelessWidget {
+  const FindAction({super.key, required this.view});
 
   final DeviceView view;
 
@@ -780,7 +790,7 @@ class _FindAction extends StatelessWidget {
     final c = LinksyScope.of(context);
     final id = view.device.id;
     final ringing = c.isFinding(id);
-    return _Quick(
+    return QuickAction(
       icon: ringing ? PhFill.bellRinging : Ph.binoculars,
       label: ringing ? context.l10n.deviceTapToStop : context.l10n.deviceFindIt,
       active: ringing,

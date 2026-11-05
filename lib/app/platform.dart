@@ -59,6 +59,7 @@ abstract final class LinksyPlatform {
   static final _directSteps =
       StreamController<(String, Map<String, Object?>)>.broadcast();
   static final _turnOnAsks = StreamController<void>.broadcast();
+  static final _appInstalls = StreamController<(String?, String)>.broadcast();
   static var _listening = false;
 
   /// Calls from Android: pairing links, second-display size and end, and
@@ -110,6 +111,9 @@ abstract final class LinksyPlatform {
           _openWebcam.add(call.arguments as String);
         case 'turnOn':
           _turnOnAsks.add(null);
+        case 'appInstall' when call.arguments is Map:
+          final a = call.arguments as Map;
+          _appInstalls.add((a['package'] as String?, a['status'] as String));
         case 'networkChanged':
           _networkChanges.add(null);
         case 'directStep' when call.arguments is Map:
@@ -486,6 +490,85 @@ abstract final class LinksyPlatform {
         'paths': paths,
       }))?.cast<String>() ??
       paths;
+
+  /// This phone's apps that can travel (§4.22).
+  static Future<List<Map<Object?, Object?>>> phoneApps() async =>
+      (await _call<List<Object?>>('phoneApps'))?.cast() ?? const [];
+
+  /// Its photo albums, newest first.
+  static Future<List<Map<Object?, Object?>>> phoneAlbums() async =>
+      (await _call<List<Object?>>('phoneAlbums'))?.cast() ?? const [];
+
+  /// A page of its photos and videos older than [before], newest first.
+  static Future<List<Map<Object?, Object?>>> phoneMedia({
+    String? album,
+    int? before,
+    int limit = 200,
+  }) async =>
+      (await _call<List<Object?>>('phoneMedia', {
+        'album': album,
+        'before': before,
+        'limit': limit,
+      }))?.cast() ??
+      const [];
+
+  /// A small JPEG of one of them.
+  static Future<Uint8List?> phoneThumb(int id, {required bool video}) =>
+      _call<Uint8List>('phoneThumb', {'id': id, 'video': video});
+
+  /// A small JPEG of a file, by its path or `content://` URI; null if gone.
+  static Future<Uint8List?> thumbOf(String ref) =>
+      _call<Uint8List>('thumbOf', {'ref': ref});
+
+  /// Starts an installed app.
+  static Future<void> openApp(String package) =>
+      _call<void>('openApp', {'package': package});
+
+  /// An installed app's icon; null if it isn't here.
+  static Future<Uint8List?> appIcon(String package) =>
+      _call<Uint8List>('appIcon', {'package': package});
+
+  /// What only this phone knows for a preflight's answer, ready to send.
+  static Future<Map<Object?, Object?>> preflightFacts(
+    List<Map<String, Object?>> probes,
+  ) async =>
+      await _call<Map<Object?, Object?>>('preflightFacts', {
+        'probes': probes,
+      }) ??
+      const {};
+
+  /// Installs apps one after the other, Android asking each time. The
+  /// outcomes come on [appInstalls], and the files go.
+  static Future<void> installApps(List<Map<String, Object?>> apps) =>
+      _call<void>('installApps', {'apps': apps});
+
+  /// `(package, status)`: `installed`, `cancelled`, `mismatch`, `other_signer`
+  /// or `failed:…`, and `(null, done)` at the end.
+  static Stream<(String?, String)> get appInstalls {
+    _listen();
+    return _appInstalls.stream;
+  }
+
+  static Future<void> deleteFiles(List<String> paths) =>
+      _call<void>('deleteFiles', {'paths': paths});
+
+  /// A folder to send, copied where the core can read it; null if cancelled.
+  static Future<String?> pickSendFolder() => _call<String>('pickSendFolder');
+
+  /// Shows a place in the phone's own map app. False if there's none.
+  static Future<bool> openMap(double lat, double lon) async =>
+      await _call<bool>('openMap', {'lat': lat, 'lon': lon}) ?? false;
+
+  /// Leaves the screen with Linksy running, as Home does.
+  static Future<void> toBackground() => _call<void>('toBackground');
+
+  /// Moves files the core finished with nobody there to move them, all but
+  /// [keep]; returns where they went.
+  static Future<List<String>> publishLeftovers(List<String> keep) async =>
+      (await _call<List<Object?>>('publishLeftovers', {
+        'keep': keep,
+      }))?.cast<String>() ??
+      const [];
 
   /// A running webcam's capabilities and controls (see CameraShare.kt).
   static Future<Map<String, Object?>?> webcamState(String session) async {
