@@ -291,14 +291,19 @@ class _DeviceScreenState extends State<DeviceScreen> {
                   ],
                 SliverToBoxAdapter(
                   child: SizedBox(
-                    height: 32 + MediaQuery.paddingOf(context).bottom,
+                    height:
+                        (c.liveTransfers.isEmpty ? 32 : TransferBar.room) +
+                        MediaQuery.paddingOf(context).bottom,
                   ),
                 ),
               ],
             ),
             _Bar(view: view, scroll: _scroll),
             // Files on their way, from any page.
-            const TransferBubble(),
+            const Align(
+              alignment: Alignment.bottomCenter,
+              child: TransferBar(),
+            ),
           ],
         ),
       ),

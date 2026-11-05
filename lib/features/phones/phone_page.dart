@@ -157,6 +157,7 @@ class _PhonePageState extends State<PhonePage> {
                     builder: (context, _) => SizedBox(
                       height:
                           (_flow.selection.isEmpty ? 0 : SendBar.room) +
+                          (c.liveTransfers.isEmpty ? 0 : TransferBar.room) +
                           MediaQuery.paddingOf(context).bottom,
                     ),
                   ),
@@ -166,9 +167,18 @@ class _PhonePageState extends State<PhonePage> {
             _ScrolledBar(past: _past, view: view),
             Align(
               alignment: Alignment.bottomCenter,
-              child: SendBar(flow: _flow, name: d.name),
+              child: SafeArea(
+                top: false,
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: [
+                    const TransferBar(),
+                    SendBar(flow: _flow, name: d.name),
+                  ],
+                ),
+              ),
             ),
-            const TransferBubble(),
           ],
         ),
         backgroundColor: s.bg,

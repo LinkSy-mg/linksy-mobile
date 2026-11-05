@@ -15,6 +15,7 @@ All notable changes to Linksy for Android. Format: [Keep a Changelog](https://ke
 
 ### Changed
 
+- Files on their way: a bar along the bottom of a device's page, with the way they go, instead of the circle. Tap it to open it up, to the speed, each file and Cancel.
 - The home screen before your first device: an arrow leads from the steps to Add a device, instead of a second set of buttons for the same thing.
 
 ### Fixed

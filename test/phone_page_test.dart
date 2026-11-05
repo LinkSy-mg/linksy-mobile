@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -10,6 +12,7 @@ import 'package:linksy/features/device/device_screen.dart';
 import 'package:linksy/features/phones/selection.dart';
 import 'package:linksy/features/phones/send_bar.dart';
 import 'package:linksy/features/phones/send_flow.dart';
+import 'package:linksy/features/transfer/transfer_bubble.dart';
 import 'package:linksy/l10n/app_localizations.dart';
 import 'package:linksy/ui/sig.dart';
 
@@ -70,6 +73,48 @@ void main() {
       expect(find.text(gone), findsNothing);
     }
     await finish(tester, c);
+  });
+
+  testWidgets('files on their way: a bar that opens up, then all done', (
+    tester,
+  ) async {
+    final (c, id) = await pump(tester, name: 'Pixel of Sam');
+    expect(tester.getSize(find.byType(TransferBar)).height, 0);
+
+    unawaited(c.sendFiles(id, ['/photos/a.jpg']));
+    await tester.pump();
+    await tester.pump(const Duration(milliseconds: 300));
+    expect(tester.getSize(find.byType(TransferBar)).height, greaterThan(50));
+    expect(find.text('Cancel'), findsNothing);
+
+    await tester.tap(find.byType(TransferBar));
+    await tester.pump();
+    await tester.pump(const Duration(milliseconds: 300));
+    expect(find.text('Cancel'), findsOneWidget);
+    expect(
+      find.descendant(
+        of: find.byType(TransferBar),
+        matching: find.text('a.jpg'),
+      ),
+      findsOneWidget,
+    );
+
+    // A second tap closes it again.
+    await tester.tap(find.text('Waiting to start'));
+    await tester.pump();
+    await tester.pump(const Duration(milliseconds: 300));
+    expect(find.text('Cancel'), findsNothing);
+
+    // Accepted, sent, the moment of All done, then gone.
+    await tester.pump(const Duration(seconds: 2));
+    await tester.pump(const Duration(seconds: 3));
+    await tester.pump(const Duration(milliseconds: 300));
+    expect(find.text('All done'), findsOneWidget);
+    await tester.pump(const Duration(seconds: 3));
+    await tester.pump(const Duration(milliseconds: 300));
+    expect(find.text('All done'), findsNothing);
+    await tester.pumpWidget(const SizedBox());
+    c.dispose();
   });
 
   testWidgets('a computer keeps its page', (tester) async {
