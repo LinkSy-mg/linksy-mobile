@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
+import '../../app/platform.dart';
 import '../../core/models.dart';
 import '../../app/scope.dart';
 import '../../ui/components.dart';
@@ -84,10 +85,14 @@ class _IslandState extends State<Island> with SingleTickerProviderStateMixin {
     final width = MediaQuery.sizeOf(context).width;
     final duration = open ? _grow : _shrink;
     final curve = open ? _growCurve : _shrinkCurve;
+    // Back closes the card. Else, on the home screen, it leaves Linksy running
+    // as Home does: finishing would end Flutter but not the core, and files
+    // would go on arriving with nobody to move them, list them or say so.
     return PopScope(
-      canPop: !open,
+      canPop: false,
       onPopInvokedWithResult: (popped, _) {
-        if (!popped) _close();
+        if (popped) return;
+        open ? _close() : LinksyPlatform.toBackground();
       },
       child: Stack(
         children: [
