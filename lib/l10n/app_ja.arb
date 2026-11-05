@@ -303,6 +303,7 @@
   "settingsReceiving": "受信",
   "settingsFiles": "ファイル",
   "settingsSaveLocation": "保存先",
+  "settingsSaveLocationUse": "{path} を使う",
   "settingsSaveLocationPath": "ダウンロード › Linksy",
   "settingsAcceptFromMyDevices": "自分のデバイスから自動で受信",
   "settingsAcceptFromMyDevicesCaption": "ペアリング済みのデバイスからのファイルは確認なしで届きます。",

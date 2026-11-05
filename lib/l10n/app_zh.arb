@@ -303,6 +303,7 @@
   "settingsReceiving": "接收",
   "settingsFiles": "文件",
   "settingsSaveLocation": "保存位置",
+  "settingsSaveLocationUse": "使用 {path}",
   "settingsSaveLocationPath": "下载 › Linksy",
   "settingsAcceptFromMyDevices": "自动接受我的设备",
   "settingsAcceptFromMyDevicesCaption": "来自已配对设备的文件无需确认即可接收。",

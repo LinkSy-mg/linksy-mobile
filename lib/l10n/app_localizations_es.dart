@@ -1164,6 +1164,11 @@ class AppLocalizationsEs extends AppLocalizations {
   String get settingsSaveLocation => 'Ubicación de guardado';
 
   @override
+  String settingsSaveLocationUse(String path) {
+    return 'Usar $path';
+  }
+
+  @override
   String get settingsSaveLocationPath => 'Descargas › Linksy';
 
   @override

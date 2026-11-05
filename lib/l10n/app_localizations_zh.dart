@@ -1127,6 +1127,11 @@ class AppLocalizationsZh extends AppLocalizations {
   String get settingsSaveLocation => '保存位置';
 
   @override
+  String settingsSaveLocationUse(String path) {
+    return '使用 $path';
+  }
+
+  @override
   String get settingsSaveLocationPath => '下载 › Linksy';
 
   @override

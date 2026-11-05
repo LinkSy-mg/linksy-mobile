@@ -303,6 +303,7 @@
   "settingsReceiving": "Получение",
   "settingsFiles": "Файлы",
   "settingsSaveLocation": "Куда сохранять",
+  "settingsSaveLocationUse": "Использовать {path}",
   "settingsSaveLocationPath": "Загрузки › Linksy",
   "settingsAcceptFromMyDevices": "Принимать с моих устройств",
   "settingsAcceptFromMyDevicesCaption": "Файлы со связанных устройств приходят без вопросов.",

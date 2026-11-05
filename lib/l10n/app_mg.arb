@@ -303,6 +303,7 @@
   "settingsReceiving": "Fandraisana",
   "settingsFiles": "Rakitra",
   "settingsSaveLocation": "Toerana itahirizana",
+  "settingsSaveLocationUse": "Ampiasao {path}",
   "settingsSaveLocationPath": "Downloads › Linksy",
   "settingsAcceptFromMyDevices": "Ekeo avy amin'ny fitaovako",
   "settingsAcceptFromMyDevicesCaption": "Tonga tsy anontaniana ny rakitra avy amin'ny fitaovana mifandray.",

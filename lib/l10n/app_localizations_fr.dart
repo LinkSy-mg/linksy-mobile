@@ -1166,6 +1166,11 @@ class AppLocalizationsFr extends AppLocalizations {
   String get settingsSaveLocation => 'Emplacement d’enregistrement';
 
   @override
+  String settingsSaveLocationUse(String path) {
+    return 'Utiliser $path';
+  }
+
+  @override
   String get settingsSaveLocationPath => 'Téléchargements › Linksy';
 
   @override

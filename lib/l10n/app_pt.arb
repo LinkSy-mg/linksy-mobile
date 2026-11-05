@@ -303,6 +303,7 @@
   "settingsReceiving": "Recebimento",
   "settingsFiles": "Arquivos",
   "settingsSaveLocation": "Local de salvamento",
+  "settingsSaveLocationUse": "Usar {path}",
   "settingsSaveLocationPath": "Downloads › Linksy",
   "settingsAcceptFromMyDevices": "Aceitar dos meus dispositivos",
   "settingsAcceptFromMyDevicesCaption": "Arquivos de dispositivos pareados chegam sem perguntar.",

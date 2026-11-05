@@ -303,6 +303,7 @@
   "settingsReceiving": "Ricezione",
   "settingsFiles": "File",
   "settingsSaveLocation": "Posizione di salvataggio",
+  "settingsSaveLocationUse": "Usa {path}",
   "settingsSaveLocationPath": "Download › Linksy",
   "settingsAcceptFromMyDevices": "Accetta dai miei dispositivi",
   "settingsAcceptFromMyDevicesCaption": "I file dai dispositivi associati arrivano senza chiedere.",

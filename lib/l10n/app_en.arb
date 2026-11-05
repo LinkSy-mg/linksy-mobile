@@ -1556,6 +1556,15 @@
   "@settingsSaveLocation": {
     "description": "Settings row: where received files are saved"
   },
+  "settingsSaveLocationUse": "Use {path}",
+  "@settingsSaveLocationUse": {
+    "description": "Button in the Save location card: back to the default folder",
+    "placeholders": {
+      "path": {
+        "type": "String"
+      }
+    }
+  },
   "settingsSaveLocationPath": "Downloads › Linksy",
   "@settingsSaveLocationPath": {
     "description": "Settings row caption: the folder received files go to (Downloads folder, then Linksy subfolder)"

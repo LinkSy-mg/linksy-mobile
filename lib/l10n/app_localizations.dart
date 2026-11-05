@@ -1932,6 +1932,12 @@ abstract class AppLocalizations {
   /// **'Save location'**
   String get settingsSaveLocation;
 
+  /// Button in the Save location card: back to the default folder
+  ///
+  /// In en, this message translates to:
+  /// **'Use {path}'**
+  String settingsSaveLocationUse(String path);
+
   /// Settings row caption: the folder received files go to (Downloads folder, then Linksy subfolder)
   ///
   /// In en, this message translates to:

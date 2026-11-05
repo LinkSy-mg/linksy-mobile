@@ -1137,6 +1137,11 @@ class AppLocalizationsJa extends AppLocalizations {
   String get settingsSaveLocation => '保存先';
 
   @override
+  String settingsSaveLocationUse(String path) {
+    return '$path を使う';
+  }
+
+  @override
   String get settingsSaveLocationPath => 'ダウンロード › Linksy';
 
   @override

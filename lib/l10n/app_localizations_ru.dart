@@ -1185,6 +1185,11 @@ class AppLocalizationsRu extends AppLocalizations {
   String get settingsSaveLocation => 'Куда сохранять';
 
   @override
+  String settingsSaveLocationUse(String path) {
+    return 'Использовать $path';
+  }
+
+  @override
   String get settingsSaveLocationPath => 'Загрузки › Linksy';
 
   @override

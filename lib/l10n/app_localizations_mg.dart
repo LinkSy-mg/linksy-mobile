@@ -1165,6 +1165,11 @@ class AppLocalizationsMg extends AppLocalizations {
   String get settingsSaveLocation => 'Toerana itahirizana';
 
   @override
+  String settingsSaveLocationUse(String path) {
+    return 'Ampiasao $path';
+  }
+
+  @override
   String get settingsSaveLocationPath => 'Downloads › Linksy';
 
   @override
