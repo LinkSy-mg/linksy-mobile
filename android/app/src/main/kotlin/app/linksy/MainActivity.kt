@@ -37,6 +37,7 @@ class MainActivity : FlutterActivity() {
     /// Something shared to Linksy from another app (text or file copies),
     /// until Dart asks for it.
     private var pendingShare: Map<String, Any>? = null
+    private var pendingSendFolder: MethodChannel.Result? = null
 
     private val ring by lazy { RingPlayer(applicationContext) }
     private var calls: CallWatcher? = null
@@ -83,6 +84,9 @@ class MainActivity : FlutterActivity() {
         }
         Push.subscribe()
         Updater.onStatus = { status -> channel?.invokeMethod("updateStatus", status) }
+        AppInstaller.onStatus = { name, status ->
+            channel?.invokeMethod("appInstall", mapOf("package" to name, "status" to status))
+        }
         ComputerMedia.onAction = { action, position ->
             runOnUiThread { channel?.invokeMethod("mediaAction", mapOf("action" to action, "position_ms" to position)) }
         }
@@ -330,6 +334,100 @@ class MainActivity : FlutterActivity() {
                         val root = java.io.File(getExternalFilesDir(null), "Received")
                         Thread {
                             val moved = Downloads.publish(applicationContext, root, paths, folder("received"))
+                            runOnUiThread { result.success(moved) }
+                        }.start()
+                    }
+                    "toBackground" -> result.success(moveTaskToBack(true))
+                    "openMap" -> {
+                        val lat = call.argument<Double>("lat")!!
+                        val lon = call.argument<Double>("lon")!!
+                        val uri = android.net.Uri.parse("geo:$lat,$lon?q=$lat,$lon")
+                        result.success(runCatching { startActivity(Intent(Intent.ACTION_VIEW, uri)) }.isSuccess)
+                    }
+                    "pickSendFolder" -> {
+                        pendingSendFolder?.success(null)
+                        pendingSendFolder = result
+                        startActivityForResult(Intent(Intent.ACTION_OPEN_DOCUMENT_TREE), REQUEST_SEND_FOLDER)
+                    }
+                    "phoneApps" -> Thread {
+                        val apps = runCatching { Apps.list(applicationContext) }.getOrDefault(emptyList())
+                        runOnUiThread { result.success(apps) }
+                    }.start()
+                    "phoneAlbums" -> Thread {
+                        val albums = runCatching { PhoneMedia.albums(applicationContext) }.getOrDefault(emptyList())
+                        runOnUiThread { result.success(albums) }
+                    }.start()
+                    "phoneMedia" -> {
+                        val album = call.argument<String>("album")
+                        val before = call.argument<Number>("before")?.toLong()
+                        val limit = call.argument<Int>("limit") ?: 200
+                        Thread {
+                            val items = runCatching {
+                                PhoneMedia.items(applicationContext, album, before, limit)
+                            }.getOrDefault(emptyList())
+                            runOnUiThread { result.success(items) }
+                        }.start()
+                    }
+                    "phoneThumb" -> {
+                        val id = call.argument<Number>("id")!!.toLong()
+                        val video = call.argument<Boolean>("video") == true
+                        Thread {
+                            val bytes = PhoneMedia.thumb(applicationContext, id, video, 256)
+                            runOnUiThread { result.success(bytes) }
+                        }.start()
+                    }
+                    "thumbOf" -> {
+                        val ref = call.argument<String>("ref")!!
+                        Thread {
+                            val bytes = PhoneMedia.thumbOf(applicationContext, ref, 256)
+                            runOnUiThread { result.success(bytes) }
+                        }.start()
+                    }
+                    "openApp" -> {
+                        val name = call.argument<String>("package")!!
+                        packageManager.getLaunchIntentForPackage(name)?.let { startActivity(it) }
+                        result.success(null)
+                    }
+                    "appIcon" -> {
+                        val name = call.argument<String>("package")!!
+                        Thread {
+                            val bytes = Apps.iconOf(applicationContext, name)
+                            runOnUiThread { result.success(bytes) }
+                        }.start()
+                    }
+                    "preflightFacts" -> {
+                        @Suppress("UNCHECKED_CAST")
+                        val probes = call.argument<List<Map<String, Any?>>>("probes").orEmpty()
+                        Thread {
+                            val facts = mapOf(
+                                "free" to Apps.free(applicationContext),
+                                "direct" to Apps.direct(applicationContext),
+                                "can_install" to Updater.allowed(applicationContext),
+                                "apps" to Apps.compare(applicationContext, probes),
+                            )
+                            runOnUiThread { result.success(facts) }
+                        }.start()
+                    }
+                    "installApps" -> {
+                        @Suppress("UNCHECKED_CAST")
+                        AppInstaller.install(this@MainActivity, call.argument<List<Map<String, Any?>>>("apps").orEmpty())
+                        result.success(null)
+                    }
+                    "deleteFiles" -> {
+                        for (path in call.argument<List<String>>("paths").orEmpty()) {
+                            val file = java.io.File(path)
+                            file.delete()
+                            file.parentFile?.takeIf { it.list()?.isEmpty() == true }?.delete()
+                        }
+                        result.success(null)
+                    }
+                    "publishLeftovers" -> {
+                        val keep = call.argument<List<String>>("keep").orEmpty()
+                        val root = java.io.File(getExternalFilesDir(null), "Received")
+                        Thread {
+                            val moved = runCatching {
+                                Downloads.publishLeftovers(applicationContext, root, keep, folder("received"))
+                            }.getOrDefault(emptyList())
                             runOnUiThread { result.success(moved) }
                         }.start()
                     }
@@ -1059,6 +1157,17 @@ class MainActivity : FlutterActivity() {
             }.start()
             return
         }
+        if (requestCode == REQUEST_SEND_FOLDER) {
+            val result = pendingSendFolder ?: return
+            pendingSendFolder = null
+            val tree = data?.data
+            if (resultCode != RESULT_OK || tree == null) return result.success(null)
+            Thread {
+                val path = ShareTarget.copyTree(applicationContext, tree, "picked")
+                runOnUiThread { result.success(path) }
+            }.start()
+            return
+        }
         if (requestCode == REQUEST_FOLDER) {
             val (kind, result) = pendingFolder ?: return
             pendingFolder = null
@@ -1126,6 +1235,7 @@ class MainActivity : FlutterActivity() {
         const val REQUEST_NEARBY = 51
         const val REQUEST_PICK = 44
         const val REQUEST_FOLDER = 45
+        const val REQUEST_SEND_FOLDER = 54
         const val REQUEST_PICTURE = 46
         const val REQUEST_NOTIFICATION_ACCESS = 52
         const val REQUEST_PHOTOS = 53

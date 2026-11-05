@@ -34,6 +34,12 @@ class KeepAlive : Service() {
         } else {
             startForeground(NOTIFICATION, note)
         }
+        pending = maxOf(0, pending - 1)
+        if (pending == 0 && stopWanted) {
+            stopWanted = false
+            stopSelf()
+            return START_NOT_STICKY
+        }
         val awake = intent?.getBooleanExtra(EXTRA_AWAKE, false) == true
         if (awake && wake == null) {
             wake = (getSystemService(Context.POWER_SERVICE) as PowerManager)
@@ -108,6 +114,12 @@ class KeepAlive : Service() {
         private const val EXTRA_TITLE = "title"
         private const val EXTRA_PROGRESS = "progress"
 
+        /// Starts Android hasn't reached [onStartCommand] for yet, and a stop
+        /// that waits for them: stopped before it's in the foreground, Android
+        /// ends the app. A small file can start and finish that fast.
+        private var pending = 0
+        private var stopWanted = false
+
         /// Starts or updates it; [awake] keeps the CPU on (heartbeats, transfers),
         /// [progress] is files on their way.
         fun start(context: Context, text: String, awake: Boolean, title: String? = null, progress: Int? = null) {
@@ -116,13 +128,15 @@ class KeepAlive : Service() {
             progress?.let { intent.putExtra(EXTRA_PROGRESS, it) }
             // Refused from the background on Android 12 and later (a transfer accepted
             // there): it carries on while Android lets it.
+            stopWanted = false
             runCatching {
                 if (Build.VERSION.SDK_INT >= 26) context.startForegroundService(intent) else context.startService(intent)
+                pending++
             }
         }
 
         fun stop(context: Context) {
-            context.stopService(Intent(context, KeepAlive::class.java))
+            if (pending > 0) stopWanted = true else context.stopService(Intent(context, KeepAlive::class.java))
         }
     }
 }

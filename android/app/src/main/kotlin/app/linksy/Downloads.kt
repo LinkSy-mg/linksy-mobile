@@ -16,10 +16,14 @@ import java.io.File
 /// folder is a grant from Android's folder picker. Folders keep their shape:
 /// Downloads/Linksy/Photos/a.jpg.
 object Downloads {
+    /// The core's name for a file still arriving (linksy-core's transfer.rs).
+    private const val PART = ".linksy-part"
+
     /// Moves each received file (under [root]) into [folder], else Downloads,
     /// and returns where it went (`content://` URIs); a file that couldn't
     /// move keeps its path. A folder that's gone falls back to Downloads, and
     /// older Android, with none, keeps them all where they are.
+    @Synchronized
     fun publish(context: Context, root: File, paths: List<String>, folder: Uri? = null): List<String> {
         if (folder == null && Build.VERSION.SDK_INT < 29) return paths
         return paths.map { path ->
@@ -41,6 +45,20 @@ object Downloads {
                 uri.toString()
             }.onFailure { Log.w("linksy", "couldn't move ${file.name} to Downloads", it) }.getOrDefault(path)
         }
+    }
+
+    /// Moves what the core finished with nobody there to move it: Flutter ends
+    /// with the screen, but with Linksy kept running the core goes on receiving.
+    /// Not what's still arriving, the clipboard's, or [keep], what the timeline
+    /// points to. Returns where they went.
+    @Synchronized
+    fun publishLeftovers(context: Context, root: File, keep: List<String>, folder: Uri? = null): List<String> {
+        val clipboard = File(root, "Clipboard")
+        val kept = keep.map { File(it).canonicalPath }.toSet()
+        val left = root.walkTopDown().onEnter { it != clipboard }
+            .filter { it.isFile && !it.name.endsWith(PART) && it.canonicalPath !in kept }
+            .map { it.path }.toList()
+        return if (left.isEmpty()) left else publish(context, root, left, folder)
     }
 
     private fun intoDownloads(context: Context, relative: String, file: File): Uri {

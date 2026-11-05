@@ -63,6 +63,42 @@ class ShareTarget : Activity() {
         /// Each hand-over gets its own folder under [folder], so a transfer
         /// still waiting keeps its files; folders a day old go, with their
         /// descriptors. Unreadable ones are left out.
+        /// A folder from Android's picker, copied with its name and everything in it,
+        /// for the core to read as a path; null if it can't be read.
+        fun copyTree(context: Context, tree: Uri, folder: String): String? = runCatching {
+            val root = File(context.cacheDir, folder).apply { mkdirs() }
+            sweep(root)
+            val resolver = context.contentResolver
+            val top = android.provider.DocumentsContract.getTreeDocumentId(tree)
+            val name = resolver.query(
+                android.provider.DocumentsContract.buildDocumentUriUsingTree(tree, top),
+                arrayOf(android.provider.DocumentsContract.Document.COLUMN_DISPLAY_NAME), null, null, null,
+            )?.use { c -> if (c.moveToFirst()) c.getString(0) else null } ?: "folder"
+            val into = File(File(root, "${System.currentTimeMillis()}"), name.replace('/', '_')).apply { mkdirs() }
+            fun copy(id: String, dir: File) {
+                val children = android.provider.DocumentsContract.buildChildDocumentsUriUsingTree(tree, id)
+                val columns = arrayOf(
+                    android.provider.DocumentsContract.Document.COLUMN_DOCUMENT_ID,
+                    android.provider.DocumentsContract.Document.COLUMN_DISPLAY_NAME,
+                    android.provider.DocumentsContract.Document.COLUMN_MIME_TYPE,
+                )
+                resolver.query(children, columns, null, null, null)?.use { c ->
+                    while (c.moveToNext()) {
+                        val child = File(dir, c.getString(1).replace('/', '_'))
+                        if (c.getString(2) == android.provider.DocumentsContract.Document.MIME_TYPE_DIR) {
+                            child.mkdirs()
+                            copy(c.getString(0), child)
+                        } else {
+                            val uri = android.provider.DocumentsContract.buildDocumentUriUsingTree(tree, c.getString(0))
+                            resolver.openInputStream(uri)!!.use { input -> child.outputStream().use { input.copyTo(it) } }
+                        }
+                    }
+                }
+            }
+            copy(top, into)
+            into.path
+        }.getOrNull()
+
         fun copyUris(context: Context, uris: List<Uri>, folder: String): List<String> {
             val root = File(context.cacheDir, folder).apply { mkdirs() }
             sweep(root)

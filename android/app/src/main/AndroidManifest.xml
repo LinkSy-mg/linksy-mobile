@@ -149,6 +149,9 @@
             android:name=".TransferNotice$Answer"
             android:exported="false"/>
         <receiver
+            android:name=".AppInstaller$Status"
+            android:exported="false"/>
+        <receiver
             android:name=".Updater$Status"
             android:exported="false"/>
         <receiver
@@ -185,6 +188,12 @@
         <intent>
             <action android:name="android.intent.action.PROCESS_TEXT"/>
             <data android:mimeType="text/plain"/>
+        </intent>
+        <!-- Launchable apps, for sending them to another phone: no
+             QUERY_ALL_PACKAGES. -->
+        <intent>
+            <action android:name="android.intent.action.MAIN"/>
+            <category android:name="android.intent.category.LAUNCHER"/>
         </intent>
     </queries>
 </manifest>
