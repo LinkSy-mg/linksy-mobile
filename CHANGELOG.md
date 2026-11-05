@@ -8,6 +8,7 @@ All notable changes to Linksy for Android. Format: [Keep a Changelog](https://ke
 
 - First-run setup offers Messages on your computers (the computer's Inbox) and Photos on your computers (its Gallery), with an Allow button each.
 - A one-time card on the home screen, for people updating: "Your messages and photos on your computers", with a Turn On button for whichever is off.
+- Settings > Files > Save location: tap it to choose where received files go. Use Downloads › Linksy brings it back.
 
 ### Changed
 
