@@ -2408,7 +2408,7 @@ class AppLocalizationsMg extends AppLocalizations {
 
   @override
   String get noticeAccessStepAgain =>
-      'Miverena, tsindrio ny Andramo indray ary alefaso ny Linksy.';
+      'Sokafy indray ny Fidirana amin\'ny fampandrenesana ary alefaso ny Linksy.';
 
   @override
   String get noticeAccessPlain =>
@@ -2708,4 +2708,52 @@ class AppLocalizationsMg extends AppLocalizations {
   @override
   String get news033MessagesBody =>
       'Ao amin\'ny solosaina, asehon\'ny resaka koa ny hafatra teo aloha, ary mbola mandeha mandritra ny iray andro ny Valio na efa lasa aza ny fampandrenesana.';
+
+  @override
+  String get onboardingMessages => 'Hafatra ao amin\'ny solosainao';
+
+  @override
+  String get onboardingMessagesDetail =>
+      'Vakio sy valio ny hafatra sy fampandrenesanao ao amin\'ny Hafatra voaray an\'ny solosaina.';
+
+  @override
+  String get onboardingGalleryDetail =>
+      'Jereo ny sary sy horonan-tsarin\'ity finday ity ao amin\'ny Sary an\'ny solosaina. Rehefa manontany ny Android, fidio ny Avelao daholo.';
+
+  @override
+  String get homeTurnOnTitle => 'Ny hafatra sy sarinao ao amin\'ny solosainao';
+
+  @override
+  String get homeTurnOnBody =>
+      'Jereo ao amin\'ny Hafatra voaray sy Sary an\'ny solosaina.';
+
+  @override
+  String get homeTurnOnMessages => 'Alefaso ny hafatra';
+
+  @override
+  String get homeTurnOnPhotos => 'Alefaso ny sary';
+
+  @override
+  String turnOnAskMessages(String name) {
+    return 'Mangataka ny hampiseho ny hafatr\'ity finday ity i $name';
+  }
+
+  @override
+  String turnOnAskPhotos(String name) {
+    return 'Mangataka ny hampiseho ny sarin\'ity finday ity i $name';
+  }
+
+  @override
+  String get turnOnNow => 'Alefaso';
+
+  @override
+  String get settingsDemoAsk =>
+      'Mangataka izany ny solosaina, afaka 4 segondra';
+
+  @override
+  String get noticeAccessStepSwitch =>
+      'Sokafy ny Fidirana amin\'ny fampandrenesana ary alefaso ny Linksy. Raha maizina ilay bokotra, tsindrio ihany: mandà ny Android, ary izany no ahafahana manao ny dingana manaraka.';
+
+  @override
+  String get noticeAccessOpen => 'Sokafy ny Fidirana amin\'ny fampandrenesana';
 }

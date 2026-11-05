@@ -639,7 +639,7 @@
   "noticeAccessGreyed": "Android disattiva questo interruttore per le app installate dal web. Per consentirlo:",
   "noticeAccessStepInfo": "Apri Informazioni app di Linksy.",
   "noticeAccessStepRestricted": "Tocca ⋮ in alto a destra, poi Consenti impostazioni con limitazioni.",
-  "noticeAccessStepAgain": "Torna qui, tocca Riprova e attiva Linksy.",
+  "noticeAccessStepAgain": "Riapri Accesso alle notifiche e attiva Linksy.",
   "noticeAccessPlain": "Attiva Linksy in Accesso alle notifiche di Android, poi torna qui.",
   "commonOpenAppInfo": "Apri Informazioni app",
   "batteryGuide": "Tieni attivo Linksy",
@@ -723,5 +723,18 @@
   "news033PhotosTitle": "Le tue foto sul tuo computer",
   "news033PhotosBody": "La Galleria di un computer sfoglia le foto e i video di questo telefono, pagina per pagina, e salva quelli che scegli. Impostazioni › File › Foto sui tuoi computer.",
   "news033MessagesTitle": "Messaggi precedenti",
-  "news033MessagesBody": "Sul computer, una conversazione mostra anche i messaggi precedenti, e Rispondi funziona ancora per un giorno dopo che la notifica è sparita."
+  "news033MessagesBody": "Sul computer, una conversazione mostra anche i messaggi precedenti, e Rispondi funziona ancora per un giorno dopo che la notifica è sparita.",
+  "onboardingMessages": "Messaggi sui tuoi computer",
+  "onboardingMessagesDetail": "Leggi e rispondi a messaggi e notifiche nella Posta in arrivo del computer.",
+  "onboardingGalleryDetail": "Sfoglia le foto e i video di questo telefono nella Galleria del computer. Quando Android lo chiede, scegli Consenti tutto.",
+  "homeTurnOnTitle": "I tuoi messaggi e foto sui tuoi computer",
+  "homeTurnOnBody": "Trovali nella Posta in arrivo e nella Galleria del computer.",
+  "homeTurnOnMessages": "Attiva i messaggi",
+  "homeTurnOnPhotos": "Attiva le foto",
+  "turnOnAskMessages": "{name} chiede di mostrare i messaggi di questo telefono",
+  "turnOnAskPhotos": "{name} chiede di mostrare le foto di questo telefono",
+  "turnOnNow": "Attiva",
+  "settingsDemoAsk": "Un computer lo chiede, tra 4 secondi",
+  "noticeAccessStepSwitch": "Apri Accesso alle notifiche e attiva Linksy. Se l'interruttore è disattivato, toccalo lo stesso: Android rifiuta, ed è questo che rende possibile il passaggio successivo.",
+  "noticeAccessOpen": "Apri Accesso alle notifiche"
 }

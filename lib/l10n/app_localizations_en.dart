@@ -2392,7 +2392,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get noticeAccessStepAgain =>
-      'Come back, tap Try again and turn Linksy on.';
+      'Open Notification access again and turn Linksy on.';
 
   @override
   String get noticeAccessPlain =>
@@ -2685,4 +2685,50 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get news033MessagesBody =>
       'On the computer, a conversation shows its earlier messages too, and Reply still works for a day after the notification is gone.';
+
+  @override
+  String get onboardingMessages => 'Messages on your computers';
+
+  @override
+  String get onboardingMessagesDetail =>
+      'Read and answer your messages and notifications in the computer\'s Inbox.';
+
+  @override
+  String get onboardingGalleryDetail =>
+      'Look through this phone\'s photos and videos in the computer\'s Gallery. When Android asks, pick Allow all.';
+
+  @override
+  String get homeTurnOnTitle => 'Your messages and photos on your computers';
+
+  @override
+  String get homeTurnOnBody => 'See them in the computer\'s Inbox and Gallery.';
+
+  @override
+  String get homeTurnOnMessages => 'Turn On Messages';
+
+  @override
+  String get homeTurnOnPhotos => 'Turn On Photos';
+
+  @override
+  String turnOnAskMessages(String name) {
+    return '$name asks to show this phone\'s messages';
+  }
+
+  @override
+  String turnOnAskPhotos(String name) {
+    return '$name asks to show this phone\'s photos';
+  }
+
+  @override
+  String get turnOnNow => 'Turn On';
+
+  @override
+  String get settingsDemoAsk => 'A computer asks for it, in 4 seconds';
+
+  @override
+  String get noticeAccessStepSwitch =>
+      'Open Notification access and turn Linksy on. If its switch is greyed out, tap it anyway: Android refuses, and that makes the next step possible.';
+
+  @override
+  String get noticeAccessOpen => 'Open Notification access';
 }

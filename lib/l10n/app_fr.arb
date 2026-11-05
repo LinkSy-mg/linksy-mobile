@@ -639,7 +639,7 @@
   "noticeAccessGreyed": "Android grise ce bouton pour les applis installées depuis le web. Pour l'autoriser :",
   "noticeAccessStepInfo": "Ouvrez Infos sur l'appli pour Linksy.",
   "noticeAccessStepRestricted": "Touchez ⋮ en haut à droite, puis Autoriser les paramètres restreints.",
-  "noticeAccessStepAgain": "Revenez, touchez Réessayer et activez Linksy.",
+  "noticeAccessStepAgain": "Rouvrez Accès aux notifications et activez Linksy.",
   "noticeAccessPlain": "Activez Linksy dans Accès aux notifications d'Android, puis revenez.",
   "commonOpenAppInfo": "Ouvrir Infos sur l'appli",
   "batteryGuide": "Garder Linksy actif",
@@ -723,5 +723,18 @@
   "news033PhotosTitle": "Vos photos sur votre ordinateur",
   "news033PhotosBody": "La Galerie d'un ordinateur parcourt les photos et vidéos de ce téléphone, page par page, et enregistre celles que vous choisissez. Réglages › Fichiers › Photos sur vos ordinateurs.",
   "news033MessagesTitle": "Messages précédents",
-  "news033MessagesBody": "Sur l'ordinateur, une conversation affiche aussi ses messages précédents, et Répondre fonctionne encore un jour après la disparition de la notification."
+  "news033MessagesBody": "Sur l'ordinateur, une conversation affiche aussi ses messages précédents, et Répondre fonctionne encore un jour après la disparition de la notification.",
+  "onboardingMessages": "Messages sur vos ordinateurs",
+  "onboardingMessagesDetail": "Lisez vos messages et notifications dans la Boîte de réception de l'ordinateur, et répondez-y.",
+  "onboardingGalleryDetail": "Parcourez les photos et vidéos de ce téléphone dans la Galerie de l'ordinateur. Quand Android demande, choisissez Tout autoriser.",
+  "homeTurnOnTitle": "Vos messages et photos sur vos ordinateurs",
+  "homeTurnOnBody": "Retrouvez-les dans la Boîte de réception et la Galerie de l'ordinateur.",
+  "homeTurnOnMessages": "Activer les messages",
+  "homeTurnOnPhotos": "Activer les photos",
+  "turnOnAskMessages": "{name} demande à afficher les messages de ce téléphone",
+  "turnOnAskPhotos": "{name} demande à afficher les photos de ce téléphone",
+  "turnOnNow": "Activer",
+  "settingsDemoAsk": "Un ordinateur le demande, dans 4 secondes",
+  "noticeAccessStepSwitch": "Ouvrez Accès aux notifications et activez Linksy. Si le bouton est grisé, touchez-le quand même : Android refuse, et c'est ce qui rend l'étape suivante possible.",
+  "noticeAccessOpen": "Ouvrir Accès aux notifications"
 }

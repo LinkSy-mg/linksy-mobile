@@ -639,7 +639,7 @@
   "noticeAccessGreyed": "Android desactiva este interruptor para las apps instaladas desde la web. Para permitirlo:",
   "noticeAccessStepInfo": "Abre Información de la app de Linksy.",
   "noticeAccessStepRestricted": "Toca ⋮ arriba a la derecha y luego Permitir ajustes restringidos.",
-  "noticeAccessStepAgain": "Vuelve, toca Reintentar y activa Linksy.",
+  "noticeAccessStepAgain": "Vuelve a abrir Acceso a notificaciones y activa Linksy.",
   "noticeAccessPlain": "Activa Linksy en Acceso a notificaciones de Android y vuelve.",
   "commonOpenAppInfo": "Abrir Información de la app",
   "batteryGuide": "Mantener Linksy activo",
@@ -723,5 +723,18 @@
   "news033PhotosTitle": "Tus fotos en tu computadora",
   "news033PhotosBody": "La Galería de una computadora recorre las fotos y videos de este teléfono, página a página, y guarda las que elijas. Ajustes › Archivos › Fotos en tus computadoras.",
   "news033MessagesTitle": "Mensajes anteriores",
-  "news033MessagesBody": "En la computadora, una conversación también muestra sus mensajes anteriores, y Responder sigue funcionando un día después de que la notificación desaparezca."
+  "news033MessagesBody": "En la computadora, una conversación también muestra sus mensajes anteriores, y Responder sigue funcionando un día después de que la notificación desaparezca.",
+  "onboardingMessages": "Mensajes en tus computadoras",
+  "onboardingMessagesDetail": "Lee y responde tus mensajes y notificaciones en la Bandeja de entrada de la computadora.",
+  "onboardingGalleryDetail": "Explora las fotos y videos de este teléfono en la Galería de la computadora. Cuando Android pregunte, elige Permitir todo.",
+  "homeTurnOnTitle": "Tus mensajes y fotos en tus computadoras",
+  "homeTurnOnBody": "Míralos en la Bandeja de entrada y la Galería de la computadora.",
+  "homeTurnOnMessages": "Activar mensajes",
+  "homeTurnOnPhotos": "Activar fotos",
+  "turnOnAskMessages": "{name} pide mostrar los mensajes de este teléfono",
+  "turnOnAskPhotos": "{name} pide mostrar las fotos de este teléfono",
+  "turnOnNow": "Activar",
+  "settingsDemoAsk": "Una computadora lo pide, en 4 segundos",
+  "noticeAccessStepSwitch": "Abre Acceso a notificaciones y activa Linksy. Si el interruptor está desactivado, tócalo igualmente: Android lo rechaza, y eso hace posible el siguiente paso.",
+  "noticeAccessOpen": "Abrir Acceso a notificaciones"
 }

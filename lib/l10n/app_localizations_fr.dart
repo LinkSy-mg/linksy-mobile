@@ -2411,7 +2411,7 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String get noticeAccessStepAgain =>
-      'Revenez, touchez Réessayer et activez Linksy.';
+      'Rouvrez Accès aux notifications et activez Linksy.';
 
   @override
   String get noticeAccessPlain =>
@@ -2711,4 +2711,51 @@ class AppLocalizationsFr extends AppLocalizations {
   @override
   String get news033MessagesBody =>
       'Sur l\'ordinateur, une conversation affiche aussi ses messages précédents, et Répondre fonctionne encore un jour après la disparition de la notification.';
+
+  @override
+  String get onboardingMessages => 'Messages sur vos ordinateurs';
+
+  @override
+  String get onboardingMessagesDetail =>
+      'Lisez vos messages et notifications dans la Boîte de réception de l\'ordinateur, et répondez-y.';
+
+  @override
+  String get onboardingGalleryDetail =>
+      'Parcourez les photos et vidéos de ce téléphone dans la Galerie de l\'ordinateur. Quand Android demande, choisissez Tout autoriser.';
+
+  @override
+  String get homeTurnOnTitle => 'Vos messages et photos sur vos ordinateurs';
+
+  @override
+  String get homeTurnOnBody =>
+      'Retrouvez-les dans la Boîte de réception et la Galerie de l\'ordinateur.';
+
+  @override
+  String get homeTurnOnMessages => 'Activer les messages';
+
+  @override
+  String get homeTurnOnPhotos => 'Activer les photos';
+
+  @override
+  String turnOnAskMessages(String name) {
+    return '$name demande à afficher les messages de ce téléphone';
+  }
+
+  @override
+  String turnOnAskPhotos(String name) {
+    return '$name demande à afficher les photos de ce téléphone';
+  }
+
+  @override
+  String get turnOnNow => 'Activer';
+
+  @override
+  String get settingsDemoAsk => 'Un ordinateur le demande, dans 4 secondes';
+
+  @override
+  String get noticeAccessStepSwitch =>
+      'Ouvrez Accès aux notifications et activez Linksy. Si le bouton est grisé, touchez-le quand même : Android refuse, et c\'est ce qui rend l\'étape suivante possible.';
+
+  @override
+  String get noticeAccessOpen => 'Ouvrir Accès aux notifications';
 }

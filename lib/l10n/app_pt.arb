@@ -639,7 +639,7 @@
   "noticeAccessGreyed": "O Android deixa esta chave cinza para apps instalados pela web. Para permitir:",
   "noticeAccessStepInfo": "Abra Informações do app do Linksy.",
   "noticeAccessStepRestricted": "Toque em ⋮ no canto superior direito e em Permitir configurações restritas.",
-  "noticeAccessStepAgain": "Volte, toque em Tentar de novo e ative o Linksy.",
+  "noticeAccessStepAgain": "Abra Acesso a notificações de novo e ative o Linksy.",
   "noticeAccessPlain": "Ative o Linksy em Acesso a notificações do Android e volte.",
   "commonOpenAppInfo": "Abrir Informações do app",
   "batteryGuide": "Manter o Linksy ativo",
@@ -723,5 +723,18 @@
   "news033PhotosTitle": "Suas fotos no seu computador",
   "news033PhotosBody": "A Galeria de um computador navega pelas fotos e vídeos deste telefone, página por página, e salva as que você escolher. Configurações › Arquivos › Fotos nos seus computadores.",
   "news033MessagesTitle": "Mensagens anteriores",
-  "news033MessagesBody": "No computador, uma conversa mostra também as mensagens anteriores, e Responder ainda funciona por um dia depois que a notificação some."
+  "news033MessagesBody": "No computador, uma conversa mostra também as mensagens anteriores, e Responder ainda funciona por um dia depois que a notificação some.",
+  "onboardingMessages": "Mensagens nos seus computadores",
+  "onboardingMessagesDetail": "Leia e responda suas mensagens e notificações na Caixa de entrada do computador.",
+  "onboardingGalleryDetail": "Navegue pelas fotos e vídeos deste telefone na Galeria do computador. Quando o Android perguntar, escolha Permitir tudo.",
+  "homeTurnOnTitle": "Suas mensagens e fotos nos seus computadores",
+  "homeTurnOnBody": "Veja-as na Caixa de entrada e na Galeria do computador.",
+  "homeTurnOnMessages": "Ativar mensagens",
+  "homeTurnOnPhotos": "Ativar fotos",
+  "turnOnAskMessages": "{name} pede para mostrar as mensagens deste telefone",
+  "turnOnAskPhotos": "{name} pede para mostrar as fotos deste telefone",
+  "turnOnNow": "Ativar",
+  "settingsDemoAsk": "Um computador pede, em 4 segundos",
+  "noticeAccessStepSwitch": "Abra Acesso a notificações e ative o Linksy. Se a chave estiver cinza, toque nela mesmo assim: o Android recusa, e isso torna possível o próximo passo.",
+  "noticeAccessOpen": "Abrir Acesso a notificações"
 }

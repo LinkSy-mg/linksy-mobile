@@ -2343,7 +2343,7 @@ class AppLocalizationsJa extends AppLocalizations {
   String get noticeAccessStepRestricted => '右上の ⋮ をタップし、「制限付き設定を許可」をタップします。';
 
   @override
-  String get noticeAccessStepAgain => '戻ってきて「再試行」をタップし、Linksy をオンにします。';
+  String get noticeAccessStepAgain => 'もう一度「通知へのアクセス」を開き、Linksy をオンにします。';
 
   @override
   String get noticeAccessPlain =>
@@ -2627,4 +2627,49 @@ class AppLocalizationsJa extends AppLocalizations {
   @override
   String get news033MessagesBody =>
       'コンピュータで、会話に以前のメッセージも表示され、通知が消えてから 1 日は返信できます。';
+
+  @override
+  String get onboardingMessages => 'コンピュータでメッセージを見る';
+
+  @override
+  String get onboardingMessagesDetail => 'メッセージや通知をコンピュータの受信トレイで読み、返信できます。';
+
+  @override
+  String get onboardingGalleryDetail =>
+      'このスマホの写真と動画をコンピュータのギャラリーで見られます。Android に聞かれたら「すべて許可」を選んでください。';
+
+  @override
+  String get homeTurnOnTitle => 'メッセージと写真をコンピュータで';
+
+  @override
+  String get homeTurnOnBody => 'コンピュータの受信トレイとギャラリーに表示されます。';
+
+  @override
+  String get homeTurnOnMessages => 'メッセージをオンにする';
+
+  @override
+  String get homeTurnOnPhotos => '写真をオンにする';
+
+  @override
+  String turnOnAskMessages(String name) {
+    return '$name がこのスマホのメッセージの表示を求めています';
+  }
+
+  @override
+  String turnOnAskPhotos(String name) {
+    return '$name がこのスマホの写真の表示を求めています';
+  }
+
+  @override
+  String get turnOnNow => 'オンにする';
+
+  @override
+  String get settingsDemoAsk => '4 秒後にコンピュータが求めます';
+
+  @override
+  String get noticeAccessStepSwitch =>
+      '「通知へのアクセス」を開いて Linksy をオンにします。スイッチがグレーでもタップしてください。Android に拒否されると、次の手順ができるようになります。';
+
+  @override
+  String get noticeAccessOpen => '「通知へのアクセス」を開く';
 }

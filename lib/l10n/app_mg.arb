@@ -639,7 +639,7 @@
   "noticeAccessGreyed": "Manamaizina io bokotra io ny Android ho an'ny app nampidirina avy amin'ny tranonkala. Mba hanomezana alalana:",
   "noticeAccessStepInfo": "Sokafy ny Mombamomba ny app ho an'ny Linksy.",
   "noticeAccessStepRestricted": "Tsindrio ny ⋮ eo ambony havanana, avy eo Avelao ny fikirana voafetra.",
-  "noticeAccessStepAgain": "Miverena, tsindrio ny Andramo indray ary alefaso ny Linksy.",
+  "noticeAccessStepAgain": "Sokafy indray ny Fidirana amin'ny fampandrenesana ary alefaso ny Linksy.",
   "noticeAccessPlain": "Alefaso ny Linksy ao amin'ny Fidirana amin'ny fampandrenesana an'ny Android, dia miverena.",
   "commonOpenAppInfo": "Sokafy ny Mombamomba ny app",
   "batteryGuide": "Tazomy ho velona ny Linksy",
@@ -723,5 +723,18 @@
   "news033PhotosTitle": "Ny sarinao ao amin'ny solosainao",
   "news033PhotosBody": "Mijery ny sary sy horonan-tsarin'ity finday ity pejy tsirairay ny Galerie an'ny solosaina, ary mitahiry izay fidinao. Fikirana › Rakitra › Sary ao amin'ny solosainao.",
   "news033MessagesTitle": "Hafatra teo aloha",
-  "news033MessagesBody": "Ao amin'ny solosaina, asehon'ny resaka koa ny hafatra teo aloha, ary mbola mandeha mandritra ny iray andro ny Valio na efa lasa aza ny fampandrenesana."
+  "news033MessagesBody": "Ao amin'ny solosaina, asehon'ny resaka koa ny hafatra teo aloha, ary mbola mandeha mandritra ny iray andro ny Valio na efa lasa aza ny fampandrenesana.",
+  "onboardingMessages": "Hafatra ao amin'ny solosainao",
+  "onboardingMessagesDetail": "Vakio sy valio ny hafatra sy fampandrenesanao ao amin'ny Hafatra voaray an'ny solosaina.",
+  "onboardingGalleryDetail": "Jereo ny sary sy horonan-tsarin'ity finday ity ao amin'ny Sary an'ny solosaina. Rehefa manontany ny Android, fidio ny Avelao daholo.",
+  "homeTurnOnTitle": "Ny hafatra sy sarinao ao amin'ny solosainao",
+  "homeTurnOnBody": "Jereo ao amin'ny Hafatra voaray sy Sary an'ny solosaina.",
+  "homeTurnOnMessages": "Alefaso ny hafatra",
+  "homeTurnOnPhotos": "Alefaso ny sary",
+  "turnOnAskMessages": "Mangataka ny hampiseho ny hafatr'ity finday ity i {name}",
+  "turnOnAskPhotos": "Mangataka ny hampiseho ny sarin'ity finday ity i {name}",
+  "turnOnNow": "Alefaso",
+  "settingsDemoAsk": "Mangataka izany ny solosaina, afaka 4 segondra",
+  "noticeAccessStepSwitch": "Sokafy ny Fidirana amin'ny fampandrenesana ary alefaso ny Linksy. Raha maizina ilay bokotra, tsindrio ihany: mandà ny Android, ary izany no ahafahana manao ny dingana manaraka.",
+  "noticeAccessOpen": "Sokafy ny Fidirana amin'ny fampandrenesana"
 }

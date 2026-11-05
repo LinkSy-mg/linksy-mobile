@@ -2409,7 +2409,7 @@ class AppLocalizationsIt extends AppLocalizations {
 
   @override
   String get noticeAccessStepAgain =>
-      'Torna qui, tocca Riprova e attiva Linksy.';
+      'Riapri Accesso alle notifiche e attiva Linksy.';
 
   @override
   String get noticeAccessPlain =>
@@ -2706,4 +2706,51 @@ class AppLocalizationsIt extends AppLocalizations {
   @override
   String get news033MessagesBody =>
       'Sul computer, una conversazione mostra anche i messaggi precedenti, e Rispondi funziona ancora per un giorno dopo che la notifica è sparita.';
+
+  @override
+  String get onboardingMessages => 'Messaggi sui tuoi computer';
+
+  @override
+  String get onboardingMessagesDetail =>
+      'Leggi e rispondi a messaggi e notifiche nella Posta in arrivo del computer.';
+
+  @override
+  String get onboardingGalleryDetail =>
+      'Sfoglia le foto e i video di questo telefono nella Galleria del computer. Quando Android lo chiede, scegli Consenti tutto.';
+
+  @override
+  String get homeTurnOnTitle => 'I tuoi messaggi e foto sui tuoi computer';
+
+  @override
+  String get homeTurnOnBody =>
+      'Trovali nella Posta in arrivo e nella Galleria del computer.';
+
+  @override
+  String get homeTurnOnMessages => 'Attiva i messaggi';
+
+  @override
+  String get homeTurnOnPhotos => 'Attiva le foto';
+
+  @override
+  String turnOnAskMessages(String name) {
+    return '$name chiede di mostrare i messaggi di questo telefono';
+  }
+
+  @override
+  String turnOnAskPhotos(String name) {
+    return '$name chiede di mostrare le foto di questo telefono';
+  }
+
+  @override
+  String get turnOnNow => 'Attiva';
+
+  @override
+  String get settingsDemoAsk => 'Un computer lo chiede, tra 4 secondi';
+
+  @override
+  String get noticeAccessStepSwitch =>
+      'Apri Accesso alle notifiche e attiva Linksy. Se l\'interruttore è disattivato, toccalo lo stesso: Android rifiuta, ed è questo che rende possibile il passaggio successivo.';
+
+  @override
+  String get noticeAccessOpen => 'Apri Accesso alle notifiche';
 }

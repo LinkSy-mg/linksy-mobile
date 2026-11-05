@@ -3215,7 +3215,7 @@
   "@noticeAccessStepRestricted": {
     "description": "Step 2: Android's own label is Allow restricted settings"
   },
-  "noticeAccessStepAgain": "Come back, tap Try again and turn Linksy on.",
+  "noticeAccessStepAgain": "Open Notification access again and turn Linksy on.",
   "@noticeAccessStepAgain": {
     "description": "Step 3; Try again is the button below"
   },
@@ -3604,5 +3604,67 @@
   "news033MessagesBody": "On the computer, a conversation shows its earlier messages too, and Reply still works for a day after the notification is gone.",
   "@news033MessagesBody": {
     "description": "What's New 0.3.3"
+  },
+  "onboardingMessages": "Messages on your computers",
+  "@onboardingMessages": {
+    "description": "First-run setup row: this phone's messages and notifications in the computer's Inbox. Parallels settingsGallery"
+  },
+  "onboardingMessagesDetail": "Read and answer your messages and notifications in the computer's Inbox.",
+  "@onboardingMessagesDetail": {
+    "description": "Under that row, and on a computer's ask. Inbox is the computer's tab, as the desktop translates it"
+  },
+  "onboardingGalleryDetail": "Look through this phone's photos and videos in the computer's Gallery. When Android asks, pick Allow all.",
+  "@onboardingGalleryDetail": {
+    "description": "Under Photos on your computers in the first-run setup, and on a computer's ask. Gallery is the computer's tab; Allow all is Android's own label for photos and videos"
+  },
+  "homeTurnOnTitle": "Your messages and photos on your computers",
+  "@homeTurnOnTitle": {
+    "description": "One-time home card for people updating, when the computer's Inbox or Gallery isn't on"
+  },
+  "homeTurnOnBody": "See them in the computer's Inbox and Gallery.",
+  "@homeTurnOnBody": {
+    "description": "Under that title"
+  },
+  "homeTurnOnMessages": "Turn On Messages",
+  "@homeTurnOnMessages": {
+    "description": "Button on that card"
+  },
+  "homeTurnOnPhotos": "Turn On Photos",
+  "@homeTurnOnPhotos": {
+    "description": "Button on that card"
+  },
+  "turnOnAskMessages": "{name} asks to show this phone's messages",
+  "@turnOnAskMessages": {
+    "description": "A computer's Ask the Phone, as a sheet and a notification; name is the computer",
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "turnOnAskPhotos": "{name} asks to show this phone's photos",
+  "@turnOnAskPhotos": {
+    "description": "A computer's Ask the Phone, as a sheet and a notification; name is the computer",
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "turnOnNow": "Turn On",
+  "@turnOnNow": {
+    "description": "Button on that sheet"
+  },
+  "settingsDemoAsk": "A computer asks for it, in 4 seconds",
+  "@settingsDemoAsk": {
+    "description": "Demo mode only: a computer's Ask the Phone comes 4 seconds after the tap"
+  },
+  "noticeAccessStepSwitch": "Open Notification access and turn Linksy on. If its switch is greyed out, tap it anyway: Android refuses, and that makes the next step possible.",
+  "noticeAccessOpen": "Open Notification access",
+  "@noticeAccessStepSwitch": {
+    "description": "First step for a switch Android greys out: Allow restricted settings only appears in App info after Android refused once (tested on Android 15)"
+  },
+  "@noticeAccessOpen": {
+    "description": "Button opening Android's Notification access page for Linksy"
   }
 }

@@ -2310,7 +2310,7 @@ class AppLocalizationsZh extends AppLocalizations {
   String get noticeAccessStepRestricted => '点按右上角的 ⋮，然后点按“允许受限制的设置”。';
 
   @override
-  String get noticeAccessStepAgain => '返回这里，点按“重试”，然后开启 Linksy。';
+  String get noticeAccessStepAgain => '再次打开“通知使用权”并开启 Linksy。';
 
   @override
   String get noticeAccessPlain => '在 Android 的“通知使用权”中开启 Linksy，然后返回。';
@@ -2590,4 +2590,49 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get news033MessagesBody => '在电脑上，对话也会显示更早的消息，通知消失后一天内仍可回复。';
+
+  @override
+  String get onboardingMessages => '在电脑上查看消息';
+
+  @override
+  String get onboardingMessagesDetail => '在电脑的收件箱中阅读并回复你的消息和通知。';
+
+  @override
+  String get onboardingGalleryDetail =>
+      '在电脑的图库中浏览这部手机的照片和视频。Android 询问时，请选择“全部允许”。';
+
+  @override
+  String get homeTurnOnTitle => '在电脑上查看你的消息和照片';
+
+  @override
+  String get homeTurnOnBody => '它们会显示在电脑的收件箱和图库中。';
+
+  @override
+  String get homeTurnOnMessages => '开启消息';
+
+  @override
+  String get homeTurnOnPhotos => '开启照片';
+
+  @override
+  String turnOnAskMessages(String name) {
+    return '$name 请求显示这部手机的消息';
+  }
+
+  @override
+  String turnOnAskPhotos(String name) {
+    return '$name 请求显示这部手机的照片';
+  }
+
+  @override
+  String get turnOnNow => '开启';
+
+  @override
+  String get settingsDemoAsk => '电脑将在 4 秒后请求';
+
+  @override
+  String get noticeAccessStepSwitch =>
+      '打开“通知使用权”并开启 Linksy。如果开关是灰色的，也请点按一下：Android 会拒绝，之后才能进行下一步。';
+
+  @override
+  String get noticeAccessOpen => '打开通知使用权';
 }

@@ -2430,7 +2430,7 @@ class AppLocalizationsRu extends AppLocalizations {
 
   @override
   String get noticeAccessStepAgain =>
-      'Вернитесь, нажмите «Повторить» и включите Linksy.';
+      'Снова откройте «Доступ к уведомлениям» и включите Linksy.';
 
   @override
   String get noticeAccessPlain =>
@@ -2727,4 +2727,51 @@ class AppLocalizationsRu extends AppLocalizations {
   @override
   String get news033MessagesBody =>
       'На компьютере переписка показывает и прежние сообщения, а «Ответить» работает ещё сутки после того, как уведомление исчезло.';
+
+  @override
+  String get onboardingMessages => 'Сообщения на ваших компьютерах';
+
+  @override
+  String get onboardingMessagesDetail =>
+      'Читайте сообщения и уведомления и отвечайте на них во «Входящих» на компьютере.';
+
+  @override
+  String get onboardingGalleryDetail =>
+      'Просматривайте фото и видео с этого телефона в «Галерее» на компьютере. Когда Android спросит, выберите «Разрешить все».';
+
+  @override
+  String get homeTurnOnTitle => 'Ваши сообщения и фото на компьютерах';
+
+  @override
+  String get homeTurnOnBody =>
+      'Они будут во «Входящих» и «Галерее» на компьютере.';
+
+  @override
+  String get homeTurnOnMessages => 'Включить сообщения';
+
+  @override
+  String get homeTurnOnPhotos => 'Включить фото';
+
+  @override
+  String turnOnAskMessages(String name) {
+    return '$name просит показывать сообщения этого телефона';
+  }
+
+  @override
+  String turnOnAskPhotos(String name) {
+    return '$name просит показывать фото этого телефона';
+  }
+
+  @override
+  String get turnOnNow => 'Включить';
+
+  @override
+  String get settingsDemoAsk => 'Компьютер попросит об этом через 4 секунды';
+
+  @override
+  String get noticeAccessStepSwitch =>
+      'Откройте «Доступ к уведомлениям» и включите Linksy. Если переключатель серый, всё равно нажмите на него: Android откажет, и только после этого станет возможен следующий шаг.';
+
+  @override
+  String get noticeAccessOpen => 'Открыть «Доступ к уведомлениям»';
 }

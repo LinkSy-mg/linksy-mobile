@@ -639,7 +639,7 @@
   "noticeAccessGreyed": "ウェブからインストールしたアプリでは、Android がこのスイッチをグレー表示にします。許可するには：",
   "noticeAccessStepInfo": "Linksy のアプリ情報を開きます。",
   "noticeAccessStepRestricted": "右上の ⋮ をタップし、「制限付き設定を許可」をタップします。",
-  "noticeAccessStepAgain": "戻ってきて「再試行」をタップし、Linksy をオンにします。",
+  "noticeAccessStepAgain": "もう一度「通知へのアクセス」を開き、Linksy をオンにします。",
   "noticeAccessPlain": "Android の「通知へのアクセス」で Linksy をオンにしてから戻ってきてください。",
   "commonOpenAppInfo": "アプリ情報を開く",
   "batteryGuide": "Linksy を動かし続ける",
@@ -723,5 +723,18 @@
   "news033PhotosTitle": "コンピュータであなたの写真を",
   "news033PhotosBody": "コンピュータのギャラリーがこのスマホの写真と動画を 1 ページずつ表示し、選んだものを保存します。設定 › ファイル › コンピュータで写真を見る。",
   "news033MessagesTitle": "以前のメッセージ",
-  "news033MessagesBody": "コンピュータで、会話に以前のメッセージも表示され、通知が消えてから 1 日は返信できます。"
+  "news033MessagesBody": "コンピュータで、会話に以前のメッセージも表示され、通知が消えてから 1 日は返信できます。",
+  "onboardingMessages": "コンピュータでメッセージを見る",
+  "onboardingMessagesDetail": "メッセージや通知をコンピュータの受信トレイで読み、返信できます。",
+  "onboardingGalleryDetail": "このスマホの写真と動画をコンピュータのギャラリーで見られます。Android に聞かれたら「すべて許可」を選んでください。",
+  "homeTurnOnTitle": "メッセージと写真をコンピュータで",
+  "homeTurnOnBody": "コンピュータの受信トレイとギャラリーに表示されます。",
+  "homeTurnOnMessages": "メッセージをオンにする",
+  "homeTurnOnPhotos": "写真をオンにする",
+  "turnOnAskMessages": "{name} がこのスマホのメッセージの表示を求めています",
+  "turnOnAskPhotos": "{name} がこのスマホの写真の表示を求めています",
+  "turnOnNow": "オンにする",
+  "settingsDemoAsk": "4 秒後にコンピュータが求めます",
+  "noticeAccessStepSwitch": "「通知へのアクセス」を開いて Linksy をオンにします。スイッチがグレーでもタップしてください。Android に拒否されると、次の手順ができるようになります。",
+  "noticeAccessOpen": "「通知へのアクセス」を開く"
 }

@@ -2408,7 +2408,7 @@ class AppLocalizationsEs extends AppLocalizations {
 
   @override
   String get noticeAccessStepAgain =>
-      'Vuelve, toca Reintentar y activa Linksy.';
+      'Vuelve a abrir Acceso a notificaciones y activa Linksy.';
 
   @override
   String get noticeAccessPlain =>
@@ -2706,4 +2706,51 @@ class AppLocalizationsEs extends AppLocalizations {
   @override
   String get news033MessagesBody =>
       'En la computadora, una conversación también muestra sus mensajes anteriores, y Responder sigue funcionando un día después de que la notificación desaparezca.';
+
+  @override
+  String get onboardingMessages => 'Mensajes en tus computadoras';
+
+  @override
+  String get onboardingMessagesDetail =>
+      'Lee y responde tus mensajes y notificaciones en la Bandeja de entrada de la computadora.';
+
+  @override
+  String get onboardingGalleryDetail =>
+      'Explora las fotos y videos de este teléfono en la Galería de la computadora. Cuando Android pregunte, elige Permitir todo.';
+
+  @override
+  String get homeTurnOnTitle => 'Tus mensajes y fotos en tus computadoras';
+
+  @override
+  String get homeTurnOnBody =>
+      'Míralos en la Bandeja de entrada y la Galería de la computadora.';
+
+  @override
+  String get homeTurnOnMessages => 'Activar mensajes';
+
+  @override
+  String get homeTurnOnPhotos => 'Activar fotos';
+
+  @override
+  String turnOnAskMessages(String name) {
+    return '$name pide mostrar los mensajes de este teléfono';
+  }
+
+  @override
+  String turnOnAskPhotos(String name) {
+    return '$name pide mostrar las fotos de este teléfono';
+  }
+
+  @override
+  String get turnOnNow => 'Activar';
+
+  @override
+  String get settingsDemoAsk => 'Una computadora lo pide, en 4 segundos';
+
+  @override
+  String get noticeAccessStepSwitch =>
+      'Abre Acceso a notificaciones y activa Linksy. Si el interruptor está desactivado, tócalo igualmente: Android lo rechaza, y eso hace posible el siguiente paso.';
+
+  @override
+  String get noticeAccessOpen => 'Abrir Acceso a notificaciones';
 }

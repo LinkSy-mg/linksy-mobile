@@ -639,7 +639,7 @@
   "noticeAccessGreyed": "Android graut diesen Schalter für Apps aus, die aus dem Web installiert wurden. So erlaubst du es:",
   "noticeAccessStepInfo": "Öffne die App-Info von Linksy.",
   "noticeAccessStepRestricted": "Tippe oben rechts auf ⋮, dann auf Eingeschränkte Einstellungen zulassen.",
-  "noticeAccessStepAgain": "Komm zurück, tippe auf Erneut versuchen und schalte Linksy ein.",
+  "noticeAccessStepAgain": "Öffne den Benachrichtigungszugriff erneut und schalte Linksy ein.",
   "noticeAccessPlain": "Schalte Linksy in Androids Benachrichtigungszugriff ein und komm dann zurück.",
   "commonOpenAppInfo": "App-Info öffnen",
   "batteryGuide": "Linksy am Laufen halten",
@@ -723,5 +723,18 @@
   "news033PhotosTitle": "Deine Fotos auf deinem Computer",
   "news033PhotosBody": "Die Galerie eines Computers blättert Seite für Seite durch die Fotos und Videos dieses Telefons und speichert die, die du auswählst. Einstellungen › Dateien › Fotos auf deinen Computern.",
   "news033MessagesTitle": "Frühere Nachrichten",
-  "news033MessagesBody": "Auf dem Computer zeigt ein Gespräch auch seine früheren Nachrichten, und Antworten geht noch einen Tag, nachdem die Benachrichtigung verschwunden ist."
+  "news033MessagesBody": "Auf dem Computer zeigt ein Gespräch auch seine früheren Nachrichten, und Antworten geht noch einen Tag, nachdem die Benachrichtigung verschwunden ist.",
+  "onboardingMessages": "Nachrichten auf deinen Computern",
+  "onboardingMessagesDetail": "Lies und beantworte deine Nachrichten und Benachrichtigungen im Posteingang des Computers.",
+  "onboardingGalleryDetail": "Sieh dir die Fotos und Videos dieses Telefons in der Galerie des Computers an. Wenn Android fragt, wähle Alle zulassen.",
+  "homeTurnOnTitle": "Deine Nachrichten und Fotos auf deinen Computern",
+  "homeTurnOnBody": "Sieh sie im Posteingang und in der Galerie des Computers.",
+  "homeTurnOnMessages": "Nachrichten einschalten",
+  "homeTurnOnPhotos": "Fotos einschalten",
+  "turnOnAskMessages": "{name} möchte die Nachrichten dieses Telefons anzeigen",
+  "turnOnAskPhotos": "{name} möchte die Fotos dieses Telefons anzeigen",
+  "turnOnNow": "Einschalten",
+  "settingsDemoAsk": "Ein Computer fragt danach, in 4 Sekunden",
+  "noticeAccessStepSwitch": "Öffne den Benachrichtigungszugriff und schalte Linksy ein. Ist der Schalter ausgegraut, tippe trotzdem darauf: Android lehnt ab, und erst das macht den nächsten Schritt möglich.",
+  "noticeAccessOpen": "Benachrichtigungszugriff öffnen"
 }

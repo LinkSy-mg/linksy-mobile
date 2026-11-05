@@ -3951,7 +3951,7 @@ abstract class AppLocalizations {
   /// Step 3; Try again is the button below
   ///
   /// In en, this message translates to:
-  /// **'Come back, tap Try again and turn Linksy on.'**
+  /// **'Open Notification access again and turn Linksy on.'**
   String get noticeAccessStepAgain;
 
   /// Before Android 13: just turn Linksy on in Notification access
@@ -4457,6 +4457,84 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'On the computer, a conversation shows its earlier messages too, and Reply still works for a day after the notification is gone.'**
   String get news033MessagesBody;
+
+  /// First-run setup row: this phone's messages and notifications in the computer's Inbox. Parallels settingsGallery
+  ///
+  /// In en, this message translates to:
+  /// **'Messages on your computers'**
+  String get onboardingMessages;
+
+  /// Under that row, and on a computer's ask. Inbox is the computer's tab, as the desktop translates it
+  ///
+  /// In en, this message translates to:
+  /// **'Read and answer your messages and notifications in the computer\'s Inbox.'**
+  String get onboardingMessagesDetail;
+
+  /// Under Photos on your computers in the first-run setup, and on a computer's ask. Gallery is the computer's tab; Allow all is Android's own label for photos and videos
+  ///
+  /// In en, this message translates to:
+  /// **'Look through this phone\'s photos and videos in the computer\'s Gallery. When Android asks, pick Allow all.'**
+  String get onboardingGalleryDetail;
+
+  /// One-time home card for people updating, when the computer's Inbox or Gallery isn't on
+  ///
+  /// In en, this message translates to:
+  /// **'Your messages and photos on your computers'**
+  String get homeTurnOnTitle;
+
+  /// Under that title
+  ///
+  /// In en, this message translates to:
+  /// **'See them in the computer\'s Inbox and Gallery.'**
+  String get homeTurnOnBody;
+
+  /// Button on that card
+  ///
+  /// In en, this message translates to:
+  /// **'Turn On Messages'**
+  String get homeTurnOnMessages;
+
+  /// Button on that card
+  ///
+  /// In en, this message translates to:
+  /// **'Turn On Photos'**
+  String get homeTurnOnPhotos;
+
+  /// A computer's Ask the Phone, as a sheet and a notification; name is the computer
+  ///
+  /// In en, this message translates to:
+  /// **'{name} asks to show this phone\'s messages'**
+  String turnOnAskMessages(String name);
+
+  /// A computer's Ask the Phone, as a sheet and a notification; name is the computer
+  ///
+  /// In en, this message translates to:
+  /// **'{name} asks to show this phone\'s photos'**
+  String turnOnAskPhotos(String name);
+
+  /// Button on that sheet
+  ///
+  /// In en, this message translates to:
+  /// **'Turn On'**
+  String get turnOnNow;
+
+  /// Demo mode only: a computer's Ask the Phone comes 4 seconds after the tap
+  ///
+  /// In en, this message translates to:
+  /// **'A computer asks for it, in 4 seconds'**
+  String get settingsDemoAsk;
+
+  /// First step for a switch Android greys out: Allow restricted settings only appears in App info after Android refused once (tested on Android 15)
+  ///
+  /// In en, this message translates to:
+  /// **'Open Notification access and turn Linksy on. If its switch is greyed out, tap it anyway: Android refuses, and that makes the next step possible.'**
+  String get noticeAccessStepSwitch;
+
+  /// Button opening Android's Notification access page for Linksy
+  ///
+  /// In en, this message translates to:
+  /// **'Open Notification access'**
+  String get noticeAccessOpen;
 }
 
 class _AppLocalizationsDelegate

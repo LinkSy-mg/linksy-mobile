@@ -2403,7 +2403,7 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get noticeAccessStepAgain =>
-      'Komm zurück, tippe auf Erneut versuchen und schalte Linksy ein.';
+      'Öffne den Benachrichtigungszugriff erneut und schalte Linksy ein.';
 
   @override
   String get noticeAccessPlain =>
@@ -2700,4 +2700,52 @@ class AppLocalizationsDe extends AppLocalizations {
   @override
   String get news033MessagesBody =>
       'Auf dem Computer zeigt ein Gespräch auch seine früheren Nachrichten, und Antworten geht noch einen Tag, nachdem die Benachrichtigung verschwunden ist.';
+
+  @override
+  String get onboardingMessages => 'Nachrichten auf deinen Computern';
+
+  @override
+  String get onboardingMessagesDetail =>
+      'Lies und beantworte deine Nachrichten und Benachrichtigungen im Posteingang des Computers.';
+
+  @override
+  String get onboardingGalleryDetail =>
+      'Sieh dir die Fotos und Videos dieses Telefons in der Galerie des Computers an. Wenn Android fragt, wähle Alle zulassen.';
+
+  @override
+  String get homeTurnOnTitle =>
+      'Deine Nachrichten und Fotos auf deinen Computern';
+
+  @override
+  String get homeTurnOnBody =>
+      'Sieh sie im Posteingang und in der Galerie des Computers.';
+
+  @override
+  String get homeTurnOnMessages => 'Nachrichten einschalten';
+
+  @override
+  String get homeTurnOnPhotos => 'Fotos einschalten';
+
+  @override
+  String turnOnAskMessages(String name) {
+    return '$name möchte die Nachrichten dieses Telefons anzeigen';
+  }
+
+  @override
+  String turnOnAskPhotos(String name) {
+    return '$name möchte die Fotos dieses Telefons anzeigen';
+  }
+
+  @override
+  String get turnOnNow => 'Einschalten';
+
+  @override
+  String get settingsDemoAsk => 'Ein Computer fragt danach, in 4 Sekunden';
+
+  @override
+  String get noticeAccessStepSwitch =>
+      'Öffne den Benachrichtigungszugriff und schalte Linksy ein. Ist der Schalter ausgegraut, tippe trotzdem darauf: Android lehnt ab, und erst das macht den nächsten Schritt möglich.';
+
+  @override
+  String get noticeAccessOpen => 'Benachrichtigungszugriff öffnen';
 }

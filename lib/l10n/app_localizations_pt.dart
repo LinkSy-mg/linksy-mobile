@@ -2402,7 +2402,7 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get noticeAccessStepAgain =>
-      'Volte, toque em Tentar de novo e ative o Linksy.';
+      'Abra Acesso a notificações de novo e ative o Linksy.';
 
   @override
   String get noticeAccessPlain =>
@@ -2699,4 +2699,51 @@ class AppLocalizationsPt extends AppLocalizations {
   @override
   String get news033MessagesBody =>
       'No computador, uma conversa mostra também as mensagens anteriores, e Responder ainda funciona por um dia depois que a notificação some.';
+
+  @override
+  String get onboardingMessages => 'Mensagens nos seus computadores';
+
+  @override
+  String get onboardingMessagesDetail =>
+      'Leia e responda suas mensagens e notificações na Caixa de entrada do computador.';
+
+  @override
+  String get onboardingGalleryDetail =>
+      'Navegue pelas fotos e vídeos deste telefone na Galeria do computador. Quando o Android perguntar, escolha Permitir tudo.';
+
+  @override
+  String get homeTurnOnTitle => 'Suas mensagens e fotos nos seus computadores';
+
+  @override
+  String get homeTurnOnBody =>
+      'Veja-as na Caixa de entrada e na Galeria do computador.';
+
+  @override
+  String get homeTurnOnMessages => 'Ativar mensagens';
+
+  @override
+  String get homeTurnOnPhotos => 'Ativar fotos';
+
+  @override
+  String turnOnAskMessages(String name) {
+    return '$name pede para mostrar as mensagens deste telefone';
+  }
+
+  @override
+  String turnOnAskPhotos(String name) {
+    return '$name pede para mostrar as fotos deste telefone';
+  }
+
+  @override
+  String get turnOnNow => 'Ativar';
+
+  @override
+  String get settingsDemoAsk => 'Um computador pede, em 4 segundos';
+
+  @override
+  String get noticeAccessStepSwitch =>
+      'Abra Acesso a notificações e ative o Linksy. Se a chave estiver cinza, toque nela mesmo assim: o Android recusa, e isso torna possível o próximo passo.';
+
+  @override
+  String get noticeAccessOpen => 'Abrir Acesso a notificações';
 }
