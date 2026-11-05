@@ -118,7 +118,29 @@
                 <category android:name="android.intent.category.DEFAULT"/>
                 <data android:mimeType="*/*"/>
             </intent-filter>
+            <!-- "Copy to Computer" in Android's menu over selected text. -->
+            <intent-filter android:label="@string/copy_to_computer">
+                <action android:name="android.intent.action.PROCESS_TEXT"/>
+                <category android:name="android.intent.category.DEFAULT"/>
+                <data android:mimeType="text/plain"/>
+            </intent-filter>
         </activity>
+        <!-- "Snap to Computer": the camera, from the app or its tile. -->
+        <activity
+            android:name=".SnapActivity"
+            android:exported="false"
+            android:excludeFromRecents="true"
+            android:theme="@android:style/Theme.Translucent.NoTitleBar"/>
+        <service
+            android:name=".SnapTile"
+            android:exported="true"
+            android:icon="@drawable/ic_snap"
+            android:label="@string/snap_to_computer"
+            android:permission="android.permission.BIND_QUICK_SETTINGS_TILE">
+            <intent-filter>
+                <action android:name="android.service.quicksettings.action.QS_TILE"/>
+            </intent-filter>
+        </service>
         <!-- Opens received files in other apps, read-only, without any storage permission. -->
         <provider
             android:name=".ReceivedFiles"
@@ -188,6 +210,9 @@
         <intent>
             <action android:name="android.intent.action.PROCESS_TEXT"/>
             <data android:mimeType="text/plain"/>
+        </intent>
+        <intent>
+            <action android:name="android.media.action.IMAGE_CAPTURE"/>
         </intent>
         <!-- Launchable apps, for sending them to another phone: no
              QUERY_ALL_PACKAGES. -->

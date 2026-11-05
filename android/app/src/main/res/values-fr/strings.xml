@@ -33,4 +33,7 @@
     <string name="media_back10">10 secondes en arrière</string>
     <string name="media_forward10">10 secondes en avant</string>
     <string name="all_files">Tous les fichiers</string>
+    <string name="snap_to_computer">Photo vers l\'ordinateur</string>
+    <string name="copy_to_computer">Copier vers l\'ordinateur</string>
+    <string name="snap_no_camera">Aucune app appareil photo sur ce téléphone</string>
 </resources>

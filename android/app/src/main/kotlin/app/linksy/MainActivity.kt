@@ -376,6 +376,39 @@ class MainActivity : FlutterActivity() {
                             runOnUiThread { result.success(bytes) }
                         }.start()
                     }
+                    "snap" -> {
+                        startActivity(
+                            Intent(this@MainActivity, SnapActivity::class.java)
+                                .putExtra(ShareTarget.EXTRA_DEVICE, call.arguments as String?),
+                        )
+                        result.success(null)
+                    }
+                    "highRefresh" -> {
+                        highRefresh(call.arguments as Boolean)
+                        result.success(null)
+                    }
+                    "usbPlugged" -> {
+                        val battery = registerReceiver(null, IntentFilter(Intent.ACTION_BATTERY_CHANGED))
+                        result.success(
+                            battery?.getIntExtra(android.os.BatteryManager.EXTRA_PLUGGED, 0) ==
+                                android.os.BatteryManager.BATTERY_PLUGGED_USB,
+                        )
+                    }
+                    "phoneModel" -> result.success(
+                        mapOf("maker" to android.os.Build.MANUFACTURER, "model" to android.os.Build.MODEL),
+                    )
+                    "connectionFacts" -> result.success(connectionFacts())
+                    "openSystem" -> {
+                        val action = when (call.arguments as String) {
+                            "wifi" -> android.provider.Settings.ACTION_WIFI_SETTINGS
+                            "vpn" -> android.provider.Settings.ACTION_VPN_SETTINGS
+                            "saver" -> android.provider.Settings.ACTION_BATTERY_SAVER_SETTINGS
+                            "data" -> android.provider.Settings.ACTION_DATA_USAGE_SETTINGS
+                            else -> android.provider.Settings.ACTION_SETTINGS
+                        }
+                        runCatching { startActivity(Intent(action)) }
+                        result.success(null)
+                    }
                     "thumbOf" -> {
                         val ref = call.argument<String>("ref")!!
                         Thread {
@@ -817,6 +850,37 @@ class MainActivity : FlutterActivity() {
         startActivityForResult(intent, REQUEST_FOLDER)
     }
 
+    /// The display's fastest mode at its size while a screen is shown, so
+    /// frames aren't held back by a panel left at 60 Hz or lower.
+    private fun highRefresh(on: Boolean) {
+        @Suppress("DEPRECATION")
+        val screen = (if (android.os.Build.VERSION.SDK_INT >= 30) display else windowManager.defaultDisplay)
+            ?: return
+        val now = screen.mode
+        val best = screen.supportedModes
+            .filter { it.physicalWidth == now.physicalWidth && it.physicalHeight == now.physicalHeight }
+            .maxByOrNull { it.refreshRate } ?: return
+        window.attributes = window.attributes.apply { preferredDisplayModeId = if (on) best.modeId else 0 }
+    }
+
+    /// What can keep this phone from its computers, for the Connection Doctor.
+    private fun connectionFacts(): Map<String, Boolean> {
+        val net = getSystemService(android.net.ConnectivityManager::class.java)
+        val power = getSystemService(android.os.PowerManager::class.java)
+        @Suppress("DEPRECATION")
+        val all = net.allNetworks.mapNotNull { net.getNetworkCapabilities(it) }
+        return mapOf(
+            "wifi" to all.any {
+                it.hasTransport(android.net.NetworkCapabilities.TRANSPORT_WIFI) ||
+                    it.hasTransport(android.net.NetworkCapabilities.TRANSPORT_ETHERNET)
+            },
+            "vpn" to all.any { it.hasTransport(android.net.NetworkCapabilities.TRANSPORT_VPN) },
+            "batteryFree" to power.isIgnoringBatteryOptimizations(packageName),
+            "powerSave" to power.isPowerSaveMode,
+            "dataSaver" to (net.restrictBackgroundStatus == android.net.ConnectivityManager.RESTRICT_BACKGROUND_STATUS_ENABLED),
+        )
+    }
+
     /// "Share → Linksy", handed over by [ShareTarget] (files already copied).
     private fun takeShared(intent: Intent?) {
         if (intent?.action != ShareTarget.ACTION_SHARED) return
@@ -825,7 +889,10 @@ class MainActivity : FlutterActivity() {
         val files = intent.getStringArrayExtra(ShareTarget.EXTRA_FILES)?.toList().orEmpty()
         val text = intent.getStringExtra(ShareTarget.EXTRA_TEXT)
         val device = intent.getStringExtra(ShareTarget.EXTRA_DEVICE)
-        val to = if (device != null) mapOf("device" to device) else emptyMap()
+        val to = buildMap<String, Any> {
+            if (device != null) put("device", device)
+            if (intent.getBooleanExtra(ShareTarget.EXTRA_QUICK, false)) put("quick", true)
+        }
         when {
             files.isNotEmpty() -> deliverShare(mapOf("files" to files) + to)
             !text.isNullOrBlank() -> deliverShare(mapOf("text" to text) + to)

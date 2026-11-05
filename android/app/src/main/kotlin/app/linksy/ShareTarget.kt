@@ -26,11 +26,16 @@ class ShareTarget : Activity() {
                 for (i in 0 until clip.itemCount) clip.getItemAt(i).uri?.let(::add)
             }
         }
-        val text = shared.getCharSequenceExtra(Intent.EXTRA_TEXT)?.toString()
+        // "Copy to Computer" over selected text: to a clipboard, with no fuss.
+        val selected = shared.getCharSequenceExtra(Intent.EXTRA_PROCESS_TEXT)?.toString()
+        val text = selected ?: shared.getCharSequenceExtra(Intent.EXTRA_TEXT)?.toString()
         // Picked as a device in the share sheet: straight to it.
         val device = ShareShortcuts.deviceOf(shared)
         if (uris.isEmpty()) {
-            forward(device) { if (!text.isNullOrBlank()) putExtra(EXTRA_TEXT, text) }
+            forward(device) {
+                if (!text.isNullOrBlank()) putExtra(EXTRA_TEXT, text)
+                if (selected != null) putExtra(EXTRA_QUICK, true)
+            }
             return
         }
         Thread {
@@ -54,6 +59,10 @@ class ShareTarget : Activity() {
         const val EXTRA_TEXT = "app.linksy.text"
         const val EXTRA_FILES = "app.linksy.files"
         const val EXTRA_DEVICE = "app.linksy.device"
+
+        /// A snap or copied text: straight to the one computer there is, and
+        /// back to what was on screen.
+        const val EXTRA_QUICK = "app.linksy.quick"
 
         /// Hands content over to the node, which sends from paths: each file
         /// as a link, under its own name, to a descriptor kept open here, so

@@ -33,4 +33,7 @@
     <string name="media_back10">Назад на 10 секунд</string>
     <string name="media_forward10">Вперёд на 10 секунд</string>
     <string name="all_files">Все файлы</string>
+    <string name="snap_to_computer">Снимок на компьютер</string>
+    <string name="copy_to_computer">Копировать на компьютер</string>
+    <string name="snap_no_camera">На телефоне нет приложения камеры</string>
 </resources>
