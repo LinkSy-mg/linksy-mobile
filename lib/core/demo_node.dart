@@ -671,6 +671,16 @@ class DemoNode implements LinksyNode {
     );
   }
 
+  /// A computer's "Ask the Phone", in a moment: time to leave the app and
+  /// see its notification instead.
+  void simulateTurnOn(String feature) {
+    final from = _devices.values.firstWhere((v) => v.trusted).device;
+    _setConnected(from.id, true);
+    Timer(const Duration(seconds: 4), () {
+      _emit(TurnOnRequested(from: from, feature: feature));
+    });
+  }
+
   void simulateClipboard() {
     final from = _devices.values.firstWhere((v) => v.trusted).device;
     _setConnected(from.id, true);

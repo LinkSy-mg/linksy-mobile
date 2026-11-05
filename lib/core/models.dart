@@ -648,6 +648,14 @@ class NotificationDismissRequested extends LinksyEvent {
 }
 
 /// A computer asks where this phone is, once (§4.14).
+/// A computer asks to turn on what its tab needs here: `notifications` (its
+/// Inbox) or `gallery` (its Gallery).
+class TurnOnRequested extends LinksyEvent {
+  const TurnOnRequested({required this.from, required this.feature});
+  final DeviceInfo from;
+  final String feature;
+}
+
 class LocateRequested extends LinksyEvent {
   const LocateRequested(this.from);
   final DeviceInfo from;

@@ -194,6 +194,18 @@ class _SettingsScreenState extends State<SettingsScreen> {
                             title: l.settingsDemoReceiveClipboard,
                             onTap: demo.simulateClipboard,
                           ),
+                          SettingRow(
+                            icon: Ph.chatCircleText,
+                            title: l.onboardingMessages,
+                            caption: l.settingsDemoAsk,
+                            onTap: () => demo.simulateTurnOn('notifications'),
+                          ),
+                          SettingRow(
+                            icon: Ph.imagesSquare,
+                            title: l.settingsGallery,
+                            caption: l.settingsDemoAsk,
+                            onTap: () => demo.simulateTurnOn('gallery'),
+                          ),
                         ],
                       ),
                     const SizedBox(height: 40),

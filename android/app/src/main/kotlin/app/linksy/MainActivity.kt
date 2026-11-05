@@ -31,6 +31,9 @@ class MainActivity : FlutterActivity() {
 
     /// A `linksy://pair?…` link that opened the app, until Dart asks for it.
     private var pendingLink: String? = null
+
+    /// A computer's ask whose notification started the app.
+    private var pendingTurnOn: Map<String, String>? = null
     /// Something shared to Linksy from another app (text or file copies),
     /// until Dart asks for it.
     private var pendingShare: Map<String, Any>? = null
@@ -61,6 +64,7 @@ class MainActivity : FlutterActivity() {
         networks?.stop()
         networks = NetworkWatcher(this) { channel?.invokeMethod("networkChanged", null) }.apply { start() }
         pendingLink = linkFrom(intent)
+        pendingTurnOn = turnOnFrom(intent)
         takeShared(intent)
         watchBattery()
         Logs.sink = { line -> runOnUiThread { channel?.invokeMethod("log", line) } }
@@ -95,6 +99,10 @@ class MainActivity : FlutterActivity() {
                     "takeLink" -> {
                         result.success(pendingLink)
                         pendingLink = null
+                    }
+                    "takeTurnOn" -> {
+                        result.success(pendingTurnOn)
+                        pendingTurnOn = null
                     }
                     "pictures" -> result.success(Pictures.all(this@MainActivity))
                     "pickPicture" -> pickPicture(call.argument<String>("device")!!, result)
@@ -293,6 +301,17 @@ class MainActivity : FlutterActivity() {
                         ArrivedNotice.post(
                             this@MainActivity, call.argument<String>("id")!!,
                             call.argument<String>("title")!!, call.argument<String>("body") ?: "",
+                        )
+                        result.success(null)
+                    }
+                    "noticeTurnOn" -> {
+                        ArrivedNotice.post(
+                            this@MainActivity, call.argument<String>("id")!!,
+                            call.argument<String>("title")!!, call.argument<String>("body") ?: "",
+                            mapOf(
+                                EXTRA_TURN_ON to call.argument<String>("feature")!!,
+                                EXTRA_TURN_ON_NAME to call.argument<String>("name")!!,
+                            ),
                         )
                         result.success(null)
                     }
@@ -612,8 +631,23 @@ class MainActivity : FlutterActivity() {
         takeShared(intent)
         if (intent.action == android.hardware.usb.UsbManager.ACTION_USB_ACCESSORY_ATTACHED) openUsb(intent)
         intent.getStringExtra(ShareService.EXTRA_WEBCAM)?.let { channel?.invokeMethod("openWebcam", it) }
+        // Kept here until taken: when Android restarts this activity, Flutter
+        // isn't listening yet and this call goes nowhere.
+        turnOnFrom(intent)?.let { ask ->
+            pendingTurnOn = ask
+            channel?.invokeMethod("turnOn", null)
+        }
         val link = linkFrom(intent) ?: return
         channel?.invokeMethod("link", link) ?: run { pendingLink = link }
+    }
+
+    /// The computer's name and the feature from a tapped ask, once: the
+    /// activity may be recreated with this intent.
+    private fun turnOnFrom(intent: Intent?): Map<String, String>? {
+        val feature = intent?.getStringExtra(EXTRA_TURN_ON) ?: return null
+        val name = intent.getStringExtra(EXTRA_TURN_ON_NAME).orEmpty()
+        intent.removeExtra(EXTRA_TURN_ON)
+        return mapOf("feature" to feature, "name" to name)
     }
 
     private fun prefs() = getSharedPreferences("linksy", MODE_PRIVATE)
@@ -1072,6 +1106,8 @@ class MainActivity : FlutterActivity() {
     }
 
     private companion object {
+        const val EXTRA_TURN_ON = "app.linksy.turn_on"
+        const val EXTRA_TURN_ON_NAME = "app.linksy.turn_on_name"
         const val REQUEST_CAPTURE = 41
         const val REQUEST_CAMERA = 42
         const val REQUEST_NOTIFICATIONS = 43

@@ -1057,16 +1057,29 @@ class LinksyController extends ChangeNotifier with WidgetsBindingObserver {
   /// What this phone can do that comes and goes (§4.10), told to the
   /// computers whenever it changes.
   Future<void> _announce() async {
+    await node.setFeatures(_features).catchError((Object _) {});
+    if (mirroring && gallery && prefs['turn_on_card'] == null) {
+      await _setPref('turn_on_card', 'done');
+    }
+  }
+
+  List<String> get _features {
     const changing = {'notifications', 'inbox_history', 'gallery'};
-    final features = [
+    return [
       ...node.info.features.where((f) => !changing.contains(f)),
       if (mirroring) ...['notifications', 'inbox_history'],
       if (gallery) 'gallery',
     ];
+  }
+
+  /// The same list again, for a computer that missed it. The core only tells
+  /// a list that changed, and the order means nothing: backwards, then back.
+  Future<void> _announceAgain() async {
+    final features = _features;
+    await node
+        .setFeatures(features.reversed.toList())
+        .catchError((Object _) {});
     await node.setFeatures(features).catchError((Object _) {});
-    if (mirroring && gallery && prefs['turn_on_card'] == null) {
-      await _setPref('turn_on_card', 'done');
-    }
   }
 
   /// Android's answers about notifications and photos are in.
@@ -1082,6 +1095,58 @@ class LinksyController extends ChangeNotifier with WidgetsBindingObserver {
       !(mirroring && gallery);
 
   Future<void> dismissTurnOnCard() => _setPref('turn_on_card', 'done');
+
+  /// What Android allows now. A computer's ask, or the tap on its
+  /// notification, can come before the check on coming back to the app.
+  Future<void> refreshAccess() async {
+    await refreshNotificationAccess();
+    await _refreshGallery();
+  }
+
+  /// Whether what a computer's tab needs is on here: `notifications` or
+  /// `gallery`. Null: not something this phone knows.
+  bool? isTurnedOn(String feature) => switch (feature) {
+    'notifications' => mirroring,
+    'gallery' => gallery,
+    _ => null,
+  };
+
+  /// When each computer last asked for each feature, to ask the user at most
+  /// once a minute.
+  final _turnOnAsked = <(String, String), DateTime>{};
+
+  /// A computer asks (its "Ask the Phone"): already on, it only missed the
+  /// news; else the user decides, here or from a notification.
+  Future<void> _onTurnOnRequest(TurnOnRequested e) async {
+    if (isTurnedOn(e.feature) == null) return;
+    if (device(e.from.id)?.trusted != true) return;
+    await refreshAccess();
+    if (isTurnedOn(e.feature) == true) {
+      await _announceAgain();
+      return;
+    }
+    final key = (e.from.id, e.feature);
+    final now = DateTime.now();
+    final last = _turnOnAsked[key];
+    if (last != null && now.difference(last) < const Duration(minutes: 1)) {
+      return;
+    }
+    _turnOnAsked[key] = now;
+    if (_onScreen) {
+      _prompts.add(e);
+      return;
+    }
+    final messages = e.feature == 'notifications';
+    LinksyPlatform.noticeTurnOn(
+      device: e.from.id,
+      name: e.from.name,
+      feature: e.feature,
+      title: messages
+          ? tr.turnOnAskMessages(e.from.name)
+          : tr.turnOnAskPhotos(e.from.name),
+      body: messages ? tr.onboardingMessagesDetail : tr.onboardingGalleryDetail,
+    );
+  }
 
   /// Linksy may read the phone's photos and videos (Android's permission, or
   /// All files access).
@@ -1616,6 +1681,8 @@ class LinksyController extends ChangeNotifier with WidgetsBindingObserver {
         LinksyPlatform.dismissNotification(key);
       case InboxHistoryRequested():
         _answerHistory(e);
+      case TurnOnRequested():
+        unawaited(_onTurnOnRequest(e));
       case DeckActionsReceived(:final from, :final actions):
         deckActions[from.id] = actions;
         _deckFirstLayout(from.id, actions);

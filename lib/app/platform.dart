@@ -58,6 +58,7 @@ abstract final class LinksyPlatform {
 
   static final _directSteps =
       StreamController<(String, Map<String, Object?>)>.broadcast();
+  static final _turnOnAsks = StreamController<void>.broadcast();
   static var _listening = false;
 
   /// Calls from Android: pairing links, second-display size and end, and
@@ -107,6 +108,8 @@ abstract final class LinksyPlatform {
           ));
         case 'openWebcam' when call.arguments is String:
           _openWebcam.add(call.arguments as String);
+        case 'turnOn':
+          _turnOnAsks.add(null);
         case 'networkChanged':
           _networkChanges.add(null);
         case 'directStep' when call.arguments is Map:
@@ -393,6 +396,36 @@ abstract final class LinksyPlatform {
     'title': title,
     'body': body,
   });
+
+  /// A computer's ask while Linksy isn't on screen: a notification whose tap
+  /// opens its sheet ([turnOnAsks], [takeTurnOn]).
+  static Future<void> noticeTurnOn({
+    required String device,
+    required String name,
+    required String feature,
+    required String title,
+    required String body,
+  }) => _call<void>('noticeTurnOn', {
+    'id': 'turn-on-$device-$feature',
+    'name': name,
+    'feature': feature,
+    'title': title,
+    'body': body,
+  });
+
+  /// Such a tap while the app runs: [takeTurnOn] has it.
+  static Stream<void> get turnOnAsks {
+    _listen();
+    return _turnOnAsks.stream;
+  }
+
+  /// The computer's name and the feature of such a tap, once. Android keeps
+  /// it until asked, so a tap that started the app isn't lost.
+  static Future<(String, String)?> takeTurnOn() async {
+    final ask = await _call<Object?>('takeTurnOn');
+    if (ask is! Map) return null;
+    return (ask['name'] as String? ?? '', ask['feature'] as String? ?? '');
+  }
 
   /// A ping or a link from a computer while Linksy isn't on screen: a
   /// notification that buzzes and opens the app.

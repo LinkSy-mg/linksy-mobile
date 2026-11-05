@@ -207,6 +207,10 @@ LinksyEvent? eventFromJson(Json j) {
       image: j['image'] as String? ?? '',
     ),
     'locate_request' => LocateRequested(device('from')),
+    'turn_on_request' => TurnOnRequested(
+      from: device('from'),
+      feature: j['feature'] as String? ?? '',
+    ),
     'direct_wanted' => DirectWanted(
       j['id'] as String,
       group: (j['group'] as Map?)?.cast<String, Object?>(),
