@@ -144,6 +144,9 @@ class LinksyController extends ChangeNotifier with WidgetsBindingObserver {
   String? filesFolder;
   String? photosFolder;
 
+  /// Where received files go, when it isn't Downloads › Linksy.
+  String? saveFolder;
+
   /// Photo imports going out: transfer → (device, newest photo time, more).
   final Map<String, (String, int, bool)> _imports = {};
   bool _importing = false;
@@ -423,6 +426,7 @@ class LinksyController extends ChangeNotifier with WidgetsBindingObserver {
       ..remove(_self);
     filesFolder = await LinksyPlatform.folder('files');
     photosFolder = await LinksyPlatform.folder('photos');
+    saveFolder = await LinksyPlatform.folder('received');
     allFiles = await LinksyPlatform.allFilesState();
     await LinksyPlatform.shareFiles(sharingFiles && filesReady, all: filesAll);
     await LinksyPlatform.watchCalls(pauseOnCalls);
@@ -1221,6 +1225,20 @@ class LinksyController extends ChangeNotifier with WidgetsBindingObserver {
 
   // Files (§4.9): computers browse the one folder the user picked.
 
+  Future<void> pickSaveFolder() async {
+    final name = await LinksyPlatform.pickFolder('received');
+    if (name == null) return;
+    saveFolder = name;
+    notifyListeners();
+  }
+
+  /// Back to Downloads › Linksy.
+  Future<void> forgetSaveFolder() async {
+    await LinksyPlatform.forgetFolder('received');
+    saveFolder = null;
+    notifyListeners();
+  }
+
   Future<String?> pickFilesFolder() async {
     final name = await LinksyPlatform.pickFolder('files');
     if (name == null) return null;
@@ -1815,8 +1833,8 @@ class LinksyController extends ChangeNotifier with WidgetsBindingObserver {
             ..bytes = a.total
             ..saved = saved;
         });
-        // Into Downloads/Linksy, where other apps find them. Not a file put
-        // on the clipboard: no timeline entry was made for its transfer.
+        // Where other apps find them: Downloads/Linksy, or the chosen folder.
+        // Not a file put on the clipboard: no timeline entry was made for its transfer.
         if (saved.isNotEmpty && _activity.any((a) => a.id == transfer)) {
           LinksyPlatform.publishDownloads(saved).then((moved) {
             _update(transfer, (a) => a.saved = moved);

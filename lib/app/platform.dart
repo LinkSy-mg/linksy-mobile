@@ -219,6 +219,10 @@ abstract final class LinksyPlatform {
   static Future<String?> pickFolder(String kind) =>
       _call<String>('pickFolder', {'kind': kind});
 
+  /// Forgets a folder from [pickFolder], and Android's grant for it.
+  static Future<void> forgetFolder(String kind) =>
+      _call<void>('forgetFolder', {'kind': kind});
+
   /// The name of the folder picked for [kind], if still allowed.
   static Future<String?> folder(String kind) =>
       _call<String>('folder', {'kind': kind});
@@ -474,7 +478,8 @@ abstract final class LinksyPlatform {
     return _transferAnswers.stream;
   }
 
-  /// Moves received files into Downloads/Linksy (Android 10+); returns where
+  /// Moves received files into the chosen folder, else Downloads/Linksy
+  /// (Android 10+); returns where
   /// each one is now (a `content://` URI, or the same path if it stayed).
   static Future<List<String>> publishDownloads(List<String> paths) async =>
       (await _call<List<Object?>>('publishDownloads', {

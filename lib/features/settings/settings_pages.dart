@@ -218,7 +218,7 @@ String settingsSummary(BuildContext context, SettingsArea area) {
   if (st == null) return '';
   final on = switch (area) {
     SettingsArea.files => [
-      l.settingsSaveLocationPath,
+      c.saveFolder ?? l.settingsSaveLocationPath,
       if (st.autoAccept) l.settingsAcceptFromMyDevices,
       if (c.sharingFiles && c.filesReady)
         c.filesAll ? l.settingsFilesAll : l.settingsBrowseFiles,
@@ -303,10 +303,27 @@ class _FilesSettingsState extends State<FilesSettings>
       backLabel: l.settingsTitle,
       highlight: widget.highlight,
       children: [
-        SettingsCard(
-          id: 'save',
-          label: l.settingsSaveLocation,
-          child: _Path(l.settingsSaveLocationPath),
+        Pressable(
+          onTap: c.pickSaveFolder,
+          scale: 0.98,
+          semanticLabel: l.settingsSaveLocation,
+          child: SettingsCard(
+            id: 'save',
+            label: l.settingsSaveLocation,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                _Path(c.saveFolder ?? l.settingsSaveLocationPath),
+                if (c.saveFolder != null)
+                  SmallAction(
+                    label: l.settingsSaveLocationUse(
+                      l.settingsSaveLocationPath,
+                    ),
+                    onTap: c.forgetSaveFolder,
+                  ),
+              ],
+            ),
+          ),
         ),
         SettingsSection(
           title: l.settingsReceiving,
@@ -441,7 +458,7 @@ class _Choice extends StatelessWidget {
   }
 }
 
-/// "Downloads › Linksy" as the folders it is.
+/// "Downloads › Linksy" as the folders it is, in a card that changes it.
 class _Path extends StatelessWidget {
   const _Path(this.path);
 
@@ -456,10 +473,10 @@ class _Path extends StatelessWidget {
         const IconCircle(
           icon: Ph.downloadSimple,
           color: Sig.cyan,
-          size: 52,
+          size: 48,
           filled: true,
         ),
-        const SizedBox(width: 14),
+        const SizedBox(width: 12),
         Expanded(
           child: Wrap(
             crossAxisAlignment: WrapCrossAlignment.center,
@@ -497,6 +514,8 @@ class _Path extends StatelessWidget {
             ],
           ),
         ),
+        const SizedBox(width: 4),
+        Icon(Ph.caretRight, color: s.faint, size: 16),
       ],
     );
   }

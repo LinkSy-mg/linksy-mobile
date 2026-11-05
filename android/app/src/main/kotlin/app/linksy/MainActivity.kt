@@ -112,6 +112,12 @@ class MainActivity : FlutterActivity() {
                     }
                     "pickFolder" -> pickFolder(call.argument<String>("kind")!!, result)
                     "folder" -> result.success(folderName(call.argument<String>("kind")!!))
+                    "forgetFolder" -> {
+                        val kind = call.argument<String>("kind")!!
+                        prefs().getString("folder.$kind", null)?.let { letGoOf(it, kind) }
+                        prefs().edit().remove("folder.$kind").apply()
+                        result.success(null)
+                    }
                     "shareFiles" -> {
                         val on = call.argument<Boolean>("on") == true
                         // All files: `/` is the phone's storage, once Android allows it.
@@ -323,7 +329,7 @@ class MainActivity : FlutterActivity() {
                         val paths = call.argument<List<String>>("paths").orEmpty()
                         val root = java.io.File(getExternalFilesDir(null), "Received")
                         Thread {
-                            val moved = Downloads.publish(applicationContext, root, paths)
+                            val moved = Downloads.publish(applicationContext, root, paths, folder("received"))
                             runOnUiThread { result.success(moved) }
                         }.start()
                     }
@@ -653,10 +659,21 @@ class MainActivity : FlutterActivity() {
     private fun prefs() = getSharedPreferences("linksy", MODE_PRIVATE)
 
     /// A folder the user picked for Linksy (`files` to share, `photos` to back
-    /// up), if Android still grants it.
+    /// up, `received` to save into), if Android still grants it.
     private fun folder(kind: String): android.net.Uri? {
         val uri = prefs().getString("folder.$kind", null)?.let(android.net.Uri::parse) ?: return null
         return uri.takeIf { u -> contentResolver.persistedUriPermissions.any { it.uri == u && it.isReadPermission } }
+    }
+
+    /// Gives Android's grant for [uri] back, unless another kind still uses it.
+    private fun letGoOf(uri: String, kind: String) {
+        val stillUsed = listOf("files", "photos", "received").any { it != kind && prefs().getString("folder.$it", null) == uri }
+        if (!stillUsed) runCatching {
+            contentResolver.releasePersistableUriPermission(
+                android.net.Uri.parse(uri),
+                Intent.FLAG_GRANT_READ_URI_PERMISSION or Intent.FLAG_GRANT_WRITE_URI_PERMISSION,
+            )
+        }
     }
 
     private fun folderName(kind: String): String? {
@@ -1048,18 +1065,10 @@ class MainActivity : FlutterActivity() {
             val uri = data?.data
             if (resultCode != RESULT_OK || uri == null) return result.success(null)
             val flags = Intent.FLAG_GRANT_READ_URI_PERMISSION or
-                (if (kind == "files") Intent.FLAG_GRANT_WRITE_URI_PERMISSION else 0)
+                (if (kind != "photos") Intent.FLAG_GRANT_WRITE_URI_PERMISSION else 0)
             runCatching { contentResolver.takePersistableUriPermission(uri, flags) }
             // Let go of the folder this replaces.
-            prefs().getString("folder.$kind", null)?.takeIf { it != uri.toString() }?.let { old ->
-                val stillUsed = listOf("files", "photos").any { it != kind && prefs().getString("folder.$it", null) == old }
-                if (!stillUsed) runCatching {
-                    contentResolver.releasePersistableUriPermission(
-                        android.net.Uri.parse(old),
-                        Intent.FLAG_GRANT_READ_URI_PERMISSION or Intent.FLAG_GRANT_WRITE_URI_PERMISSION,
-                    )
-                }
-            }
+            prefs().getString("folder.$kind", null)?.takeIf { it != uri.toString() }?.let { letGoOf(it, kind) }
             prefs().edit().putString("folder.$kind", uri.toString()).apply()
             if (kind == "files") fileServer(this).root = uri
             return result.success(folderName(kind))
