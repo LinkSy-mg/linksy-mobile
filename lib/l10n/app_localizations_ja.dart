@@ -2613,6 +2613,17 @@ class AppLocalizationsJa extends AppLocalizations {
   }
 
   @override
+  String get news034TurnOnBody =>
+      'ホーム画面のカードからオンにすると、コンピュータの受信トレイとギャラリーに自動で表示されます。';
+
+  @override
+  String get news034SaveTitle => 'ファイルの保存先を選べます';
+
+  @override
+  String get news034SaveBody =>
+      '設定 › ファイル › 保存先：タップすると、受信したファイルの保存先フォルダを変更できます。';
+
+  @override
   String get news033DeckTitle => 'デッキ：コンピュータ用のボタン';
 
   @override

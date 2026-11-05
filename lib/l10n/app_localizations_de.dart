@@ -2686,6 +2686,17 @@ class AppLocalizationsDe extends AppLocalizations {
   }
 
   @override
+  String get news034TurnOnBody =>
+      'Schalte sie über die Karte auf dem Startbildschirm ein, und Posteingang und Galerie des Computers füllen sich von selbst.';
+
+  @override
+  String get news034SaveTitle => 'Wähle, wohin Dateien gehen';
+
+  @override
+  String get news034SaveBody =>
+      'Einstellungen › Dateien › Speicherort: Tippe darauf, um einen anderen Ordner für Empfangenes zu wählen.';
+
+  @override
   String get news033DeckTitle => 'Deck: Tasten für deinen Computer';
 
   @override

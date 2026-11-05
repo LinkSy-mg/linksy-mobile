@@ -2692,6 +2692,17 @@ class AppLocalizationsIt extends AppLocalizations {
   }
 
   @override
+  String get news034TurnOnBody =>
+      'Attivali dalla scheda nella schermata iniziale: la Posta in arrivo e la Galleria del computer si riempiono da sole.';
+
+  @override
+  String get news034SaveTitle => 'Scegli dove vanno i file';
+
+  @override
+  String get news034SaveBody =>
+      'Impostazioni › File › Posizione di salvataggio: toccala per scegliere un\'altra cartella per ciò che ricevi.';
+
+  @override
   String get news033DeckTitle => 'Deck: pulsanti per il tuo computer';
 
   @override

@@ -2671,6 +2671,17 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
+  String get news034TurnOnBody =>
+      'Turn them on from the card on the home screen, and the computer\'s Inbox and Gallery fill by themselves.';
+
+  @override
+  String get news034SaveTitle => 'Choose where files go';
+
+  @override
+  String get news034SaveBody =>
+      'Settings › Files › Save location: tap it to pick another folder for what you receive.';
+
+  @override
   String get news033DeckTitle => 'Deck: buttons for your computer';
 
   @override

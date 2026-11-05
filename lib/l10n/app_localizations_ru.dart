@@ -2713,6 +2713,17 @@ class AppLocalizationsRu extends AppLocalizations {
   }
 
   @override
+  String get news034TurnOnBody =>
+      'Включите их с карточки на главном экране, и «Входящие» и «Галерея» на компьютере заполнятся сами.';
+
+  @override
+  String get news034SaveTitle => 'Выбирайте, куда сохранять файлы';
+
+  @override
+  String get news034SaveBody =>
+      'Настройки › Файлы › Куда сохранять: нажмите, чтобы выбрать другую папку для полученных файлов.';
+
+  @override
   String get news033DeckTitle => 'Пульт: кнопки для компьютера';
 
   @override

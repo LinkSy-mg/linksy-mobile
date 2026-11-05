@@ -4428,6 +4428,24 @@ abstract class AppLocalizations {
   /// **'{name} has no deck for this phone yet. Make one in Linksy on the computer.'**
   String deckNoLayouts(String name);
 
+  /// What's New 0.3.4: the home card turns on the Inbox and Gallery
+  ///
+  /// In en, this message translates to:
+  /// **'Turn them on from the card on the home screen, and the computer\'s Inbox and Gallery fill by themselves.'**
+  String get news034TurnOnBody;
+
+  /// What's New 0.3.4: title, choosing the save folder
+  ///
+  /// In en, this message translates to:
+  /// **'Choose where files go'**
+  String get news034SaveTitle;
+
+  /// What's New 0.3.4: where to choose it
+  ///
+  /// In en, this message translates to:
+  /// **'Settings › Files › Save location: tap it to pick another folder for what you receive.'**
+  String get news034SaveBody;
+
   /// What's New 0.3.3: the deck, the phone as buttons for the computer, laid out on the computer
   ///
   /// In en, this message translates to:

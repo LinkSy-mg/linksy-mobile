@@ -2697,6 +2697,17 @@ class AppLocalizationsFr extends AppLocalizations {
   }
 
   @override
+  String get news034TurnOnBody =>
+      'Activez-les depuis la carte de l\'écran d\'accueil : la Boîte de réception et la Galerie de l\'ordinateur se remplissent toutes seules.';
+
+  @override
+  String get news034SaveTitle => 'Choisissez où vont les fichiers';
+
+  @override
+  String get news034SaveBody =>
+      'Réglages › Fichiers › Emplacement d’enregistrement: touchez-le pour choisir un autre dossier pour ce que vous recevez.';
+
+  @override
   String get news033DeckTitle => 'Deck : des boutons pour votre ordinateur';
 
   @override

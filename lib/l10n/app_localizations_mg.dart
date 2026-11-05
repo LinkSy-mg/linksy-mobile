@@ -2694,6 +2694,17 @@ class AppLocalizationsMg extends AppLocalizations {
   }
 
   @override
+  String get news034TurnOnBody =>
+      'Alefaso avy amin\'ny karatra eo amin\'ny efijery fandraisana, dia feno ho azy ny Hafatra voaray sy Sary an\'ny solosaina.';
+
+  @override
+  String get news034SaveTitle => 'Fidio izay hitehirizana ny rakitra';
+
+  @override
+  String get news034SaveBody =>
+      'Fikirana › Rakitra › Toerana itahirizana: tsindrio mba hisafidianana lahatahiry hafa ho an\'izay voarainao.';
+
+  @override
   String get news033DeckTitle => 'Deck: bokotra ho an\'ny solosainao';
 
   @override

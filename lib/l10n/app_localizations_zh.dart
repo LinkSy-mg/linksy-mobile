@@ -2577,6 +2577,15 @@ class AppLocalizationsZh extends AppLocalizations {
   }
 
   @override
+  String get news034TurnOnBody => '在主屏幕的卡片上开启后，电脑的收件箱和图库会自动显示内容。';
+
+  @override
+  String get news034SaveTitle => '选择文件保存位置';
+
+  @override
+  String get news034SaveBody => '设置 › 文件 › 保存位置：点按即可为收到的文件选择其他文件夹。';
+
+  @override
   String get news033DeckTitle => '控制面板：电脑的按钮';
 
   @override

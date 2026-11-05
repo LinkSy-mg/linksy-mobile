@@ -2685,6 +2685,17 @@ class AppLocalizationsPt extends AppLocalizations {
   }
 
   @override
+  String get news034TurnOnBody =>
+      'Ative pelo cartão na tela inicial, e a Caixa de entrada e a Galeria do computador se preenchem sozinhas.';
+
+  @override
+  String get news034SaveTitle => 'Escolha para onde vão os arquivos';
+
+  @override
+  String get news034SaveBody =>
+      'Configurações › Arquivos › Local de salvamento: toque para escolher outra pasta para o que você recebe.';
+
+  @override
   String get news033DeckTitle => 'Deck: botões para o seu computador';
 
   @override

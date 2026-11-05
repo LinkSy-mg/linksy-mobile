@@ -3590,6 +3590,18 @@
       }
     }
   },
+  "news034TurnOnBody": "Turn them on from the card on the home screen, and the computer's Inbox and Gallery fill by themselves.",
+  "@news034TurnOnBody": {
+    "description": "What's New 0.3.4: the home card turns on the Inbox and Gallery"
+  },
+  "news034SaveTitle": "Choose where files go",
+  "@news034SaveTitle": {
+    "description": "What's New 0.3.4: title, choosing the save folder"
+  },
+  "news034SaveBody": "Settings › Files › Save location: tap it to pick another folder for what you receive.",
+  "@news034SaveBody": {
+    "description": "What's New 0.3.4: where to choose it"
+  },
   "news033DeckTitle": "Deck: buttons for your computer",
   "@news033DeckTitle": {
     "description": "What's New 0.3.3: the deck, the phone as buttons for the computer, laid out on the computer"

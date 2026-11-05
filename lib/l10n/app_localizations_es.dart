@@ -2692,6 +2692,17 @@ class AppLocalizationsEs extends AppLocalizations {
   }
 
   @override
+  String get news034TurnOnBody =>
+      'Actívalos desde la tarjeta de la pantalla de inicio, y la Bandeja de entrada y la Galería de la computadora se llenan solas.';
+
+  @override
+  String get news034SaveTitle => 'Elige dónde van los archivos';
+
+  @override
+  String get news034SaveBody =>
+      'Ajustes › Archivos › Ubicación de guardado: tócala para elegir otra carpeta para lo que recibes.';
+
+  @override
   String get news033DeckTitle => 'Deck: botones para tu computadora';
 
   @override
