@@ -14,6 +14,7 @@ import '../onboarding/language_wheel.dart';
 import '../permissions/permissions_sheet.dart';
 import 'battery_guide.dart';
 import 'phone_notifications.dart';
+import 'turn_on.dart';
 import 'settings_kit.dart';
 
 /// The settings pages the hub opens.
@@ -369,12 +370,8 @@ class _FilesSettingsState extends State<FilesSettings>
               caption: l.settingsGalleryCaption,
               trailing: Switch(
                 value: c.gallery,
-                onChanged: (v) async {
-                  final on = await c.setGallery(v);
-                  if (v && !on && context.mounted) {
-                    showMessage(context, l.settingsGalleryDenied);
-                  }
-                },
+                onChanged: (v) =>
+                    v ? allowGallery(context) : c.setGallery(false),
               ),
             ),
             SettingRow(

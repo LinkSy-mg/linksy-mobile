@@ -6,6 +6,7 @@ import '../../app/scope.dart';
 import '../../ui/components.dart';
 import '../../ui/l10n.dart';
 import '../../ui/sig.dart';
+import '../settings/turn_on.dart';
 import 'language_wheel.dart';
 
 /// The first run: the language, then what Linksy may do, each with a word on
@@ -208,6 +209,14 @@ class _SetUpPageState extends State<_SetUpPage> with WidgetsBindingObserver {
         ? _Granted(label: t.onboardingAllowed)
         : _SmallButton(label: t.onboardingAllow, onTap: () => _ask(name));
 
+    // For the computer's tabs: on, or the way to turn them on.
+    Widget turnOnRow(bool on, String feature) => on
+        ? _Granted(label: t.onboardingAllowed)
+        : _SmallButton(
+            label: t.onboardingAllow,
+            onTap: () => turnOn(context, feature),
+          );
+
     return Column(
       children: [
         Padding(
@@ -253,6 +262,18 @@ class _SetUpPageState extends State<_SetUpPage> with WidgetsBindingObserver {
                     title: t.onboardingCamera,
                     detail: t.onboardingCameraDetail,
                     trailing: allow(_granted?.camera, 'camera'),
+                  ),
+                  _Item(
+                    icon: Ph.chatCircleText,
+                    title: t.onboardingMessages,
+                    detail: t.onboardingMessagesDetail,
+                    trailing: turnOnRow(c.mirroring, 'notifications'),
+                  ),
+                  _Item(
+                    icon: Ph.imagesSquare,
+                    title: t.settingsGallery,
+                    detail: t.onboardingGalleryDetail,
+                    trailing: turnOnRow(c.gallery, 'gallery'),
                   ),
                 ],
               ),
