@@ -16,6 +16,7 @@ import '../device/device_screen.dart';
 import '../pairing/pairing_flows.dart';
 import '../sharing/sharing.dart';
 import '../settings/settings_screen.dart';
+import '../settings/turn_on.dart';
 import 'island.dart';
 import '../update/update_sheet.dart';
 
@@ -176,6 +177,18 @@ class _Notices extends StatelessWidget {
           onAction: () => showUpdate(context),
           onDismiss: () => c.setPref('update_later', update.version),
         ),
+      if (c.turnOnCard)
+        _Notice(
+          icon: Ph.chatCircleText,
+          warning: false,
+          title: context.l10n.homeTurnOnTitle,
+          body: context.l10n.homeTurnOnBody,
+          action: c.mirroring ? null : context.l10n.homeTurnOnMessages,
+          onAction: () => turnOn(context, 'notifications'),
+          secondAction: c.gallery ? null : context.l10n.homeTurnOnPhotos,
+          onSecondAction: () => turnOn(context, 'gallery'),
+          onDismiss: c.dismissTurnOnCard,
+        ),
       if (c.outdated)
         _Notice(
           icon: Ph.warningCircle,
@@ -229,6 +242,8 @@ class _Notice extends StatelessWidget {
     required this.body,
     this.action,
     this.onAction,
+    this.secondAction,
+    this.onSecondAction,
     this.onDismiss,
   });
 
@@ -238,6 +253,8 @@ class _Notice extends StatelessWidget {
   final String body;
   final String? action;
   final VoidCallback? onAction;
+  final String? secondAction;
+  final VoidCallback? onSecondAction;
   final VoidCallback? onDismiss;
 
   @override
@@ -271,8 +288,18 @@ class _Notice extends StatelessWidget {
                     ),
                   ),
                 ],
-                if (action != null)
-                  SmallAction(label: action!, onTap: onAction),
+                if (action != null || secondAction != null)
+                  Wrap(
+                    children: [
+                      if (action != null)
+                        SmallAction(label: action!, onTap: onAction),
+                      if (secondAction != null)
+                        SmallAction(
+                          label: secondAction!,
+                          onTap: onSecondAction,
+                        ),
+                    ],
+                  ),
               ],
             ),
           ),

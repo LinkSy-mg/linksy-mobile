@@ -197,7 +197,11 @@ class LinksyController extends ChangeNotifier with WidgetsBindingObserver {
   /// The first-run setup (language, then what Linksy may do) is done.
   bool get onboarded => prefs['onboarded'] == '1';
 
-  Future<void> finishOnboarding() => _setPref('onboarded', '1');
+  Future<void> finishOnboarding() async {
+    await _setPref('onboarded', '1');
+    // The setup page just offered what the home card would.
+    await _setPref('turn_on_card', 'done');
+  }
 
   /// This phone's screen in landscape, for "Second display".
   (int, int)? screenSize;
@@ -424,6 +428,7 @@ class LinksyController extends ChangeNotifier with WidgetsBindingObserver {
     await LinksyPlatform.watchCalls(pauseOnCalls);
     await refreshNotificationAccess();
     await _refreshGallery();
+    _accessRead.complete();
     final phone = await LinksyPlatform.phoneMaker();
     maker = phone.maker;
     sdk = phone.sdk;
@@ -1059,7 +1064,24 @@ class LinksyController extends ChangeNotifier with WidgetsBindingObserver {
       if (gallery) 'gallery',
     ];
     await node.setFeatures(features).catchError((Object _) {});
+    if (mirroring && gallery && prefs['turn_on_card'] == null) {
+      await _setPref('turn_on_card', 'done');
+    }
   }
+
+  /// Android's answers about notifications and photos are in.
+  final _accessRead = Completer<void>();
+  Future<void> get accessRead => _accessRead.future;
+
+  /// The home card for people updating, who never saw the setup page's rows
+  /// for these: until it's dismissed, or both are on.
+  bool get turnOnCard =>
+      _accessRead.isCompleted &&
+      onboarded &&
+      prefs['turn_on_card'] == null &&
+      !(mirroring && gallery);
+
+  Future<void> dismissTurnOnCard() => _setPref('turn_on_card', 'done');
 
   /// Linksy may read the phone's photos and videos (Android's permission, or
   /// All files access).
