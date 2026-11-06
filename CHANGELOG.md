@@ -4,6 +4,11 @@ All notable changes to Linksy for Android. Format: [Keep a Changelog](https://ke
 
 ## [Unreleased]
 
+## [0.3.5] - 2026-11-06
+
+> [!IMPORTANT]
+> **If Play Protect stops the install,** pause **Scan apps with Play Protect** while installing (Play Store › your picture › Play Protect › the gear at the top right), then turn it back on.
+
 ### Added
 
 - A page for another phone or tablet, with no computer between them: send what you copied, a note or a link, and find it; then your latest photos and your apps right there to tap, files and folders, and what went between them. See all has photos by day and album, and every app.
