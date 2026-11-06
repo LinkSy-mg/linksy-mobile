@@ -20,6 +20,13 @@ All notable changes to Linksy for Android. Format: [Keep a Changelog](https://ke
 - The terminal's key bar has Home, End, PgUp, PgDn and Ctrl-C.
 - A computer's screen shows at the phone's fastest refresh rate.
 
+- **Your computer can set this phone's volumes, ringer, Do Not Disturb and flashlight**, and sees them change. Do Not Disturb needs the access in Settings › Connection.
+- **Your computer's notifications here**, in Settings › Connection, off by default, in their own channel.
+- **Snap from a computer**: it can open this phone's camera, or ask with a notification when Linksy isn't on screen.
+- **The sound of what plays here**, with this phone's screen on a computer, on Android 10 and up.
+- This phone's screen at 60 fps where its encoder can.
+- Wi-Fi Direct on the channel the computer's Wi-Fi is on.
+
 ### Changed
 
 - Files on their way: a bar along the bottom of a device's page, with the way they go, instead of the circle. Tap it to open it up, to the speed, each file and Cancel.
