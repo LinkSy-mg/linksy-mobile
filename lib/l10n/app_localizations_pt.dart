@@ -3115,4 +3115,46 @@ class AppLocalizationsPt extends AppLocalizations {
   @override
   String get news035CopyBody =>
       'Selecione texto em qualquer app e escolha Copiar para o computador. E se algo não conectar, Ajustes › Conexão diz por quê.';
+
+  @override
+  String get controlsNoDnd =>
+      'Permita primeiro o acesso ao Não perturbe para o Linksy no telefone';
+
+  @override
+  String get controlsNoFlashlight => 'A lanterna não pode ser usada agora';
+
+  @override
+  String get controlsDenied => 'O Android não permitiu isso';
+
+  @override
+  String get snapNoCamera => 'O Linksy precisa da permissão da câmera';
+
+  @override
+  String snapAsked(String name) {
+    return 'Tire uma foto para $name';
+  }
+
+  @override
+  String get settingsComputerNotifications => 'Notificações do computador';
+
+  @override
+  String get settingsComputerNotificationsCaption =>
+      'Mostra aqui quando você ativar também no computador para este telefone';
+
+  @override
+  String get settingsDndAccess => 'Acesso ao Não perturbe';
+
+  @override
+  String get settingsDndAccessCaption =>
+      'Permite que seus computadores mudem o Não perturbe aqui';
+
+  @override
+  String get settingsDndAccessOn => 'Permitido: seus computadores podem mudar';
+
+  @override
+  String get settingsTurnTaps => 'Girar toques na horizontal';
+
+  @override
+  String get settingsTurnTapsCaption =>
+      'Só se os toques do computador caírem no lugar errado com o telefone na horizontal';
 }

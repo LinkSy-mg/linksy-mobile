@@ -836,5 +836,17 @@
   "news035SnapTitle": "コンピュータへ撮影",
   "news035SnapBody": "コンピュータのページやクイック設定タイルから撮影すると、すぐに届いて貼り付けられます。",
   "news035CopyTitle": "コンピュータへコピー",
-  "news035CopyBody": "任意のアプリでテキストを選択して「コンピュータへコピー」を選びます。接続できないときは、設定 › 接続で理由がわかります。"
+  "news035CopyBody": "任意のアプリでテキストを選択して「コンピュータへコピー」を選びます。接続できないときは、設定 › 接続で理由がわかります。",
+  "controlsNoDnd": "先にスマートフォンで Linksy にサイレントモードへのアクセスを許可してください",
+  "controlsNoFlashlight": "今はライトを使用できません",
+  "controlsDenied": "Android で許可されませんでした",
+  "snapNoCamera": "Linksy にはカメラの権限が必要です",
+  "snapAsked": "{name} のために撮影",
+  "settingsComputerNotifications": "コンピュータの通知",
+  "settingsComputerNotificationsCaption": "コンピュータ側でもこのスマートフォン向けにオンにすると、ここに表示されます",
+  "settingsDndAccess": "サイレントモードへのアクセス",
+  "settingsDndAccessCaption": "コンピュータからここのサイレントモードを変更できるようにします",
+  "settingsDndAccessOn": "許可済み: コンピュータから変更できます",
+  "settingsTurnTaps": "横向きでタップを回転",
+  "settingsTurnTapsCaption": "スマートフォンが横向きのとき、コンピュータからのタップがずれる場合のみ"
 }

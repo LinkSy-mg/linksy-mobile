@@ -3118,4 +3118,48 @@ class AppLocalizationsDe extends AppLocalizations {
   @override
   String get news035CopyBody =>
       'Wähle Text in einer App aus und tippe auf An Computer kopieren. Und wenn keine Verbindung klappt, sagt Einstellungen › Verbindung warum.';
+
+  @override
+  String get controlsNoDnd =>
+      'Erlaube Linksy zuerst auf dem Telefon den Zugriff auf „Bitte nicht stören“';
+
+  @override
+  String get controlsNoFlashlight =>
+      'Die Taschenlampe kann gerade nicht benutzt werden';
+
+  @override
+  String get controlsDenied => 'Android hat das nicht erlaubt';
+
+  @override
+  String get snapNoCamera => 'Linksy braucht die Kamera-Berechtigung';
+
+  @override
+  String snapAsked(String name) {
+    return 'Mach ein Foto für $name';
+  }
+
+  @override
+  String get settingsComputerNotifications =>
+      'Benachrichtigungen deines Computers';
+
+  @override
+  String get settingsComputerNotificationsCaption =>
+      'Zeigt sie hier, sobald du es auch am Computer für dieses Telefon einschaltest';
+
+  @override
+  String get settingsDndAccess => 'Zugriff auf „Bitte nicht stören“';
+
+  @override
+  String get settingsDndAccessCaption =>
+      'Lässt deine Computer „Bitte nicht stören“ hier ändern';
+
+  @override
+  String get settingsDndAccessOn => 'Erlaubt: deine Computer können es ändern';
+
+  @override
+  String get settingsTurnTaps => 'Tipps im Querformat drehen';
+
+  @override
+  String get settingsTurnTapsCaption =>
+      'Nur wenn Tipps vom Computer bei quer gehaltenem Telefon falsch landen';
 }

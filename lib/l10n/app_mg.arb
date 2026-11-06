@@ -836,5 +836,17 @@
   "news035SnapTitle": "Sary mankany amin'ny solosaina",
   "news035SnapBody": "Maka sary avy amin'ny pejin'ny solosaina na ny tile Quick Settings, ary mankany avy hatrany, vonona hapetaka.",
   "news035CopyTitle": "Adikao any amin'ny solosaina",
-  "news035CopyBody": "Fidio ny soratra amin'ny app rehetra ary safidio ny Adikao any amin'ny solosaina. Ary raha tsy mifandray, lazain'ny Fikirana › Fifandraisana ny antony."
+  "news035CopyBody": "Fidio ny soratra amin'ny app rehetra ary safidio ny Adikao any amin'ny solosaina. Ary raha tsy mifandray, lazain'ny Fikirana › Fifandraisana ny antony.",
+  "controlsNoDnd": "Avelao aloha i Linksy hiditra amin'ny Do Not Disturb eo amin'ny finday",
+  "controlsNoFlashlight": "Tsy azo ampiasaina izao ny jiro",
+  "controlsDenied": "Tsy navelan'i Android izany",
+  "snapNoCamera": "Mila alalana amin'ny fakan-tsary i Linksy",
+  "snapAsked": "Maka sary ho an'i {name}",
+  "settingsComputerNotifications": "Fampandrenesana avy amin'ny solosainao",
+  "settingsComputerNotificationsCaption": "Aseho eto izy ireo, rehefa alefanao koa ao amin'ny solosaina ho an'ity finday ity",
+  "settingsDndAccess": "Fidirana amin'ny Do Not Disturb",
+  "settingsDndAccessCaption": "Mamela ny solosainao hanova ny Do Not Disturb eto",
+  "settingsDndAccessOn": "Navela: afaka manova izany ny solosainao",
+  "settingsTurnTaps": "Ahodino ny tsindry rehefa mitsivalana",
+  "settingsTurnTapsCaption": "Raha diso toerana fotsiny ny tsindry avy amin'ny solosaina rehefa mitsivalana ny finday"
 }

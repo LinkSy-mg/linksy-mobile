@@ -836,5 +836,17 @@
   "news035SnapTitle": "拍照到电脑",
   "news035SnapBody": "在电脑页面或快捷设置磁贴拍照，照片会直接发送过去，可立即粘贴。",
   "news035CopyTitle": "复制到电脑",
-  "news035CopyBody": "在任意应用中选择文本，然后选“复制到电脑”。如果无法连接，设置 › 连接会告诉你原因。"
+  "news035CopyBody": "在任意应用中选择文本，然后选“复制到电脑”。如果无法连接，设置 › 连接会告诉你原因。",
+  "controlsNoDnd": "请先在手机上允许 Linksy 访问“勿扰”",
+  "controlsNoFlashlight": "手电筒现在无法使用",
+  "controlsDenied": "Android 不允许此操作",
+  "snapNoCamera": "Linksy 需要相机权限",
+  "snapAsked": "为 {name} 拍照",
+  "settingsComputerNotifications": "电脑的通知",
+  "settingsComputerNotificationsCaption": "在电脑上也为这台手机开启后，它们会显示在这里",
+  "settingsDndAccess": "“勿扰”访问权限",
+  "settingsDndAccessCaption": "允许你的电脑更改这里的“勿扰”",
+  "settingsDndAccessOn": "已允许：你的电脑可以更改",
+  "settingsTurnTaps": "横屏时旋转点按",
+  "settingsTurnTapsCaption": "仅在手机横放时，电脑的点按位置不对才需要"
 }

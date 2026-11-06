@@ -3036,4 +3036,43 @@ class AppLocalizationsJa extends AppLocalizations {
   @override
   String get news035CopyBody =>
       '任意のアプリでテキストを選択して「コンピュータへコピー」を選びます。接続できないときは、設定 › 接続で理由がわかります。';
+
+  @override
+  String get controlsNoDnd => '先にスマートフォンで Linksy にサイレントモードへのアクセスを許可してください';
+
+  @override
+  String get controlsNoFlashlight => '今はライトを使用できません';
+
+  @override
+  String get controlsDenied => 'Android で許可されませんでした';
+
+  @override
+  String get snapNoCamera => 'Linksy にはカメラの権限が必要です';
+
+  @override
+  String snapAsked(String name) {
+    return '$name のために撮影';
+  }
+
+  @override
+  String get settingsComputerNotifications => 'コンピュータの通知';
+
+  @override
+  String get settingsComputerNotificationsCaption =>
+      'コンピュータ側でもこのスマートフォン向けにオンにすると、ここに表示されます';
+
+  @override
+  String get settingsDndAccess => 'サイレントモードへのアクセス';
+
+  @override
+  String get settingsDndAccessCaption => 'コンピュータからここのサイレントモードを変更できるようにします';
+
+  @override
+  String get settingsDndAccessOn => '許可済み: コンピュータから変更できます';
+
+  @override
+  String get settingsTurnTaps => '横向きでタップを回転';
+
+  @override
+  String get settingsTurnTapsCaption => 'スマートフォンが横向きのとき、コンピュータからのタップがずれる場合のみ';
 }

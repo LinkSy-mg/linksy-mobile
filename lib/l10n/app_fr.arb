@@ -836,5 +836,17 @@
   "news035SnapTitle": "Photo vers l'ordinateur",
   "news035SnapBody": "Prenez une photo depuis la page d'un ordinateur ou la tuile des réglages rapides : elle y arrive, prête à coller.",
   "news035CopyTitle": "Copier vers l'ordinateur",
-  "news035CopyBody": "Sélectionnez du texte dans une app et choisissez Copier vers l'ordinateur. Et si rien ne se connecte, Réglages › Connexion dit pourquoi."
+  "news035CopyBody": "Sélectionnez du texte dans une app et choisissez Copier vers l'ordinateur. Et si rien ne se connecte, Réglages › Connexion dit pourquoi.",
+  "controlsNoDnd": "Autorisez d'abord l'accès à Ne pas déranger pour Linksy sur le téléphone",
+  "controlsNoFlashlight": "La lampe torche n'est pas disponible pour le moment",
+  "controlsDenied": "Android ne l'a pas autorisé",
+  "snapNoCamera": "Linksy a besoin de l'autorisation de l'appareil photo",
+  "snapAsked": "Prenez une photo pour {name}",
+  "settingsComputerNotifications": "Notifications de votre ordinateur",
+  "settingsComputerNotificationsCaption": "Les affiche ici, une fois activé aussi sur l'ordinateur pour ce téléphone",
+  "settingsDndAccess": "Accès à Ne pas déranger",
+  "settingsDndAccessCaption": "Permet à vos ordinateurs de changer Ne pas déranger ici",
+  "settingsDndAccessOn": "Autorisé : vos ordinateurs peuvent le changer",
+  "settingsTurnTaps": "Tourner les appuis en paysage",
+  "settingsTurnTapsCaption": "Seulement si les appuis de l'ordinateur tombent au mauvais endroit, téléphone en paysage"
 }

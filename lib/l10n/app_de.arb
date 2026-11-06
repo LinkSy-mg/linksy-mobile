@@ -836,5 +836,17 @@
   "news035SnapTitle": "Foto an den Computer",
   "news035SnapBody": "Mache ein Foto von der Seite eines Computers oder per Schnelleinstellung, und es landet direkt dort, bereit zum Einfügen.",
   "news035CopyTitle": "An Computer kopieren",
-  "news035CopyBody": "Wähle Text in einer App aus und tippe auf An Computer kopieren. Und wenn keine Verbindung klappt, sagt Einstellungen › Verbindung warum."
+  "news035CopyBody": "Wähle Text in einer App aus und tippe auf An Computer kopieren. Und wenn keine Verbindung klappt, sagt Einstellungen › Verbindung warum.",
+  "controlsNoDnd": "Erlaube Linksy zuerst auf dem Telefon den Zugriff auf „Bitte nicht stören“",
+  "controlsNoFlashlight": "Die Taschenlampe kann gerade nicht benutzt werden",
+  "controlsDenied": "Android hat das nicht erlaubt",
+  "snapNoCamera": "Linksy braucht die Kamera-Berechtigung",
+  "snapAsked": "Mach ein Foto für {name}",
+  "settingsComputerNotifications": "Benachrichtigungen deines Computers",
+  "settingsComputerNotificationsCaption": "Zeigt sie hier, sobald du es auch am Computer für dieses Telefon einschaltest",
+  "settingsDndAccess": "Zugriff auf „Bitte nicht stören“",
+  "settingsDndAccessCaption": "Lässt deine Computer „Bitte nicht stören“ hier ändern",
+  "settingsDndAccessOn": "Erlaubt: deine Computer können es ändern",
+  "settingsTurnTaps": "Tipps im Querformat drehen",
+  "settingsTurnTapsCaption": "Nur wenn Tipps vom Computer bei quer gehaltenem Telefon falsch landen"
 }

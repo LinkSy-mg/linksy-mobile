@@ -5135,6 +5135,78 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Select text in any app and pick Copy to Computer. And when something won\'t connect, Settings › Connection says why.'**
   String get news035CopyBody;
+
+  /// Phone controls, computer notifications, snap.
+  ///
+  /// In en, this message translates to:
+  /// **'Allow Do Not Disturb access to Linksy on the phone first'**
+  String get controlsNoDnd;
+
+  /// Phone controls, computer notifications, snap.
+  ///
+  /// In en, this message translates to:
+  /// **'The flashlight can\'t be used right now'**
+  String get controlsNoFlashlight;
+
+  /// Phone controls, computer notifications, snap.
+  ///
+  /// In en, this message translates to:
+  /// **'Android didn\'t allow this'**
+  String get controlsDenied;
+
+  /// Phone controls, computer notifications, snap.
+  ///
+  /// In en, this message translates to:
+  /// **'Linksy needs the camera permission'**
+  String get snapNoCamera;
+
+  /// Phone controls, computer notifications, snap.
+  ///
+  /// In en, this message translates to:
+  /// **'Take a picture for {name}'**
+  String snapAsked(String name);
+
+  /// Phone controls, computer notifications, snap.
+  ///
+  /// In en, this message translates to:
+  /// **'Your computer\'s notifications'**
+  String get settingsComputerNotifications;
+
+  /// Phone controls, computer notifications, snap.
+  ///
+  /// In en, this message translates to:
+  /// **'Shows them here, once you turn it on for this phone on the computer too'**
+  String get settingsComputerNotificationsCaption;
+
+  /// Phone controls, computer notifications, snap.
+  ///
+  /// In en, this message translates to:
+  /// **'Do Not Disturb access'**
+  String get settingsDndAccess;
+
+  /// Phone controls, computer notifications, snap.
+  ///
+  /// In en, this message translates to:
+  /// **'Lets your computers change Do Not Disturb here'**
+  String get settingsDndAccessCaption;
+
+  /// Phone controls, computer notifications, snap.
+  ///
+  /// In en, this message translates to:
+  /// **'Allowed: your computers can change it'**
+  String get settingsDndAccessOn;
+
+  /// Phone controls, computer notifications, snap.
+  ///
+  /// In en, this message translates to:
+  /// **'Turn taps in landscape'**
+  String get settingsTurnTaps;
+
+  /// Phone controls, computer notifications, snap.
+  ///
+  /// In en, this message translates to:
+  /// **'Only if taps from a computer land in the wrong place with the phone on its side'**
+  String get settingsTurnTapsCaption;
 }
 
 class _AppLocalizationsDelegate

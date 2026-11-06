@@ -836,5 +836,17 @@
   "news035SnapTitle": "Foto para o computador",
   "news035SnapBody": "Tire uma foto na página de um computador ou no bloco de ajustes rápidos, e ela vai direto, pronta para colar.",
   "news035CopyTitle": "Copiar para o computador",
-  "news035CopyBody": "Selecione texto em qualquer app e escolha Copiar para o computador. E se algo não conectar, Ajustes › Conexão diz por quê."
+  "news035CopyBody": "Selecione texto em qualquer app e escolha Copiar para o computador. E se algo não conectar, Ajustes › Conexão diz por quê.",
+  "controlsNoDnd": "Permita primeiro o acesso ao Não perturbe para o Linksy no telefone",
+  "controlsNoFlashlight": "A lanterna não pode ser usada agora",
+  "controlsDenied": "O Android não permitiu isso",
+  "snapNoCamera": "O Linksy precisa da permissão da câmera",
+  "snapAsked": "Tire uma foto para {name}",
+  "settingsComputerNotifications": "Notificações do computador",
+  "settingsComputerNotificationsCaption": "Mostra aqui quando você ativar também no computador para este telefone",
+  "settingsDndAccess": "Acesso ao Não perturbe",
+  "settingsDndAccessCaption": "Permite que seus computadores mudem o Não perturbe aqui",
+  "settingsDndAccessOn": "Permitido: seus computadores podem mudar",
+  "settingsTurnTaps": "Girar toques na horizontal",
+  "settingsTurnTapsCaption": "Só se os toques do computador caírem no lugar errado com o telefone na horizontal"
 }

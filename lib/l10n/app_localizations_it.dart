@@ -3122,4 +3122,47 @@ class AppLocalizationsIt extends AppLocalizations {
   @override
   String get news035CopyBody =>
       'Seleziona il testo in un\'app e scegli Copia sul computer. E se qualcosa non si connette, Impostazioni › Connessione spiega perché.';
+
+  @override
+  String get controlsNoDnd =>
+      'Consenti prima a Linksy l\'accesso a Non disturbare sul telefono';
+
+  @override
+  String get controlsNoFlashlight => 'La torcia non può essere usata ora';
+
+  @override
+  String get controlsDenied => 'Android non lo ha consentito';
+
+  @override
+  String get snapNoCamera =>
+      'Linksy ha bisogno dell\'autorizzazione della fotocamera';
+
+  @override
+  String snapAsked(String name) {
+    return 'Scatta una foto per $name';
+  }
+
+  @override
+  String get settingsComputerNotifications => 'Notifiche del tuo computer';
+
+  @override
+  String get settingsComputerNotificationsCaption =>
+      'Le mostra qui, dopo averlo attivato anche sul computer per questo telefono';
+
+  @override
+  String get settingsDndAccess => 'Accesso a Non disturbare';
+
+  @override
+  String get settingsDndAccessCaption =>
+      'Permette ai computer di cambiare Non disturbare qui';
+
+  @override
+  String get settingsDndAccessOn => 'Consentito: i computer possono cambiarlo';
+
+  @override
+  String get settingsTurnTaps => 'Ruota i tocchi in orizzontale';
+
+  @override
+  String get settingsTurnTapsCaption =>
+      'Solo se i tocchi dal computer finiscono nel punto sbagliato con il telefono in orizzontale';
 }

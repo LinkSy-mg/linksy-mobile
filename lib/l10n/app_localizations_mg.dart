@@ -3129,4 +3129,47 @@ class AppLocalizationsMg extends AppLocalizations {
   @override
   String get news035CopyBody =>
       'Fidio ny soratra amin\'ny app rehetra ary safidio ny Adikao any amin\'ny solosaina. Ary raha tsy mifandray, lazain\'ny Fikirana › Fifandraisana ny antony.';
+
+  @override
+  String get controlsNoDnd =>
+      'Avelao aloha i Linksy hiditra amin\'ny Do Not Disturb eo amin\'ny finday';
+
+  @override
+  String get controlsNoFlashlight => 'Tsy azo ampiasaina izao ny jiro';
+
+  @override
+  String get controlsDenied => 'Tsy navelan\'i Android izany';
+
+  @override
+  String get snapNoCamera => 'Mila alalana amin\'ny fakan-tsary i Linksy';
+
+  @override
+  String snapAsked(String name) {
+    return 'Maka sary ho an\'i $name';
+  }
+
+  @override
+  String get settingsComputerNotifications =>
+      'Fampandrenesana avy amin\'ny solosainao';
+
+  @override
+  String get settingsComputerNotificationsCaption =>
+      'Aseho eto izy ireo, rehefa alefanao koa ao amin\'ny solosaina ho an\'ity finday ity';
+
+  @override
+  String get settingsDndAccess => 'Fidirana amin\'ny Do Not Disturb';
+
+  @override
+  String get settingsDndAccessCaption =>
+      'Mamela ny solosainao hanova ny Do Not Disturb eto';
+
+  @override
+  String get settingsDndAccessOn => 'Navela: afaka manova izany ny solosainao';
+
+  @override
+  String get settingsTurnTaps => 'Ahodino ny tsindry rehefa mitsivalana';
+
+  @override
+  String get settingsTurnTapsCaption =>
+      'Raha diso toerana fotsiny ny tsindry avy amin\'ny solosaina rehefa mitsivalana ny finday';
 }

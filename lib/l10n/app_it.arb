@@ -836,5 +836,17 @@
   "news035SnapTitle": "Foto al computer",
   "news035SnapBody": "Scatta una foto dalla pagina di un computer o dal riquadro delle impostazioni rapide: arriva lì, pronta da incollare.",
   "news035CopyTitle": "Copia sul computer",
-  "news035CopyBody": "Seleziona il testo in un'app e scegli Copia sul computer. E se qualcosa non si connette, Impostazioni › Connessione spiega perché."
+  "news035CopyBody": "Seleziona il testo in un'app e scegli Copia sul computer. E se qualcosa non si connette, Impostazioni › Connessione spiega perché.",
+  "controlsNoDnd": "Consenti prima a Linksy l'accesso a Non disturbare sul telefono",
+  "controlsNoFlashlight": "La torcia non può essere usata ora",
+  "controlsDenied": "Android non lo ha consentito",
+  "snapNoCamera": "Linksy ha bisogno dell'autorizzazione della fotocamera",
+  "snapAsked": "Scatta una foto per {name}",
+  "settingsComputerNotifications": "Notifiche del tuo computer",
+  "settingsComputerNotificationsCaption": "Le mostra qui, dopo averlo attivato anche sul computer per questo telefono",
+  "settingsDndAccess": "Accesso a Non disturbare",
+  "settingsDndAccessCaption": "Permette ai computer di cambiare Non disturbare qui",
+  "settingsDndAccessOn": "Consentito: i computer possono cambiarlo",
+  "settingsTurnTaps": "Ruota i tocchi in orizzontale",
+  "settingsTurnTapsCaption": "Solo se i tocchi dal computer finiscono nel punto sbagliato con il telefono in orizzontale"
 }

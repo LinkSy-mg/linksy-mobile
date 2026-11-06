@@ -2991,4 +2991,42 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get news035CopyBody => '在任意应用中选择文本，然后选“复制到电脑”。如果无法连接，设置 › 连接会告诉你原因。';
+
+  @override
+  String get controlsNoDnd => '请先在手机上允许 Linksy 访问“勿扰”';
+
+  @override
+  String get controlsNoFlashlight => '手电筒现在无法使用';
+
+  @override
+  String get controlsDenied => 'Android 不允许此操作';
+
+  @override
+  String get snapNoCamera => 'Linksy 需要相机权限';
+
+  @override
+  String snapAsked(String name) {
+    return '为 $name 拍照';
+  }
+
+  @override
+  String get settingsComputerNotifications => '电脑的通知';
+
+  @override
+  String get settingsComputerNotificationsCaption => '在电脑上也为这台手机开启后，它们会显示在这里';
+
+  @override
+  String get settingsDndAccess => '“勿扰”访问权限';
+
+  @override
+  String get settingsDndAccessCaption => '允许你的电脑更改这里的“勿扰”';
+
+  @override
+  String get settingsDndAccessOn => '已允许：你的电脑可以更改';
+
+  @override
+  String get settingsTurnTaps => '横屏时旋转点按';
+
+  @override
+  String get settingsTurnTapsCaption => '仅在手机横放时，电脑的点按位置不对才需要';
 }

@@ -3129,4 +3129,50 @@ class AppLocalizationsFr extends AppLocalizations {
   @override
   String get news035CopyBody =>
       'Sélectionnez du texte dans une app et choisissez Copier vers l\'ordinateur. Et si rien ne se connecte, Réglages › Connexion dit pourquoi.';
+
+  @override
+  String get controlsNoDnd =>
+      'Autorisez d\'abord l\'accès à Ne pas déranger pour Linksy sur le téléphone';
+
+  @override
+  String get controlsNoFlashlight =>
+      'La lampe torche n\'est pas disponible pour le moment';
+
+  @override
+  String get controlsDenied => 'Android ne l\'a pas autorisé';
+
+  @override
+  String get snapNoCamera =>
+      'Linksy a besoin de l\'autorisation de l\'appareil photo';
+
+  @override
+  String snapAsked(String name) {
+    return 'Prenez une photo pour $name';
+  }
+
+  @override
+  String get settingsComputerNotifications =>
+      'Notifications de votre ordinateur';
+
+  @override
+  String get settingsComputerNotificationsCaption =>
+      'Les affiche ici, une fois activé aussi sur l\'ordinateur pour ce téléphone';
+
+  @override
+  String get settingsDndAccess => 'Accès à Ne pas déranger';
+
+  @override
+  String get settingsDndAccessCaption =>
+      'Permet à vos ordinateurs de changer Ne pas déranger ici';
+
+  @override
+  String get settingsDndAccessOn =>
+      'Autorisé : vos ordinateurs peuvent le changer';
+
+  @override
+  String get settingsTurnTaps => 'Tourner les appuis en paysage';
+
+  @override
+  String get settingsTurnTapsCaption =>
+      'Seulement si les appuis de l\'ordinateur tombent au mauvais endroit, téléphone en paysage';
 }

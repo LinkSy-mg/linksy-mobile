@@ -3143,4 +3143,46 @@ class AppLocalizationsRu extends AppLocalizations {
   @override
   String get news035CopyBody =>
       'Выделите текст в любом приложении и выберите «Копировать на компьютер». А если что-то не подключается, Настройки › Подключение объяснят почему.';
+
+  @override
+  String get controlsNoDnd =>
+      'Сначала разрешите Linksy доступ к режиму «Не беспокоить» на телефоне';
+
+  @override
+  String get controlsNoFlashlight => 'Фонарик сейчас недоступен';
+
+  @override
+  String get controlsDenied => 'Android не разрешил это';
+
+  @override
+  String get snapNoCamera => 'Linksy нужно разрешение на камеру';
+
+  @override
+  String snapAsked(String name) {
+    return 'Сделайте снимок для $name';
+  }
+
+  @override
+  String get settingsComputerNotifications => 'Уведомления компьютера';
+
+  @override
+  String get settingsComputerNotificationsCaption =>
+      'Показывает их здесь, если включить это и на компьютере для этого телефона';
+
+  @override
+  String get settingsDndAccess => 'Доступ к «Не беспокоить»';
+
+  @override
+  String get settingsDndAccessCaption =>
+      'Позволяет компьютерам менять здесь «Не беспокоить»';
+
+  @override
+  String get settingsDndAccessOn => 'Разрешено: компьютеры могут это менять';
+
+  @override
+  String get settingsTurnTaps => 'Поворачивать касания в альбомной';
+
+  @override
+  String get settingsTurnTapsCaption =>
+      'Только если касания с компьютера попадают не туда при горизонтальном телефоне';
 }

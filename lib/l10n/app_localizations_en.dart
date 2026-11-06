@@ -3101,4 +3101,46 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get news035CopyBody =>
       'Select text in any app and pick Copy to Computer. And when something won\'t connect, Settings › Connection says why.';
+
+  @override
+  String get controlsNoDnd =>
+      'Allow Do Not Disturb access to Linksy on the phone first';
+
+  @override
+  String get controlsNoFlashlight => 'The flashlight can\'t be used right now';
+
+  @override
+  String get controlsDenied => 'Android didn\'t allow this';
+
+  @override
+  String get snapNoCamera => 'Linksy needs the camera permission';
+
+  @override
+  String snapAsked(String name) {
+    return 'Take a picture for $name';
+  }
+
+  @override
+  String get settingsComputerNotifications => 'Your computer\'s notifications';
+
+  @override
+  String get settingsComputerNotificationsCaption =>
+      'Shows them here, once you turn it on for this phone on the computer too';
+
+  @override
+  String get settingsDndAccess => 'Do Not Disturb access';
+
+  @override
+  String get settingsDndAccessCaption =>
+      'Lets your computers change Do Not Disturb here';
+
+  @override
+  String get settingsDndAccessOn => 'Allowed: your computers can change it';
+
+  @override
+  String get settingsTurnTaps => 'Turn taps in landscape';
+
+  @override
+  String get settingsTurnTapsCaption =>
+      'Only if taps from a computer land in the wrong place with the phone on its side';
 }

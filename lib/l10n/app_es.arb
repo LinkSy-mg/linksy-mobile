@@ -836,5 +836,17 @@
   "news035SnapTitle": "Foto al ordenador",
   "news035SnapBody": "Haz una foto desde la página de un ordenador o el ajuste rápido, y llega allí, lista para pegar.",
   "news035CopyTitle": "Copiar al ordenador",
-  "news035CopyBody": "Selecciona texto en cualquier app y elige Copiar al ordenador. Y si algo no conecta, Ajustes › Conexión dice por qué."
+  "news035CopyBody": "Selecciona texto en cualquier app y elige Copiar al ordenador. Y si algo no conecta, Ajustes › Conexión dice por qué.",
+  "controlsNoDnd": "Permite primero a Linksy el acceso a No molestar en el teléfono",
+  "controlsNoFlashlight": "La linterna no se puede usar ahora",
+  "controlsDenied": "Android no lo ha permitido",
+  "snapNoCamera": "Linksy necesita el permiso de la cámara",
+  "snapAsked": "Haz una foto para {name}",
+  "settingsComputerNotifications": "Notificaciones de tu ordenador",
+  "settingsComputerNotificationsCaption": "Las muestra aquí cuando también lo actives en el ordenador para este teléfono",
+  "settingsDndAccess": "Acceso a No molestar",
+  "settingsDndAccessCaption": "Permite que tus ordenadores cambien No molestar aquí",
+  "settingsDndAccessOn": "Permitido: tus ordenadores pueden cambiarlo",
+  "settingsTurnTaps": "Girar los toques en horizontal",
+  "settingsTurnTapsCaption": "Solo si los toques del ordenador caen en el lugar equivocado con el teléfono en horizontal"
 }
