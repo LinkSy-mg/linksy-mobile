@@ -22,18 +22,28 @@ const _ink = Color(0xFFEDEFF3);
 const _muted = Color(0xFF8B93A3);
 const _accent = Color(0xFF3B8BEB);
 
-/// Opens the editor on [device]'s deck: the layouts it has, or a first one
-/// made of what it offers.
-Future<void> openDeckEditor(BuildContext context, DeviceInfo device) {
+/// Opens the editor on [device]'s deck, over it, as if the deck itself woke
+/// up: the layouts it has, or a first one made of what it offers. [select]
+/// comes picked up, on [page].
+Future<void> openDeckEditor(
+  BuildContext context,
+  DeviceInfo device, {
+  String? select,
+  int page = 0,
+}) {
   final c = LinksyScope.read(context);
   final offered = c.deckActions[device.id] ?? const <DeckAction>[];
   final start =
       c.deckLayouts(device.id) ??
       DeckDraft.starter(context.l10n.deviceDeck, offered);
   return Navigator.of(context).push(
-    MaterialPageRoute<void>(
-      fullscreenDialog: true,
-      builder: (_) => DeckEditor(device: device, start: start),
+    PageRouteBuilder<void>(
+      transitionDuration: const Duration(milliseconds: 160),
+      reverseTransitionDuration: const Duration(milliseconds: 160),
+      pageBuilder: (_, _, _) =>
+          DeckEditor(device: device, start: start, select: select, page: page),
+      transitionsBuilder: (_, animation, _, child) =>
+          FadeTransition(opacity: animation, child: child),
     ),
   );
 }
@@ -41,10 +51,18 @@ Future<void> openDeckEditor(BuildContext context, DeviceInfo device) {
 /// The deck laid out on the phone, right on the deck: a tap selects a tile,
 /// a drag moves it, its corner resizes it, an empty cell adds one.
 class DeckEditor extends StatefulWidget {
-  const DeckEditor({super.key, required this.device, required this.start});
+  const DeckEditor({
+    super.key,
+    required this.device,
+    required this.start,
+    this.select,
+    this.page = 0,
+  });
 
   final DeviceInfo device;
   final DeckLayouts start;
+  final String? select;
+  final int page;
 
   @override
   State<DeckEditor> createState() => _DeckEditorState();
@@ -52,7 +70,7 @@ class DeckEditor extends StatefulWidget {
 
 class _DeckEditorState extends State<DeckEditor> {
   late final DeckDraft _d = DeckDraft(widget.start);
-  String? _selected;
+  late String? _selected = widget.select;
 
   // A tile on the move: where the finger has it, and the cell it would take.
   String? _dragging;
@@ -150,7 +168,7 @@ class _DeckEditorState extends State<DeckEditor> {
         draft: _d,
         id: tile.id,
         offered: _offered,
-        preview: (t) => _tileView(t, 72, 8),
+        preview: (t) => _tileView(t, const _Cells(wide: 72, tall: 72, gap: 8)),
         onChanged: () => setState(() {}),
       ),
     );
@@ -228,6 +246,7 @@ class _DeckEditorState extends State<DeckEditor> {
     MaterialPageRoute<void>(
       builder: (_) => LaidDeck(
         device: widget.device,
+        editable: false,
         layouts: _d.layouts.copyWith(active: _d.layoutId),
         connected: LinksyScope.read(context).device(_id)?.connected ?? false,
       ),
@@ -236,12 +255,12 @@ class _DeckEditorState extends State<DeckEditor> {
 
   DeckLook get _look => DeckLook.of(_d.layout.theme.id, _d.layout.theme.accent);
 
-  Widget _tileView(DeckTile t, double cell, double gap) {
+  Widget _tileView(DeckTile t, _Cells g) {
     final c = LinksyScope.read(context);
     return DeckTileView(
       tile: t,
-      cell: cell,
-      gap: gap,
+      cell: g.wide,
+      gap: g.gap,
       device: widget.device,
       look: _look,
       connected: true,
@@ -256,12 +275,16 @@ class _DeckEditorState extends State<DeckEditor> {
   Widget build(BuildContext context) {
     final look = _look;
     final wide = MediaQuery.orientationOf(context) == Orientation.landscape;
-    if (wide != _wide) {
-      _wide = wide;
+    if (_wide == null) {
+      // Where it was opened from: this way up, this page.
+      _d.landscape = wide;
+      _d.page = widget.page.clamp(0, _d.face.pages.length - 1);
+    } else if (wide != _wide) {
       _d.landscape = wide;
       _d.page = 0;
       _selected = null;
     }
+    _wide = wide;
     final selected = _selected == null ? null : _shownTile(_selected!);
     return PopScope(
       canPop: false,
@@ -510,7 +533,7 @@ class _DeckEditorState extends State<DeckEditor> {
         final face = _d.face;
         final cols = face.columns, rows = face.rows;
         final gap = rows > cols ? 8.0 : 6.0;
-        final cell = math
+        final square = math
             .max(
               8.0,
               math.min(
@@ -519,8 +542,7 @@ class _DeckEditorState extends State<DeckEditor> {
               ),
             )
             .floorToDouble();
-        final step = cell + gap;
-        double span(int n) => n * cell + (n - 1) * gap;
+        final g = _Cells(wide: square, tall: square, gap: gap);
         final taken = <(int, int)>{
           for (final t in _shown)
             for (var y = t.y; y < t.y + t.h; y++)
@@ -530,8 +552,8 @@ class _DeckEditorState extends State<DeckEditor> {
         final busy = _dragging != null || _sizing != null;
         return Center(
           child: SizedBox(
-            width: span(cols),
-            height: span(rows),
+            width: g.across(cols),
+            height: g.down(rows),
             child: Stack(
               clipBehavior: Clip.none,
               children: [
@@ -546,10 +568,10 @@ class _DeckEditorState extends State<DeckEditor> {
                   for (var x = 0; x < cols; x++)
                     if (!taken.contains((x, y)))
                       Positioned(
-                        left: x * step,
-                        top: y * step,
-                        width: cell,
-                        height: cell,
+                        left: x * g.stepX,
+                        top: y * g.stepY,
+                        width: g.wide,
+                        height: g.tall,
                         child: _Empty(
                           label: context.l10n.deckAdd,
                           onTap: () => _add(x: x, y: y),
@@ -557,10 +579,10 @@ class _DeckEditorState extends State<DeckEditor> {
                       ),
                 if (moving != null)
                   Positioned(
-                    left: moving.x * step,
-                    top: moving.y * step,
-                    width: span(moving.w),
-                    height: span(moving.h),
+                    left: moving.x * g.stepX,
+                    top: moving.y * g.stepY,
+                    width: g.across(moving.w),
+                    height: g.down(moving.h),
                     child: IgnorePointer(
                       child: DecoratedBox(
                         decoration: BoxDecoration(
@@ -577,33 +599,32 @@ class _DeckEditorState extends State<DeckEditor> {
                     key: ValueKey(t.id),
                     duration: motion(context, 130),
                     curve: Curves.easeOutCubic,
-                    left: t.x * step,
-                    top: t.y * step,
-                    width: span(t.w),
-                    height: span(t.h),
+                    left: t.x * g.stepX,
+                    top: t.y * g.stepY,
+                    width: g.across(t.w),
+                    height: g.down(t.h),
                     child: Opacity(
                       opacity: t.id == _dragging ? 0 : 1,
-                      child: _placed(t, cell, gap, step),
+                      child: _placed(t, g),
                     ),
                   ),
                 if (selected != null && _dragging == null)
-                  ..._handles(selected, step, span),
-                if (_sizing != null && selected != null)
-                  _badge(selected, step, span),
+                  ..._handles(selected, g),
+                if (_sizing != null && selected != null) _badge(selected, g),
                 if (selected != null && !busy)
-                  _menu(selected, step, span, span(cols), span(rows)),
+                  _menu(selected, g, g.across(cols), g.down(rows)),
                 if (moving != null)
                   Positioned(
                     left: _at.dx,
                     top: _at.dy,
-                    width: span(moving.w),
-                    height: span(moving.h),
+                    width: g.across(moving.w),
+                    height: g.down(moving.h),
                     child: IgnorePointer(
                       child: Transform.scale(
                         scale: 1.05,
                         child: Opacity(
                           opacity: 0.92,
-                          child: _tileView(moving, cell, gap),
+                          child: _tileView(moving, g),
                         ),
                       ),
                     ),
@@ -616,7 +637,7 @@ class _DeckEditorState extends State<DeckEditor> {
     ),
   );
 
-  Widget _placed(DeckTile t, double cell, double gap, double step) {
+  Widget _placed(DeckTile t, _Cells g) {
     final on = t.id == _selected;
     return GestureDetector(
       behavior: HitTestBehavior.opaque,
@@ -626,15 +647,15 @@ class _DeckEditorState extends State<DeckEditor> {
         _do(() {
           _dragging = t.id;
           _selected = t.id;
-          _at = Offset(t.x * step, t.y * step);
+          _at = Offset(t.x * g.stepX, t.y * g.stepY);
           _target = (t.x, t.y);
         });
       },
       onPanUpdate: (e) => _do(() {
         _at += e.delta;
         final face = _d.face;
-        final x = (_at.dx / step).round().clamp(0, face.columns - t.w);
-        final y = (_at.dy / step).round().clamp(0, face.rows - t.h);
+        final x = (_at.dx / g.stepX).round().clamp(0, face.columns - t.w);
+        final y = (_at.dy / g.stepY).round().clamp(0, face.rows - t.h);
         if ((x, y) == _target) return;
         final next = _d.arranged(t.id, x, y, t.w, t.h);
         if (next == null) return;
@@ -648,7 +669,7 @@ class _DeckEditorState extends State<DeckEditor> {
         fit: StackFit.expand,
         clipBehavior: Clip.none,
         children: [
-          IgnorePointer(child: _tileView(t, cell, gap)),
+          IgnorePointer(child: _tileView(t, g)),
           if (on)
             IgnorePointer(
               child: DecoratedBox(
@@ -674,11 +695,12 @@ class _DeckEditorState extends State<DeckEditor> {
     if (next != null) _d.settle(next);
   });
 
-  void _pullTo(Offset delta, double step) {
+  void _pullTo(Offset delta, _Cells g) {
     final start = _sizing, sides = _sides;
     if (start == null || sides == null) return;
     _pull += delta;
-    final dx = (_pull.dx / step).round(), dy = (_pull.dy / step).round();
+    final dx = (_pull.dx / g.stepX).round();
+    final dy = (_pull.dy / g.stepY).round();
     final face = _d.face;
     var left = start.x, top = start.y;
     var right = start.x + start.w, bottom = start.y + start.h;
@@ -697,8 +719,9 @@ class _DeckEditorState extends State<DeckEditor> {
   }
 
   /// A dot on each corner and a bar on each side: pull any of them.
-  List<Widget> _handles(DeckTile t, double step, double Function(int) span) {
-    final x = t.x * step, y = t.y * step, w = span(t.w), h = span(t.h);
+  List<Widget> _handles(DeckTile t, _Cells g) {
+    final x = t.x * g.stepX, y = t.y * g.stepY;
+    final w = g.across(t.w), h = g.down(t.h);
     // Corners are for both ways; the rest of each side, all along it, for one.
     Widget grip(
       String key,
@@ -718,7 +741,7 @@ class _DeckEditorState extends State<DeckEditor> {
             _pull = Offset.zero;
           });
         },
-        onPanUpdate: (e) => _pullTo(e.delta, step),
+        onPanUpdate: (e) => _pullTo(e.delta, g),
         onPanEnd: (_) => _settle(),
         onPanCancel: _settle,
         child: Center(child: mark),
@@ -785,51 +808,44 @@ class _DeckEditorState extends State<DeckEditor> {
   }
 
   /// Its size, over it, while it changes.
-  Widget _badge(DeckTile t, double step, double Function(int) span) =>
-      Positioned(
-        left: t.x * step,
-        top: t.y * step,
-        width: span(t.w),
-        height: span(t.h),
-        child: IgnorePointer(
-          child: Center(
-            child: Container(
-              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
-              decoration: BoxDecoration(
-                color: _accent,
-                borderRadius: BorderRadius.circular(12),
-              ),
-              child: Text(
-                '${t.w} × ${t.h}',
-                style: const TextStyle(
-                  color: Colors.white,
-                  fontSize: 13,
-                  fontWeight: FontWeight.w700,
-                ),
-              ),
+  Widget _badge(DeckTile t, _Cells g) => Positioned(
+    left: t.x * g.stepX,
+    top: t.y * g.stepY,
+    width: g.across(t.w),
+    height: g.down(t.h),
+    child: IgnorePointer(
+      child: Center(
+        child: Container(
+          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+          decoration: BoxDecoration(
+            color: _accent,
+            borderRadius: BorderRadius.circular(12),
+          ),
+          child: Text(
+            '${t.w} × ${t.h}',
+            style: const TextStyle(
+              color: Colors.white,
+              fontSize: 13,
+              fontWeight: FontWeight.w700,
             ),
           ),
         ),
-      );
+      ),
+    ),
+  );
 
-  Widget _menu(
-    DeckTile t,
-    double step,
-    double Function(int) span,
-    double width,
-    double height,
-  ) {
+  Widget _menu(DeckTile t, _Cells g, double width, double height) {
     final l = context.l10n;
     const w = 232.0, h = 56.0;
-    final top = t.y * step;
+    final top = t.y * g.stepY;
     final above = top - h - 16;
-    final below = top + span(t.h) + 16;
+    final below = top + g.down(t.h) + 16;
     final y = above >= 0
         ? above
         : below + h <= height
         ? below
         : math.max(0.0, top + 8);
-    final x = (t.x * step + span(t.w) / 2 - w / 2)
+    final x = (t.x * g.stepX + g.across(t.w) / 2 - w / 2)
         .clamp(0.0, math.max(0.0, width - w))
         .toDouble();
     Widget item(IconData i, String label, VoidCallback onTap) => Expanded(
@@ -1015,6 +1031,20 @@ class _DeckEditorState extends State<DeckEditor> {
       ),
     );
   }
+}
+
+/// The grid's measures: a cell, and the room between them.
+class _Cells {
+  const _Cells({required this.wide, required this.tall, required this.gap});
+
+  final double wide;
+  final double tall;
+  final double gap;
+
+  double get stepX => wide + gap;
+  double get stepY => tall + gap;
+  double across(int n) => n * wide + (n - 1) * gap;
+  double down(int n) => n * tall + (n - 1) * gap;
 }
 
 class _Empty extends StatelessWidget {

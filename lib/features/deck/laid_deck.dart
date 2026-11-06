@@ -5,6 +5,7 @@ import 'dart:math' as math;
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
+import '../../app/platform.dart';
 import '../../app/scope.dart';
 import '../../core/deck_layouts.dart';
 import '../../core/models.dart';
@@ -26,11 +27,15 @@ class LaidDeck extends StatefulWidget {
     required this.device,
     required this.layouts,
     required this.connected,
+    this.editable = true,
   });
 
   final DeviceInfo device;
   final DeckLayouts layouts;
   final bool connected;
+
+  /// False while trying a deck out from the editor.
+  final bool editable;
 
   @override
   State<LaidDeck> createState() => _LaidDeckState();
@@ -44,7 +49,48 @@ class _LaidDeckState extends State<LaidDeck> {
   String? _note;
   Timer? _noteTimer;
 
+  /// Held sideways, the deck has the whole screen: no bars, no header. A
+  /// swipe from the edge brings them back for a moment.
+  bool _fullScreen = false;
+  bool _chrome = false;
+  Timer? _chromeTimer;
+
+  void _setFullScreen(bool on) {
+    if (on == _fullScreen) return;
+    _fullScreen = on;
+    _chrome = false;
+    _chromeTimer?.cancel();
+    LinksyPlatform.fullScreen(on: on);
+    if (on) {
+      SystemChrome.setEnabledSystemUIMode(SystemUiMode.immersive);
+      SystemChrome.setSystemUIChangeCallback((visible) async {
+        if (visible && mounted) _showChrome();
+      });
+    } else {
+      SystemChrome.setSystemUIChangeCallback(null);
+      SystemChrome.setEnabledSystemUIMode(SystemUiMode.edgeToEdge);
+    }
+  }
+
+  void _showChrome() {
+    setState(() => _chrome = true);
+    _chromeTimer?.cancel();
+    _chromeTimer = Timer(const Duration(seconds: 4), () {
+      if (!mounted || !_fullScreen) return;
+      setState(() => _chrome = false);
+      SystemChrome.setEnabledSystemUIMode(SystemUiMode.immersive);
+    });
+  }
+
   String get _id => widget.device.id;
+
+  /// Into the editor, like holding a widget on the home screen: with [tile]
+  /// picked up, when it was one.
+  void _edit([String? tile]) {
+    if (!widget.editable) return;
+    HapticFeedback.mediumImpact();
+    openDeckEditor(context, widget.device, select: tile, page: _page);
+  }
 
   void _say(String text) {
     _noteTimer?.cancel();
@@ -57,6 +103,12 @@ class _LaidDeckState extends State<LaidDeck> {
   @override
   void dispose() {
     _noteTimer?.cancel();
+    _chromeTimer?.cancel();
+    if (_fullScreen) {
+      LinksyPlatform.fullScreen(on: false);
+      SystemChrome.setSystemUIChangeCallback(null);
+      SystemChrome.setEnabledSystemUIMode(SystemUiMode.edgeToEdge);
+    }
     _pages.dispose();
     super.dispose();
   }
@@ -73,6 +125,11 @@ class _LaidDeckState extends State<LaidDeck> {
 
     final landscape =
         MediaQuery.orientationOf(context) == Orientation.landscape;
+    if (landscape != _fullScreen) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (mounted) _setFullScreen(landscape);
+      });
+    }
     var face = layout == null
         ? null
         : (landscape ? layout.landscape : layout.portrait);
@@ -99,6 +156,7 @@ class _LaidDeckState extends State<LaidDeck> {
       states: c.deckStates[_id] ?? const {},
       player: widget.connected ? player : null,
       say: _say,
+      hold: _edit,
     );
 
     Widget body;
@@ -118,10 +176,27 @@ class _LaidDeckState extends State<LaidDeck> {
         controller: _pages,
         itemCount: pages.length,
         onPageChanged: (i) => setState(() => _page = i),
-        itemBuilder: (context, i) =>
-            _Page(face: face!, tiles: pages[i], scope: scope),
+        itemBuilder: (context, i) => _Page(
+          face: face!,
+          tiles: pages[i],
+          scope: scope,
+          sideways: landscape,
+          dotsBelow: pages.length > 1,
+        ),
       );
     }
+
+    Widget header() => _Header(
+      look: look,
+      title: layout?.name ?? name,
+      subtitle: name,
+      connected: widget.connected,
+      page: _page,
+      pages: pages.length,
+      compact: landscape,
+      onTheme: layout == null ? null : () => _pickTheme(layout, own),
+      onEdit: widget.editable ? _edit : null,
+    );
 
     final dark = look.brightness == Brightness.dark;
     return AnnotatedRegion<SystemUiOverlayStyle>(
@@ -136,55 +211,84 @@ class _LaidDeckState extends State<LaidDeck> {
           decoration: BoxDecoration(gradient: look.gradient),
           child: CustomPaint(
             painter: DeckBackdropPainter(look, accent),
-            child: SafeArea(
-              child: Column(
-                children: [
-                  _Header(
-                    look: look,
-                    title: layout?.name ?? name,
-                    subtitle: name,
-                    connected: widget.connected,
-                    page: _page,
-                    pages: pages.length,
-                    compact: landscape,
-                    onTheme: layout == null
-                        ? null
-                        : () => _pickTheme(layout, own),
-                    onEdit: () => openDeckEditor(context, widget.device),
+            child: landscape
+                ? _sideways(context, body, look, pages.length, header())
+                : SafeArea(
+                    child: Column(
+                      children: [
+                        header(),
+                        Expanded(child: body),
+                        _Dots(
+                          look: look,
+                          count: pages.length,
+                          at: _page,
+                          height: 44,
+                        ),
+                        _noteLine(look),
+                      ],
+                    ),
                   ),
-                  Expanded(child: body),
-                  _Dots(
-                    look: look,
-                    count: pages.length,
-                    at: _page,
-                    height: landscape ? 18 : 30,
-                  ),
-                  AnimatedSize(
-                    duration: motion(context),
-                    curve: Curves.easeOutCubic,
-                    child: _note == null
-                        ? const SizedBox(width: double.infinity)
-                        : Padding(
-                            padding: const EdgeInsets.fromLTRB(24, 0, 24, 10),
-                            child: Text(
-                              _note!,
-                              textAlign: TextAlign.center,
-                              style: look.text(
-                                13,
-                                color: look.screenInk,
-                                opacity: 0.8,
-                              ),
-                            ),
-                          ),
-                  ),
-                ],
-              ),
-            ),
           ),
         ),
       ),
     );
   }
+
+  Widget _noteLine(DeckLook look) => AnimatedSize(
+    duration: motion(context),
+    curve: Curves.easeOutCubic,
+    child: _note == null
+        ? const SizedBox(width: double.infinity)
+        : Padding(
+            padding: const EdgeInsets.fromLTRB(24, 0, 24, 10),
+            child: Text(
+              _note!,
+              textAlign: TextAlign.center,
+              style: look.text(13, color: look.screenInk, opacity: 0.8),
+            ),
+          ),
+  );
+
+  /// The deck from edge to edge; what it says, and its header once called,
+  /// over it.
+  Widget _sideways(
+    BuildContext context,
+    Widget body,
+    DeckLook look,
+    int pages,
+    Widget header,
+  ) => Stack(
+    fit: StackFit.expand,
+    children: [
+      Row(
+        children: [
+          Expanded(
+            child: Column(
+              children: [
+                Expanded(child: body),
+                if (pages > 1)
+                  _Dots(look: look, count: pages, at: _page, height: 32),
+              ],
+            ),
+          ),
+          _Rail(look: look, onEdit: widget.editable ? _edit : null),
+        ],
+      ),
+      if (_note != null)
+        Positioned(left: 0, right: 0, bottom: 14, child: _noteLine(look)),
+      AnimatedPositioned(
+        duration: motion(context, 180),
+        curve: Curves.easeOutCubic,
+        left: 0,
+        right: 0,
+        top: _chrome ? 0 : -90,
+        child: ColoredBox(
+          color: look.background.withValues(alpha: 0.92),
+          child: SafeArea(bottom: false, child: header),
+        ),
+      ),
+    ],
+  );
 
   Future<void> _pickTheme(DeckLayout layout, String? own) async {
     final c = LinksyScope.read(context);
@@ -198,6 +302,47 @@ class _LaidDeckState extends State<LaidDeck> {
     if (picked == null) return;
     await c.setDeckTheme(_id, layout.id, picked.$1);
   }
+}
+
+/// Sideways, beside the tiles: the way back, and Edit under it.
+class _Rail extends StatelessWidget {
+  const _Rail({required this.look, required this.onEdit});
+
+  final DeckLook look;
+  final VoidCallback? onEdit;
+
+  Widget _button(IconData icon, String label, VoidCallback? onTap) => Pressable(
+    onTap: onTap,
+    scale: 0.9,
+    semanticLabel: label,
+    child: Container(
+      width: 44,
+      height: 44,
+      decoration: BoxDecoration(
+        shape: BoxShape.circle,
+        border: Border.all(color: look.screenInk.withValues(alpha: 0.3)),
+      ),
+      child: Icon(icon, color: look.screenInk, size: 20),
+    ),
+  );
+
+  @override
+  Widget build(BuildContext context) => Padding(
+    padding: const EdgeInsets.fromLTRB(0, 16, 12, 16),
+    child: Column(
+      children: [
+        _button(
+          Ph.arrowLeft,
+          MaterialLocalizations.of(context).backButtonTooltip,
+          () => Navigator.of(context).maybePop(),
+        ),
+        if (onEdit != null) ...[
+          const SizedBox(height: 10),
+          _button(Ph.pencilSimple, context.l10n.deckEdit, onEdit),
+        ],
+      ],
+    ),
+  );
 }
 
 /// One tile as the deck draws it, for the editor: with nothing playing, and
@@ -238,6 +383,7 @@ class DeckTileView extends StatelessWidget {
       states: states,
       player: null,
       say: (_) {},
+      hold: null,
     ),
   );
 }
@@ -253,6 +399,7 @@ class _Scope {
     required this.states,
     required this.player,
     required this.say,
+    required this.hold,
   });
 
   final String deviceId;
@@ -265,6 +412,9 @@ class _Scope {
   final Map<String, DeckState> states;
   final MediaPlayer? player;
   final void Function(String) say;
+
+  /// Held down: to the editor, with this tile.
+  final void Function([String? tile])? hold;
 }
 
 /// The deck's name (hold or tap it for the theme), the computer's under it
@@ -283,7 +433,7 @@ class _Header extends StatelessWidget {
     required this.onEdit,
   });
 
-  final VoidCallback onEdit;
+  final VoidCallback? onEdit;
   final DeckLook look;
   final String title;
   final String subtitle;
@@ -359,15 +509,40 @@ class _Header extends StatelessWidget {
                     ),
             ),
           ),
-          Pressable(
-            onTap: onEdit,
-            semanticLabel: l.deckEdit,
-            child: SizedBox(
-              width: 40,
-              height: compact ? 36 : 44,
-              child: Icon(Ph.pencilSimple, color: look.screenInk, size: 20),
+          if (onEdit != null)
+            Padding(
+              padding: const EdgeInsets.only(right: 10),
+              child: Pressable(
+                onTap: onEdit,
+                scale: 0.94,
+                semanticLabel: l.deckEdit,
+                child: Container(
+                  height: compact ? 32 : 36,
+                  padding: const EdgeInsets.symmetric(horizontal: 13),
+                  decoration: BoxDecoration(
+                    color: look.play,
+                    borderRadius: BorderRadius.circular(
+                      look.radius == 0 ? 0 : 18,
+                    ),
+                  ),
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Icon(Ph.pencilSimple, size: 16, color: look.playInk),
+                      const SizedBox(width: 6),
+                      Text(
+                        l.deckEdit,
+                        style: TextStyle(
+                          color: look.playInk,
+                          fontSize: 13.5,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
             ),
-          ),
           if (!connected)
             Container(
               padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
@@ -436,19 +611,32 @@ class _Dots extends StatelessWidget {
 /// One page: square cells, as many as the face's grid, as big as fit; each
 /// tile where the computer put it.
 class _Page extends StatelessWidget {
-  const _Page({required this.face, required this.tiles, required this.scope});
+  const _Page({
+    required this.face,
+    required this.tiles,
+    required this.scope,
+    this.sideways = false,
+    this.dotsBelow = false,
+  });
 
   final DeckFace face;
   final List<DeckTile> tiles;
   final _Scope scope;
 
+  final bool sideways;
+
+  /// Sideways, the dots under the page bring their own room.
+  final bool dotsBelow;
+
   @override
   Widget build(BuildContext context) => Padding(
-    padding: const EdgeInsets.fromLTRB(14, 6, 14, 6),
+    padding: sideways
+        ? EdgeInsets.fromLTRB(18, 16, 14, dotsBelow ? 0 : 16)
+        : const EdgeInsets.fromLTRB(14, 6, 14, 6),
     child: LayoutBuilder(
       builder: (context, box) {
         final cols = face.columns, rows = face.rows;
-        final gap = face.rows > face.columns ? 10.0 : 8.0;
+        final gap = face.rows > face.columns || sideways ? 10.0 : 8.0;
         final cell = math
             .max(
               8.0,
@@ -466,6 +654,13 @@ class _Page extends StatelessWidget {
             child: Stack(
               clipBehavior: Clip.none,
               children: [
+                // Held on nothing: the same as holding a tile.
+                Positioned.fill(
+                  child: GestureDetector(
+                    behavior: HitTestBehavior.opaque,
+                    onLongPress: scope.hold,
+                  ),
+                ),
                 for (final t in tiles)
                   Positioned(
                     key: ValueKey(t.id),
@@ -597,7 +792,9 @@ class _Tile extends StatelessWidget {
   });
 
   final DeckTile tile;
+
   final double cell;
+
   final double gap;
   final _Scope scope;
 
@@ -768,47 +965,50 @@ class _Tile extends StatelessWidget {
         );
     }
     final confirm = offered?.confirm != null;
-    return AnimatedOpacity(
-      opacity: dimmed ? 0.45 : 1,
-      duration: motion(context),
-      child: Stack(
-        fit: StackFit.expand,
-        clipBehavior: Clip.none,
-        children: [
-          built,
-          if (dimmed && t.kind != 'button' && t.kind != 'volume')
-            Positioned.fill(
-              child: GestureDetector(
-                behavior: HitTestBehavior.opaque,
-                onTap: why,
+    return GestureDetector(
+      onLongPress: scope.hold == null ? null : () => scope.hold!(t.id),
+      child: AnimatedOpacity(
+        opacity: dimmed ? 0.45 : 1,
+        duration: motion(context),
+        child: Stack(
+          fit: StackFit.expand,
+          clipBehavior: Clip.none,
+          children: [
+            built,
+            if (dimmed && t.kind != 'button' && t.kind != 'volume')
+              Positioned.fill(
+                child: GestureDetector(
+                  behavior: HitTestBehavior.opaque,
+                  onTap: why,
+                ),
               ),
-            ),
-          if (confirm)
-            Positioned(
-              top: 5 * scale,
-              right: 5 * scale,
-              child: IgnorePointer(
-                child: Container(
-                  width: 13 * scale,
-                  height: 13 * scale,
-                  alignment: Alignment.center,
-                  decoration: BoxDecoration(
-                    color: const Color(0xFFFFB020),
-                    shape: look.bevel ? BoxShape.rectangle : BoxShape.circle,
-                  ),
-                  child: Text(
-                    '!',
-                    style: TextStyle(
-                      color: const Color(0xFF1D1D20),
-                      fontSize: 9 * scale,
-                      fontWeight: FontWeight.w800,
-                      height: 1,
+            if (confirm)
+              Positioned(
+                top: 5 * scale,
+                right: 5 * scale,
+                child: IgnorePointer(
+                  child: Container(
+                    width: 13 * scale,
+                    height: 13 * scale,
+                    alignment: Alignment.center,
+                    decoration: BoxDecoration(
+                      color: const Color(0xFFFFB020),
+                      shape: look.bevel ? BoxShape.rectangle : BoxShape.circle,
+                    ),
+                    child: Text(
+                      '!',
+                      style: TextStyle(
+                        color: const Color(0xFF1D1D20),
+                        fontSize: 9 * scale,
+                        fontWeight: FontWeight.w800,
+                        height: 1,
+                      ),
                     ),
                   ),
                 ),
               ),
-            ),
-        ],
+          ],
+        ),
       ),
     );
   }
