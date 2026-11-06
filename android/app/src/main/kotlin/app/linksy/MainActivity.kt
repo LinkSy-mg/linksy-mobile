@@ -434,6 +434,18 @@ class MainActivity : FlutterActivity() {
                         )
                         result.success(null)
                     }
+                    "fullScreen" -> {
+                        if (android.os.Build.VERSION.SDK_INT >= 28) {
+                            window.attributes = window.attributes.apply {
+                                layoutInDisplayCutoutMode = if (call.arguments as Boolean) {
+                                    android.view.WindowManager.LayoutParams.LAYOUT_IN_DISPLAY_CUTOUT_MODE_SHORT_EDGES
+                                } else {
+                                    android.view.WindowManager.LayoutParams.LAYOUT_IN_DISPLAY_CUTOUT_MODE_DEFAULT
+                                }
+                            }
+                        }
+                        result.success(null)
+                    }
                     "highRefresh" -> {
                         highRefresh(call.arguments as Boolean)
                         result.success(null)

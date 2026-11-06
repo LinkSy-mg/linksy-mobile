@@ -594,6 +594,10 @@ abstract final class LinksyPlatform {
   /// Opens the camera, and sends the picture to [device], or asks where.
   static Future<void> snap([String? device]) => _call<void>('snap', device);
 
+  /// The deck over the whole screen, past a camera cut-out too.
+  static Future<void> fullScreen({required bool on}) =>
+      _call<void>('fullScreen', on);
+
   /// The display at its fastest while a screen is shown.
   static Future<void> highRefresh({required bool on}) =>
       _call<void>('highRefresh', on);
