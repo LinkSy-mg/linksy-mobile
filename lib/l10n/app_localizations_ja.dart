@@ -3075,4 +3075,125 @@ class AppLocalizationsJa extends AppLocalizations {
 
   @override
   String get settingsTurnTapsCaption => 'スマートフォンが横向きのとき、コンピュータからのタップがずれる場合のみ';
+
+  @override
+  String get deckDiscardTitle => '変更を破棄しますか?';
+
+  @override
+  String get deckDiscard => '破棄';
+
+  @override
+  String get deckKeepEditing => '編集を続ける';
+
+  @override
+  String get deckUndo => '元に戻す';
+
+  @override
+  String get deckRedo => 'やり直す';
+
+  @override
+  String get deckCopy => 'コピー';
+
+  @override
+  String get deckPage => 'ページ';
+
+  @override
+  String deckPageN(int n) {
+    return 'ページ $n';
+  }
+
+  @override
+  String deckPages(int n) {
+    String _temp0 = intl.Intl.pluralLogic(
+      n,
+      locale: localeName,
+      other: '$n ページ',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get deckRemoveShort => '削除';
+
+  @override
+  String get deckNoRoom => 'ここには入りません';
+
+  @override
+  String get deckFillForMe => '自動で埋める';
+
+  @override
+  String get deckTryIt => '試す';
+
+  @override
+  String get deckLayouts => 'レイアウト';
+
+  @override
+  String get deckPortrait => '縦向き';
+
+  @override
+  String get deckLandscape => '横向き';
+
+  @override
+  String get deckAddSearch => 'できることを検索';
+
+  @override
+  String get deckLive => 'デッキにライブ表示';
+
+  @override
+  String get deckSuggested => 'おすすめ';
+
+  @override
+  String get deckMusic => '音楽';
+
+  @override
+  String get deckClock => '時計';
+
+  @override
+  String get deckName => '名前';
+
+  @override
+  String get deckDoes => '動作';
+
+  @override
+  String get deckAccent => 'アクセント';
+
+  @override
+  String get deckRename => '名前を変更';
+
+  @override
+  String get deckNewLayout => '新規作成の元';
+
+  @override
+  String get deckBlank => '空白';
+
+  @override
+  String get deckPresenter => 'プレゼンター';
+
+  @override
+  String get deckLandscapeFromPortrait => '縦向きから横向きを作成';
+
+  @override
+  String get deckMade => '完了しました。横向きで確認してください';
+
+  @override
+  String deckUseComputers(String name) {
+    return '$name のものを使う';
+  }
+
+  @override
+  String deckSavedHere(String name) {
+    return '今はこのスマートフォンに保存されます。$name は受け取れるようになるまで自身のものを保持します。';
+  }
+
+  @override
+  String get deckWidth => '幅';
+
+  @override
+  String get deckHeight => '高さ';
+
+  @override
+  String get deckStartFromPortrait => '縦向きのデッキから始める';
+
+  @override
+  String get deckStartEmpty => '空から始める';
 }

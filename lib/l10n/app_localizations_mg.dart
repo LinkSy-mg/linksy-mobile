@@ -3172,4 +3172,126 @@ class AppLocalizationsMg extends AppLocalizations {
   @override
   String get settingsTurnTapsCaption =>
       'Raha diso toerana fotsiny ny tsindry avy amin\'ny solosaina rehefa mitsivalana ny finday';
+
+  @override
+  String get deckDiscardTitle => 'Hariana ve ny fanovana?';
+
+  @override
+  String get deckDiscard => 'Hariana';
+
+  @override
+  String get deckKeepEditing => 'Tohizo';
+
+  @override
+  String get deckUndo => 'Averina';
+
+  @override
+  String get deckRedo => 'Ataovy indray';
+
+  @override
+  String get deckCopy => 'Adikao';
+
+  @override
+  String get deckPage => 'Pejy';
+
+  @override
+  String deckPageN(int n) {
+    return 'Pejy $n';
+  }
+
+  @override
+  String deckPages(int n) {
+    String _temp0 = intl.Intl.pluralLogic(
+      n,
+      locale: localeName,
+      other: 'Pejy $n',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get deckRemoveShort => 'Esory';
+
+  @override
+  String get deckNoRoom => 'Tsy misy toerana eto';
+
+  @override
+  String get deckFillForMe => 'Fenoy ho ahy';
+
+  @override
+  String get deckTryIt => 'Andramo';
+
+  @override
+  String get deckLayouts => 'Fandaharana';
+
+  @override
+  String get deckPortrait => 'Mitsangana';
+
+  @override
+  String get deckLandscape => 'Mitsivalana';
+
+  @override
+  String get deckAddSearch => 'Karohy izay azony atao';
+
+  @override
+  String get deckLive => 'Mivantana eo amin\'ny deck';
+
+  @override
+  String get deckSuggested => 'Soso-kevitra';
+
+  @override
+  String get deckMusic => 'Mozika';
+
+  @override
+  String get deckClock => 'Famantaranandro';
+
+  @override
+  String get deckName => 'Anarana';
+
+  @override
+  String get deckDoes => 'Izay ataony';
+
+  @override
+  String get deckAccent => 'Loko manokana';
+
+  @override
+  String get deckRename => 'Ovay anarana';
+
+  @override
+  String get deckNewLayout => 'Manomboka vaovao avy amin\'ny';
+
+  @override
+  String get deckBlank => 'Banga';
+
+  @override
+  String get deckPresenter => 'Mpanolotra';
+
+  @override
+  String get deckLandscapeFromPortrait =>
+      'Amboary mitsivalana avy amin\'ny mitsangana';
+
+  @override
+  String get deckMade => 'Vita, jereo amin\'ny Mitsivalana';
+
+  @override
+  String deckUseComputers(String name) {
+    return 'Ampiasao ilay ao amin\'i $name';
+  }
+
+  @override
+  String deckSavedHere(String name) {
+    return 'Voatahiry amin\'ity finday ity aloha izao. Mitazona ny azy i $name mandra-pahazoany ity.';
+  }
+
+  @override
+  String get deckWidth => 'Sakany';
+
+  @override
+  String get deckHeight => 'Haavo';
+
+  @override
+  String get deckStartFromPortrait => 'Manomboka amin\'ny deck mitsangana';
+
+  @override
+  String get deckStartEmpty => 'Manomboka banga';
 }

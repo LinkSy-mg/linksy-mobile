@@ -3162,4 +3162,126 @@ class AppLocalizationsDe extends AppLocalizations {
   @override
   String get settingsTurnTapsCaption =>
       'Nur wenn Tipps vom Computer bei quer gehaltenem Telefon falsch landen';
+
+  @override
+  String get deckDiscardTitle => 'Änderungen verwerfen?';
+
+  @override
+  String get deckDiscard => 'Verwerfen';
+
+  @override
+  String get deckKeepEditing => 'Weiter bearbeiten';
+
+  @override
+  String get deckUndo => 'Rückgängig';
+
+  @override
+  String get deckRedo => 'Wiederholen';
+
+  @override
+  String get deckCopy => 'Kopieren';
+
+  @override
+  String get deckPage => 'Seite';
+
+  @override
+  String deckPageN(int n) {
+    return 'Seite $n';
+  }
+
+  @override
+  String deckPages(int n) {
+    String _temp0 = intl.Intl.pluralLogic(
+      n,
+      locale: localeName,
+      other: '$n Seiten',
+      one: '1 Seite',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get deckRemoveShort => 'Entfernen';
+
+  @override
+  String get deckNoRoom => 'Hier ist kein Platz dafür';
+
+  @override
+  String get deckFillForMe => 'Für mich füllen';
+
+  @override
+  String get deckTryIt => 'Ausprobieren';
+
+  @override
+  String get deckLayouts => 'Layouts';
+
+  @override
+  String get deckPortrait => 'Hochformat';
+
+  @override
+  String get deckLandscape => 'Querformat';
+
+  @override
+  String get deckAddSearch => 'Suchen, was er kann';
+
+  @override
+  String get deckLive => 'Live auf dem Deck';
+
+  @override
+  String get deckSuggested => 'Vorschläge';
+
+  @override
+  String get deckMusic => 'Musik';
+
+  @override
+  String get deckClock => 'Uhr';
+
+  @override
+  String get deckName => 'Name';
+
+  @override
+  String get deckDoes => 'Was sie tut';
+
+  @override
+  String get deckAccent => 'Akzent';
+
+  @override
+  String get deckRename => 'Umbenennen';
+
+  @override
+  String get deckNewLayout => 'Neu beginnen mit';
+
+  @override
+  String get deckBlank => 'Leer';
+
+  @override
+  String get deckPresenter => 'Präsentation';
+
+  @override
+  String get deckLandscapeFromPortrait => 'Querformat aus Hochformat machen';
+
+  @override
+  String get deckMade => 'Fertig, sieh im Querformat nach';
+
+  @override
+  String deckUseComputers(String name) {
+    return 'Das von $name verwenden';
+  }
+
+  @override
+  String deckSavedHere(String name) {
+    return 'Vorerst auf diesem Telefon gespeichert. $name behält sein eigenes, bis es dieses übernehmen kann.';
+  }
+
+  @override
+  String get deckWidth => 'Breite';
+
+  @override
+  String get deckHeight => 'Höhe';
+
+  @override
+  String get deckStartFromPortrait => 'Mit deinem Hochformat-Deck beginnen';
+
+  @override
+  String get deckStartEmpty => 'Leer beginnen';
 }

@@ -3185,4 +3185,128 @@ class AppLocalizationsRu extends AppLocalizations {
   @override
   String get settingsTurnTapsCaption =>
       'Только если касания с компьютера попадают не туда при горизонтальном телефоне';
+
+  @override
+  String get deckDiscardTitle => 'Отменить изменения?';
+
+  @override
+  String get deckDiscard => 'Отменить';
+
+  @override
+  String get deckKeepEditing => 'Продолжить';
+
+  @override
+  String get deckUndo => 'Отменить';
+
+  @override
+  String get deckRedo => 'Повторить';
+
+  @override
+  String get deckCopy => 'Копия';
+
+  @override
+  String get deckPage => 'Страница';
+
+  @override
+  String deckPageN(int n) {
+    return 'Страница $n';
+  }
+
+  @override
+  String deckPages(int n) {
+    String _temp0 = intl.Intl.pluralLogic(
+      n,
+      locale: localeName,
+      other: '$n страниц',
+      many: '$n страниц',
+      few: '$n страницы',
+      one: '1 страница',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get deckRemoveShort => 'Убрать';
+
+  @override
+  String get deckNoRoom => 'Здесь нет места';
+
+  @override
+  String get deckFillForMe => 'Заполнить';
+
+  @override
+  String get deckTryIt => 'Попробовать';
+
+  @override
+  String get deckLayouts => 'Макеты';
+
+  @override
+  String get deckPortrait => 'Портрет';
+
+  @override
+  String get deckLandscape => 'Ландшафт';
+
+  @override
+  String get deckAddSearch => 'Найти, что он умеет';
+
+  @override
+  String get deckLive => 'Живые плитки';
+
+  @override
+  String get deckSuggested => 'Предложения';
+
+  @override
+  String get deckMusic => 'Музыка';
+
+  @override
+  String get deckClock => 'Часы';
+
+  @override
+  String get deckName => 'Название';
+
+  @override
+  String get deckDoes => 'Что делает';
+
+  @override
+  String get deckAccent => 'Акцент';
+
+  @override
+  String get deckRename => 'Переименовать';
+
+  @override
+  String get deckNewLayout => 'Начать новый из';
+
+  @override
+  String get deckBlank => 'Пустой';
+
+  @override
+  String get deckPresenter => 'Докладчик';
+
+  @override
+  String get deckLandscapeFromPortrait => 'Сделать ландшафт из портрета';
+
+  @override
+  String get deckMade => 'Готово, посмотрите в Ландшафте';
+
+  @override
+  String deckUseComputers(String name) {
+    return 'Использовать с $name';
+  }
+
+  @override
+  String deckSavedHere(String name) {
+    return 'Пока сохранено на этом телефоне. $name хранит свой, пока не сможет принять этот.';
+  }
+
+  @override
+  String get deckWidth => 'Ширина';
+
+  @override
+  String get deckHeight => 'Высота';
+
+  @override
+  String get deckStartFromPortrait => 'Начать с портретной панели';
+
+  @override
+  String get deckStartEmpty => 'Начать с пустой';
 }

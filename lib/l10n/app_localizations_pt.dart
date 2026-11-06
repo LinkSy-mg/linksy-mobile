@@ -3157,4 +3157,126 @@ class AppLocalizationsPt extends AppLocalizations {
   @override
   String get settingsTurnTapsCaption =>
       'Só se os toques do computador caírem no lugar errado com o telefone na horizontal';
+
+  @override
+  String get deckDiscardTitle => 'Descartar as alterações?';
+
+  @override
+  String get deckDiscard => 'Descartar';
+
+  @override
+  String get deckKeepEditing => 'Continuar editando';
+
+  @override
+  String get deckUndo => 'Desfazer';
+
+  @override
+  String get deckRedo => 'Refazer';
+
+  @override
+  String get deckCopy => 'Copiar';
+
+  @override
+  String get deckPage => 'Página';
+
+  @override
+  String deckPageN(int n) {
+    return 'Página $n';
+  }
+
+  @override
+  String deckPages(int n) {
+    String _temp0 = intl.Intl.pluralLogic(
+      n,
+      locale: localeName,
+      other: '$n páginas',
+      one: '1 página',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get deckRemoveShort => 'Remover';
+
+  @override
+  String get deckNoRoom => 'Não há espaço aqui';
+
+  @override
+  String get deckFillForMe => 'Preencher para mim';
+
+  @override
+  String get deckTryIt => 'Testar';
+
+  @override
+  String get deckLayouts => 'Layouts';
+
+  @override
+  String get deckPortrait => 'Vertical';
+
+  @override
+  String get deckLandscape => 'Horizontal';
+
+  @override
+  String get deckAddSearch => 'Busque o que ele pode fazer';
+
+  @override
+  String get deckLive => 'Ao vivo no deck';
+
+  @override
+  String get deckSuggested => 'Sugestões';
+
+  @override
+  String get deckMusic => 'Música';
+
+  @override
+  String get deckClock => 'Relógio';
+
+  @override
+  String get deckName => 'Nome';
+
+  @override
+  String get deckDoes => 'O que faz';
+
+  @override
+  String get deckAccent => 'Destaque';
+
+  @override
+  String get deckRename => 'Renomear';
+
+  @override
+  String get deckNewLayout => 'Começar um novo de';
+
+  @override
+  String get deckBlank => 'Em branco';
+
+  @override
+  String get deckPresenter => 'Apresentador';
+
+  @override
+  String get deckLandscapeFromPortrait => 'Criar horizontal do vertical';
+
+  @override
+  String get deckMade => 'Pronto, veja na Horizontal';
+
+  @override
+  String deckUseComputers(String name) {
+    return 'Usar o de $name';
+  }
+
+  @override
+  String deckSavedHere(String name) {
+    return 'Salvo neste telefone por enquanto. $name mantém o seu até poder receber este.';
+  }
+
+  @override
+  String get deckWidth => 'Largura';
+
+  @override
+  String get deckHeight => 'Altura';
+
+  @override
+  String get deckStartFromPortrait => 'Começar do seu deck vertical';
+
+  @override
+  String get deckStartEmpty => 'Começar vazio';
 }

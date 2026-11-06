@@ -5207,6 +5207,222 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Only if taps from a computer land in the wrong place with the phone on its side'**
   String get settingsTurnTapsCaption;
+
+  /// The deck editor.
+  ///
+  /// In en, this message translates to:
+  /// **'Discard your changes?'**
+  String get deckDiscardTitle;
+
+  /// The deck editor.
+  ///
+  /// In en, this message translates to:
+  /// **'Discard'**
+  String get deckDiscard;
+
+  /// The deck editor.
+  ///
+  /// In en, this message translates to:
+  /// **'Keep editing'**
+  String get deckKeepEditing;
+
+  /// The deck editor.
+  ///
+  /// In en, this message translates to:
+  /// **'Undo'**
+  String get deckUndo;
+
+  /// The deck editor.
+  ///
+  /// In en, this message translates to:
+  /// **'Redo'**
+  String get deckRedo;
+
+  /// The deck editor.
+  ///
+  /// In en, this message translates to:
+  /// **'Copy'**
+  String get deckCopy;
+
+  /// The deck editor.
+  ///
+  /// In en, this message translates to:
+  /// **'Page'**
+  String get deckPage;
+
+  /// The deck editor.
+  ///
+  /// In en, this message translates to:
+  /// **'Page {n}'**
+  String deckPageN(int n);
+
+  /// The deck editor.
+  ///
+  /// In en, this message translates to:
+  /// **'{n, plural, =1{1 page} other{{n} pages}}'**
+  String deckPages(int n);
+
+  /// The deck editor.
+  ///
+  /// In en, this message translates to:
+  /// **'Remove'**
+  String get deckRemoveShort;
+
+  /// The deck editor.
+  ///
+  /// In en, this message translates to:
+  /// **'No room for it here'**
+  String get deckNoRoom;
+
+  /// The deck editor.
+  ///
+  /// In en, this message translates to:
+  /// **'Fill for me'**
+  String get deckFillForMe;
+
+  /// The deck editor.
+  ///
+  /// In en, this message translates to:
+  /// **'Try it'**
+  String get deckTryIt;
+
+  /// The deck editor.
+  ///
+  /// In en, this message translates to:
+  /// **'Layouts'**
+  String get deckLayouts;
+
+  /// The deck editor.
+  ///
+  /// In en, this message translates to:
+  /// **'Portrait'**
+  String get deckPortrait;
+
+  /// The deck editor.
+  ///
+  /// In en, this message translates to:
+  /// **'Landscape'**
+  String get deckLandscape;
+
+  /// The deck editor.
+  ///
+  /// In en, this message translates to:
+  /// **'Search what it can do'**
+  String get deckAddSearch;
+
+  /// The deck editor.
+  ///
+  /// In en, this message translates to:
+  /// **'Live on the deck'**
+  String get deckLive;
+
+  /// The deck editor.
+  ///
+  /// In en, this message translates to:
+  /// **'Suggested'**
+  String get deckSuggested;
+
+  /// The deck editor.
+  ///
+  /// In en, this message translates to:
+  /// **'Music'**
+  String get deckMusic;
+
+  /// The deck editor.
+  ///
+  /// In en, this message translates to:
+  /// **'Clock'**
+  String get deckClock;
+
+  /// The deck editor.
+  ///
+  /// In en, this message translates to:
+  /// **'Name'**
+  String get deckName;
+
+  /// The deck editor.
+  ///
+  /// In en, this message translates to:
+  /// **'What it does'**
+  String get deckDoes;
+
+  /// The deck editor.
+  ///
+  /// In en, this message translates to:
+  /// **'Accent'**
+  String get deckAccent;
+
+  /// The deck editor.
+  ///
+  /// In en, this message translates to:
+  /// **'Rename'**
+  String get deckRename;
+
+  /// The deck editor.
+  ///
+  /// In en, this message translates to:
+  /// **'Start a new one from'**
+  String get deckNewLayout;
+
+  /// The deck editor.
+  ///
+  /// In en, this message translates to:
+  /// **'Blank'**
+  String get deckBlank;
+
+  /// The deck editor.
+  ///
+  /// In en, this message translates to:
+  /// **'Presenter'**
+  String get deckPresenter;
+
+  /// The deck editor.
+  ///
+  /// In en, this message translates to:
+  /// **'Make landscape from portrait'**
+  String get deckLandscapeFromPortrait;
+
+  /// The deck editor.
+  ///
+  /// In en, this message translates to:
+  /// **'Done, have a look in Landscape'**
+  String get deckMade;
+
+  /// The deck editor.
+  ///
+  /// In en, this message translates to:
+  /// **'Use the one on {name}'**
+  String deckUseComputers(String name);
+
+  /// The deck editor.
+  ///
+  /// In en, this message translates to:
+  /// **'Saved on this phone for now. {name} keeps its own until it can take this one.'**
+  String deckSavedHere(String name);
+
+  /// The deck editor.
+  ///
+  /// In en, this message translates to:
+  /// **'Width'**
+  String get deckWidth;
+
+  /// The deck editor.
+  ///
+  /// In en, this message translates to:
+  /// **'Height'**
+  String get deckHeight;
+
+  /// The deck editor.
+  ///
+  /// In en, this message translates to:
+  /// **'Start from your portrait deck'**
+  String get deckStartFromPortrait;
+
+  /// The deck editor.
+  ///
+  /// In en, this message translates to:
+  /// **'Start empty'**
+  String get deckStartEmpty;
 }
 
 class _AppLocalizationsDelegate

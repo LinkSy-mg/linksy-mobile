@@ -3143,4 +3143,126 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get settingsTurnTapsCaption =>
       'Only if taps from a computer land in the wrong place with the phone on its side';
+
+  @override
+  String get deckDiscardTitle => 'Discard your changes?';
+
+  @override
+  String get deckDiscard => 'Discard';
+
+  @override
+  String get deckKeepEditing => 'Keep editing';
+
+  @override
+  String get deckUndo => 'Undo';
+
+  @override
+  String get deckRedo => 'Redo';
+
+  @override
+  String get deckCopy => 'Copy';
+
+  @override
+  String get deckPage => 'Page';
+
+  @override
+  String deckPageN(int n) {
+    return 'Page $n';
+  }
+
+  @override
+  String deckPages(int n) {
+    String _temp0 = intl.Intl.pluralLogic(
+      n,
+      locale: localeName,
+      other: '$n pages',
+      one: '1 page',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get deckRemoveShort => 'Remove';
+
+  @override
+  String get deckNoRoom => 'No room for it here';
+
+  @override
+  String get deckFillForMe => 'Fill for me';
+
+  @override
+  String get deckTryIt => 'Try it';
+
+  @override
+  String get deckLayouts => 'Layouts';
+
+  @override
+  String get deckPortrait => 'Portrait';
+
+  @override
+  String get deckLandscape => 'Landscape';
+
+  @override
+  String get deckAddSearch => 'Search what it can do';
+
+  @override
+  String get deckLive => 'Live on the deck';
+
+  @override
+  String get deckSuggested => 'Suggested';
+
+  @override
+  String get deckMusic => 'Music';
+
+  @override
+  String get deckClock => 'Clock';
+
+  @override
+  String get deckName => 'Name';
+
+  @override
+  String get deckDoes => 'What it does';
+
+  @override
+  String get deckAccent => 'Accent';
+
+  @override
+  String get deckRename => 'Rename';
+
+  @override
+  String get deckNewLayout => 'Start a new one from';
+
+  @override
+  String get deckBlank => 'Blank';
+
+  @override
+  String get deckPresenter => 'Presenter';
+
+  @override
+  String get deckLandscapeFromPortrait => 'Make landscape from portrait';
+
+  @override
+  String get deckMade => 'Done, have a look in Landscape';
+
+  @override
+  String deckUseComputers(String name) {
+    return 'Use the one on $name';
+  }
+
+  @override
+  String deckSavedHere(String name) {
+    return 'Saved on this phone for now. $name keeps its own until it can take this one.';
+  }
+
+  @override
+  String get deckWidth => 'Width';
+
+  @override
+  String get deckHeight => 'Height';
+
+  @override
+  String get deckStartFromPortrait => 'Start from your portrait deck';
+
+  @override
+  String get deckStartEmpty => 'Start empty';
 }

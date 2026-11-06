@@ -3029,4 +3029,121 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get settingsTurnTapsCaption => '仅在手机横放时，电脑的点按位置不对才需要';
+
+  @override
+  String get deckDiscardTitle => '放弃更改?';
+
+  @override
+  String get deckDiscard => '放弃';
+
+  @override
+  String get deckKeepEditing => '继续编辑';
+
+  @override
+  String get deckUndo => '撤销';
+
+  @override
+  String get deckRedo => '重做';
+
+  @override
+  String get deckCopy => '复制';
+
+  @override
+  String get deckPage => '页面';
+
+  @override
+  String deckPageN(int n) {
+    return '第 $n 页';
+  }
+
+  @override
+  String deckPages(int n) {
+    String _temp0 = intl.Intl.pluralLogic(n, locale: localeName, other: '$n 页');
+    return '$_temp0';
+  }
+
+  @override
+  String get deckRemoveShort => '移除';
+
+  @override
+  String get deckNoRoom => '这里放不下';
+
+  @override
+  String get deckFillForMe => '帮我填充';
+
+  @override
+  String get deckTryIt => '试用';
+
+  @override
+  String get deckLayouts => '布局';
+
+  @override
+  String get deckPortrait => '竖屏';
+
+  @override
+  String get deckLandscape => '横屏';
+
+  @override
+  String get deckAddSearch => '搜索它能做什么';
+
+  @override
+  String get deckLive => '实时磁贴';
+
+  @override
+  String get deckSuggested => '建议';
+
+  @override
+  String get deckMusic => '音乐';
+
+  @override
+  String get deckClock => '时钟';
+
+  @override
+  String get deckName => '名称';
+
+  @override
+  String get deckDoes => '功能';
+
+  @override
+  String get deckAccent => '强调色';
+
+  @override
+  String get deckRename => '重命名';
+
+  @override
+  String get deckNewLayout => '新建自';
+
+  @override
+  String get deckBlank => '空白';
+
+  @override
+  String get deckPresenter => '演示者';
+
+  @override
+  String get deckLandscapeFromPortrait => '从竖屏生成横屏';
+
+  @override
+  String get deckMade => '已完成，请在横屏中查看';
+
+  @override
+  String deckUseComputers(String name) {
+    return '使用 $name 上的';
+  }
+
+  @override
+  String deckSavedHere(String name) {
+    return '暂时保存在这台手机上。在能接收之前，$name 会保留自己的布局。';
+  }
+
+  @override
+  String get deckWidth => '宽度';
+
+  @override
+  String get deckHeight => '高度';
+
+  @override
+  String get deckStartFromPortrait => '从竖屏布局开始';
+
+  @override
+  String get deckStartEmpty => '从空白开始';
 }
