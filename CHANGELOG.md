@@ -27,6 +27,8 @@ All notable changes to Linksy for Android. Format: [Keep a Changelog](https://ke
 - This phone's screen at 60 fps where its encoder can.
 - Wi-Fi Direct on the channel the computer's Wi-Fi is on.
 
+- **Deck editor on the phone**: edit right on the deck with the pencil. Drag a tile, pull any corner or side to any size, and the others make room. Turn the phone for the landscape deck, with its own editor. Tap an empty cell to add, with undo, pages, layouts, themes and Try It. New decks start on Dot Matrix. Saved on this phone until the computer can take it.
+
 ### Changed
 
 - A computer's page: its picture or the grid, gray while it isn't around, the bar past it in the page's own color, a slim player that opens up, its controls as tiles, what this phone can be as chips, and History as the conversation.
