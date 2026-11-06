@@ -3025,6 +3025,13 @@ class AppLocalizationsJa extends AppLocalizations {
   String get doctorCheckAgain => 'もう一度確認';
 
   @override
+  String get news035DeckTitle => 'デッキをスマホで作る';
+
+  @override
+  String get news035DeckBody =>
+      '鉛筆をタップするか、タイルを長押し。ドラッグして好きな大きさに広げると、ほかのタイルが場所を空けます。スマホを横にすると横向きのデッキも作れます。';
+
+  @override
   String get news035SnapTitle => 'コンピュータへ撮影';
 
   @override

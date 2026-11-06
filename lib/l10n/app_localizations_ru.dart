@@ -3131,6 +3131,13 @@ class AppLocalizationsRu extends AppLocalizations {
   String get doctorCheckAgain => 'Проверить снова';
 
   @override
+  String get news035DeckTitle => 'Собирайте панель на телефоне';
+
+  @override
+  String get news035DeckBody =>
+      'Нажмите на карандаш или удерживайте плитку. Перетаскивайте её, меняйте размер, остальные подвинутся. Поверните телефон для горизонтальной панели.';
+
+  @override
   String get news035SnapTitle => 'Снимок на компьютер';
 
   @override

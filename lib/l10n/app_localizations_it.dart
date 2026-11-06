@@ -3110,6 +3110,13 @@ class AppLocalizationsIt extends AppLocalizations {
   String get doctorCheckAgain => 'Controlla di nuovo';
 
   @override
+  String get news035DeckTitle => 'Crea il tuo deck sul telefono';
+
+  @override
+  String get news035DeckBody =>
+      'Tocca la matita o tieni premuto un riquadro. Trascinalo, allargalo come vuoi e gli altri fanno spazio. Ruota il telefono per il deck orizzontale.';
+
+  @override
   String get news035SnapTitle => 'Foto al computer';
 
   @override

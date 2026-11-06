@@ -5112,6 +5112,18 @@ abstract class AppLocalizations {
   /// **'Check again'**
   String get doctorCheckAgain;
 
+  /// What's New 0.3.5
+  ///
+  /// In en, this message translates to:
+  /// **'Build your deck on the phone'**
+  String get news035DeckTitle;
+
+  /// What's New 0.3.5
+  ///
+  /// In en, this message translates to:
+  /// **'Tap the pencil or hold a tile. Drag it, pull it to any size, and the others make room. Turn the phone for the landscape deck.'**
+  String get news035DeckBody;
+
   /// Snap, Copy to Computer, Connection Doctor or USB button.
   ///
   /// In en, this message translates to:

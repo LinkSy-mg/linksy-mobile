@@ -3117,6 +3117,13 @@ class AppLocalizationsFr extends AppLocalizations {
   String get doctorCheckAgain => 'Vérifier à nouveau';
 
   @override
+  String get news035DeckTitle => 'Créez votre deck sur le téléphone';
+
+  @override
+  String get news035DeckBody =>
+      'Touchez le crayon ou maintenez une tuile. Déplacez-la, tirez-la à la taille voulue, les autres font de la place. Tournez le téléphone pour le deck en paysage.';
+
+  @override
   String get news035SnapTitle => 'Photo vers l\'ordinateur';
 
   @override

@@ -833,6 +833,8 @@
   "doctorOpenSettings": "設定を開く",
   "doctorShowHow": "方法を見る",
   "doctorCheckAgain": "もう一度確認",
+  "news035DeckTitle": "デッキをスマホで作る",
+  "news035DeckBody": "鉛筆をタップするか、タイルを長押し。ドラッグして好きな大きさに広げると、ほかのタイルが場所を空けます。スマホを横にすると横向きのデッキも作れます。",
   "news035SnapTitle": "コンピュータへ撮影",
   "news035SnapBody": "コンピュータのページやクイック設定タイルから撮影すると、すぐに届いて貼り付けられます。",
   "news035CopyTitle": "コンピュータへコピー",

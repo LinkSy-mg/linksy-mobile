@@ -3106,6 +3106,13 @@ class AppLocalizationsDe extends AppLocalizations {
   String get doctorCheckAgain => 'Erneut prüfen';
 
   @override
+  String get news035DeckTitle => 'Dein Deck auf dem Handy bauen';
+
+  @override
+  String get news035DeckBody =>
+      'Tippe auf den Stift oder halte eine Kachel. Zieh sie an jede Stelle und auf jede Größe, die anderen machen Platz. Dreh das Handy für das Querformat-Deck.';
+
+  @override
   String get news035SnapTitle => 'Foto an den Computer';
 
   @override

@@ -3089,6 +3089,13 @@ class AppLocalizationsEn extends AppLocalizations {
   String get doctorCheckAgain => 'Check again';
 
   @override
+  String get news035DeckTitle => 'Build your deck on the phone';
+
+  @override
+  String get news035DeckBody =>
+      'Tap the pencil or hold a tile. Drag it, pull it to any size, and the others make room. Turn the phone for the landscape deck.';
+
+  @override
   String get news035SnapTitle => 'Snap to Computer';
 
   @override

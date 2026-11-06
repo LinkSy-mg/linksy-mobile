@@ -2981,6 +2981,12 @@ class AppLocalizationsZh extends AppLocalizations {
   String get doctorCheckAgain => '再次检查';
 
   @override
+  String get news035DeckTitle => '在手机上搭建你的面板';
+
+  @override
+  String get news035DeckBody => '点铅笔或长按磁贴。拖动它、拉到任意大小,其他磁贴会自动让位。横过手机即可编辑横屏面板。';
+
+  @override
   String get news035SnapTitle => '拍照到电脑';
 
   @override

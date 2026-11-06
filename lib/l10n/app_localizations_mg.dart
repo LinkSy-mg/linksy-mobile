@@ -3117,6 +3117,13 @@ class AppLocalizationsMg extends AppLocalizations {
   String get doctorCheckAgain => 'Hamarino indray';
 
   @override
+  String get news035DeckTitle => 'Amboary amin\'ny finday ny deck-nao';
+
+  @override
+  String get news035DeckBody =>
+      'Tsindrio ny pensily na tazony ny tile iray. Afindrao, sintony amin\'izay habe tianao, dia manome toerana ny hafa. Ahodino ny finday ho an\'ny deck mitsivalana.';
+
+  @override
   String get news035SnapTitle => 'Sary mankany amin\'ny solosaina';
 
   @override
