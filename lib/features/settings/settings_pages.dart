@@ -587,6 +587,32 @@ class ConnectionSettings extends StatelessWidget {
               ),
             ),
             SettingRow(
+              id: 'computer_notifications',
+              icon: Ph.bellRinging,
+              title: l.settingsComputerNotifications,
+              caption: l.settingsComputerNotificationsCaption,
+              trailing: Switch(
+                value: c.computerNotifications,
+                onChanged: c.setComputerNotifications,
+              ),
+            ),
+            SettingRow(
+              id: 'dnd',
+              icon: Ph.moon,
+              title: l.settingsDndAccess,
+              caption: c.dndAccess
+                  ? l.settingsDndAccessOn
+                  : l.settingsDndAccessCaption,
+              onTap: LinksyPlatform.openDndAccess,
+            ),
+            SettingRow(
+              id: 'turn_taps',
+              icon: Ph.usb,
+              title: l.settingsTurnTaps,
+              caption: l.settingsTurnTapsCaption,
+              trailing: Switch(value: c.turnsTaps, onChanged: c.setTurnsTaps),
+            ),
+            SettingRow(
               id: 'copied',
               icon: Ph.clipboardText,
               title: l.settingsSendCopied,

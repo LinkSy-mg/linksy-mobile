@@ -272,12 +272,162 @@ class LinksyController extends ChangeNotifier with WidgetsBindingObserver {
     if (error != null) return error;
     final view = device(id);
     final file = File(path);
-    if ((view?.device.features.contains('clipboard_file') ?? false) &&
-        file.existsSync() &&
-        file.lengthSync() <= 10 * 1024 * 1024) {
-      await _run(() => node.sendClipboardFile(id, path));
+    if (!(view?.device.features.contains('clipboard_file') ?? false) ||
+        !file.existsSync()) {
+      return null;
     }
+    // At most 10 MiB on a clipboard: a smaller copy of a bigger one (§4.23).
+    final copy = file.lengthSync() <= 10 * 1024 * 1024
+        ? path
+        : await LinksyPlatform.shrinkPicture(path);
+    if (copy != null) await _run(() => node.sendClipboardFile(id, copy));
     return null;
+  }
+
+  // This phone's controls for a computer (§4.24).
+
+  final _controlWatchers = <String>{};
+  Timer? _controlsSoon;
+  StreamSubscription<void>? _controlsSub;
+
+  /// Android lets a computer change Do Not Disturb here.
+  bool dndAccess = false;
+
+  Future<void> _sendControls(Iterable<String> to) async {
+    final state = await LinksyPlatform.controlsRead();
+    if (state == null) return;
+    final json = jsonEncode({
+      'seq': DateTime.now().millisecondsSinceEpoch,
+      ...state,
+    });
+    for (final id in to) {
+      node.sendControlsState(id, json).catchError((Object _) {});
+    }
+  }
+
+  /// At most four a second while a level moves.
+  void _controlsMoved() {
+    if (_controlWatchers.isEmpty || _controlsSoon != null) return;
+    _controlsSoon = Timer(const Duration(milliseconds: 250), () {
+      _controlsSoon = null;
+      unawaited(_sendControls(_controlWatchers.toList()));
+    });
+  }
+
+  Future<void> _watchControls(String id, {required bool on}) async {
+    if (on) {
+      _controlWatchers.add(id);
+      await _sendControls([id]);
+    } else {
+      _controlWatchers.remove(id);
+    }
+    await LinksyPlatform.controlsWatch(on: _controlWatchers.isNotEmpty);
+  }
+
+  Future<void> _setControls(
+    DeviceInfo from,
+    Map<String, Object?> change,
+  ) async {
+    final view = device(from.id);
+    // Not among what's always allowed from away (§4.13).
+    if ((view?.away ?? false) && !(view?.awayAll ?? false)) {
+      for (final what in change.keys) {
+        await node
+            .refuseControls(from.id, what, 'away')
+            .catchError((Object _) {});
+      }
+      return;
+    }
+    final refused = await LinksyPlatform.controlsSet(change);
+    for (final MapEntry(key: what, value: why) in refused.entries) {
+      await node
+          .refuseControls(from.id, what, switch (why) {
+            'dnd' => tr.controlsNoDnd,
+            'flashlight' => tr.controlsNoFlashlight,
+            _ => tr.controlsDenied,
+          })
+          .catchError((Object _) {});
+    }
+    _controlsMoved();
+  }
+
+  Future<void> refreshDndAccess() async {
+    final now = await LinksyPlatform.dndAccess();
+    if (now == dndAccess) return;
+    dndAccess = now;
+    notifyListeners();
+    _controlsMoved();
+  }
+
+  // What's announced because of a choice here.
+
+  /// This phone shows a computer's notifications (off until asked for).
+  bool get computerNotifications => prefs['computer_notifications'] == 'on';
+
+  Future<void> setComputerNotifications(bool on) async {
+    await _setPref('computer_notifications', on ? 'on' : null);
+    await _announce();
+    notifyListeners();
+  }
+
+  /// A computer's snap: the camera is allowed here.
+  bool _cameraAllowed = false;
+
+  Future<void> _readCamera() async {
+    final now = (await LinksyPlatform.permissions())?.camera ?? false;
+    if (now == _cameraAllowed) return;
+    _cameraAllowed = now;
+    await _announce();
+  }
+
+  Future<void> _snapAsked(DeviceInfo from) async {
+    await _readCamera();
+    if (!_cameraAllowed) {
+      await node.refuseSnap(from.id, tr.snapNoCamera).catchError((Object _) {});
+    } else if (_onScreen) {
+      await LinksyPlatform.snap(from.id);
+    } else {
+      await LinksyPlatform.snapNotice(from.id, tr.snapAsked(from.name));
+    }
+  }
+
+  // The phone's sound with its screen (§4.8).
+
+  /// Yes by itself while its screen is shared and the microphone permission
+  /// (which Android wants for this) is there: the screen's projection is what
+  /// it records through, so with no screen there's nothing to give.
+  Future<void> _answerSound(SessionRequest request) async {
+    bool sharingTo() => sharing.values.any(
+      (s) =>
+          s.peer.id == request.from.id &&
+          (s.kind == SessionKind.screen || s.kind == SessionKind.control),
+    );
+    // It comes right after the screen, which may still be starting.
+    for (var i = 0; i < 12 && !sharingTo(); i++) {
+      await Future<void>.delayed(const Duration(milliseconds: 250));
+    }
+    final yes =
+        sharingTo() && await LinksyPlatform.requestPermission('microphone');
+    await node.respond(request.request, accept: yes).catchError((Object _) {});
+  }
+
+  // Taps in landscape over the cable (§4.11).
+
+  /// Only where taps from a computer land turned a quarter: Android may
+  /// already turn them, which needs a look on a real phone.
+  bool get turnsTaps => prefs['turn_taps'] == 'on';
+  Future<void> setTurnsTaps(bool on) async {
+    await _setPref('turn_taps', on ? 'on' : null);
+    notifyListeners();
+  }
+
+  void _onRotation((String, int) turned) {
+    final (session, degrees) = turned;
+    final share = sharing[session];
+    if (!turnsTaps || share == null || share.kind != SessionKind.control) {
+      return;
+    }
+    node.sendScreenRotation(share.peer.id, degrees).catchError((Object _) {});
   }
 
   /// The computers saying what's plugged into them.
@@ -646,6 +796,8 @@ class LinksyController extends ChangeNotifier with WidgetsBindingObserver {
     if (state == AppLifecycleState.resumed) {
       _importAll();
       unawaited(_sendCopied());
+      unawaited(_readCamera());
+      unawaited(refreshDndAccess());
       unawaited(_readUsbHost());
       unawaited(updates.recheck());
       // Back from Notification access or App info, maybe.
@@ -705,6 +857,12 @@ class LinksyController extends ChangeNotifier with WidgetsBindingObserver {
     addListener(_shareTargets);
     _shareTargets();
     _usbSub = LinksyPlatform.usbPorts.listen(_onUsb);
+    _controlsSub = LinksyPlatform.controlsChanges.listen(
+      (_) => _controlsMoved(),
+    );
+    LinksyPlatform.screenRotations.listen(_onRotation);
+    unawaited(_readCamera());
+    unawaited(refreshDndAccess());
     _logSub = LinksyPlatform.logs.listen(log.add);
     final usb = await LinksyPlatform.usbPort();
     if (usb != null) _onUsb(usb);
@@ -1332,11 +1490,22 @@ class LinksyController extends ChangeNotifier with WidgetsBindingObserver {
   }
 
   List<String> get _features {
-    const changing = {'notifications', 'inbox_history', 'gallery'};
+    const changing = {
+      'notifications',
+      'inbox_history',
+      'gallery',
+      'snap',
+      'sound',
+      'computer_notifications',
+    };
     return [
       ...node.info.features.where((f) => !changing.contains(f)),
       if (mirroring) ...['notifications', 'inbox_history'],
       if (gallery) 'gallery',
+      if (_cameraAllowed) 'snap',
+      // AudioPlaybackCapture is Android 10.
+      if (sdk >= 29) 'sound',
+      if (computerNotifications) 'computer_notifications',
     ];
   }
 
@@ -1853,6 +2022,32 @@ class LinksyController extends ChangeNotifier with WidgetsBindingObserver {
         _onPicture(from, image);
       case LocateRequested(:final from):
         _onLocate(from);
+      case ControlsWatchRequested(:final from, :final on):
+        unawaited(_watchControls(from.id, on: on));
+      case ControlsSetRequested(:final from, :final change):
+        unawaited(_setControls(from, change));
+      case ComputerNotificationReceived(
+        :final from,
+        :final key,
+        :final app,
+        :final title,
+        :final body,
+        :final atMs,
+      ):
+        if (computerNotifications) {
+          LinksyPlatform.computerNotice(
+            computer: from.name,
+            key: key,
+            app: app,
+            title: title,
+            body: body,
+            atMs: atMs,
+          );
+        }
+      case SnapRequested(:final from):
+        unawaited(_snapAsked(from));
+      case SessionRequest(kind: SessionKind.sound):
+        unawaited(_answerSound(e));
       case UsbPlugged(:final from, :final phones):
         _plugged[from.id] = phones;
         unawaited(_readUsbHost());
@@ -2188,7 +2383,8 @@ class LinksyController extends ChangeNotifier with WidgetsBindingObserver {
           when e.sharing && kind != SessionKind.display:
         sharing[session] = e;
         LinksyPlatform.startShare(session, kind.name, peer.name, peer.id);
-        _addSession(e);
+        // One line for a screen and its sound.
+        if (kind != SessionKind.sound) _addSession(e);
       case SessionStarted(:final session, kind: SessionKind.display)
           when !e.sharing:
         displays[session] = e;
@@ -2218,6 +2414,8 @@ class LinksyController extends ChangeNotifier with WidgetsBindingObserver {
         break;
     }
     switch (e) {
+      case SessionRequest(kind: SessionKind.sound):
+        break;
       case PairingRequest() ||
           PairingFailed() ||
           SessionRequest() ||
@@ -2280,6 +2478,7 @@ class LinksyController extends ChangeNotifier with WidgetsBindingObserver {
         SessionKind.display => ActivityKind.display,
         SessionKind.input => ActivityKind.remote,
         SessionKind.microphone => ActivityKind.microphone,
+        SessionKind.sound => ActivityKind.screen,
       },
       // Video coming in: a second display, or a computer's screen watched.
       incoming: !e.sharing && e.kind != SessionKind.input,
@@ -2655,7 +2854,7 @@ class LinksyController extends ChangeNotifier with WidgetsBindingObserver {
             );
             return null;
           }
-        case SessionKind.input:
+        case SessionKind.input || SessionKind.sound:
           break;
       }
     }
@@ -2777,6 +2976,8 @@ class LinksyController extends ChangeNotifier with WidgetsBindingObserver {
     log.dispose();
     _mediaActionSub?.cancel();
     LinksyPlatform.mediaNotice(null);
+    _controlsSub?.cancel();
+    _controlsSoon?.cancel();
     _usbSub?.cancel();
     _logSub?.cancel();
     updates.dispose();

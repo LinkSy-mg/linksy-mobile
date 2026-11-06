@@ -47,6 +47,7 @@ const _features = [
   'locate',
   'deck_layout',
   'turn_on',
+  'phone_controls',
   'preflight',
   'apps',
 ];

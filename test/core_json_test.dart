@@ -338,4 +338,41 @@ void main() {
       'Something went wrong: connection lost: timed out',
     );
   });
+
+  group('what a computer asks of this phone', () {
+    test('its controls', () {
+      final watch = eventFromJson({
+        'type': 'controls_watch',
+        'from': device,
+        'on': true,
+      });
+      expect(watch, isA<ControlsWatchRequested>());
+      final set = eventFromJson({
+        'type': 'controls_set',
+        'from': device,
+        'change': {'media': 0.5, 'dnd': 'priority'},
+      });
+      expect((set! as ControlsSetRequested).change, {
+        'media': 0.5,
+        'dnd': 'priority',
+      });
+    });
+
+    test('its notifications and a snap', () {
+      final note = eventFromJson({
+        'type': 'computer_notification',
+        'from': device,
+        'key': '4121-17',
+        'app': 'Thunderbird',
+        'title': 'Mum',
+        'body': 'Dinner at eight?',
+        'at_ms': 1760945000123,
+      });
+      expect((note! as ComputerNotificationReceived).key, '4121-17');
+      expect(
+        eventFromJson({'type': 'snap_request', 'from': device}),
+        isA<SnapRequested>(),
+      );
+    });
+  });
 }

@@ -52,6 +52,12 @@ class SessionRequestDialog extends StatelessWidget {
         l.sharingDisplayRequestTitle(name),
         l.sharingDisplayRequestDetail(name),
       ),
+      // Answered by itself, never asked.
+      SessionKind.sound => (
+        Ph.screencast,
+        l.sharingScreenRequestTitle(name),
+        l.sharingScreenRequestDetail(name),
+      ),
     };
     return Dialog(
       child: Padding(
@@ -127,6 +133,8 @@ class SharingBanners extends StatelessWidget {
     final shares = controller.sharing.values
         .where((s) => deviceId == null || s.peer.id == deviceId)
         .where((s) => kinds == null || kinds!.contains(s.kind))
+        // Goes with its screen, which has the banner.
+        .where((s) => s.kind != SessionKind.sound)
         .toList();
     // Banners come and go: the page makes room, and closes up.
     return AnimatedSize(

@@ -52,6 +52,8 @@ abstract final class LinksyPlatform {
   static final _openWebcam = StreamController<String>.broadcast();
   static final _transferAnswers = StreamController<(String, bool)>.broadcast();
   static final _usbPorts = StreamController<int>.broadcast();
+  static final _controlsChanges = StreamController<void>.broadcast();
+  static final _screenRotations = StreamController<(String, int)>.broadcast();
   static final _networkChanges = StreamController<void>.broadcast();
 
   /// This phone's networks changed (at most once a second).
@@ -129,6 +131,11 @@ abstract final class LinksyPlatform {
           _transferAnswers.add((a['transfer'] as String, a['accept'] == true));
         case 'volumeKey' when call.arguments is String:
           _volumeKeys.add(call.arguments == 'up');
+        case 'controlsChanged':
+          _controlsChanges.add(null);
+        case 'screenRotation' when call.arguments is Map:
+          final m = call.arguments as Map;
+          _screenRotations.add((m['session'] as String, m['degrees'] as int));
         case 'usbPort' when call.arguments is int:
           _usbPorts.add(call.arguments as int);
         case 'updateStatus' when call.arguments is String:
@@ -520,6 +527,69 @@ abstract final class LinksyPlatform {
   /// A small JPEG of one of them.
   static Future<Uint8List?> phoneThumb(int id, {required bool video}) =>
       _call<Uint8List>('phoneThumb', {'id': id, 'video': video});
+
+  /// This phone's volumes, ringer, Do Not Disturb and flashlight (§4.24).
+  static Future<Map<String, Object?>?> controlsRead() async =>
+      (await _call<Map<Object?, Object?>>('controlsRead'))
+          ?.cast<String, Object?>();
+
+  /// Applies [change]; what couldn't be done comes back with why: `dnd`,
+  /// `flashlight` or `denied`.
+  static Future<Map<String, String>> controlsSet(
+    Map<String, Object?> change,
+  ) async =>
+      (await _call<Map<Object?, Object?>>(
+        'controlsSet',
+        change,
+      ))?.cast<String, String>() ??
+      const {};
+
+  /// Tells [controlsChanges] about changes, by the phone's own buttons too.
+  static Future<void> controlsWatch({required bool on}) =>
+      _call<void>('controlsWatch', on);
+
+  static Stream<void> get controlsChanges {
+    _listen();
+    return _controlsChanges.stream;
+  }
+
+  /// Android lets Linksy change Do Not Disturb.
+  static Future<bool> dndAccess() async =>
+      await _call<bool>('dndAccess') ?? false;
+
+  static Future<void> openDndAccess() => _call<void>('openDndAccess');
+
+  /// A computer's own notification, in its own channel (§4.25).
+  static Future<void> computerNotice({
+    required String computer,
+    required String key,
+    required String app,
+    required String title,
+    required String body,
+    required int atMs,
+  }) => _call<void>('computerNotice', {
+    'computer': computer,
+    'key': key,
+    'app': app,
+    'title': title,
+    'body': body,
+    'at': atMs,
+  });
+
+  /// Out of sight, a computer's snap asks through a notification: Android
+  /// won't start the camera from the background.
+  static Future<void> snapNotice(String device, String title) =>
+      _call<void>('snapNotice', {'device': device, 'title': title});
+
+  /// A smaller copy of a picture for a clipboard; null if it can't be made.
+  static Future<String?> shrinkPicture(String path) =>
+      _call<String>('shrinkPicture', path);
+
+  /// (session, degrees) when the display turns while it's shared.
+  static Stream<(String, int)> get screenRotations {
+    _listen();
+    return _screenRotations.stream;
+  }
 
   /// Opens the camera, and sends the picture to [device], or asks where.
   static Future<void> snap([String? device]) => _call<void>('snap', device);
