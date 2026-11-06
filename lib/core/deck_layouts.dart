@@ -25,6 +25,22 @@ class DeckLayouts {
   final String active;
   final List<DeckLayout> layouts;
 
+  DeckLayouts copyWith({
+    int? version,
+    String? active,
+    List<DeckLayout>? layouts,
+  }) => DeckLayouts(
+    version: version ?? this.version,
+    active: active ?? this.active,
+    layouts: layouts ?? this.layouts,
+  );
+
+  Map<String, Object?> toJson() => {
+    'version': version,
+    'active': active,
+    'layouts': [for (final l in layouts) l.toJson()],
+  };
+
   /// The layout to show: the active one, else the first.
   DeckLayout? get shown =>
       layouts.where((l) => l.id == active).firstOrNull ?? layouts.firstOrNull;
@@ -72,6 +88,27 @@ class DeckLayout {
   final DeckFace portrait;
   final DeckFace landscape;
 
+  DeckLayout copyWith({
+    String? name,
+    DeckTheme? theme,
+    DeckFace? portrait,
+    DeckFace? landscape,
+  }) => DeckLayout(
+    id: id,
+    name: name ?? this.name,
+    theme: theme ?? this.theme,
+    portrait: portrait ?? this.portrait,
+    landscape: landscape ?? this.landscape,
+  );
+
+  Map<String, Object?> toJson() => {
+    'id': id,
+    'name': name,
+    'theme': theme.toJson(),
+    'portrait': portrait.toJson(),
+    'landscape': landscape.toJson(),
+  };
+
   static DeckLayout _parse(_Json j) => DeckLayout(
     id: j['id'] as String? ?? '',
     name: j['name'] as String? ?? '',
@@ -91,6 +128,11 @@ class DeckTheme {
   final Color accent;
 
   static const stock = DeckTheme(id: 'stock', accent: Color(0xFF3584E4));
+
+  /// What a deck made on the phone starts with.
+  static const dots = DeckTheme(id: 'dots', accent: Color(0xFF3B8BEB));
+
+  Map<String, Object?> toJson() => {'id': id, 'accent': deckHex(accent)};
 
   static DeckTheme _parse(Object? j) {
     if (j is! _Json) return stock;
@@ -115,6 +157,16 @@ class DeckFace {
   final List<List<DeckTile>> pages;
 
   bool get isEmpty => pages.every((p) => p.isEmpty);
+
+  DeckFace withPages(List<List<DeckTile>> pages) =>
+      DeckFace(columns: columns, rows: rows, pages: pages);
+
+  Map<String, Object?> toJson() => {
+    'grid': [columns, rows],
+    'pages': [
+      for (final p in pages) [for (final t in p) t.toJson()],
+    ],
+  };
 
   static DeckFace _parse(Object? j, int columns, int rows) {
     if (j is! _Json) return DeckFace(columns: columns, rows: rows, pages: [[]]);
@@ -171,6 +223,44 @@ class DeckTile {
   final String? action;
   final Map<String, String> props;
 
+  /// [noColor]: back to the look's own colour.
+  DeckTile copyWith({
+    String? id,
+    int? x,
+    int? y,
+    int? w,
+    int? h,
+    String? label,
+    Color? color,
+    bool noColor = false,
+    String? action,
+    Map<String, String>? props,
+  }) => DeckTile(
+    id: id ?? this.id,
+    kind: kind,
+    x: x ?? this.x,
+    y: y ?? this.y,
+    w: w ?? this.w,
+    h: h ?? this.h,
+    label: label ?? this.label,
+    color: noColor ? null : color ?? this.color,
+    action: action ?? this.action,
+    props: props ?? this.props,
+  );
+
+  Map<String, Object?> toJson() => {
+    'id': id,
+    'kind': kind,
+    'x': x,
+    'y': y,
+    'w': w,
+    'h': h,
+    if (label.isNotEmpty) 'label': label,
+    if (color case final c?) 'color': deckHex(c),
+    'action': ?action,
+    if (props.isNotEmpty) 'props': props,
+  };
+
   /// Kept inside the grid, whatever came.
   static DeckTile _parse(_Json j, int columns, int rows) {
     int n(String k) => (j[k] as num? ?? 0).toInt();
@@ -194,6 +284,10 @@ class DeckTile {
     );
   }
 }
+
+/// A colour as `#rrggbb`.
+String deckHex(Color c) =>
+    '#${(c.toARGB32() & 0xFFFFFF).toRadixString(16).padLeft(6, '0')}';
 
 /// `#rrggbb` as a colour; null for anything else.
 Color? deckColor(String? hex) {
