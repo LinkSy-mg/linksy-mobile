@@ -96,7 +96,7 @@ class _ConnectionDoctorState extends State<ConnectionDoctor>
         batteryFree: facts['batteryFree'] ?? true,
         powerSave: facts['powerSave'] ?? false,
         dataSaver: facts['dataSaver'] ?? false,
-        heard: c.devices.any((v) => v.connected || v.nearby),
+        heard: c.devices.any((v) => v.reachable),
       ),
     );
     return SettingsPage(

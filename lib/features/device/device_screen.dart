@@ -413,7 +413,7 @@ class _Hero extends StatelessWidget {
           children: [
             // Gray while it isn't around.
             TweenAnimationBuilder<double>(
-              tween: Tween(end: notNearby ? 1 : 0),
+              tween: Tween(end: view.reachable ? 0 : 1),
               duration: motion(context, 300),
               builder: (context, gray, child) => ColorFiltered(
                 colorFilter: ColorFilter.matrix(_gray(gray)),
@@ -647,7 +647,7 @@ class _Actions extends StatelessWidget {
                 onTap: () => c.connectUsb(id, key),
               ),
             ),
-          if (view.presence == Presence.notNearby)
+          if (!view.reachable)
             Padding(
               padding: const EdgeInsets.only(bottom: 10),
               child: SmallAction(

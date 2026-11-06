@@ -118,6 +118,10 @@ class DeviceView {
   /// A direct link (Wi-Fi Direct, §4.17) to it is up.
   final bool direct;
 
+  /// There to talk to: connected, nearby, or reachable away from home.
+  bool get reachable =>
+      connected || nearby || (awayUntil?.isAfter(DateTime.now()) ?? false);
+
   Presence get presence => connected
       ? Presence.connected
       : nearby

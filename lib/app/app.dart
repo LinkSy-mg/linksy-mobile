@@ -148,7 +148,7 @@ class _LinksyAppState extends State<LinksyApp> {
     final c = widget.controller;
     List<String> near() => [
       for (final v in c.paired)
-        if (v.presence != Presence.notNearby &&
+        if (v.reachable &&
             v.device.kind != DeviceKind.phone &&
             v.device.kind != DeviceKind.tablet)
           v.device.id,
