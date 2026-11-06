@@ -259,7 +259,7 @@ class LinksyController extends ChangeNotifier with WidgetsBindingObserver {
     _lastCopied = text;
     if (last == null || text.isEmpty || text == last) return;
     for (final v in devices) {
-      if (v.trusted && v.connected && _isComputer(v.device)) {
+      if (v.trusted && v.reachable && _isComputer(v.device)) {
         await sendText(v.device.id, text);
       }
     }
@@ -2682,9 +2682,51 @@ class LinksyController extends ChangeNotifier with WidgetsBindingObserver {
 
   final _laid = <String, DeckLayouts?>{};
 
-  /// The layouts [id] keeps for this phone's deck (§4.20): the last it
-  /// sent, kept on the phone; none until it sends some.
+  /// The deck as laid out on this phone, for [id]. It stays here, over what
+  /// the computer has, until the computer can take it (`deck_layout_save`).
+  final _laidHere = <String, DeckLayouts?>{};
+
+  File? _deckHereFile(String id) =>
+      _decks == null ? null : File('${_decks.path}/$id.here.json');
+
+  DeckLayouts? _deckHere(String id) {
+    if (_laidHere.containsKey(id)) return _laidHere[id];
+    String? saved;
+    try {
+      saved = _deckHereFile(id)?.readAsStringSync();
+    } on FileSystemException {
+      saved = null;
+    }
+    return _laidHere[id] = DeckLayouts.decode(saved);
+  }
+
+  /// Laid out here rather than as the computer sent it.
+  bool deckHasHere(String id) => _deckHere(id) != null;
+
+  Future<void> saveDeckHere(String id, DeckLayouts layouts) async {
+    _laidHere[id] = layouts;
+    notifyListeners();
+    final file = _deckHereFile(id);
+    if (file == null) return;
+    try {
+      await file.parent.create(recursive: true);
+      await file.writeAsString(jsonEncode(layouts.toJson()));
+    } on FileSystemException catch (e) {
+      log.add('Deck not kept: $e');
+    }
+  }
+
+  /// Back to what the computer has.
+  Future<void> dropDeckHere(String id) async {
+    _laidHere[id] = null;
+    notifyListeners();
+    await _deckHereFile(id)?.delete().catchError((Object _) => File(''));
+  }
+
+  /// The layouts to show for [id] (§4.20): the ones made here, else the last
+  /// it sent, kept on the phone; none until it sends some.
   DeckLayouts? deckLayouts(String id) {
+    if (_deckHere(id) case final here?) return here;
     if (_laid.containsKey(id)) return _laid[id];
     String? saved;
     try {
@@ -2725,6 +2767,8 @@ class LinksyController extends ChangeNotifier with WidgetsBindingObserver {
 
   Future<void> _forgetDeck(String id) async {
     _laid.remove(id);
+    _laidHere.remove(id);
+    await _deckHereFile(id)?.delete().catchError((Object _) => File(''));
     _phoneDecks.remove(id);
     await _deckFile(id)?.delete().catchError((Object _) => File(''));
     for (final key in [...prefs.keys]) {

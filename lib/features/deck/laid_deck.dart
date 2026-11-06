@@ -13,6 +13,7 @@ import '../../ui/format.dart';
 import '../../ui/l10n.dart';
 import '../../ui/sig.dart';
 import 'deck_art.dart';
+import 'deck_editor.dart';
 import 'deck_looks.dart';
 
 /// The deck as a computer laid it out (docs/protocol.md §4.20): its active
@@ -149,6 +150,7 @@ class _LaidDeckState extends State<LaidDeck> {
                     onTheme: layout == null
                         ? null
                         : () => _pickTheme(layout, own),
+                    onEdit: () => openDeckEditor(context, widget.device),
                   ),
                   Expanded(child: body),
                   _Dots(
@@ -198,6 +200,48 @@ class _LaidDeckState extends State<LaidDeck> {
   }
 }
 
+/// One tile as the deck draws it, for the editor: with nothing playing, and
+/// nothing to say.
+class DeckTileView extends StatelessWidget {
+  const DeckTileView({
+    super.key,
+    required this.tile,
+    required this.cell,
+    required this.gap,
+    required this.device,
+    required this.look,
+    required this.connected,
+    required this.actions,
+    required this.states,
+  });
+
+  final DeckTile tile;
+  final double cell;
+  final double gap;
+  final DeviceInfo device;
+  final DeckLook look;
+  final bool connected;
+  final Map<String, DeckAction>? actions;
+  final Map<String, DeckState> states;
+
+  @override
+  Widget build(BuildContext context) => _Tile(
+    tile: tile,
+    cell: cell,
+    gap: gap,
+    scope: _Scope(
+      deviceId: device.id,
+      deviceName: device.name,
+      look: look,
+      connected: connected,
+      actions: actions,
+      states: states,
+      player: null,
+      say: (_) {},
+    ),
+  );
+}
+
 /// What every tile of the deck needs to know besides itself.
 class _Scope {
   const _Scope({
@@ -236,8 +280,10 @@ class _Header extends StatelessWidget {
     required this.pages,
     required this.compact,
     required this.onTheme,
+    required this.onEdit,
   });
 
+  final VoidCallback onEdit;
   final DeckLook look;
   final String title;
   final String subtitle;
@@ -311,6 +357,15 @@ class _Header extends StatelessWidget {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [name, computer],
                     ),
+            ),
+          ),
+          Pressable(
+            onTap: onEdit,
+            semanticLabel: l.deckEdit,
+            child: SizedBox(
+              width: 40,
+              height: compact ? 36 : 44,
+              child: Icon(Ph.pencilSimple, color: look.screenInk, size: 20),
             ),
           ),
           if (!connected)
@@ -611,9 +666,11 @@ class _Tile extends StatelessWidget {
 
     final pen = _Pen(look, scale, paint.ink);
     final inner = cell * t.w + (t.w - 1) * gap - 2 * pad;
+    // A big tile, a big icon.
+    final grown = cell * 0.36 * (1 + (math.min(t.w, t.h) - 1) * 0.6);
     final iconSize = look.icons == DeckStroke.pixel
-        ? math.max(12.0, (cell * 0.36 / 12).roundToDouble() * 12)
-        : cell * 0.36;
+        ? math.max(12.0, (grown / 12).roundToDouble() * 12)
+        : grown;
     final Widget built;
     switch (t.kind) {
       case 'clock':
@@ -642,7 +699,7 @@ class _Tile extends StatelessWidget {
       case 'button':
         final playing = scope.player?.playing ?? false;
         final icon = DeckIcon(
-          deckIconName(action, playing: playing),
+          t.props['icon'] ?? deckIconName(action, playing: playing),
           size: iconSize,
           color: paint.icon,
           stroke: look.icons,

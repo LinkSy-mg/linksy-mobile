@@ -11,6 +11,7 @@ import '../../core/models.dart';
 import '../../ui/components.dart';
 import '../../ui/l10n.dart';
 import '../../ui/sig.dart';
+import 'deck_editor.dart';
 import 'laid_deck.dart';
 
 /// The deck (docs/protocol.md §4.19): this phone as buttons for a computer.
@@ -32,7 +33,7 @@ class _DeckScreenState extends State<DeckScreen> with WidgetsBindingObserver {
   late final LinksyController _c;
   final _pages = PageController();
   int _page = 0;
-  bool _editing = false;
+  final bool _editing = false;
   bool _open = false;
   bool _connected = false;
 
@@ -306,7 +307,7 @@ class _DeckScreenState extends State<DeckScreen> with WidgetsBindingObserver {
                       fill: _editing
                           ? Sig.blue
                           : Sig.blue.withValues(alpha: 0.1),
-                      onTap: () => setState(() => _editing = !_editing),
+                      onTap: () => openDeckEditor(context, widget.device),
                     ),
                 ],
               ),

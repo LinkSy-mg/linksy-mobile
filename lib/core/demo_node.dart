@@ -560,6 +560,7 @@ class DemoNode implements LinksyNode {
   Future<void> deckOpen(String id, {required bool open}) async {
     final from = _devices[id]?.device;
     if (!open || from == null) return;
+    _setConnected(id, true);
     _emit(DeckActionsReceived(from: from, actions: _deck));
     _emit(DeckStateReceived(from: from, states: _deckState.values.toList()));
   }

@@ -14,6 +14,13 @@ abstract final class Ph {
   );
   static const bellRinging = IconData(0xe5e8, fontFamily: 'PhosphorRegular');
   static const camera = IconData(0xe10e, fontFamily: 'PhosphorRegular');
+  static const arrowCounterClockwise = IconData(
+    0xe038,
+    fontFamily: 'PhosphorRegular',
+  );
+  static const deviceRotate = IconData(0xe1da, fontFamily: 'PhosphorRegular');
+  static const palette = IconData(0xe6c8, fontFamily: 'PhosphorRegular');
+  static const stack = IconData(0xe466, fontFamily: 'PhosphorRegular');
   static const cameraSlash = IconData(0xe110, fontFamily: 'PhosphorRegular');
   static const caretRight = IconData(0xe13a, fontFamily: 'PhosphorRegular');
   static const caretDown = IconData(0xe136, fontFamily: 'PhosphorRegular');
@@ -141,6 +148,7 @@ abstract final class PhBold {
   static const arrowRight = IconData(0xe06c, fontFamily: 'PhosphorBold');
   static const arrowUpRight = IconData(0xe092, fontFamily: 'PhosphorBold');
   static const check = IconData(0xe182, fontFamily: 'PhosphorBold');
+  static const minus = IconData(0xe32a, fontFamily: 'PhosphorBold');
   static const downloadSimple = IconData(0xe20c, fontFamily: 'PhosphorBold');
   static const plus = IconData(0xe3d4, fontFamily: 'PhosphorBold');
   static const qrCode = IconData(0xe3e6, fontFamily: 'PhosphorBold');
