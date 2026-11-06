@@ -66,6 +66,9 @@ class MainActivity : FlutterActivity() {
         networks = NetworkWatcher(this) { channel?.invokeMethod("networkChanged", null) }.apply { start() }
         pendingLink = linkFrom(intent)
         pendingTurnOn = turnOnFrom(intent)
+        app.linksy.media.ShareService.rotationListener = { session, degrees ->
+            runOnUiThread { channel?.invokeMethod("screenRotation", mapOf("session" to session, "degrees" to degrees)) }
+        }
         takeShared(intent)
         watchBattery()
         Logs.sink = { line -> runOnUiThread { channel?.invokeMethod("log", line) } }
@@ -374,6 +377,54 @@ class MainActivity : FlutterActivity() {
                         Thread {
                             val bytes = PhoneMedia.thumb(applicationContext, id, video, 256)
                             runOnUiThread { result.success(bytes) }
+                        }.start()
+                    }
+                    "controlsRead" -> result.success(controls().read())
+                    "controlsSet" -> result.success(controls().apply(call.arguments as Map<*, *>))
+                    "controlsWatch" -> {
+                        controls().watch(call.arguments as Boolean)
+                        result.success(null)
+                    }
+                    "dndAccess" -> result.success(controls().dndAccess)
+                    "openDndAccess" -> {
+                        runCatching { startActivity(Intent(android.provider.Settings.ACTION_NOTIFICATION_POLICY_ACCESS_SETTINGS)) }
+                        result.success(null)
+                    }
+                    "computerNotice" -> {
+                        ComputerNotices.post(
+                            this@MainActivity,
+                            call.argument<String>("computer")!!,
+                            call.argument<String>("key")!!,
+                            call.argument<String>("app") ?: "",
+                            call.argument<String>("title") ?: "",
+                            call.argument<String>("body") ?: "",
+                            (call.argument<Number>("at"))?.toLong() ?: 0L,
+                        )
+                        result.success(null)
+                    }
+                    "snapNotice" -> {
+                        val open = android.app.PendingIntent.getActivity(
+                            this@MainActivity,
+                            1,
+                            Intent(this@MainActivity, SnapActivity::class.java)
+                                .putExtra(ShareTarget.EXTRA_DEVICE, call.argument<String>("device"))
+                                .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK),
+                            android.app.PendingIntent.FLAG_IMMUTABLE or android.app.PendingIntent.FLAG_UPDATE_CURRENT,
+                        )
+                        ArrivedNotice.post(this@MainActivity, "snap", call.argument<String>("title")!!, "", emptyMap(), open)
+                        result.success(null)
+                    }
+                    "shrinkPicture" -> {
+                        val from = call.arguments as String
+                        Thread {
+                            val path = runCatching {
+                                val options = android.graphics.BitmapFactory.Options().apply { inSampleSize = 2 }
+                                val picture = android.graphics.BitmapFactory.decodeFile(from, options)!!
+                                val to = java.io.File(cacheDir, "snap-clipboard.jpg")
+                                to.outputStream().use { picture.compress(android.graphics.Bitmap.CompressFormat.JPEG, 85, it) }
+                                to.path
+                            }.getOrNull()
+                            runOnUiThread { result.success(path) }
                         }.start()
                     }
                     "snap" -> {
@@ -849,6 +900,12 @@ class MainActivity : FlutterActivity() {
         @Suppress("DEPRECATION")
         startActivityForResult(intent, REQUEST_FOLDER)
     }
+
+    private var controlsHere: Controls? = null
+
+    private fun controls() = controlsHere ?: Controls(this) {
+        channel?.invokeMethod("controlsChanged", null)
+    }.also { controlsHere = it }
 
     /// The display's fastest mode at its size while a screen is shown, so
     /// frames aren't held back by a panel left at 60 Hz or lower.

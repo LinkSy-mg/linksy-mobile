@@ -14,7 +14,7 @@ import android.os.Build
 object ArrivedNotice {
     private const val CHANNEL = "arrived"
 
-    fun post(context: Context, id: String, title: String, body: String, extras: Map<String, String> = emptyMap()) {
+    fun post(context: Context, id: String, title: String, body: String, extras: Map<String, String> = emptyMap(), action: PendingIntent? = null) {
         val manager = context.getSystemService(NotificationManager::class.java)
         if (Build.VERSION.SDK_INT >= 26) {
             manager.createNotificationChannel(
@@ -34,7 +34,7 @@ object ArrivedNotice {
             .setContentTitle(title)
             .setContentText(body)
             .setStyle(Notification.BigTextStyle().bigText(body))
-            .setContentIntent(open)
+            .setContentIntent(action ?: open)
             .setAutoCancel(true)
             .build()
         runCatching { manager.notify(id.hashCode(), note) }

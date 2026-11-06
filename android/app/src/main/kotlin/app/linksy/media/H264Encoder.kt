@@ -22,6 +22,8 @@ class H264Encoder(
     fps: Int,
     private val label: String,
     private val session: String,
+    /// A screen at 60 fps (docs/protocol.md §4.8): a steady rate and a keyframe a second.
+    private val fast: Boolean = false,
     private val onEnded: () -> Unit,
 ) {
     private val codec: MediaCodec
@@ -84,7 +86,11 @@ class H264Encoder(
             setInteger(MediaFormat.KEY_COLOR_FORMAT, CodecCapabilities.COLOR_FormatSurface)
             setInteger(MediaFormat.KEY_BIT_RATE, bitrate)
             setInteger(MediaFormat.KEY_FRAME_RATE, fps)
-            setInteger(MediaFormat.KEY_I_FRAME_INTERVAL, 2)
+            setInteger(MediaFormat.KEY_I_FRAME_INTERVAL, if (fast) 1 else 2)
+            if (fast) {
+                setInteger(MediaFormat.KEY_BITRATE_MODE, android.media.MediaCodecInfo.EncoderCapabilities.BITRATE_MODE_CBR)
+                setInteger(MediaFormat.KEY_OPERATING_RATE, fps)
+            }
             setInteger(MediaFormat.KEY_PROFILE, profile)
             // A still screen produces no frames; repeat the last one so the
             // viewer keeps getting pictures (and keyframes).

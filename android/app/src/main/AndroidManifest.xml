@@ -20,6 +20,8 @@
         android:usesPermissionFlags="neverForLocation"/>
     <!-- Scanning the desktop's pairing QR code. -->
     <uses-permission android:name="android.permission.CAMERA"/>
+    <!-- A computer changing Do Not Disturb, once the user allows it in Android's settings. -->
+    <uses-permission android:name="android.permission.ACCESS_NOTIFICATION_POLICY"/>
     <uses-feature android:name="android.hardware.camera" android:required="false"/>
     <!-- Sharing the screen or camera with a desktop keeps going in other apps. -->
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE"/>

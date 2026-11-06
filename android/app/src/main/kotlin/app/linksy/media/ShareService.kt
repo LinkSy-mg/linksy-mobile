@@ -45,9 +45,10 @@ class ShareService : Service() {
         active[session] = mapOf("session" to session, "kind" to kind, "peer" to (intent.getStringExtra(EXTRA_PEER_ID) ?: ""))
         val screen = kind == "screen" || kind == "control"
         val mic = kind == "microphone"
+        val sound = kind == "sound"
         peers[session] = peer
         val text = when {
-            screen -> screenText(peer)
+            screen || sound -> screenText(peer)
             mic -> Lang.str(this, R.string.using_microphone, peer)
             else -> Lang.str(this, R.string.using_camera, peer)
         }
@@ -67,6 +68,11 @@ class ShareService : Service() {
                     ScreenShare(this, projection, session, onEnded)
                 }
                 mic -> MicShare(session, onEnded)
+                sound -> {
+                    val screenShare = shares.values.filterIsInstance<ScreenShare>().firstOrNull() ?: error("no screen to take the sound from")
+                    if (Build.VERSION.SDK_INT < 29) error("needs Android 10")
+                    SoundShare(screenShare.projection, session, onEnded)
+                }
                 else -> CameraShare(this, session, onEnded).also { camera ->
                     webcams[session] = camera
                     camera.onState = { state ->
@@ -92,7 +98,7 @@ class ShareService : Service() {
         var type = 0
         for (k in kinds.values) {
             type = type or when (k) {
-                "screen", "control" -> ServiceInfo.FOREGROUND_SERVICE_TYPE_MEDIA_PROJECTION
+                "screen", "control", "sound" -> ServiceInfo.FOREGROUND_SERVICE_TYPE_MEDIA_PROJECTION
                 "microphone" -> if (Build.VERSION.SDK_INT >= 30) ServiceInfo.FOREGROUND_SERVICE_TYPE_MICROPHONE else 0
                 else -> if (Build.VERSION.SDK_INT >= 30) ServiceInfo.FOREGROUND_SERVICE_TYPE_CAMERA else 0
             }
@@ -239,6 +245,13 @@ class ShareService : Service() {
     }
 
     companion object {
+        /// Set by the app: (session, degrees) when the display turns.
+        @Volatile var rotationListener: ((String, Int) -> Unit)? = null
+
+        fun tellRotation(session: String, degrees: Int) {
+            rotationListener?.invoke(session, degrees)
+        }
+
         private const val CHANNEL = "sharing"
         private const val NOTIFICATION = 7
         private const val ACTION_START = "app.linksy.START_SHARE"

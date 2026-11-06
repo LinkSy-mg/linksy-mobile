@@ -21,7 +21,7 @@ import kotlin.math.roundToInt
 /// encoder at the new shape; the new stream opens with SPS/PPS and a keyframe.
 class ScreenShare(
     private val context: Context,
-    private val projection: MediaProjection,
+    val projection: MediaProjection,
     private val session: String,
     private val onEnded: () -> Unit,
 ) : Share {
@@ -36,6 +36,7 @@ class ScreenShare(
     private val rotation = object : DisplayManager.DisplayListener {
         override fun onDisplayChanged(id: Int) {
             if (id != Display.DEFAULT_DISPLAY || stopped) return
+            ShareService.tellRotation(session, degrees())
             val next = fit(screen(), caps)
             if (next != size) restart(next)
         }
@@ -60,10 +61,19 @@ class ScreenShare(
             DisplayManager.VIRTUAL_DISPLAY_FLAG_AUTO_MIRROR, encoder.inputSurface, null, null,
         ) ?: error("screen capture gave no display")
         displays.registerDisplayListener(rotation, main)
+        ShareService.tellRotation(session, degrees())
     }
 
     private fun encoder(size: Pair<Int, Int>) =
-        H264Encoder(size.first, size.second, bitrate = 6_000_000, fps = 30, label = "Screen", session = session, onEnded = onEnded)
+        if (sixty(size)) {
+            H264Encoder(size.first, size.second, bitrate = 14_000_000, fps = 60, label = "Screen", session = session, fast = true, onEnded = onEnded)
+        } else {
+            H264Encoder(size.first, size.second, bitrate = 6_000_000, fps = 30, label = "Screen", session = session, onEnded = onEnded)
+        }
+
+    /// This phone's encoder can do 60 at this size.
+    private fun sixty(size: Pair<Int, Int>) =
+        runCatching { caps?.areSizeAndRateSupported(size.first, size.second, 60.0) == true }.getOrDefault(false)
 
     /// The old encoder stops before the new one starts, so the stream never
     /// mixes frames from the two.
@@ -82,6 +92,12 @@ class ScreenShare(
         display.release()
         encoder.stop()
         projection.stop()
+    }
+
+    /// How far the display is turned from the phone's natural way up.
+    private fun degrees(): Int {
+        @Suppress("DEPRECATION")
+        return (context.getSystemService(Context.WINDOW_SERVICE) as WindowManager).defaultDisplay.rotation * 90
     }
 
     private fun metrics() = DisplayMetrics().also {

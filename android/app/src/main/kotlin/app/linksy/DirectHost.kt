@@ -148,22 +148,33 @@ object DirectHost {
     private fun makeGroup(context: Context, manager: WifiP2pManager, channel: WifiP2pManager.Channel, id: String, group: Group) {
         this.group = group
         val wifi = context.getSystemService(Context.WIFI_SERVICE) as WifiManager
-        val config = WifiP2pConfig.Builder()
+        fun config(frequency: Int?) = WifiP2pConfig.Builder()
             .setNetworkName(group.ssid)
             .setPassphrase(group.passphrase)
-            .setGroupOperatingBand(
-                if (wifi.is5GHzBandSupported) WifiP2pConfig.GROUP_OWNER_BAND_5GHZ else WifiP2pConfig.GROUP_OWNER_BAND_AUTO,
-            )
+            .apply {
+                // A band or a frequency, never both
+                if (frequency != null) {
+                    setGroupOperatingFrequency(frequency)
+                } else {
+                    setGroupOperatingBand(
+                        if (wifi.is5GHzBandSupported) WifiP2pConfig.GROUP_OWNER_BAND_5GHZ else WifiP2pConfig.GROUP_OWNER_BAND_AUTO,
+                    )
+                }
+            }
             .enablePersistentMode(false)
             .build()
-        val create = {
-            if (device == id) {
-                manager.createGroup(channel, config, object : WifiP2pManager.ActionListener {
-                    override fun onSuccess() = checkGroup()
-                    override fun onFailure(reason: Int) = fail("couldn't make the group (${why(reason)})")
-                })
-            }
+        // On the channel the computer's Wi-Fi is on, so its one chip doesn't hop between two.
+        // A channel this phone may not host on (a DFS one): the band instead.
+        fun make(frequency: Int?) {
+            if (device != id) return
+            manager.createGroup(channel, config(frequency), object : WifiP2pManager.ActionListener {
+                override fun onSuccess() = checkGroup()
+                override fun onFailure(reason: Int) {
+                    if (frequency != null) make(null) else fail("couldn't make the group (${why(reason)})")
+                }
+            })
         }
+        val create = { make(group.frequency) }
         // Anything left over from before goes first, then the group
         manager.removeGroup(channel, object : WifiP2pManager.ActionListener {
             override fun onSuccess() = create()
