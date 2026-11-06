@@ -295,6 +295,30 @@ class RustNode implements LinksyNode {
   );
 
   @override
+  Future<void> sendControlsState(String id, String stateJson) => _guard(
+    () => _node.sendControlsState(id: id, stateJson: stateJson),
+    name: _nameOf(id),
+  );
+
+  @override
+  Future<void> refuseControls(String id, String what, String reason) => _guard(
+    () => _node.refuseControls(id: id, what: what, reason: reason),
+    name: _nameOf(id),
+  );
+
+  @override
+  Future<void> refuseSnap(String id, String reason) => _guard(
+    () => _node.refuseSnap(id: id, reason: reason),
+    name: _nameOf(id),
+  );
+
+  @override
+  Future<void> sendScreenRotation(String id, int degrees) => _guard(
+    () => _node.sendScreenRotation(id: id, degrees: degrees),
+    name: _nameOf(id),
+  );
+
+  @override
   Future<void> usbConnect(String id, String key) => _guard(
     () => _node.usbConnect(id: id, key: key),
     name: _nameOf(id),

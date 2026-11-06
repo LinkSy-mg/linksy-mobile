@@ -429,7 +429,32 @@ class DemoNode implements LinksyNode {
   Future<bool> sessionWrite(String session, Uint8List bytes) async => true;
 
   @override
-  Future<void> watchMedia(String id, {required bool on}) async {}
+  Future<void> watchMedia(String id, {required bool on}) async {
+    final from = _devices[id]?.device;
+    if (!on || from == null) return;
+    _emit(
+      MediaStateReceived(
+        from: from,
+        state: const MediaState(
+          seq: 1,
+          players: [
+            MediaPlayer(
+              id: 'demo',
+              app: 'Music',
+              title: 'Night Drive',
+              artist: 'Nova Lane',
+              playing: true,
+              positionMs: 86000,
+              lengthMs: 214000,
+              canNext: true,
+              canPrevious: true,
+              canSeek: true,
+            ),
+          ],
+        ),
+      ),
+    );
+  }
 
   @override
   Future<void> watchVolume(String id, {required bool on}) async {}
@@ -626,6 +651,18 @@ class DemoNode implements LinksyNode {
 
   @override
   Future<void> usbConnect(String id, String key) async {}
+
+  @override
+  Future<void> sendControlsState(String id, String stateJson) async {}
+
+  @override
+  Future<void> refuseControls(String id, String what, String reason) async {}
+
+  @override
+  Future<void> refuseSnap(String id, String reason) async {}
+
+  @override
+  Future<void> sendScreenRotation(String id, int degrees) async {}
 
   @override
   Future<String> sendClipboardFile(String id, String path) =>

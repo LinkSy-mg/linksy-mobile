@@ -432,7 +432,11 @@ enum SessionKind {
   input,
 
   /// The receiver shares its microphone: raw 48 kHz mono PCM.
-  microphone;
+  microphone,
+
+  /// The receiver shares what its apps play, with its screen: raw 48 kHz
+  /// stereo PCM.
+  sound;
 
   static SessionKind? parse(String value) =>
       SessionKind.values.where((k) => k.name == value).firstOrNull;
@@ -730,6 +734,44 @@ class NotificationDismissRequested extends LinksyEvent {
 /// A computer asks where this phone is, once (§4.14).
 /// A computer asks to turn on what its tab needs here: `notifications` (its
 /// Inbox) or `gallery` (its Gallery).
+/// A computer wants this phone's `controls_state` while connected (§4.24).
+class ControlsWatchRequested extends LinksyEvent {
+  const ControlsWatchRequested({required this.from, required this.on});
+  final DeviceInfo from;
+  final bool on;
+}
+
+/// A computer changes some of this phone's controls: only what's in [change].
+class ControlsSetRequested extends LinksyEvent {
+  const ControlsSetRequested({required this.from, required this.change});
+  final DeviceInfo from;
+  final Map<String, Object?> change;
+}
+
+/// A computer's own notification, to show here (§4.25).
+class ComputerNotificationReceived extends LinksyEvent {
+  const ComputerNotificationReceived({
+    required this.from,
+    required this.key,
+    required this.app,
+    required this.title,
+    required this.body,
+    required this.atMs,
+  });
+  final DeviceInfo from;
+  final String key;
+  final String app;
+  final String title;
+  final String body;
+  final int atMs;
+}
+
+/// A computer asks this phone to open its camera (§4.23).
+class SnapRequested extends LinksyEvent {
+  const SnapRequested(this.from);
+  final DeviceInfo from;
+}
+
 /// A phone plugged into a computer by USB (§4.11).
 class PluggedPhone {
   const PluggedPhone({

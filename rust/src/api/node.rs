@@ -302,6 +302,35 @@ impl LinksyNode {
         run(async move { node.usb_connect(&id, &key).await }).await
     }
 
+    /// This phone's controls, to a computer watching them (§4.24).
+    pub async fn send_controls_state(&self, id: String, state_json: String) -> Result<(), String> {
+        let id = fingerprint(&id)?;
+        let state: linksy_core::ControlsState = serde_json::from_str(&state_json).map_err(|e| format!("{e}"))?;
+        let node = self.node.clone();
+        run(async move { node.send_controls_state(&id, &state).await }).await
+    }
+
+    /// One control that wasn't changed, and why (§4.24).
+    pub async fn refuse_controls(&self, id: String, what: String, reason: String) -> Result<(), String> {
+        let id = fingerprint(&id)?;
+        let node = self.node.clone();
+        run(async move { node.refuse_controls(&id, &what, &reason).await }).await
+    }
+
+    /// A `snap_request` this phone can't answer (§4.23).
+    pub async fn refuse_snap(&self, id: String, reason: String) -> Result<(), String> {
+        let id = fingerprint(&id)?;
+        let node = self.node.clone();
+        run(async move { node.refuse_snap(&id, &reason).await }).await
+    }
+
+    /// How the display is turned, for a computer driving it by cable (§4.11).
+    pub async fn send_screen_rotation(&self, id: String, degrees: u16) -> Result<(), String> {
+        let id = fingerprint(&id)?;
+        let node = self.node.clone();
+        run(async move { node.send_screen_rotation(&id, degrees).await }).await
+    }
+
     /// "Find my computer": makes it ring (`on`), or stops it.
     pub async fn ring(&self, id: String, on: bool) -> Result<(), String> {
         let id = fingerprint(&id)?;

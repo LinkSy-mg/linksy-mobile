@@ -41,6 +41,18 @@ abstract interface class LinksyNode {
   /// it isn't connected.
   SendPlan? planSend(String id, int bytes);
 
+  /// This phone's controls as JSON, to computer [id] (§4.24).
+  Future<void> sendControlsState(String id, String stateJson);
+
+  /// One control that wasn't changed, and why.
+  Future<void> refuseControls(String id, String what, String reason);
+
+  /// A `snap_request` this phone can't answer (§4.23).
+  Future<void> refuseSnap(String id, String reason);
+
+  /// How the display is turned, for computer [id] driving it (§4.11).
+  Future<void> sendScreenRotation(String id, int degrees);
+
   /// Asks computer [id] to use the cable for plugged-in phone [key] (§4.11).
   Future<void> usbConnect(String id, String key);
 

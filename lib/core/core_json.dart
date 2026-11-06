@@ -237,6 +237,23 @@ LinksyEvent? eventFromJson(Json j) {
       image: j['image'] as String? ?? '',
     ),
     'locate_request' => LocateRequested(device('from')),
+    'controls_watch' => ControlsWatchRequested(
+      from: device('from'),
+      on: j['on'] as bool? ?? false,
+    ),
+    'controls_set' => ControlsSetRequested(
+      from: device('from'),
+      change: (j['change'] as Map?)?.cast<String, Object?>() ?? const {},
+    ),
+    'computer_notification' => ComputerNotificationReceived(
+      from: device('from'),
+      key: j['key'] as String? ?? '',
+      app: j['app'] as String? ?? '',
+      title: j['title'] as String? ?? '',
+      body: j['body'] as String? ?? '',
+      atMs: (j['at_ms'] as num?)?.toInt() ?? 0,
+    ),
+    'snap_request' => SnapRequested(device('from')),
     'usb_plugged' => UsbPlugged(
       from: device('from'),
       phones: [

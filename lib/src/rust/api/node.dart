@@ -186,8 +186,18 @@ abstract class LinksyNode implements RustOpaqueInterface {
   /// route ready (§4.22). Sends nothing and does nothing twice.
   Future<String?> prepareSend({required String id, required BigInt bytes});
 
+  /// One control that wasn't changed, and why (§4.24).
+  Future<void> refuseControls({
+    required String id,
+    required String what,
+    required String reason,
+  });
+
   /// Answers `locate` with why not.
   Future<void> refuseLocation({required String id, required String reason});
+
+  /// A `snap_request` this phone can't answer (§4.23).
+  Future<void> refuseSnap({required String id, required String reason});
 
   /// The notification `key` went away on this phone; with `reply_kept`, its
   /// conversation can still be answered (§4.5).
@@ -240,6 +250,12 @@ abstract class LinksyNode implements RustOpaqueInterface {
   /// Puts a file (≤ 10 MiB) on a computer's clipboard; returns the transfer id.
   Future<String> sendClipboardFile({required String id, required String path});
 
+  /// This phone's controls, to a computer watching them (§4.24).
+  Future<void> sendControlsState({
+    required String id,
+    required String stateJson,
+  });
+
   /// Returns the transfer id.
   Future<String> sendFiles({required String id, required List<String> paths});
 
@@ -254,6 +270,9 @@ abstract class LinksyNode implements RustOpaqueInterface {
 
   /// This phone's own picture (base64 JPEG/PNG ≤ 128 KiB) to a computer.
   Future<void> sendPicture({required String id, required String image});
+
+  /// How the display is turned, for a computer driving it by cable (§4.11).
+  Future<void> sendScreenRotation({required String id, required int degrees});
 
   /// Writes to a session (framed input messages). False once it has ended.
   Future<bool> sessionWrite({
