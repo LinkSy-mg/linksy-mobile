@@ -6,7 +6,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
 import '../deck/deck_screen.dart';
-import '../../app/activity.dart';
 import '../../app/linksy_controller.dart';
 import '../../app/platform.dart';
 import '../../app/scope.dart';
@@ -16,14 +15,14 @@ import '../../ui/format.dart';
 import '../../ui/l10n.dart';
 import '../../ui/sig.dart';
 import '../phones/phone_page.dart';
+import '../phones/shelves.dart';
+import '../phones/thread.dart';
 import '../remote/remote_screen.dart';
 import '../settings/doctor.dart';
-import '../settings/settings_kit.dart';
 import '../sharing/sharing.dart';
 import '../sharing/webcam_screen.dart';
 import '../terminal/terminal_screen.dart';
 import '../../app/terminals.dart';
-import 'activity_tile.dart';
 import 'device_settings.dart';
 import '../transfer/transfer_bubble.dart';
 
@@ -89,8 +88,8 @@ class DeviceScreen extends StatefulWidget {
 class _DeviceScreenState extends State<DeviceScreen> {
   late final LinksyController _c;
 
-  /// The timeline's filter: null for everything.
-  ActivityKind? _filter;
+  /// The player opened up, to its bar and the volume.
+  bool _mediaOpen = false;
 
   /// The page's scroll, for the bar that keeps back and settings in reach.
   final _scroll = ScrollController();
@@ -150,11 +149,8 @@ class _DeviceScreenState extends State<DeviceScreen> {
     scheduleMicrotask(() {
       if (mounted) _volumeSteps(front && volume != null);
     });
-    final all = c.activityFor(deviceId);
-    final days = _byDay([
-      for (final a in all)
-        if (_filter == null || a.kind == _filter) a,
-    ]);
+    final recent = c.activityFor(deviceId).take(8).toList();
+    final players = c.media[deviceId]?.players ?? const <MediaPlayer>[];
 
     return AnnotatedRegion<SystemUiOverlayStyle>(
       value: overlayFor(Brightness.dark),
@@ -164,18 +160,6 @@ class _DeviceScreenState extends State<DeviceScreen> {
             CustomScrollView(
               controller: _scroll,
               slivers: [
-                SliverAppBar(
-                  pinned: true,
-                  toolbarHeight: 0,
-                  collapsedHeight: 0,
-                  systemOverlayStyle: overlayFor(Brightness.dark),
-                  // The banner's top under its shadow, so the two meet without
-                  // a seam.
-                  backgroundColor: Color.alphaBlend(
-                    const Color(0x590A1024),
-                    Sig.deep,
-                  ),
-                ),
                 // One box, so the actions paint over the hero they overlap.
                 // Top to bottom: what to do now, what's going on now, ways
                 // to control it, what this phone does for it. Its settings
@@ -220,20 +204,22 @@ class _DeviceScreenState extends State<DeviceScreen> {
                                       crossAxisAlignment:
                                           CrossAxisAlignment.stretch,
                                       children: [
-                                        if (c.media[deviceId]?.players
-                                            case final players?
-                                            when players.isNotEmpty)
-                                          for (final p in players)
-                                            Padding(
-                                              padding: const EdgeInsets.only(
-                                                top: 10,
-                                              ),
-                                              child: _NowPlaying(
-                                                deviceId: deviceId,
-                                                player: p,
+                                        for (final p in players)
+                                          Padding(
+                                            padding: const EdgeInsets.only(
+                                              top: 12,
+                                            ),
+                                            child: _NowPlaying(
+                                              deviceId: deviceId,
+                                              player: p,
+                                              open: _mediaOpen,
+                                              onToggle: () => setState(
+                                                () => _mediaOpen = !_mediaOpen,
                                               ),
                                             ),
-                                        if (volume != null)
+                                          ),
+                                        if (volume != null &&
+                                            (_mediaOpen || players.isEmpty))
                                           Padding(
                                             padding: const EdgeInsets.only(
                                               top: 10,
@@ -252,44 +238,25 @@ class _DeviceScreenState extends State<DeviceScreen> {
                                 ],
                               ),
                             ),
+                            if (recent.isEmpty)
+                              _NoActivity(name: view.device.name)
+                            else ...[
+                              ShelfTitle(
+                                context.l10n.phoneHistory,
+                                onSeeAll: () =>
+                                    openThread(context, view.device),
+                              ),
+                              HistoryThread(
+                                entries: recent,
+                                device: view.device,
+                              ),
+                            ],
                           ],
                         ),
                       ),
                     ],
                   ),
                 ),
-                if (all.isNotEmpty)
-                  SliverToBoxAdapter(
-                    child: _Filters(
-                      selected: _filter,
-                      onSelected: (k) => setState(() => _filter = k),
-                    ),
-                  ),
-                if (all.isEmpty)
-                  SliverToBoxAdapter(child: _NoActivity(name: view.device.name))
-                else if (days.isEmpty)
-                  SliverToBoxAdapter(
-                    child: Padding(
-                      padding: const EdgeInsets.fromLTRB(24, 20, 24, 0),
-                      child: Text(
-                        context.l10n.deviceNothingOfKind,
-                        textAlign: TextAlign.center,
-                        style: TextStyle(color: Sig.of(context).muted),
-                      ),
-                    ),
-                  )
-                else
-                  for (final (day, entries) in days) ...[
-                    SliverToBoxAdapter(child: SectionLabel(day)),
-                    SliverList.builder(
-                      itemCount: entries.length,
-                      itemBuilder: (context, i) => TimelineEntry(
-                        activity: entries[i],
-                        first: i == 0,
-                        last: i == entries.length - 1,
-                      ),
-                    ),
-                  ],
                 SliverToBoxAdapter(
                   child: SizedBox(
                     height:
@@ -313,16 +280,6 @@ class _DeviceScreenState extends State<DeviceScreen> {
 
   static bool _isComputer(DeviceInfo d) =>
       d.kind == DeviceKind.desktop || d.kind == DeviceKind.laptop;
-
-  static List<(String, List<Activity>)> _byDay(List<Activity> entries) {
-    final days = <(String, List<Activity>)>[];
-    for (final a in entries) {
-      final day = formatDay(a.time);
-      if (days.isEmpty || days.last.$1 != day) days.add((day, []));
-      days.last.$2.add(a);
-    }
-    return days;
-  }
 }
 
 class _Hero extends StatelessWidget {
@@ -333,6 +290,18 @@ class _Hero extends StatelessWidget {
   /// Tall enough for the name and its lines, plus the 64 px the action card
   /// overlaps at the bottom.
   static const height = 330.0;
+
+  /// A color matrix taking colors [t] of the way to gray.
+  static List<double> _gray(double t) {
+    final k = 1 - t;
+    double r(double own, double luma) => luma * t + own * k;
+    return [
+      r(1, .2126), r(0, .7152), r(0, .0722), 0, 0, //
+      r(0, .2126), r(1, .7152), r(0, .0722), 0, 0, //
+      r(0, .2126), r(0, .7152), r(1, .0722), 0, 0, //
+      0, 0, 0, 1, 0, //
+    ];
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -438,19 +407,27 @@ class _Hero extends StatelessWidget {
     return ClipRRect(
       borderRadius: const BorderRadius.vertical(bottom: Radius.circular(36)),
       child: SizedBox(
-        height: height,
+        height: height + MediaQuery.paddingOf(context).top,
         child: Stack(
           fit: StackFit.expand,
           children: [
-            if (picture != null)
-              Image.file(
-                File(picture),
-                key: ValueKey(c.pictureVersion),
-                fit: BoxFit.cover,
-                gaplessPlayback: true,
-              )
-            else
-              const GridBanner(),
+            // Gray while it isn't around.
+            TweenAnimationBuilder<double>(
+              tween: Tween(end: notNearby ? 1 : 0),
+              duration: motion(context, 300),
+              builder: (context, gray, child) => ColorFiltered(
+                colorFilter: ColorFilter.matrix(_gray(gray)),
+                child: child,
+              ),
+              child: picture != null
+                  ? Image.file(
+                      File(picture),
+                      key: ValueKey(c.pictureVersion),
+                      fit: BoxFit.cover,
+                      gaplessPlayback: true,
+                    )
+                  : const GridBanner(),
+            ),
             const HeroFade(),
             // Back and settings are on [_Bar], over this.
             Positioned(
@@ -474,14 +451,10 @@ class _Bar extends StatelessWidget {
   final DeviceView view;
   final ScrollController scroll;
 
-  /// The pinned status bar's, so the two read as one.
-  static final _color = Color.alphaBlend(const Color(0x590A1024), Sig.deep);
-
   @override
   Widget build(BuildContext context) {
+    final s = Sig.of(context);
     final top = MediaQuery.paddingOf(context).top;
-    Widget button(IconData icon, String tip, VoidCallback onTap) =>
-        RoundButton(icon: icon, tooltip: tip, onDark: true, onTap: onTap);
     return Positioned(
       left: 0,
       right: 0,
@@ -490,46 +463,65 @@ class _Bar extends StatelessWidget {
         animation: scroll,
         builder: (context, _) {
           final offset = scroll.hasClients ? scroll.offset : 0.0;
-          // In as the name goes under it.
-          final p = ((offset - 110) / 50).clamp(0.0, 1.0);
-          return Container(
-            color: _color.withValues(alpha: p),
-            padding: EdgeInsets.fromLTRB(16, top + 8, 16, 8),
-            child: Row(
-              children: [
-                button(
-                  Ph.arrowLeft,
-                  context.l10n.deviceBack,
-                  () => Navigator.of(context).maybePop(),
+          // In as the name goes under it, in the page's own color.
+          return TweenAnimationBuilder<double>(
+            tween: Tween(end: offset > 190 ? 1 : 0),
+            duration: motion(context, 160),
+            builder: (context, p, _) {
+              final past = p > 0.5;
+              Widget button(IconData icon, String tip, VoidCallback onTap) =>
+                  RoundButton(
+                    icon: icon,
+                    tooltip: tip,
+                    onDark: !past,
+                    onTap: onTap,
+                  );
+              return AnnotatedRegion<SystemUiOverlayStyle>(
+                value: overlayFor(
+                  past ? Theme.of(context).brightness : Brightness.dark,
                 ),
-                const SizedBox(width: 12),
-                Expanded(
-                  child: Opacity(
-                    opacity: p,
-                    child: Text(
-                      view.device.name,
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                      style: sora(
-                        17,
-                        weight: FontWeight.w700,
-                        color: Colors.white,
+                child: Container(
+                  color: s.bg.withValues(alpha: p),
+                  padding: EdgeInsets.fromLTRB(16, top + 8, 16, 8),
+                  child: Row(
+                    children: [
+                      button(
+                        Ph.arrowLeft,
+                        context.l10n.deviceBack,
+                        () => Navigator.of(context).maybePop(),
                       ),
-                    ),
+                      const SizedBox(width: 12),
+                      Expanded(
+                        child: Opacity(
+                          opacity: p,
+                          child: Text(
+                            view.device.name,
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                            style: sora(
+                              17,
+                              weight: FontWeight.w700,
+                              color: s.ink,
+                            ),
+                          ),
+                        ),
+                      ),
+                      const SizedBox(width: 12),
+                      button(
+                        Ph.gearSix,
+                        context.l10n.settingsTitle,
+                        () => Navigator.of(context).push(
+                          MaterialPageRoute<void>(
+                            builder: (_) =>
+                                DeviceSettings(deviceId: view.device.id),
+                          ),
+                        ),
+                      ),
+                    ],
                   ),
                 ),
-                const SizedBox(width: 12),
-                button(
-                  Ph.gearSix,
-                  context.l10n.settingsTitle,
-                  () => Navigator.of(context).push(
-                    MaterialPageRoute<void>(
-                      builder: (_) => DeviceSettings(deviceId: view.device.id),
-                    ),
-                  ),
-                ),
-              ],
-            ),
+              );
+            },
           );
         },
       ),
@@ -839,10 +831,19 @@ class FindAction extends StatelessWidget {
 /// What a computer plays (its MPRIS players): play/pause and skip, and when
 /// it can seek, 10 seconds back and forward and where in the track.
 class _NowPlaying extends StatefulWidget {
-  const _NowPlaying({required this.deviceId, required this.player});
+  const _NowPlaying({
+    required this.deviceId,
+    required this.player,
+    required this.open,
+    required this.onToggle,
+  });
 
   final String deviceId;
   final MediaPlayer player;
+
+  /// Opened up: where in the track, and 10 seconds either way.
+  final bool open;
+  final VoidCallback onToggle;
 
   @override
   State<_NowPlaying> createState() => _NowPlayingState();
@@ -1008,58 +1009,82 @@ class _NowPlayingState extends State<_NowPlaying> {
           () => _seek(position + 10000),
         ),
     ];
+    final slim = [
+      if (p.canPrevious)
+        control(PhFill.skipBack, context.l10n.devicePrevious, 'previous'),
+      control(
+        p.playing ? PhFill.pause : PhFill.play,
+        p.playing ? context.l10n.devicePause : context.l10n.devicePlay,
+        'play_pause',
+        big: true,
+      ),
+      if (p.canNext)
+        control(PhFill.skipForward, context.l10n.deviceNext, 'next'),
+    ];
+    final full = seekable && widget.open;
     final info = Row(
       children: [
-        ClipRRect(
-          borderRadius: BorderRadius.circular(Radii.sm),
-          child: SizedBox(
-            width: 52,
-            height: 52,
-            child: cover != null
-                ? Image.memory(
-                    cover,
-                    // Decoded at the size shown, not the cover's own.
-                    cacheWidth: (52 * MediaQuery.devicePixelRatioOf(context))
-                        .round(),
-                    fit: BoxFit.cover,
-                    gaplessPlayback: true,
-                  )
-                : ColoredBox(
-                    color: s.raised,
-                    child: Icon(Ph.musicNotes, color: s.muted),
-                  ),
-          ),
-        ),
-        const SizedBox(width: 12),
         Expanded(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                p.title.isEmpty ? p.app : p.title,
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis,
-                style: TextStyle(
-                  fontWeight: FontWeight.w600,
-                  fontSize: 15,
-                  color: s.ink,
+          child: GestureDetector(
+            behavior: HitTestBehavior.opaque,
+            onTap: widget.onToggle,
+            child: Row(
+              children: [
+                ClipRRect(
+                  borderRadius: BorderRadius.circular(Radii.sm),
+                  child: SizedBox(
+                    width: 52,
+                    height: 52,
+                    child: cover != null
+                        ? Image.memory(
+                            cover,
+                            // Decoded at the size shown, not the cover's own.
+                            cacheWidth:
+                                (52 * MediaQuery.devicePixelRatioOf(context))
+                                    .round(),
+                            fit: BoxFit.cover,
+                            gaplessPlayback: true,
+                          )
+                        : ColoredBox(
+                            color: s.raised,
+                            child: Icon(Ph.musicNotes, color: s.muted),
+                          ),
+                  ),
                 ),
-              ),
-              Text(
-                [if (p.artist.isNotEmpty) p.artist, p.app].join(' · '),
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis,
-                style: TextStyle(fontSize: 13, color: s.muted),
-              ),
-            ],
+                const SizedBox(width: 12),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        p.title.isEmpty ? p.app : p.title,
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        style: TextStyle(
+                          fontWeight: FontWeight.w600,
+                          fontSize: 15,
+                          color: s.ink,
+                        ),
+                      ),
+                      Text(
+                        [if (p.artist.isNotEmpty) p.artist, p.app].join(' · '),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        style: TextStyle(fontSize: 13, color: s.muted),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
           ),
         ),
-        if (!seekable) ...controls,
+        if (!full) ...slim,
       ],
     );
-    if (!seekable) {
+    if (!full) {
       return SigCard(
-        padding: const EdgeInsets.fromLTRB(12, 12, 10, 12),
+        padding: const EdgeInsets.fromLTRB(10, 10, 8, 10),
         child: info,
       );
     }
@@ -1257,41 +1282,114 @@ class _Control extends StatelessWidget {
     void push(Widget page) =>
         Navigator.of(context)
             .push(MaterialPageRoute<void>(builder: (_) => page));
-    return SettingsSection(
-      title: l10n.deviceControl,
-      children: [
-        SettingRow(
-          icon: Ph.mouseSimple,
-          title: l10n.deviceRemote,
-          caption: l10n.deviceRemoteCaption,
-          onTap: () => push(RemoteScreen(device: d)),
+    final tiles = [
+      _Tile(
+        icon: Ph.mouseSimple,
+        title: l10n.deviceRemote,
+        caption: l10n.deviceRemoteCaption,
+        onTap: () => push(RemoteScreen(device: d)),
+      ),
+      if (computer)
+        _Tile(
+          icon: Ph.monitor,
+          title: l10n.deviceSeeScreen,
+          caption: l10n.deviceSeeScreenCaption,
+          onTap: () => _watchScreen(context, view),
         ),
-        if (computer)
-          SettingRow(
-            icon: Ph.monitor,
-            title: l10n.deviceSeeScreen,
-            caption: l10n.deviceSeeScreenCaption,
-            onTap: () => _watchScreen(context, view),
-          ),
-        // Only computers that announce it (§4.19).
-        if (computer && d.features.contains('deck'))
-          SettingRow(
-            icon: Ph.squaresFour,
-            title: l10n.deviceDeck,
-            caption: l10n.deviceDeckCaption(d.name),
-            onTap: () => push(DeckScreen(device: d)),
-          ),
-        // Only computers that announce it (desktop 0.7, §4.15).
-        if (computer && d.features.contains('terminal'))
-          SettingRow(
-            icon: Ph.terminalWindow,
-            title: l10n.deviceTerminal,
-            caption: open == 0
-                ? l10n.deviceTerminalShell(d.name)
-                : l10n.deviceTerminalsOpen(open),
-            onTap: () => push(TerminalScreen(deviceId: d.id)),
-          ),
-      ],
+      // Only computers that announce it (§4.19).
+      if (computer && d.can('deck'))
+        _Tile(
+          icon: Ph.squaresFour,
+          title: l10n.deviceDeck,
+          caption: l10n.deviceDeckCaption(d.name),
+          onTap: () => push(DeckScreen(device: d)),
+        ),
+      // Only computers that announce it (desktop 0.7, §4.15).
+      if (computer && d.can('terminal'))
+        _Tile(
+          icon: Ph.terminalWindow,
+          title: l10n.deviceTerminal,
+          caption: open == 0
+              ? l10n.deviceTerminalShell(d.name)
+              : l10n.deviceTerminalsOpen(open),
+          onTap: () => push(TerminalScreen(deviceId: d.id)),
+        ),
+    ];
+    return Padding(
+      padding: const EdgeInsets.only(top: 12),
+      child: Column(
+        children: [
+          for (var i = 0; i < tiles.length; i += 2)
+            Padding(
+              padding: EdgeInsets.only(top: i == 0 ? 0 : 10),
+              child: IntrinsicHeight(
+                child: Row(
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: [
+                    Expanded(child: tiles[i]),
+                    const SizedBox(width: 10),
+                    Expanded(
+                      child: i + 1 < tiles.length
+                          ? tiles[i + 1]
+                          : const SizedBox.shrink(),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+        ],
+      ),
+    );
+  }
+}
+
+/// One way to drive it: its icon over its name, half the page's width.
+class _Tile extends StatelessWidget {
+  const _Tile({
+    required this.icon,
+    required this.title,
+    required this.caption,
+    required this.onTap,
+  });
+
+  final IconData icon;
+  final String title;
+  final String caption;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    final s = Sig.of(context);
+    return Pressable(
+      onTap: onTap,
+      semanticLabel: title,
+      child: SigCard(
+        padding: const EdgeInsets.all(14),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            IconCircle(icon: icon, color: Sig.blue, size: 42),
+            const SizedBox(height: 12),
+            Text(
+              title,
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+              style: TextStyle(
+                fontSize: 14.5,
+                fontWeight: FontWeight.w600,
+                color: s.ink,
+              ),
+            ),
+            const SizedBox(height: 1),
+            Text(
+              caption,
+              maxLines: 2,
+              overflow: TextOverflow.ellipsis,
+              style: TextStyle(fontSize: 12.5, height: 1.3, color: s.muted),
+            ),
+          ],
+        ),
+      ),
     );
   }
 }
@@ -1349,77 +1447,6 @@ Future<void> _watchScreen(BuildContext context, DeviceView view) =>
       },
     );
 
-/// "Activity" and its filters: All, Files, Clipboard, Links.
-class _Filters extends StatelessWidget {
-  const _Filters({required this.selected, required this.onSelected});
-
-  final ActivityKind? selected;
-  final ValueChanged<ActivityKind?> onSelected;
-
-  @override
-  Widget build(BuildContext context) {
-    final s = Sig.of(context);
-    final l10n = context.l10n;
-    final options = [
-      (l10n.deviceFilterAll, l10n.deviceFilterShowAll, null),
-      (l10n.deviceFilterFiles, l10n.deviceFilterShowFiles, ActivityKind.files),
-      (
-        l10n.deviceFilterClipboard,
-        l10n.deviceFilterShowClipboard,
-        ActivityKind.clipboard,
-      ),
-      (l10n.deviceFilterLinks, l10n.deviceFilterShowLinks, ActivityKind.link),
-    ];
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Padding(
-          padding: const EdgeInsets.fromLTRB(22, 0, 22, 12),
-          child: Text(
-            l10n.deviceActivity,
-            style: sora(16, weight: FontWeight.w700, color: s.ink),
-          ),
-        ),
-        Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 18),
-          child: Wrap(
-            spacing: 8,
-            runSpacing: 8,
-            children: [
-              for (final (label, semantic, kind) in options)
-                Pressable(
-                  onTap: () => onSelected(kind),
-                  semanticLabel: semantic,
-                  child: AnimatedContainer(
-                    duration: motion(context, 160),
-                    height: 38,
-                    padding: const EdgeInsets.symmetric(horizontal: 16),
-                    decoration: BoxDecoration(
-                      color: selected == kind ? Sig.blue : s.card,
-                      borderRadius: BorderRadius.circular(19),
-                    ),
-                    child: Center(
-                      widthFactor: 1,
-                      child: AnimatedDefaultTextStyle(
-                        duration: motion(context, 160),
-                        style: TextStyle(
-                          fontSize: 13.5,
-                          fontWeight: FontWeight.w600,
-                          color: selected == kind ? Colors.white : s.ink,
-                        ),
-                        child: Text(label),
-                      ),
-                    ),
-                  ),
-                ),
-            ],
-          ),
-        ),
-      ],
-    );
-  }
-}
-
 /// What this phone is for the computer right now, or could be: its webcam,
 /// microphone and second display. The computer starts them, so the rows only
 /// say how they are; a button shows while one is in use.
@@ -1441,70 +1468,63 @@ class _PhoneAs extends StatelessWidget {
     final display = c.displays.values
         .where((e) => e.peer.id == d.id && e.kind == SessionKind.display)
         .firstOrNull;
-    final ready = context.l10n.deviceReadyWhenAsks(d.name);
-    final size = c.screenSize;
-
-    Widget action(String label, VoidCallback onTap) =>
-        SmallAction(label: label, onTap: onTap, fill: s.raised);
-
-    final rows = [
+    final l = context.l10n;
+    final chips = [
       if (d.can('camera'))
-        _PhoneAsRow(
+        _PhoneAsChip(
           icon: Ph.videoCamera,
-          title: context.l10n.deviceWebcam,
-          live: camera != null,
-          detail: camera != null ? context.l10n.deviceInUseNow : ready,
-          action: camera == null
+          title: l.deviceWebcam,
+          live: camera == null ? null : l.deviceControls,
+          onTap: camera == null
               ? null
-              : action(
-                  context.l10n.deviceControls,
-                  () => Navigator.of(context).push(
-                    MaterialPageRoute<void>(
-                      builder: (_) => WebcamScreen(share: camera),
-                    ),
+              : () => Navigator.of(context).push(
+                  MaterialPageRoute<void>(
+                    builder: (_) => WebcamScreen(share: camera),
                   ),
                 ),
         ),
       if (d.can('microphone'))
-        _PhoneAsRow(
+        _PhoneAsChip(
           icon: Ph.microphone,
-          title: context.l10n.deviceMicrophone,
-          live: mic != null,
-          detail: mic != null ? context.l10n.deviceInUseNow : ready,
-          action: mic == null
-              ? null
-              : action(
-                  context.l10n.deviceStop,
-                  () => c.stopSharing(mic.session),
-                ),
+          title: l.deviceMicrophone,
+          live: mic == null ? null : l.deviceStop,
+          onTap: mic == null ? null : () => c.stopSharing(mic.session),
         ),
       if (d.can('display'))
-        _PhoneAsRow(
+        _PhoneAsChip(
           icon: Ph.monitor,
-          title: context.l10n.deviceSecondDisplay,
-          live: display != null,
-          detail: display != null
-              ? context.l10n.deviceShowingNow
-              : size == null
-              ? ready
-              : context.l10n.deviceReadySize(size.$1, size.$2),
+          title: l.deviceSecondDisplay,
+          live: display == null ? null : l.deviceShowingNow,
         ),
     ];
-    if (rows.isEmpty) return const SizedBox.shrink();
+    if (chips.isEmpty) return const SizedBox.shrink();
     final note = TextStyle(fontSize: 12.5, color: s.muted, height: 1.4);
     return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
+      crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
-        SettingsSection(title: context.l10n.devicePhoneAs, children: rows),
         Padding(
-          padding: const EdgeInsets.fromLTRB(8, 10, 8, 0),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
+          padding: const EdgeInsets.only(top: 18, bottom: 8),
+          child: Text(l.devicePhoneAs, style: sora(18, color: s.ink)),
+        ),
+        IntrinsicHeight(
+          child: Row(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              Text(context.l10n.deviceStartedOn(d.name), style: note),
-              if (!view.usb)
-                Text(context.l10n.deviceFasterOverUsb, style: note),
+              for (final (i, chip) in chips.indexed) ...[
+                if (i > 0) const SizedBox(width: 10),
+                Expanded(child: chip),
+              ],
             ],
+          ),
+        ),
+        Padding(
+          padding: const EdgeInsets.fromLTRB(4, 8, 4, 0),
+          child: Text(
+            [
+              l.deviceStartedOn(d.name),
+              if (!view.usb) l.deviceFasterOverUsb,
+            ].join('\n'),
+            style: note,
           ),
         ),
       ],
@@ -1512,92 +1532,64 @@ class _PhoneAs extends StatelessWidget {
   }
 }
 
-/// A row of [_PhoneAs]: not a button, so no way in; solid blue with a dot
-/// while in use.
-class _PhoneAsRow extends StatelessWidget {
-  const _PhoneAsRow({
+/// One thing this phone can be for it. The computer starts them, so no way in
+/// until one runs: then solid blue, with what a tap does.
+class _PhoneAsChip extends StatelessWidget {
+  const _PhoneAsChip({
     required this.icon,
     required this.title,
-    required this.detail,
-    required this.live,
-    this.action,
+    this.live,
+    this.onTap,
   });
 
   final IconData icon;
   final String title;
-  final String detail;
-  final bool live;
-  final Widget? action;
+
+  /// Said under it while in use.
+  final String? live;
+  final VoidCallback? onTap;
 
   @override
   Widget build(BuildContext context) {
     final s = Sig.of(context);
-    final cyanText = s.bg.computeLuminance() > 0.5
-        ? const Color(0xFF0E8FAE)
-        : Sig.cyanLight;
-    return Padding(
-      padding: const EdgeInsets.fromLTRB(14, 10, 12, 10),
-      child: Row(
+    final on = live != null;
+    final ink = on ? Colors.white : s.ink;
+    final chip = AnimatedContainer(
+      duration: motion(context, 200),
+      padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 12),
+      decoration: BoxDecoration(
+        color: on ? Sig.blue : s.card,
+        borderRadius: BorderRadius.circular(20),
+      ),
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          live
-              ? Container(
-                  width: 36,
-                  height: 36,
-                  decoration: const BoxDecoration(
-                    shape: BoxShape.circle,
-                    color: Sig.blue,
-                  ),
-                  child: Icon(icon, size: 17, color: Colors.white),
-                )
-              : IconCircle(icon: icon, color: Sig.blue, size: 36),
-          const SizedBox(width: 14),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  title,
-                  style: TextStyle(
-                    fontSize: 15.5,
-                    fontWeight: FontWeight.w600,
-                    color: s.ink,
-                  ),
-                ),
-                const SizedBox(height: 1),
-                Row(
-                  children: [
-                    if (live) ...[
-                      Container(
-                        width: 6,
-                        height: 6,
-                        decoration: const BoxDecoration(
-                          shape: BoxShape.circle,
-                          color: Sig.cyan,
-                        ),
-                      ),
-                      const SizedBox(width: 5),
-                    ],
-                    Flexible(
-                      child: Text(
-                        detail,
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
-                        style: TextStyle(
-                          fontSize: 13,
-                          fontWeight: live ? FontWeight.w600 : null,
-                          color: live ? cyanText : s.muted,
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-              ],
+          Icon(icon, size: 21, color: on ? Colors.white : Sig.blue),
+          const SizedBox(height: 6),
+          Text(
+            title,
+            textAlign: TextAlign.center,
+            maxLines: 2,
+            overflow: TextOverflow.ellipsis,
+            style: TextStyle(
+              fontSize: 12.5,
+              fontWeight: FontWeight.w600,
+              color: ink,
             ),
           ),
-          if (action != null) ...[const SizedBox(width: 10), action!],
+          if (live case final text?)
+            Text(
+              text,
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+              style: const TextStyle(fontSize: 11.5, color: Colors.white),
+            ),
         ],
       ),
     );
+    return onTap == null
+        ? chip
+        : Pressable(onTap: onTap, semanticLabel: title, child: chip);
   }
 }
 

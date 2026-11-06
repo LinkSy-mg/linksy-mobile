@@ -3,6 +3,7 @@ import 'package:flutter/services.dart';
 
 import '../../app/activity.dart';
 import '../../app/platform.dart';
+import '../../app/scope.dart';
 import '../../core/models.dart';
 import '../../ui/components.dart';
 import '../../ui/format.dart';
@@ -37,6 +38,32 @@ class HistoryThread extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: children,
+      ),
+    );
+  }
+}
+
+/// All of it, on a page of its own.
+Future<void> openThread(BuildContext context, DeviceInfo device) =>
+    Navigator.of(context)
+        .push(MaterialPageRoute<void>(builder: (_) => _Thread(device: device)));
+
+class _Thread extends StatelessWidget {
+  const _Thread({required this.device});
+
+  final DeviceInfo device;
+
+  @override
+  Widget build(BuildContext context) {
+    final c = LinksyScope.of(context);
+    return Scaffold(
+      appBar: AppBar(title: Text(context.l10n.phoneHistory)),
+      body: SingleChildScrollView(
+        padding: const EdgeInsets.only(bottom: 24),
+        child: HistoryThread(
+          entries: c.activityFor(device.id).toList(),
+          device: device,
+        ),
       ),
     );
   }
@@ -603,6 +630,12 @@ class _Line extends StatelessWidget {
           Icon(
             switch (a.kind) {
               ActivityKind.locate => Ph.mapPin,
+              ActivityKind.screen ||
+              ActivityKind.display ||
+              ActivityKind.watch => Ph.monitor,
+              ActivityKind.camera => Ph.videoCamera,
+              ActivityKind.microphone => Ph.microphone,
+              ActivityKind.control || ActivityKind.remote => Ph.mouseSimple,
               _ => Ph.bellRinging,
             },
             size: 14,
