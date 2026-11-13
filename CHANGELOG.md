@@ -26,6 +26,9 @@ All notable changes to Linksy for Android. Format: [Keep a Changelog](https://ke
 
 ### Fixed
 
+- A file transfer cut off by a lost connection (a network change, a link that moved, a device gone for a moment) carries on once the devices are connected again, for up to 2 minutes, instead of failing: the sender offers again what may not have arrived, the receiving phone takes it without asking, and nothing that already arrived is sent or saved twice. It fails only if the other device stays unreachable.
+- A network change that takes nothing away (DNS, routes, an address added, mobile data's details, and every network once more at startup) no longer makes Linksy check every connection and drop the ones that don't answer within 2 seconds. The log now says what changed, including the default network moving between Wi-Fi and mobile data.
+- Wi-Fi Direct between two phones: the host phone makes its group on its own Wi-Fi channel, not anywhere on 5 GHz, so a phone whose Wi-Fi chip works on one channel at a time can join. The joining phone logs its own Wi-Fi channel and what Android says while it joins.
 - On another phone's page, See all on Photos opens again.
 - See all for apps: a picked app gets a thin blue outline instead of a thick one, long notes stop at two lines, and the send bar no longer covers the list.
 - Terminal: the arrow keys work in full-screen programs (htop, vim) that switch to application cursor keys.
