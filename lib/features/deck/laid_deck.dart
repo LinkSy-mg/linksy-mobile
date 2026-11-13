@@ -13,6 +13,7 @@ import '../../ui/components.dart';
 import '../../ui/format.dart';
 import '../../ui/l10n.dart';
 import '../../ui/sig.dart';
+import '../remote/remote_screen.dart';
 import 'deck_art.dart';
 import 'deck_editor.dart';
 import 'deck_looks.dart';
@@ -197,6 +198,7 @@ class _LaidDeckState extends State<LaidDeck> {
       compact: landscape,
       onTheme: layout == null ? null : () => _pickTheme(layout, own),
       onEdit: widget.editable ? _edit : null,
+      onTouchpad: _touchpad,
     );
 
     final dark = look.brightness == Brightness.dark;
@@ -277,7 +279,11 @@ class _LaidDeckState extends State<LaidDeck> {
                 ],
               ),
             ),
-            _Rail(look: look, onEdit: widget.editable ? _edit : null),
+            _Rail(
+              look: look,
+              onEdit: widget.editable ? _edit : null,
+              onTouchpad: _touchpad,
+            ),
           ],
         ),
       ),
@@ -297,6 +303,14 @@ class _LaidDeckState extends State<LaidDeck> {
     ],
   );
 
+  /// Remote Input in one tap (Discussion #79); back is the deck again, and
+  /// the remote stays open a minute for the next time.
+  void _touchpad() => Navigator.of(context).push(
+    MaterialPageRoute<void>(
+      builder: (_) => RemoteScreen(device: widget.device),
+    ),
+  );
+
   Future<void> _pickTheme(DeckLayout layout, String? own) async {
     final c = LinksyScope.read(context);
     final picked = await showModalBottomSheet<(String?,)>(
@@ -311,12 +325,17 @@ class _LaidDeckState extends State<LaidDeck> {
   }
 }
 
-/// Sideways, beside the tiles: the way back, and Edit under it.
+/// Sideways, beside the tiles: the way back, the touchpad and Edit under it.
 class _Rail extends StatelessWidget {
-  const _Rail({required this.look, required this.onEdit});
+  const _Rail({
+    required this.look,
+    required this.onEdit,
+    required this.onTouchpad,
+  });
 
   final DeckLook look;
   final VoidCallback? onEdit;
+  final VoidCallback onTouchpad;
 
   Widget _button(IconData icon, String label, VoidCallback? onTap) => Pressable(
     onTap: onTap,
@@ -343,6 +362,8 @@ class _Rail extends StatelessWidget {
           MaterialLocalizations.of(context).backButtonTooltip,
           () => Navigator.of(context).maybePop(),
         ),
+        const SizedBox(height: 10),
+        _button(Ph.mouseSimple, context.l10n.remoteTouchpad, onTouchpad),
         if (onEdit != null) ...[
           const SizedBox(height: 10),
           _button(Ph.pencilSimple, context.l10n.deckEdit, onEdit),
@@ -448,9 +469,11 @@ class _Header extends StatelessWidget {
     required this.compact,
     required this.onTheme,
     required this.onEdit,
+    required this.onTouchpad,
   });
 
   final VoidCallback? onEdit;
+  final VoidCallback onTouchpad;
   final DeckLook look;
   final String title;
   final String subtitle;
@@ -526,6 +549,17 @@ class _Header extends StatelessWidget {
                     ),
             ),
           ),
+          Pressable(
+            onTap: onTouchpad,
+            scale: 0.9,
+            semanticLabel: l.remoteTouchpad,
+            child: SizedBox(
+              width: compact ? 40 : 44,
+              height: compact ? 36 : 44,
+              child: Icon(Ph.mouseSimple, color: look.screenInk, size: 22),
+            ),
+          ),
+          const SizedBox(width: 6),
           if (onEdit != null)
             Padding(
               padding: const EdgeInsets.only(right: 10),
