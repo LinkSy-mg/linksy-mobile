@@ -53,6 +53,10 @@ object DirectHost {
     private var group: Group? = null
     private var joining = false
 
+    /// This phone's Wi-Fi frequency when it began joining, and the join's last state, for the log.
+    private var ownMhz: Int? = null
+    private var lastJoinState: String? = null
+
     /// Whether this phone can host one: Wi-Fi Direct, and Android 10+ (`requestDeviceInfo`).
     fun supported(context: Context) =
         Build.VERSION.SDK_INT >= 29 && context.packageManager.hasSystemFeature(PackageManager.FEATURE_WIFI_DIRECT)
@@ -174,7 +178,14 @@ object DirectHost {
                 }
             })
         }
-        val create = { make(group.frequency) }
+        // Phone to phone the joiner rarely says its channel (the host starts it), and the 5 GHz
+        // band alone lets Android pick one that may be neither phone's: then a phone whose chip
+        // keeps Wi-Fi and Wi-Fi Direct on one channel never gets in, and gives no error (mobile
+        // Linksy, a 410 MB send at 5180 MHz that "took too long"). This phone's own Wi-Fi channel
+        // is the other phone's too on most networks, where both use the same router.
+        @Suppress("DEPRECATION")
+        val own = wifi.connectionInfo?.frequency?.takeIf { it in 2400..7125 }
+        val create = { make(group.frequency ?: own) }
         // Anything left over from before goes first, then the group
         manager.removeGroup(channel, object : WifiP2pManager.ActionListener {
             override fun onSuccess() = create()
@@ -189,6 +200,9 @@ object DirectHost {
         val (manager, channel) = open(context, id) ?: return fail("no Wi-Fi Direct on this phone")
         this.group = group
         joining = true
+        val wifi = context.applicationContext.getSystemService(Context.WIFI_SERVICE) as WifiManager
+        @Suppress("DEPRECATION")
+        ownMhz = wifi.connectionInfo?.frequency?.takeIf { it in 2400..7125 }
         // A band or a frequency, never both
         val config = WifiP2pConfig.Builder()
             .setNetworkName(group.ssid)
@@ -229,7 +243,13 @@ object DirectHost {
     private fun connect(manager: WifiP2pManager, channel: WifiP2pManager.Channel, config: WifiP2pConfig, tries: Int) {
         val id = device ?: return
         manager.connect(channel, config, object : WifiP2pManager.ActionListener {
-            override fun onSuccess() = report(id, if (joining) "joining" else "connecting")
+            override fun onSuccess() = if (joining) {
+                // Not sent on (the app keeps `joining` to itself): for the log, where a group on
+                // another channel than this phone's Wi-Fi is the first thing to suspect.
+                report(id, "joining", *listOfNotNull(ownMhz?.let { "wifi" to "$it" }).toTypedArray())
+            } else {
+                report(id, "connecting")
+            }
             override fun onFailure(reason: Int) {
                 // Busy for a moment (still discovering): again shortly
                 if (tries > 1 && device == id) {
@@ -246,7 +266,10 @@ object DirectHost {
             override fun onReceive(context: Context, intent: Intent) {
                 when (intent.action) {
                     WifiP2pManager.WIFI_P2P_PEERS_CHANGED_ACTION -> lookForTarget()
-                    WifiP2pManager.WIFI_P2P_CONNECTION_CHANGED_ACTION -> checkGroup()
+                    WifiP2pManager.WIFI_P2P_CONNECTION_CHANGED_ACTION -> {
+                        if (joining && !up) noteJoin(intent)
+                        checkGroup()
+                    }
                     WifiP2pManager.WIFI_P2P_STATE_CHANGED_ACTION ->
                         if (intent.getIntExtra(WifiP2pManager.EXTRA_WIFI_STATE, 0) == WifiP2pManager.WIFI_P2P_STATE_DISABLED) {
                             fail("Wi-Fi is off")
@@ -263,6 +286,17 @@ object DirectHost {
         else context.registerReceiver(receiver, filter)
         this.receiver = receiver
         registeredOn = context
+    }
+
+    /// While joining, what Android says of the connection, to the log once per change: a join
+    /// that fails says nothing else (its `connect` succeeded), it just never forms a group.
+    @Suppress("DEPRECATION")
+    private fun noteJoin(intent: Intent) {
+        val info = intent.getParcelableExtra<android.net.NetworkInfo>(WifiP2pManager.EXTRA_NETWORK_INFO) ?: return
+        val state = info.detailedState?.name?.lowercase() ?: return
+        if (state == lastJoinState) return
+        lastJoinState = state
+        Logs.add("Wi-Fi Direct, joining: $state")
     }
 
     @SuppressLint("MissingPermission")
@@ -371,6 +405,8 @@ object DirectHost {
         linked = false
         group = null
         joining = false
+        ownMhz = null
+        lastJoinState = null
     }
 
     private fun report(id: String, type: String, vararg extra: Pair<String, String>) {

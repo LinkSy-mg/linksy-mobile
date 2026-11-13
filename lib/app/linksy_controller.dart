@@ -554,6 +554,8 @@ class LinksyController extends ChangeNotifier with WidgetsBindingObserver {
           'inviting${step['name'] != null ? ' as ${step['name']}' : ''}',
         'connecting' => 'connecting to it',
         'up' => 'link up, this phone at ${step['ip']}',
+        'joining' when step['wifi'] != null =>
+          "joining its group, this phone's Wi-Fi at ${step['wifi']} MHz",
         'joining' => 'joining its group',
         'joined' => 'in its group, this phone at ${step['ip']}',
         'end' => 'gave up: ${step['reason']}',
