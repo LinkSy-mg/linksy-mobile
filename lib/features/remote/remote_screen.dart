@@ -70,7 +70,8 @@ class _RemoteScreenState extends State<RemoteScreen> {
   void dispose() {
     _volume?.cancel();
     LinksyPlatform.presentation(false);
-    _c.stopRemote(_id);
+    // Open a minute longer: Deck and back doesn't ask the computer again.
+    _c.leaveRemote(_id);
     super.dispose();
   }
 

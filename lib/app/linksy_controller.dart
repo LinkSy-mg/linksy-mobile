@@ -533,6 +533,7 @@ class LinksyController extends ChangeNotifier with WidgetsBindingObserver {
     // Wi-Fi came or went, mobile data took over: the core checks its links.
     _networkSub = LinksyPlatform.networkChanges.listen((_) {
       log.add('Networks changed');
+      _endLeftRemotes();
       node.networkChanged();
     });
     // The Wi-Fi part of a direct link did a step: the other device hears it,
@@ -819,6 +820,7 @@ class LinksyController extends ChangeNotifier with WidgetsBindingObserver {
       // Back from Developer options, maybe.
       _readShareProtections();
     } else if (state == AppLifecycleState.hidden) {
+      _endLeftRemotes();
       // Out of sight: decoded pictures go, they're read again on return.
       PaintingBinding.instance.imageCache
         ..clear()
@@ -1849,12 +1851,43 @@ class LinksyController extends ChangeNotifier with WidgetsBindingObserver {
   // Remote (§4.8, `input`): this phone as the computer's touchpad and
   // keyboard.
 
-  /// Asks the computer (its user allows it there); null when it's on.
-  Future<String?> startRemote(String id) => _run(() async {
-    final session = await node.startInput(id);
-    remotes[id] = session;
-    notifyListeners();
-  });
+  /// Asks the computer (its user allows it there); null when it's on. One
+  /// still open from a moment ago is used again, with no new request, so the
+  /// computer doesn't announce it again (Discussion #79).
+  Future<String?> startRemote(String id) async {
+    _remoteGrace.remove(id)?.cancel();
+    if (remotes.containsKey(id)) return null;
+    return _run(() async {
+      final session = await node.startInput(id);
+      remotes[id] = session;
+      notifyListeners();
+    });
+  }
+
+  /// How long a remote stays open once its page is left: Deck, Media or
+  /// Terminal and back shouldn't ask the computer again.
+  static const remoteGrace = Duration(seconds: 60);
+
+  /// Remotes left a moment ago, ending unless their page comes back.
+  final Map<String, Timer> _remoteGrace = {};
+
+  /// The remote's page went away: ends it after [remoteGrace].
+  void leaveRemote(String id) {
+    if (!remotes.containsKey(id)) return;
+    _remoteGrace.remove(id)?.cancel();
+    _remoteGrace[id] = Timer(remoteGrace, () {
+      _remoteGrace.remove(id);
+      stopRemote(id);
+    });
+  }
+
+  /// Ends the remotes nobody's on: Linksy went to the background, the
+  /// screen locked, the network changed.
+  void _endLeftRemotes() {
+    for (final id in _remoteGrace.keys.toList()) {
+      stopRemote(id);
+    }
+  }
 
   /// Input messages (`pointer_by`, `button`, `scroll`, `key`, `text`), each
   /// framed as u32 big-endian length + JSON. False once the computer ended it.
@@ -1872,6 +1905,7 @@ class LinksyController extends ChangeNotifier with WidgetsBindingObserver {
   }
 
   Future<void> stopRemote(String id) async {
+    _remoteGrace.remove(id)?.cancel();
     final session = remotes.remove(id);
     notifyListeners();
     if (session != null) await node.endSession(session);
@@ -2423,6 +2457,12 @@ class LinksyController extends ChangeNotifier with WidgetsBindingObserver {
         _addSession(e);
       case SessionEnded(:final session):
         if (remotes.containsValue(session)) {
+          for (final id in [
+            for (final MapEntry(:key, :value) in remotes.entries)
+              if (value == session) key,
+          ]) {
+            _remoteGrace.remove(id)?.cancel();
+          }
           remotes.removeWhere((_, s) => s == session);
           notifyListeners();
         }
