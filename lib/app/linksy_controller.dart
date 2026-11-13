@@ -1418,6 +1418,14 @@ class LinksyController extends ChangeNotifier with WidgetsBindingObserver {
   Future<void> setScrollReversed(bool on) =>
       _setPref('scroll_reverse', on ? 'on' : null);
 
+  /// How far the pointer goes for the same swipe on the touchpad, 0.5–2×.
+  double get pointerSpeed =>
+      (double.tryParse(prefs['pointer_speed'] ?? '') ?? 1).clamp(0.5, 2.0);
+  Future<void> setPointerSpeed(double speed) => _setPref(
+    'pointer_speed',
+    (speed - 1).abs() < 0.01 ? null : speed.toStringAsFixed(2),
+  );
+
   /// The number pad on the presentation remote.
   bool get slidesNumpad => prefs['slides_numpad'] == 'on';
   Future<void> setSlidesNumpad(bool on) =>

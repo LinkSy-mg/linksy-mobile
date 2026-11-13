@@ -99,6 +99,10 @@ abstract final class Ph {
   static const hand = IconData(0xe298, fontFamily: 'PhosphorRegular');
   static const handPointing = IconData(0xe29a, fontFamily: 'PhosphorRegular');
   static const handGrabbing = IconData(0xe57c, fontFamily: 'PhosphorRegular');
+  static const house = IconData(0xe2c2, fontFamily: 'PhosphorRegular');
+  static const arrowRight = IconData(0xe06c, fontFamily: 'PhosphorRegular');
+  static const plus = IconData(0xe3d4, fontFamily: 'PhosphorRegular');
+  static const tabs = IconData(0xe778, fontFamily: 'PhosphorRegular');
   static const mouseSimple = IconData(0xe644, fontFamily: 'PhosphorRegular');
   static const keyboard = IconData(0xe2d8, fontFamily: 'PhosphorRegular');
   static const presentation = IconData(0xe654, fontFamily: 'PhosphorRegular');
