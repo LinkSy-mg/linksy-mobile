@@ -68,6 +68,12 @@ abstract final class LinksyPlatform {
   static final _appInstalls = StreamController<(String?, String)>.broadcast();
   static var _listening = false;
 
+  /// Content under the status and navigation bars. Nothing answers with no
+  /// window (Linksy started with the phone): the app asks again once shown.
+  static void edgeToEdge() =>
+      SystemChrome.setEnabledSystemUIMode(SystemUiMode.edgeToEdge)
+          .catchError((Object _) {});
+
   /// Calls from Android: pairing links, second-display size and end, and
   /// the QR scanner's results.
   static void _listen() {
@@ -117,6 +123,10 @@ abstract final class LinksyPlatform {
           _openWebcam.add(call.arguments as String);
         case 'turnOn':
           _turnOnAsks.add(null);
+        case 'shown':
+          // The app opened on Linksy started with the phone, which had no
+          // window to lay out edge to edge.
+          edgeToEdge();
         case 'appInstall' when call.arguments is Map:
           final a = call.arguments as Map;
           _appInstalls.add((a['package'] as String?, a['status'] as String));

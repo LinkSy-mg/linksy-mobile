@@ -7,6 +7,7 @@
     <string name="accept">受け入れる</string>
     <string name="decline">断る</string>
     <string name="keep_alive_default">Linksy は接続中です</string>
+    <string name="keep_alive_boot">Linksy はコンピューターと接続できます</string>
     <string name="your_computer">あなたのコンピュータ</string>
     <string name="locate_not_allowed">Linksy はこの電話の位置情報を使えません</string>
     <string name="locate_off">この電話の位置情報がオフです</string>

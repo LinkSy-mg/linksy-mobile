@@ -7,6 +7,7 @@
     <string name="accept">Annehmen</string>
     <string name="decline">Ablehnen</string>
     <string name="keep_alive_default">Linksy ist verbunden</string>
+    <string name="keep_alive_boot">Linksy ist für deine Computer bereit</string>
     <string name="your_computer">Dein Computer</string>
     <string name="locate_not_allowed">Linksy darf den Standort dieses Telefons nicht verwenden</string>
     <string name="locate_off">Die Standortermittlung ist auf diesem Telefon aus</string>

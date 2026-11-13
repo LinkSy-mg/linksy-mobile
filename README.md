@@ -95,7 +95,10 @@ The APK declares: network and Wi-Fi multicast, camera, microphone (asked only wh
 computer wants it), location while in use (asked only when "Let computers locate this
 phone" is turned on), notifications, vibration, push (`c2dm.permission.RECEIVE`), and
 foreground services for screen capture, camera and microphone (only while sharing) and
-for staying connected (lock when away, opt-in background). No SMS, notification-listener,
+for staying connected (lock when away, opt-in background), and starting at boot
+(`RECEIVE_BOOT_COMPLETED`, for "Start when the phone starts": after a restart Linksy comes
+back in the background with its quiet notification, never its screen, so computers see the
+phone without opening the app). No SMS, notification-listener,
 accessibility, background-location or storage permissions. Check a build with
 `aapt2 dump permissions <apk>` before releasing.
 

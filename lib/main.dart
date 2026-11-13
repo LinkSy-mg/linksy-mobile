@@ -1,7 +1,6 @@
 import 'dart:io';
 
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:intl/date_symbol_data_local.dart';
 
 import 'app/activity.dart';
@@ -59,7 +58,7 @@ Future<void> main() async {
   PaintingBinding.instance.imageCache.maximumSizeBytes = 24 << 20;
   // Day and month names in every language the app speaks.
   await initializeDateFormatting();
-  SystemChrome.setEnabledSystemUIMode(SystemUiMode.edgeToEdge);
+  LinksyPlatform.edgeToEdge();
 
   final paths = (await LinksyPlatform.paths())!;
   final support = Directory(paths.support);

@@ -455,6 +455,27 @@ class LinksyController extends ChangeNotifier with WidgetsBindingObserver {
   /// The service says this app is too old to keep connecting.
   bool get outdated => serviceInfo?.outdated ?? false;
   bool get stayRunning => prefs['stay_running'] == 'on';
+
+  /// Start When the Phone Starts (mobile#23): the user's choice, else on once
+  /// a computer is paired. Android reads both prefs at boot (Boot.kt).
+  bool get startAtBoot => switch (prefs['start_at_boot']) {
+    'on' => true,
+    'off' => false,
+    _ => _hasComputer,
+  };
+
+  bool get _hasComputer =>
+      devices.any((v) => v.trusted && _isComputer(v.device));
+
+  Future<void> setStartAtBoot(bool on) =>
+      _setPref('start_at_boot', on ? 'on' : 'off');
+
+  /// Keeps Android's copy of "a computer is paired" for the boot default.
+  void _noteComputer() {
+    final has = _hasComputer ? 'yes' : null;
+    if (prefs['has_computer'] != has) unawaited(_setPref('has_computer', has));
+  }
+
   bool get sharingFiles => prefs['share_files'] == 'on';
   bool backsUpPhotos(String id) => prefs['photos.$id'] == 'on';
   bool photosDeclined(String id) => prefs['photos_declined.$id'] == '1';
@@ -809,6 +830,7 @@ class LinksyController extends ChangeNotifier with WidgetsBindingObserver {
   /// no Android side).
   Future<void> _loadPlatform() async {
     prefs = await LinksyPlatform.prefs();
+    _noteComputer();
     locale.value = resolveLocale(languageCode);
     useLocale(locale.value);
     themeMode.value = themeFrom(prefs['theme']);
@@ -2002,6 +2024,7 @@ class LinksyController extends ChangeNotifier with WidgetsBindingObserver {
 
   Future<void> refresh() async {
     devices = await node.devices();
+    _noteComputer();
     notifyListeners();
   }
 

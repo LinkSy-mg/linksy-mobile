@@ -19,14 +19,20 @@ import android.os.PowerManager
 /// this phone's files. And while files are on their way, in the status bar with
 /// their progress, the CPU and Wi-Fi held on so the transfer doesn't drop. Holds
 /// the CPU awake only for heartbeats and transfers.
+///
+/// Started with the phone ([Boot]), it also runs Linksy itself, with no
+/// screen, and stays for as long as the user wants that.
 class KeepAlive : Service() {
     private var wake: PowerManager.WakeLock? = null
     private var wifi: WifiManager.WifiLock? = null
+    private var multicast: WifiManager.MulticastLock? = null
 
     override fun onBind(intent: Intent?): IBinder? = null
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
-        val text = intent?.getStringExtra(EXTRA_TEXT) ?: "Linksy is connected"
+        val booting = intent?.getBooleanExtra(EXTRA_BOOT, false) == true
+        val text = intent?.getStringExtra(EXTRA_TEXT)
+            ?: Lang.str(this, if (held) R.string.keep_alive_boot else R.string.keep_alive_default)
         val progress = intent?.takeIf { it.hasExtra(EXTRA_PROGRESS) }?.getIntExtra(EXTRA_PROGRESS, -1)
         val note = notification(intent?.getStringExtra(EXTRA_TITLE) ?: "Linksy", text, progress)
         if (Build.VERSION.SDK_INT >= 29) {
@@ -35,6 +41,14 @@ class KeepAlive : Service() {
             startForeground(NOTIFICATION, note)
         }
         pending = maxOf(0, pending - 1)
+        if (booting) {
+            // mDNS for computers to find it, as the app holds while on screen.
+            if (multicast == null) {
+                multicast = (applicationContext.getSystemService(Context.WIFI_SERVICE) as WifiManager)
+                    .createMulticastLock("linksy:boot").apply { setReferenceCounted(false); acquire() }
+            }
+            Bridge.startInBackground(this)
+        }
         if (pending == 0 && stopWanted) {
             stopWanted = false
             stopSelf()
@@ -72,6 +86,8 @@ class KeepAlive : Service() {
     override fun onDestroy() {
         release()
         releaseWifi()
+        multicast?.takeIf { it.isHeld }?.release()
+        multicast = null
         super.onDestroy()
     }
 
@@ -113,6 +129,12 @@ class KeepAlive : Service() {
         private const val EXTRA_AWAKE = "awake"
         private const val EXTRA_TITLE = "title"
         private const val EXTRA_PROGRESS = "progress"
+        private const val EXTRA_BOOT = "boot"
+
+        /// Started with the phone: the service stays, quiet, when nothing else
+        /// needs it, since it's what keeps Linksy running (until the user turns
+        /// Start When the Phone Starts off).
+        private var held = false
 
         /// Starts Android hasn't reached [onStartCommand] for yet, and a stop
         /// that waits for them: stopped before it's in the foreground, Android
@@ -136,7 +158,24 @@ class KeepAlive : Service() {
         }
 
         fun stop(context: Context) {
+            if (held && Boot.wanted(context)) {
+                start(context, Lang.str(context, R.string.keep_alive_boot), awake = false)
+                return
+            }
+            held = false
             if (pending > 0) stopWanted = true else context.stopService(Intent(context, KeepAlive::class.java))
+        }
+
+        /// From [Boot]: in the foreground first (a receiver may start this
+        /// type, connectedDevice, on Android 15), then Linksy behind it.
+        fun boot(context: Context) {
+            held = true
+            stopWanted = false
+            val intent = Intent(context, KeepAlive::class.java).putExtra(EXTRA_BOOT, true)
+            runCatching {
+                if (Build.VERSION.SDK_INT >= 26) context.startForegroundService(intent) else context.startService(intent)
+                pending++
+            }.onFailure { Logs.add("Couldn't start with the phone: $it") }
         }
     }
 }

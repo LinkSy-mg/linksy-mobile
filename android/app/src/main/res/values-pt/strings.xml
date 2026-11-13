@@ -7,6 +7,7 @@
     <string name="accept">Aceitar</string>
     <string name="decline">Recusar</string>
     <string name="keep_alive_default">O Linksy está conectado</string>
+    <string name="keep_alive_boot">O Linksy está pronto para seus computadores</string>
     <string name="your_computer">Seu computador</string>
     <string name="locate_not_allowed">O Linksy não tem permissão para usar a localização deste telefone</string>
     <string name="locate_off">A localização está desativada neste telefone</string>

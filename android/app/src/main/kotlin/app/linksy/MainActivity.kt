@@ -39,14 +39,11 @@ class MainActivity : FlutterActivity() {
     private var pendingShare: Map<String, Any>? = null
     private var pendingSendFolder: MethodChannel.Result? = null
 
-    private val ring by lazy { RingPlayer(applicationContext) }
-    private var calls: CallWatcher? = null
     /// Waiting on the photo picker: which device, and Dart's reply.
     private var pendingPicture: Pair<String, MethodChannel.Result>? = null
     private var pendingNotificationAccess: MethodChannel.Result? = null
     /// Waiting on Android's folder picker: which folder, and Dart's reply.
     private var pendingFolder: Pair<String, MethodChannel.Result>? = null
-    private var batteryReceiver: BroadcastReceiver? = null
 
     /// Waiting on the system's screen capture prompt: the session and Dart's reply.
     private var pendingCapture: Pair<String, MethodChannel.Result>? = null
@@ -54,598 +51,219 @@ class MainActivity : FlutterActivity() {
     private val pendingPermissions = mutableMapOf<Int, MethodChannel.Result>()
 
     private var engine: FlutterEngine? = null
+    private var bridge: Bridge? = null
     /// Second-display sessions on screen, by session.
     private val displays = mutableMapOf<String, DisplayReceiver>()
-    /// Display input goes out in order, off the UI thread (writes can wait).
-    private val inputWriter = Executors.newSingleThreadExecutor()
+
+    /// The engine Linksy started with at boot, if it did: the app shows it
+    /// instead of starting a second one.
+    override fun provideFlutterEngine(context: Context): FlutterEngine? = Bridge.background?.engine
 
     override fun configureFlutterEngine(flutterEngine: FlutterEngine) {
         super.configureFlutterEngine(flutterEngine)
         engine = flutterEngine
-        networks?.stop()
-        networks = NetworkWatcher(this) { channel?.invokeMethod("networkChanged", null) }.apply { start() }
+        val running = Bridge.background?.takeIf { it.engine === flutterEngine }
         pendingLink = linkFrom(intent)
         pendingTurnOn = turnOnFrom(intent)
-        app.linksy.media.ShareService.rotationListener = { session, degrees ->
-            runOnUiThread { channel?.invokeMethod("screenRotation", mapOf("session" to session, "degrees" to degrees)) }
-        }
-        takeShared(intent)
-        watchBattery()
-        Logs.sink = { line -> runOnUiThread { channel?.invokeMethod("log", line) } }
-        PhoneNotifications.posted = { n -> runOnUiThread { channel?.invokeMethod("phoneNotification", n) } }
-        PhoneNotifications.removed = { key, kept ->
-            runOnUiThread { channel?.invokeMethod("phoneNotificationGone", mapOf("key" to key, "kept" to kept)) }
-        }
-        ShareService.webcamListener = { session, state ->
-            runOnUiThread { channel?.invokeMethod("webcamChanged", mapOf("session" to session, "state" to state.toString())) }
-        }
-        TransferNotice.answer = { transfer, accept ->
-            runOnUiThread { channel?.invokeMethod("transferAnswer", mapOf("transfer" to transfer, "accept" to accept)) }
-        }
-        DirectHost.step = { device, step ->
-            channel?.invokeMethod("directStep", step + ("device" to device))
-        }
-        Push.subscribe()
-        Updater.onStatus = { status -> channel?.invokeMethod("updateStatus", status) }
-        AppInstaller.onStatus = { name, status ->
-            channel?.invokeMethod("appInstall", mapOf("package" to name, "status" to status))
-        }
-        ComputerMedia.onAction = { action, position ->
-            runOnUiThread { channel?.invokeMethod("mediaAction", mapOf("action" to action, "position_ms" to position)) }
-        }
-        channel = MethodChannel(flutterEngine.dartExecutor.binaryMessenger, "app.linksy/platform").apply {
-            setMethodCallHandler { call, result ->
-                when (call.method) {
-                    "deviceName" -> result.success(deviceName())
-                    "appVersion" -> result.success(
-                        packageManager.getPackageInfo(packageName, 0).let {
-                            @Suppress("DEPRECATION")
-                            "${it.versionName} (${if (Build.VERSION.SDK_INT >= 28) it.longVersionCode else it.versionCode.toLong()})"
-                        },
-                    )
-                    "takeLink" -> {
-                        result.success(pendingLink)
-                        pendingLink = null
-                    }
-                    "takeTurnOn" -> {
-                        result.success(pendingTurnOn)
-                        pendingTurnOn = null
-                    }
-                    "pictures" -> result.success(Pictures.all(this@MainActivity))
-                    "pickPicture" -> pickPicture(call.argument<String>("device")!!, result)
-                    "removePicture" -> {
-                        Pictures.remove(this@MainActivity, call.argument<String>("device")!!)
-                        result.success(null)
-                    }
-                    "pickFolder" -> pickFolder(call.argument<String>("kind")!!, result)
-                    "folder" -> result.success(folderName(call.argument<String>("kind")!!))
-                    "forgetFolder" -> {
-                        val kind = call.argument<String>("kind")!!
-                        prefs().getString("folder.$kind", null)?.let { letGoOf(it, kind) }
-                        prefs().edit().remove("folder.$kind").apply()
-                        result.success(null)
-                    }
-                    "shareFiles" -> {
-                        val on = call.argument<Boolean>("on") == true
-                        // All files: `/` is the phone's storage, once Android allows it.
-                        val all = call.argument<Boolean>("all") == true && allFilesState() == "allowed"
-                        val server = fileServer(this@MainActivity)
-                        server.root = folder("files")
-                        server.everything = if (all) android.os.Environment.getExternalStorageDirectory() else null
-                        NativeFiles.sharing(on && (all || folder("files") != null))
-                        result.success(null)
-                    }
-                    "allFilesState" -> result.success(allFilesState())
-                    "notificationAccess" -> result.success(PhoneNotifications.allowed(this@MainActivity))
-                    "askNotificationAccess" -> {
-                        // Android's page; the answer comes back with the user.
-                        pendingNotificationAccess?.success(PhoneNotifications.allowed(this@MainActivity))
-                        pendingNotificationAccess = result
-                        val opened = runCatching {
-                            startActivityForResult(PhoneNotifications.settingsIntent(this@MainActivity), REQUEST_NOTIFICATION_ACCESS)
-                        }.recoverCatching {
-                            startActivityForResult(Intent(Settings.ACTION_NOTIFICATION_LISTENER_SETTINGS), REQUEST_NOTIFICATION_ACCESS)
-                        }
-                        if (opened.isFailure) {
-                            pendingNotificationAccess = null
-                            result.success(PhoneNotifications.allowed(this@MainActivity))
-                        }
-                    }
-                    "mirrorNotifications" -> {
-                        PhoneNotifications.on = call.argument<Boolean>("on") == true
-                        result.success(null)
-                    }
-                    "replyNotification" -> result.success(
-                        PhoneNotifications.reply(call.argument<String>("key")!!, call.argument<String>("text")!!),
-                    )
-                    "notificationAction" -> result.success(
-                        PhoneNotifications.act(call.argument<String>("key")!!, call.argument<String>("action")!!),
-                    )
-                    "dismissNotification" -> result.success(PhoneNotifications.dismiss(call.argument<String>("key")!!))
-                    "inboxHistory" -> InboxStore.page(
-                        this@MainActivity, call.argument<String>("app")!!, call.argument<String>("conversation")!!,
-                        call.argument<Number>("before")!!.toLong(), call.argument<Int>("limit")!!,
-                    ) { messages, more ->
-                        val page = mapOf("messages" to messages.map { it.json().toString() }, "more" to more)
-                        runOnUiThread { result.success(page) }
-                    }
-                    "forgetInbox" -> {
-                        InboxStore.forget(this@MainActivity)
-                        result.success(null)
-                    }
-                    "openAppInfo" -> {
-                        runCatching {
-                            startActivity(Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS, android.net.Uri.parse("package:$packageName")))
-                        }
-                        result.success(null)
-                    }
-                    "phoneMaker" -> result.success(mapOf("maker" to Build.MANUFACTURER, "sdk" to Build.VERSION.SDK_INT))
-                    "allowAllFiles" -> {
-                        // Android's own page for it; the app hears back on resume.
-                        runCatching {
-                            startActivity(Intent(Settings.ACTION_MANAGE_APP_ALL_FILES_ACCESS_PERMISSION, android.net.Uri.parse("package:$packageName")))
-                        }.onFailure { runCatching { startActivity(Intent(Settings.ACTION_MANAGE_ALL_FILES_ACCESS_PERMISSION)) } }
-                        result.success(null)
-                    }
-                    "directHost" -> result.success(DirectHost.supported(this@MainActivity))
-                    "deviceReport" -> result.success(deviceReport())
-                    "directWanted" -> {
-                        DirectHost.want(this@MainActivity, call.argument<String>("device")!!, directGroup(call))
-                        result.success(null)
-                    }
-                    "directJoin" -> {
-                        val group = directGroup(call)
-                        if (group != null) DirectHost.join(this@MainActivity, call.argument<String>("device")!!, group)
-                        result.success(null)
-                    }
-                    "directListening" -> {
-                        DirectHost.listening(call.argument<String>("device")!!, call.argument<String>("address")!!)
-                        result.success(null)
-                    }
-                    "directLinked" -> {
-                        DirectHost.linked(call.argument<String>("device")!!)
-                        result.success(null)
-                    }
-                    "directEnded" -> {
-                        DirectHost.ended(call.argument<String>("device")!!)
-                        result.success(null)
-                    }
-                    "keepAlive" -> {
-                        if (call.argument<Boolean>("on") == true) {
-                            KeepAlive.start(
-                                this@MainActivity,
-                                call.argument<String>("text") ?: Lang.str(this@MainActivity, R.string.keep_alive_default),
-                                call.argument<Boolean>("awake") == true,
-                                call.argument<String>("title"),
-                                call.argument<Int>("progress"),
-                            )
-                        } else {
-                            KeepAlive.stop(this@MainActivity)
-                        }
-                        result.success(null)
-                    }
-                    "watchCalls" -> {
-                        calls?.stop()
-                        calls = null
-                        if (call.argument<Boolean>("on") == true) {
-                            calls = CallWatcher(applicationContext) { state -> channel?.invokeMethod("callState", state) }.apply { start() }
-                        }
-                        result.success(null)
-                    }
-                    "photoBatch" -> {
-                        val tree = folder("photos") ?: return@setMethodCallHandler result.success(null)
-                        val since = (call.argument<Number>("since") ?: 0).toLong()
-                        Thread {
-                            val batch = runCatching { PhotoScanner.batch(applicationContext, tree, since) }.getOrNull()
-                            runOnUiThread { result.success(batch) }
-                        }.start()
-                    }
-                    "volumeSteps" -> {
-                        stepping = call.argument<Boolean>("on") == true
-                        result.success(null)
-                    }
-                    "presentation" -> {
-                        presenting = call.argument<Boolean>("on") == true
-                        updateScreenOn()
-                        result.success(null)
-                    }
-                    "keepScreenOn" -> {
-                        val session = call.argument<String>("session")!!
-                        if (call.argument<Boolean>("on") == true) screenOn += session else screenOn -= session
-                        updateScreenOn()
-                        result.success(null)
-                    }
-                    "dimScreen" -> {
-                        dimScreen(call.argument<Double>("level"))
-                        result.success(null)
-                    }
-                    "screenSize" -> result.success(screenSize())
-                    "shareProtections" -> result.success(shareProtections())
-                    "developerOptions" -> result.success(openDeveloperOptions())
-                    "abi" -> result.success(Updater.abi())
-                    "updatesAllowed" -> result.success(Updater.allowed(this@MainActivity))
-                    "allowUpdates" -> {
-                        Updater.allow(this@MainActivity)
-                        result.success(null)
-                    }
-                    "installUpdate" -> {
-                        Updater.install(this@MainActivity, call.argument<String>("path")!!, call.argument<String>("sha256")!!)
-                        result.success(null)
-                    }
-                    "pictureJpeg" -> {
-                        val path = call.argument<String>("path")!!
-                        Thread { Clip.pictureJpeg(path).let { runOnUiThread { result.success(it) } } }.start()
-                    }
-                    "clipboardFile" -> result.success(Clip.put(this@MainActivity, call.argument<String>("path")!!))
-                    "locate" -> Locator.fix(this@MainActivity) { result.success(it) }
-                    "usbPort" -> result.success(UsbBridge.current?.port ?: openUsb(null))
-                    "prefs" -> result.success(
-                        prefs().all.filterKeys { it.startsWith("app.") }.mapKeys { it.key.removePrefix("app.") },
-                    )
-                    "setPref" -> {
-                        val key = "app." + call.argument<String>("key")!!
-                        val value = call.argument<String>("value")
-                        prefs().edit().apply { if (value == null) remove(key) else putString(key, value) }.apply()
-                        result.success(null)
-                    }
-                    "shareTargets" -> {
-                        @Suppress("UNCHECKED_CAST")
-                        val devices = call.arguments as List<Map<String, String?>>
-                        Thread { ShareShortcuts.update(applicationContext, devices) }.start()
-                        result.success(null)
-                    }
-                    "sharedTo" -> {
-                        ShareShortcuts.used(applicationContext, call.arguments as String)
-                        result.success(null)
-                    }
-                    "takeShare" -> {
-                        result.success(pendingShare)
-                        pendingShare = null
-                    }
-                    "battery" -> result.success(battery(null))
-                    "noticeTransfer" -> {
-                        TransferNotice.post(
-                            this@MainActivity, call.argument<String>("transfer")!!,
-                            call.argument<String>("title")!!, call.argument<String>("body") ?: "",
-                        )
-                        result.success(null)
-                    }
-                    "noticeArrived" -> {
-                        ArrivedNotice.post(
-                            this@MainActivity, call.argument<String>("id")!!,
-                            call.argument<String>("title")!!, call.argument<String>("body") ?: "",
-                        )
-                        result.success(null)
-                    }
-                    "noticeTurnOn" -> {
-                        ArrivedNotice.post(
-                            this@MainActivity, call.argument<String>("id")!!,
-                            call.argument<String>("title")!!, call.argument<String>("body") ?: "",
-                            mapOf(
-                                EXTRA_TURN_ON to call.argument<String>("feature")!!,
-                                EXTRA_TURN_ON_NAME to call.argument<String>("name")!!,
-                            ),
-                        )
-                        result.success(null)
-                    }
-                    "cancelNotice" -> {
-                        TransferNotice.cancel(this@MainActivity, call.argument<String>("transfer")!!)
-                        result.success(null)
-                    }
-                    "publishDownloads" -> {
-                        val paths = call.argument<List<String>>("paths").orEmpty()
-                        val root = java.io.File(getExternalFilesDir(null), "Received")
-                        Thread {
-                            val moved = Downloads.publish(applicationContext, root, paths, folder("received"))
-                            runOnUiThread { result.success(moved) }
-                        }.start()
-                    }
-                    "toBackground" -> result.success(moveTaskToBack(true))
-                    "openMap" -> {
-                        val lat = call.argument<Double>("lat")!!
-                        val lon = call.argument<Double>("lon")!!
-                        val uri = android.net.Uri.parse("geo:$lat,$lon?q=$lat,$lon")
-                        result.success(runCatching { startActivity(Intent(Intent.ACTION_VIEW, uri)) }.isSuccess)
-                    }
-                    "pickSendFolder" -> {
-                        pendingSendFolder?.success(null)
-                        pendingSendFolder = result
-                        startActivityForResult(Intent(Intent.ACTION_OPEN_DOCUMENT_TREE), REQUEST_SEND_FOLDER)
-                    }
-                    "phoneApps" -> Thread {
-                        val apps = runCatching { Apps.list(applicationContext) }.getOrDefault(emptyList())
-                        runOnUiThread { result.success(apps) }
-                    }.start()
-                    "phoneAlbums" -> Thread {
-                        val albums = runCatching { PhoneMedia.albums(applicationContext) }.getOrDefault(emptyList())
-                        runOnUiThread { result.success(albums) }
-                    }.start()
-                    "phoneMedia" -> {
-                        val album = call.argument<String>("album")
-                        val before = call.argument<Number>("before")?.toLong()
-                        val limit = call.argument<Int>("limit") ?: 200
-                        Thread {
-                            val items = runCatching {
-                                PhoneMedia.items(applicationContext, album, before, limit)
-                            }.getOrDefault(emptyList())
-                            runOnUiThread { result.success(items) }
-                        }.start()
-                    }
-                    "phoneThumb" -> {
-                        val id = call.argument<Number>("id")!!.toLong()
-                        val video = call.argument<Boolean>("video") == true
-                        Thread {
-                            val bytes = PhoneMedia.thumb(applicationContext, id, video, 256)
-                            runOnUiThread { result.success(bytes) }
-                        }.start()
-                    }
-                    "controlsRead" -> result.success(controls().read())
-                    "controlsSet" -> result.success(controls().apply(call.arguments as Map<*, *>))
-                    "controlsWatch" -> {
-                        controls().watch(call.arguments as Boolean)
-                        result.success(null)
-                    }
-                    "dndAccess" -> result.success(controls().dndAccess)
-                    "openDndAccess" -> {
-                        runCatching { startActivity(Intent(android.provider.Settings.ACTION_NOTIFICATION_POLICY_ACCESS_SETTINGS)) }
-                        result.success(null)
-                    }
-                    "computerNotice" -> {
-                        ComputerNotices.post(
-                            this@MainActivity,
-                            call.argument<String>("computer")!!,
-                            call.argument<String>("key")!!,
-                            call.argument<String>("app") ?: "",
-                            call.argument<String>("title") ?: "",
-                            call.argument<String>("body") ?: "",
-                            (call.argument<Number>("at"))?.toLong() ?: 0L,
-                        )
-                        result.success(null)
-                    }
-                    "snapNotice" -> {
-                        val open = android.app.PendingIntent.getActivity(
-                            this@MainActivity,
-                            1,
-                            Intent(this@MainActivity, SnapActivity::class.java)
-                                .putExtra(ShareTarget.EXTRA_DEVICE, call.argument<String>("device"))
-                                .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK),
-                            android.app.PendingIntent.FLAG_IMMUTABLE or android.app.PendingIntent.FLAG_UPDATE_CURRENT,
-                        )
-                        ArrivedNotice.post(this@MainActivity, "snap", call.argument<String>("title")!!, "", emptyMap(), open)
-                        result.success(null)
-                    }
-                    "shrinkPicture" -> {
-                        val from = call.arguments as String
-                        Thread {
-                            val path = runCatching {
-                                val options = android.graphics.BitmapFactory.Options().apply { inSampleSize = 2 }
-                                val picture = android.graphics.BitmapFactory.decodeFile(from, options)!!
-                                val to = java.io.File(cacheDir, "snap-clipboard.jpg")
-                                to.outputStream().use { picture.compress(android.graphics.Bitmap.CompressFormat.JPEG, 85, it) }
-                                to.path
-                            }.getOrNull()
-                            runOnUiThread { result.success(path) }
-                        }.start()
-                    }
-                    "snap" -> {
-                        startActivity(
-                            Intent(this@MainActivity, SnapActivity::class.java)
-                                .putExtra(ShareTarget.EXTRA_DEVICE, call.arguments as String?),
-                        )
-                        result.success(null)
-                    }
-                    "fullScreen" -> {
-                        if (android.os.Build.VERSION.SDK_INT >= 28) {
-                            window.attributes = window.attributes.apply {
-                                layoutInDisplayCutoutMode = if (call.arguments as Boolean) {
-                                    android.view.WindowManager.LayoutParams.LAYOUT_IN_DISPLAY_CUTOUT_MODE_SHORT_EDGES
-                                } else {
-                                    android.view.WindowManager.LayoutParams.LAYOUT_IN_DISPLAY_CUTOUT_MODE_DEFAULT
-                                }
-                            }
-                        }
-                        result.success(null)
-                    }
-                    "highRefresh" -> {
-                        highRefresh(call.arguments as Boolean)
-                        result.success(null)
-                    }
-                    "usbPlugged" -> {
-                        val battery = registerReceiver(null, IntentFilter(Intent.ACTION_BATTERY_CHANGED))
-                        result.success(
-                            battery?.getIntExtra(android.os.BatteryManager.EXTRA_PLUGGED, 0) ==
-                                android.os.BatteryManager.BATTERY_PLUGGED_USB,
-                        )
-                    }
-                    "phoneModel" -> result.success(
-                        mapOf("maker" to android.os.Build.MANUFACTURER, "model" to android.os.Build.MODEL),
-                    )
-                    "connectionFacts" -> result.success(connectionFacts())
-                    "openSystem" -> {
-                        val action = when (call.arguments as String) {
-                            "wifi" -> android.provider.Settings.ACTION_WIFI_SETTINGS
-                            "vpn" -> android.provider.Settings.ACTION_VPN_SETTINGS
-                            "saver" -> android.provider.Settings.ACTION_BATTERY_SAVER_SETTINGS
-                            "data" -> android.provider.Settings.ACTION_DATA_USAGE_SETTINGS
-                            else -> android.provider.Settings.ACTION_SETTINGS
-                        }
-                        runCatching { startActivity(Intent(action)) }
-                        result.success(null)
-                    }
-                    "thumbOf" -> {
-                        val ref = call.argument<String>("ref")!!
-                        Thread {
-                            val bytes = PhoneMedia.thumbOf(applicationContext, ref, 256)
-                            runOnUiThread { result.success(bytes) }
-                        }.start()
-                    }
-                    "openApp" -> {
-                        val name = call.argument<String>("package")!!
-                        packageManager.getLaunchIntentForPackage(name)?.let { startActivity(it) }
-                        result.success(null)
-                    }
-                    "appIcon" -> {
-                        val name = call.argument<String>("package")!!
-                        Thread {
-                            val bytes = Apps.iconOf(applicationContext, name)
-                            runOnUiThread { result.success(bytes) }
-                        }.start()
-                    }
-                    "preflightFacts" -> {
-                        @Suppress("UNCHECKED_CAST")
-                        val probes = call.argument<List<Map<String, Any?>>>("probes").orEmpty()
-                        Thread {
-                            val facts = mapOf(
-                                "free" to Apps.free(applicationContext),
-                                "direct" to Apps.direct(applicationContext),
-                                "can_install" to Updater.allowed(applicationContext),
-                                "apps" to Apps.compare(applicationContext, probes),
-                            )
-                            runOnUiThread { result.success(facts) }
-                        }.start()
-                    }
-                    "installApps" -> {
-                        @Suppress("UNCHECKED_CAST")
-                        AppInstaller.install(this@MainActivity, call.argument<List<Map<String, Any?>>>("apps").orEmpty())
-                        result.success(null)
-                    }
-                    "deleteFiles" -> {
-                        for (path in call.argument<List<String>>("paths").orEmpty()) {
-                            val file = java.io.File(path)
-                            file.delete()
-                            file.parentFile?.takeIf { it.list()?.isEmpty() == true }?.delete()
-                        }
-                        result.success(null)
-                    }
-                    "publishLeftovers" -> {
-                        val keep = call.argument<List<String>>("keep").orEmpty()
-                        val root = java.io.File(getExternalFilesDir(null), "Received")
-                        Thread {
-                            val moved = runCatching {
-                                Downloads.publishLeftovers(applicationContext, root, keep, folder("received"))
-                            }.getOrDefault(emptyList())
-                            runOnUiThread { result.success(moved) }
-                        }.start()
-                    }
-                    "pushToken" -> Push.token { token -> runOnUiThread { result.success(token) } }
-                    "openUrl" -> result.success(openUrl(call.argument<String>("url")!!))
-                    "mediaNotice" -> {
-                        @Suppress("UNCHECKED_CAST")
-                        ComputerMedia.show(applicationContext, call.arguments as Map<String, Any?>?)
-                        result.success(null)
-                    }
-                    "startRing" -> {
-                        ring.start()
-                        result.success(null)
-                    }
-                    "stopRing" -> {
-                        ring.stop()
-        calls?.stop()
-                        result.success(null)
-                    }
-                    "requestScreenCapture" -> requestScreenCapture(call.argument<String>("session")!!, result)
-                    "requestCamera" -> requestPermission(Manifest.permission.CAMERA, REQUEST_CAMERA, result)
-                    "requestPermission" -> when (call.argument<String>("name")) {
-                        "camera" -> requestPermission(Manifest.permission.CAMERA, REQUEST_CAMERA, result)
-                        "microphone" -> requestPermission(Manifest.permission.RECORD_AUDIO, REQUEST_MICROPHONE, result)
-                        "location" -> requestPermission(Manifest.permission.ACCESS_FINE_LOCATION, REQUEST_LOCATION, result)
-                        "nearby" -> requestPermission(DirectHost.permission(), REQUEST_NEARBY, result)
-                        "notifications" -> if (Build.VERSION.SDK_INT >= 33) {
-                            requestPermission(Manifest.permission.POST_NOTIFICATIONS, REQUEST_NOTIFICATIONS, result)
-                        } else {
-                            result.success(true)
-                        }
-                        "photos" -> requestPermission(
-                            if (Build.VERSION.SDK_INT >= 33) Manifest.permission.READ_MEDIA_IMAGES else Manifest.permission.READ_EXTERNAL_STORAGE,
-                            REQUEST_PHOTOS, result,
-                        )
-                        else -> result.notImplemented()
-                    }
-                    // True once per install: whether to show the permissions sheet.
-                    // Photos for the computers' Gallery (§4.18): the requests
-                    // reach the server only while Android allows it.
-                    "shareGallery" -> {
-                        val allowed = galleryServer(this@MainActivity).allowed()
-                        NativeGallery.sharing(allowed && call.argument<Boolean>("on") == true)
-                        result.success(allowed)
-                    }
-                    "firstPermissionsVisit" -> {
-                        val prefs = getSharedPreferences("permissions", MODE_PRIVATE)
-                        val first = !prefs.getBoolean("sheet_shown", false)
-                        if (first) prefs.edit().putBoolean("sheet_shown", true).apply()
-                        result.success(first)
-                    }
-                    "permissions" -> result.success(
-                        mapOf(
-                            "notifications" to (Build.VERSION.SDK_INT < 33 || granted(Manifest.permission.POST_NOTIFICATIONS)),
-                            "camera" to granted(Manifest.permission.CAMERA),
-                        ),
-                    )
-                    "startShare" -> {
-                        ShareService.start(
-                            this@MainActivity,
-                            call.argument<String>("session")!!,
-                            call.argument<String>("kind")!!,
-                            call.argument<String>("peer") ?: Lang.str(this@MainActivity, R.string.your_computer),
-                            call.argument<String>("peerId") ?: "",
-                        )
-                        result.success(null)
-                    }
-                    "activeShares" -> result.success(ShareService.active.values.toList())
-                    // Where the node and history live, and where received files go.
-                    "paths" -> result.success(
-                        mapOf("support" to filesDir.path, "external" to getExternalFilesDir(null)?.path),
-                    )
-                    "pickFiles" -> pickFiles(result)
-                    "pickMedia" -> pickMedia(result)
-                    "openFile" -> result.success(openFile(call.argument<String>("path")!!))
-                    "startScanner" -> result.success(startScanner())
-                    "stopScanner" -> {
-                        scanner?.stop()
-                        scanner = null
-                        result.success(null)
-                    }
-                    "scannerTorch" -> {
-                        scanner?.setTorch(call.argument<Boolean>("on") == true)
-                        result.success(null)
-                    }
-                    "startDisplay" -> result.success(startDisplay(call.argument<String>("session")!!))
-                    "stopDisplay" -> {
-                        displays.remove(call.argument<String>("session")!!)?.stop()
-                        result.success(null)
-                    }
-                    "displayInput" -> {
-                        val session = call.argument<String>("session")!!
-                        val frames = call.argument<ByteArray>("frames")!!
-                        inputWriter.execute { NativeSession.write(session, frames) }
-                        result.success(null)
-                    }
-                    "webcamState" -> result.success(
-                        ShareService.webcams[call.argument<String>("session")!!]?.state()?.toString(),
-                    )
-                    "webcamSet" -> {
-                        ShareService.webcams[call.argument<String>("session")!!]
-                            ?.set(org.json.JSONObject(call.argument<String>("controls")!!))
-                        result.success(null)
-                    }
-                    "webcamPreview" -> result.success(
-                        webcamPreview(call.argument<String>("session")!!, call.argument<Boolean>("on") == true),
-                    )
-                    "switchCamera" -> {
-                        ShareService.switchCamera(this@MainActivity, call.argument<String>("session")!!)
-                        result.success(null)
-                    }
-                    "stopShare" -> {
-                        ShareService.stop(this@MainActivity, call.argument<String>("session")!!)
-                        result.success(null)
-                    }
-                    else -> result.notImplemented()
-                }
-            }
+        // Before the channel: Dart asks for it once it has started.
+        if (running == null) takeShared(intent)
+        val b = (running ?: Bridge(this, flutterEngine)).also { it.activity = this }
+        bridge = b
+        channel = b.channel
+        if (running != null) {
+            // Dart started long ago and asked already: hand these over now.
+            takeShared(intent)
+            pendingLink?.let { b.channel.invokeMethod("link", it) }
+            pendingLink = null
+            if (pendingTurnOn != null) b.channel.invokeMethod("turnOn", null)
+            b.channel.invokeMethod("shown", null)
         }
         // After the channel: a bridge opened now reaches Dart.
         watchUsb()
         openUsb(intent?.takeIf { it.action == android.hardware.usb.UsbManager.ACTION_USB_ACCESSORY_ATTACHED })
+    }
+
+    /// The calls only an activity can answer: dialogs, pickers, the window.
+    fun handle(call: MethodCall, result: MethodChannel.Result) {
+        when (call.method) {
+            "takeLink" -> {
+                result.success(pendingLink)
+                pendingLink = null
+            }
+            "takeTurnOn" -> {
+                result.success(pendingTurnOn)
+                pendingTurnOn = null
+            }
+            "pickPicture" -> pickPicture(call.argument<String>("device")!!, result)
+            "pickFolder" -> pickFolder(call.argument<String>("kind")!!, result)
+            "askNotificationAccess" -> {
+                // Android's page; the answer comes back with the user.
+                pendingNotificationAccess?.success(PhoneNotifications.allowed(this@MainActivity))
+                pendingNotificationAccess = result
+                val opened = runCatching {
+                    startActivityForResult(PhoneNotifications.settingsIntent(this@MainActivity), REQUEST_NOTIFICATION_ACCESS)
+                }.recoverCatching {
+                    startActivityForResult(Intent(Settings.ACTION_NOTIFICATION_LISTENER_SETTINGS), REQUEST_NOTIFICATION_ACCESS)
+                }
+                if (opened.isFailure) {
+                    pendingNotificationAccess = null
+                    result.success(PhoneNotifications.allowed(this@MainActivity))
+                }
+            }
+            "openAppInfo" -> {
+                runCatching {
+                    startActivity(Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS, android.net.Uri.parse("package:$packageName")))
+                }
+                result.success(null)
+            }
+            "allowAllFiles" -> {
+                // Android's own page for it; the app hears back on resume.
+                runCatching {
+                    startActivity(Intent(Settings.ACTION_MANAGE_APP_ALL_FILES_ACCESS_PERMISSION, android.net.Uri.parse("package:$packageName")))
+                }.onFailure { runCatching { startActivity(Intent(Settings.ACTION_MANAGE_ALL_FILES_ACCESS_PERMISSION)) } }
+                result.success(null)
+            }
+            "volumeSteps" -> {
+                stepping = call.argument<Boolean>("on") == true
+                result.success(null)
+            }
+            "presentation" -> {
+                presenting = call.argument<Boolean>("on") == true
+                updateScreenOn()
+                result.success(null)
+            }
+            "keepScreenOn" -> {
+                val session = call.argument<String>("session")!!
+                if (call.argument<Boolean>("on") == true) screenOn += session else screenOn -= session
+                updateScreenOn()
+                result.success(null)
+            }
+            "dimScreen" -> {
+                dimScreen(call.argument<Double>("level"))
+                result.success(null)
+            }
+            "screenSize" -> result.success(screenSize())
+            "developerOptions" -> result.success(openDeveloperOptions())
+            "usbPort" -> result.success(UsbBridge.current?.port ?: openUsb(null))
+            "takeShare" -> {
+                result.success(pendingShare)
+                pendingShare = null
+            }
+            "toBackground" -> result.success(moveTaskToBack(true))
+            "openMap" -> {
+                val lat = call.argument<Double>("lat")!!
+                val lon = call.argument<Double>("lon")!!
+                val uri = android.net.Uri.parse("geo:$lat,$lon?q=$lat,$lon")
+                result.success(runCatching { startActivity(Intent(Intent.ACTION_VIEW, uri)) }.isSuccess)
+            }
+            "pickSendFolder" -> {
+                pendingSendFolder?.success(null)
+                pendingSendFolder = result
+                startActivityForResult(Intent(Intent.ACTION_OPEN_DOCUMENT_TREE), REQUEST_SEND_FOLDER)
+            }
+            "openDndAccess" -> {
+                runCatching { startActivity(Intent(android.provider.Settings.ACTION_NOTIFICATION_POLICY_ACCESS_SETTINGS)) }
+                result.success(null)
+            }
+            "snap" -> {
+                startActivity(
+                    Intent(this@MainActivity, SnapActivity::class.java)
+                        .putExtra(ShareTarget.EXTRA_DEVICE, call.arguments as String?),
+                )
+                result.success(null)
+            }
+            "fullScreen" -> {
+                if (android.os.Build.VERSION.SDK_INT >= 28) {
+                    window.attributes = window.attributes.apply {
+                        layoutInDisplayCutoutMode = if (call.arguments as Boolean) {
+                            android.view.WindowManager.LayoutParams.LAYOUT_IN_DISPLAY_CUTOUT_MODE_SHORT_EDGES
+                        } else {
+                            android.view.WindowManager.LayoutParams.LAYOUT_IN_DISPLAY_CUTOUT_MODE_DEFAULT
+                        }
+                    }
+                }
+                result.success(null)
+            }
+            "highRefresh" -> {
+                highRefresh(call.arguments as Boolean)
+                result.success(null)
+            }
+            "openSystem" -> {
+                val action = when (call.arguments as String) {
+                    "wifi" -> android.provider.Settings.ACTION_WIFI_SETTINGS
+                    "vpn" -> android.provider.Settings.ACTION_VPN_SETTINGS
+                    "saver" -> android.provider.Settings.ACTION_BATTERY_SAVER_SETTINGS
+                    "data" -> android.provider.Settings.ACTION_DATA_USAGE_SETTINGS
+                    else -> android.provider.Settings.ACTION_SETTINGS
+                }
+                runCatching { startActivity(Intent(action)) }
+                result.success(null)
+            }
+            "openApp" -> {
+                val name = call.argument<String>("package")!!
+                packageManager.getLaunchIntentForPackage(name)?.let { startActivity(it) }
+                result.success(null)
+            }
+            "installApps" -> {
+                @Suppress("UNCHECKED_CAST")
+                AppInstaller.install(this@MainActivity, call.argument<List<Map<String, Any?>>>("apps").orEmpty())
+                result.success(null)
+            }
+            "requestScreenCapture" -> requestScreenCapture(call.argument<String>("session")!!, result)
+            "requestCamera" -> requestPermission(Manifest.permission.CAMERA, REQUEST_CAMERA, result)
+            "requestPermission" -> when (call.argument<String>("name")) {
+                "camera" -> requestPermission(Manifest.permission.CAMERA, REQUEST_CAMERA, result)
+                "microphone" -> requestPermission(Manifest.permission.RECORD_AUDIO, REQUEST_MICROPHONE, result)
+                "location" -> requestPermission(Manifest.permission.ACCESS_FINE_LOCATION, REQUEST_LOCATION, result)
+                "nearby" -> requestPermission(DirectHost.permission(), REQUEST_NEARBY, result)
+                "notifications" -> if (Build.VERSION.SDK_INT >= 33) {
+                    requestPermission(Manifest.permission.POST_NOTIFICATIONS, REQUEST_NOTIFICATIONS, result)
+                } else {
+                    result.success(true)
+                }
+                "photos" -> requestPermission(
+                    if (Build.VERSION.SDK_INT >= 33) Manifest.permission.READ_MEDIA_IMAGES else Manifest.permission.READ_EXTERNAL_STORAGE,
+                    REQUEST_PHOTOS, result,
+                )
+                else -> result.notImplemented()
+            }
+            "startShare" -> {
+                ShareService.start(
+                    this@MainActivity,
+                    call.argument<String>("session")!!,
+                    call.argument<String>("kind")!!,
+                    call.argument<String>("peer") ?: Lang.str(this@MainActivity, R.string.your_computer),
+                    call.argument<String>("peerId") ?: "",
+                )
+                result.success(null)
+            }
+            "pickFiles" -> pickFiles(result)
+            "pickMedia" -> pickMedia(result)
+            "openFile" -> result.success(openFile(call.argument<String>("path")!!))
+            "startScanner" -> result.success(startScanner())
+            "stopScanner" -> {
+                scanner?.stop()
+                scanner = null
+                result.success(null)
+            }
+            "scannerTorch" -> {
+                scanner?.setTorch(call.argument<Boolean>("on") == true)
+                result.success(null)
+            }
+            "startDisplay" -> result.success(startDisplay(call.argument<String>("session")!!))
+            "stopDisplay" -> {
+                displays.remove(call.argument<String>("session")!!)?.stop()
+                result.success(null)
+            }
+            "webcamPreview" -> result.success(
+                webcamPreview(call.argument<String>("session")!!, call.argument<Boolean>("on") == true),
+            )
+            "switchCamera" -> {
+                ShareService.switchCamera(this@MainActivity, call.argument<String>("session")!!)
+                result.success(null)
+            }
+            else -> result.notImplemented()
+        }
     }
 
     /// Presentation remote: the volume keys change slides instead of volume.
@@ -681,22 +299,6 @@ class MainActivity : FlutterActivity() {
         window.attributes = attrs
     }
 
-    /// Android 15's screen share protections, which some phones (realme…)
-    /// extend to the status bar and the notification shade: they come out
-    /// black on the computer. "on", "off", "unknown" (the setting can't be
-    /// read), or null before Android 15.
-    private fun shareProtections(): String? {
-        if (Build.VERSION.SDK_INT < 35) return null
-        return try {
-            when (Settings.Global.getInt(contentResolver, "disable_screen_share_protections_for_apps_and_notifications", 0)) {
-                0 -> "on"
-                else -> "off"
-            }
-        } catch (_: Exception) {
-            "unknown"
-        }
-    }
-
     /// Developer options if they're on, else About phone (tap Build number
     /// seven times there).
     private fun openDeveloperOptions(): Boolean {
@@ -716,14 +318,6 @@ class MainActivity : FlutterActivity() {
             m.widthPixels to m.heightPixels
         }
         return mapOf("width" to maxOf(w, h), "height" to minOf(w, h))
-    }
-
-    /// All files access (Android 11+): `allowed`, `denied`, or `unsupported` before
-    /// Android 11, where it doesn't exist.
-    private fun allFilesState(): String = when {
-        Build.VERSION.SDK_INT < 30 -> "unsupported"
-        android.os.Environment.isExternalStorageManager() -> "allowed"
-        else -> "denied"
     }
 
     /// A Linksy computer on the USB cable (§4.11): opens the bridge and
@@ -850,37 +444,6 @@ class MainActivity : FlutterActivity() {
         return mapOf("feature" to feature, "name" to name)
     }
 
-    private fun prefs() = getSharedPreferences("linksy", MODE_PRIVATE)
-
-    /// A folder the user picked for Linksy (`files` to share, `photos` to back
-    /// up, `received` to save into), if Android still grants it.
-    private fun folder(kind: String): android.net.Uri? {
-        val uri = prefs().getString("folder.$kind", null)?.let(android.net.Uri::parse) ?: return null
-        return uri.takeIf { u -> contentResolver.persistedUriPermissions.any { it.uri == u && it.isReadPermission } }
-    }
-
-    /// Gives Android's grant for [uri] back, unless another kind still uses it.
-    private fun letGoOf(uri: String, kind: String) {
-        val stillUsed = listOf("files", "photos", "received").any { it != kind && prefs().getString("folder.$it", null) == uri }
-        if (!stillUsed) runCatching {
-            contentResolver.releasePersistableUriPermission(
-                android.net.Uri.parse(uri),
-                Intent.FLAG_GRANT_READ_URI_PERMISSION or Intent.FLAG_GRANT_WRITE_URI_PERMISSION,
-            )
-        }
-    }
-
-    private fun folderName(kind: String): String? {
-        val tree = folder(kind) ?: return null
-        val doc = android.provider.DocumentsContract.buildDocumentUriUsingTree(
-            tree, android.provider.DocumentsContract.getTreeDocumentId(tree),
-        )
-        return runCatching {
-            contentResolver.query(doc, arrayOf(android.provider.DocumentsContract.Document.COLUMN_DISPLAY_NAME), null, null, null)
-                ?.use { c -> if (c.moveToFirst()) c.getString(0) else null }
-        }.getOrNull() ?: tree.lastPathSegment?.substringAfterLast(':')
-    }
-
     /// Android's photo picker (no permission), or the document picker on
     /// phones without it.
     private fun pickPicture(device: String, result: MethodChannel.Result) {
@@ -913,11 +476,6 @@ class MainActivity : FlutterActivity() {
         startActivityForResult(intent, REQUEST_FOLDER)
     }
 
-    private var controlsHere: Controls? = null
-
-    private fun controls() = controlsHere ?: Controls(this) {
-        channel?.invokeMethod("controlsChanged", null)
-    }.also { controlsHere = it }
 
     /// The display's fastest mode at its size while a screen is shown, so
     /// frames aren't held back by a panel left at 60 Hz or lower.
@@ -930,24 +488,6 @@ class MainActivity : FlutterActivity() {
             .filter { it.physicalWidth == now.physicalWidth && it.physicalHeight == now.physicalHeight }
             .maxByOrNull { it.refreshRate } ?: return
         window.attributes = window.attributes.apply { preferredDisplayModeId = if (on) best.modeId else 0 }
-    }
-
-    /// What can keep this phone from its computers, for the Connection Doctor.
-    private fun connectionFacts(): Map<String, Boolean> {
-        val net = getSystemService(android.net.ConnectivityManager::class.java)
-        val power = getSystemService(android.os.PowerManager::class.java)
-        @Suppress("DEPRECATION")
-        val all = net.allNetworks.mapNotNull { net.getNetworkCapabilities(it) }
-        return mapOf(
-            "wifi" to all.any {
-                it.hasTransport(android.net.NetworkCapabilities.TRANSPORT_WIFI) ||
-                    it.hasTransport(android.net.NetworkCapabilities.TRANSPORT_ETHERNET)
-            },
-            "vpn" to all.any { it.hasTransport(android.net.NetworkCapabilities.TRANSPORT_VPN) },
-            "batteryFree" to power.isIgnoringBatteryOptimizations(packageName),
-            "powerSave" to power.isPowerSaveMode,
-            "dataSaver" to (net.restrictBackgroundStatus == android.net.ConnectivityManager.RESTRICT_BACKGROUND_STATUS_ENABLED),
-        )
     }
 
     /// "Share → Linksy", handed over by [ShareTarget] (files already copied).
@@ -971,32 +511,6 @@ class MainActivity : FlutterActivity() {
     private fun deliverShare(share: Map<String, Any>) {
         val c = channel
         if (c == null) pendingShare = share else c.invokeMethod("share", share)
-    }
-
-    /// Battery changes go to Dart, which tells paired computers (docs/protocol.md
-    /// §4.5: on connecting, every 5 points, plugging in or out).
-    private fun watchBattery() {
-        if (batteryReceiver != null) return
-        val receiver = object : BroadcastReceiver() {
-            override fun onReceive(context: Context, intent: Intent) {
-                battery(intent)?.let { channel?.invokeMethod("batteryChanged", it) }
-            }
-        }
-        batteryReceiver = receiver
-        // A system broadcast: no export flag needed, and no permission.
-        registerReceiver(receiver, IntentFilter(Intent.ACTION_BATTERY_CHANGED))
-    }
-
-    /// Level in percent and whether it's charging; the sticky broadcast when
-    /// [intent] is null.
-    private fun battery(intent: Intent?): Map<String, Any>? {
-        val i = intent ?: registerReceiver(null, IntentFilter(Intent.ACTION_BATTERY_CHANGED)) ?: return null
-        val level = i.getIntExtra(BatteryManager.EXTRA_LEVEL, -1)
-        val scale = i.getIntExtra(BatteryManager.EXTRA_SCALE, -1)
-        if (level < 0 || scale <= 0) return null
-        val status = i.getIntExtra(BatteryManager.EXTRA_STATUS, -1)
-        val charging = status == BatteryManager.BATTERY_STATUS_CHARGING || status == BatteryManager.BATTERY_STATUS_FULL
-        return mapOf("level" to (level * 100 / scale).coerceIn(0, 100), "charging" to charging)
     }
 
     // mDNS presence needs multicast, which Android filters out unless an app
@@ -1059,28 +573,22 @@ class MainActivity : FlutterActivity() {
         return producer.id()
     }
 
-    /// Network changes, for the core (§4.13).
-    private var networks: NetworkWatcher? = null
 
     override fun onDestroy() {
-        networks?.stop()
-        networks = null
-        TransferNotice.answer = null
-        PhoneNotifications.posted = null
-        PhoneNotifications.removed = null
-        DirectHost.step = null
-        ShareService.webcamListener = null
         previews.keys.toList().forEach { webcamPreview(it, false) }
-        batteryReceiver?.let { runCatching { unregisterReceiver(it) } }
-        batteryReceiver = null
         usbReceiver?.let { runCatching { unregisterReceiver(it) } }
         usbReceiver = null
         usbPoll.removeCallbacks(usbTick)
-        ring.stop()
         scanner?.stop()
         displays.values.forEach { it.stop() }
         displays.clear()
-        inputWriter.shutdown()
+        // A boot-started engine stays, and Linksy with it; the app's own goes.
+        bridge?.let { b ->
+            b.activity = null
+            if (b !== Bridge.background) b.dispose()
+        }
+        bridge = null
+        channel = null
         super.onDestroy()
     }
 
@@ -1101,39 +609,6 @@ class MainActivity : FlutterActivity() {
         }
         @Suppress("DEPRECATION")
         startActivityForResult(intent, REQUEST_CAPTURE)
-    }
-
-    /// Settings › Logs: what this phone is and what its Wi-Fi can do, as label → value.
-    /// Nothing that identifies the user (no network name, no addresses).
-    private fun deviceReport(): Map<String, String> {
-        val wifi = applicationContext.getSystemService(Context.WIFI_SERVICE) as WifiManager
-        val power = getSystemService(Context.POWER_SERVICE) as android.os.PowerManager
-        val p2p = getSystemService(android.net.wifi.p2p.WifiP2pManager::class.java)
-        @Suppress("DEPRECATION")
-        val link = wifi.connectionInfo
-        val yes = { b: Boolean -> if (b) "yes" else "no" }
-        return linkedMapOf(
-            "Device" to "${Build.MANUFACTURER} ${Build.MODEL}",
-            "Android" to "${Build.VERSION.RELEASE} (API ${Build.VERSION.SDK_INT})",
-            "CPU" to (Build.SUPPORTED_ABIS.firstOrNull() ?: "?"),
-            "Wi-Fi" to if (!wifi.isWifiEnabled) "off"
-                // The network's id is hidden from apps now; a frequency means connected
-                else if (link == null || link.frequency <= 0) "on, not connected"
-                else "${link.frequency} MHz, ${link.linkSpeed} Mbps",
-            "5 GHz" to yes(wifi.is5GHzBandSupported),
-            "6 GHz" to if (Build.VERSION.SDK_INT >= 30) yes(wifi.is6GHzBandSupported) else "?",
-            "Wi-Fi Direct" to yes(DirectHost.supported(this)),
-            "Fast search" to if (Build.VERSION.SDK_INT >= 33 && p2p != null) yes(p2p.isChannelConstrainedDiscoverySupported) else "no",
-            "Nearby devices" to if (granted(DirectHost.permission())) "allowed" else "not allowed",
-            "Battery limits" to if (power.isIgnoringBatteryOptimizations(packageName)) "off" else "on",
-        )
-    }
-
-    /// A direct link's group (phone to phone) from a call's `ssid`, `passphrase`, `frequency`.
-    private fun directGroup(call: MethodCall): DirectHost.Group? {
-        val ssid = call.argument<String>("ssid") ?: return null
-        val passphrase = call.argument<String>("passphrase") ?: return null
-        return DirectHost.Group(ssid, passphrase, call.argument<Int>("frequency"))
     }
 
     private fun granted(permission: String) =
@@ -1232,18 +707,6 @@ class MainActivity : FlutterActivity() {
         startActivityForResult(intent, REQUEST_PICK)
     }
 
-    /// A link a computer sent, in the browser. Web links only.
-    private fun openUrl(url: String): Boolean {
-        val uri = android.net.Uri.parse(url.trim())
-        if (uri.scheme?.lowercase() !in setOf("http", "https")) return false
-        return try {
-            startActivity(Intent(Intent.ACTION_VIEW, uri).addCategory(Intent.CATEGORY_BROWSABLE))
-            true
-        } catch (e: android.content.ActivityNotFoundException) {
-            false
-        }
-    }
-
     /// Opens a received file in another app: "done", "missing" or "noApp".
     private fun openFile(path: String): String {
         if (path.startsWith("content://")) {
@@ -1313,10 +776,10 @@ class MainActivity : FlutterActivity() {
                 (if (kind != "photos") Intent.FLAG_GRANT_WRITE_URI_PERMISSION else 0)
             runCatching { contentResolver.takePersistableUriPermission(uri, flags) }
             // Let go of the folder this replaces.
-            prefs().getString("folder.$kind", null)?.takeIf { it != uri.toString() }?.let { letGoOf(it, kind) }
-            prefs().edit().putString("folder.$kind", uri.toString()).apply()
-            if (kind == "files") fileServer(this).root = uri
-            return result.success(folderName(kind))
+            bridge!!.prefs().getString("folder.$kind", null)?.takeIf { it != uri.toString() }?.let { bridge!!.letGoOf(it, kind) }
+            bridge!!.prefs().edit().putString("folder.$kind", uri.toString()).apply()
+            if (kind == "files") Bridge.fileServer(this).root = uri
+            return result.success(bridge?.folderName(kind))
         }
         if (requestCode == REQUEST_PICK) {
             val result = pendingPick ?: return
@@ -1353,13 +816,7 @@ class MainActivity : FlutterActivity() {
     private fun linkFrom(intent: Intent?): String? =
         intent?.data?.takeIf { it.scheme == "linksy" && it.host == "pair" }?.toString()
 
-    /// The name the user gave this phone, else its model ("Pixel 9").
-    private fun deviceName(): String {
-        val given = Settings.Global.getString(contentResolver, Settings.Global.DEVICE_NAME)
-        return given?.takeIf { it.isNotBlank() } ?: Build.MODEL
-    }
-
-    private companion object {
+    companion object {
         const val EXTRA_TURN_ON = "app.linksy.turn_on"
         const val EXTRA_TURN_ON_NAME = "app.linksy.turn_on_name"
         const val REQUEST_CAPTURE = 41
@@ -1375,16 +832,5 @@ class MainActivity : FlutterActivity() {
         const val REQUEST_PICTURE = 46
         const val REQUEST_NOTIFICATION_ACCESS = 52
         const val REQUEST_PHOTOS = 53
-
-        private var files: FileServer? = null
-
-        /// One file server per process, whatever happens to the activity.
-        fun fileServer(context: Context): FileServer =
-            files ?: FileServer(context.applicationContext).also { files = it; it.start() }
-
-        private var gallery: GalleryServer? = null
-
-        fun galleryServer(context: Context): GalleryServer =
-            gallery ?: GalleryServer(context.applicationContext).also { gallery = it; it.start() }
     }
 }

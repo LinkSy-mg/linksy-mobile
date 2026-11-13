@@ -7,6 +7,7 @@
     <string name="accept">Ekena</string>
     <string name="decline">Lavina</string>
     <string name="keep_alive_default">Mifandray i Linksy</string>
+    <string name="keep_alive_boot">Vonona ho an\'ny solosainao i Linksy</string>
     <string name="your_computer">Ny solosainao</string>
     <string name="locate_not_allowed">Tsy nahazo alalana hampiasa ny toerana misy ity finday ity i Linksy</string>
     <string name="locate_off">Maty ny toerana (localisation) amin\'ity finday ity</string>

@@ -576,6 +576,16 @@ class ConnectionSettings extends StatelessWidget {
               ),
             ),
             SettingRow(
+              id: 'boot',
+              icon: Ph.arrowCounterClockwise,
+              title: l.settingsStartAtBoot,
+              caption: l.settingsStartAtBootCaption,
+              trailing: Switch(
+                value: c.startAtBoot,
+                onChanged: c.setStartAtBoot,
+              ),
+            ),
+            SettingRow(
               id: 'doctor',
               icon: Ph.wifiHigh,
               title: l.doctorTitle,

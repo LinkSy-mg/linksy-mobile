@@ -7,6 +7,7 @@
     <string name="accept">接受</string>
     <string name="decline">拒绝</string>
     <string name="keep_alive_default">Linksy 已连接</string>
+    <string name="keep_alive_boot">Linksy 已为你的电脑准备好</string>
     <string name="your_computer">你的电脑</string>
     <string name="locate_not_allowed">Linksy 无权使用这部手机的位置信息</string>
     <string name="locate_off">这部手机的位置信息已关闭</string>

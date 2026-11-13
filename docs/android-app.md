@@ -68,9 +68,11 @@ offer those features to Android phones.
 | **Phone watches the computer's screen** (`screen`, and `control` with touch) | **New** | The phone *requests* `screen` or `control`. Touch in `control`: one finger = absolute `pointer` + left button held, two fingers = `scroll`. Uses the same receiver as `display`. **Choose Screen** in the corner ends the session and requests it again with `"choose": true` (§4.8, desktop#15) |
 | Remote control *of the phone* (`control` asked by the computer) | Not possible | Answered with `decline_unsupported` at once; see §3 |
 | Push notifications | Done | Firebase project `linksy-mg`, topic `all`. Nothing for the desktop to do |
+| Start when the phone starts (mobile#23) | Done | `RECEIVE_BOOT_COMPLETED` and the `Boot` receiver start `KeepAlive` (connectedDevice, which Android 15 still lets a boot receiver start), and KeepAlive starts the Flutter engine with no activity (`Bridge.startInBackground`). The platform channel lives in `Bridge`, one per engine; the calls that need a screen stay in MainActivity and answer nothing until it opens. The app, once opened, shows that same engine (`provideFlutterEngine`), and it outlives the activity. On by default once a computer is paired (`has_computer`), else the user's `start_at_boot`. Nothing after a force stop: Android sends no boot broadcast then |
 
-The phone keeps running in the background only when a computer watches heartbeats, or when
-the user turns on "Keep running in the background". Otherwise most things work while the
+The phone keeps running in the background only when a computer watches heartbeats, when
+the user turns on "Keep running in the background", or after a restart with "Start when the
+phone starts" on. Otherwise most things work while the
 app is open.
 
 ## 2. What the phone needs from the desktop
