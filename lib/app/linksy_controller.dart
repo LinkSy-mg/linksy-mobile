@@ -3212,6 +3212,13 @@ class LinksyController extends ChangeNotifier with WidgetsBindingObserver {
 
   @override
   void dispose() {
+    _volumeKeySub?.cancel();
+    for (final t in _volumeCooling.values) {
+      t.cancel();
+    }
+    for (final t in _remoteGrace.values) {
+      t.cancel();
+    }
     _sub?.cancel();
     _batterySub?.cancel();
     _callSub?.cancel();
