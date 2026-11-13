@@ -185,6 +185,7 @@
   "activityDeclined": "Nolavina",
   "activityFailed": "Tsy nahomby",
   "activityInProgress": "Mandeha",
+  "activityReconnecting": "Tapaka ny fifandraisana, hitohy rehefa miverina",
   "activityCopiedHere": "Voadika eto",
   "activityReceived": "Voaray",
   "activitySent": "Lasa",

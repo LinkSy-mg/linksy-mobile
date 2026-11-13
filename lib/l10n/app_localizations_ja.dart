@@ -675,6 +675,9 @@ class AppLocalizationsJa extends AppLocalizations {
   String get activityInProgress => '進行中';
 
   @override
+  String get activityReconnecting => '接続が切れました。戻りしだい続けます';
+
+  @override
   String get activityCopiedHere => 'ここにコピー済み';
 
   @override

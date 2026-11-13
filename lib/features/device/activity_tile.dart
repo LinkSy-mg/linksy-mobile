@@ -114,7 +114,9 @@ String activityDetail(Activity a) {
   final verb = switch (a.status) {
     ActivityStatus.declined => tr.activityDeclined,
     ActivityStatus.failed => a.reason ?? tr.activityFailed,
-    ActivityStatus.waiting || ActivityStatus.active => tr.activityInProgress,
+    // A transfer waiting for its connection says so.
+    ActivityStatus.waiting ||
+    ActivityStatus.active => a.reason ?? tr.activityInProgress,
     _ when a.kind == ActivityKind.clipboard && a.incoming =>
       tr.activityCopiedHere,
     _ => a.incoming ? tr.activityReceived : tr.activitySent,

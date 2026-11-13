@@ -689,6 +689,9 @@ class AppLocalizationsIt extends AppLocalizations {
   String get activityInProgress => 'In corso';
 
   @override
+  String get activityReconnecting => 'Connessione persa, riprende appena torna';
+
+  @override
   String get activityCopiedHere => 'Copiato qui';
 
   @override

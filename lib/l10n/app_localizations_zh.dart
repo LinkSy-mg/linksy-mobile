@@ -668,6 +668,9 @@ class AppLocalizationsZh extends AppLocalizations {
   String get activityInProgress => '进行中';
 
   @override
+  String get activityReconnecting => '连接中断，恢复后继续';
+
+  @override
   String get activityCopiedHere => '已复制到本机';
 
   @override

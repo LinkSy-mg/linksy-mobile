@@ -185,6 +185,7 @@
   "activityDeclined": "已拒绝",
   "activityFailed": "失败",
   "activityInProgress": "进行中",
+  "activityReconnecting": "连接中断，恢复后继续",
   "activityCopiedHere": "已复制到本机",
   "activityReceived": "已接收",
   "activitySent": "已发送",

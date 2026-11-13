@@ -691,6 +691,10 @@ class AppLocalizationsMg extends AppLocalizations {
   String get activityInProgress => 'Mandeha';
 
   @override
+  String get activityReconnecting =>
+      'Tapaka ny fifandraisana, hitohy rehefa miverina';
+
+  @override
   String get activityCopiedHere => 'Voadika eto';
 
   @override

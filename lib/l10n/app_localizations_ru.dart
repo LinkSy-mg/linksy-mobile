@@ -696,6 +696,10 @@ class AppLocalizationsRu extends AppLocalizations {
   String get activityInProgress => 'Выполняется';
 
   @override
+  String get activityReconnecting =>
+      'Связь потеряна, продолжится, когда вернётся';
+
+  @override
   String get activityCopiedHere => 'Скопировано сюда';
 
   @override

@@ -185,6 +185,7 @@
   "activityDeclined": "Отклонено",
   "activityFailed": "Ошибка",
   "activityInProgress": "Выполняется",
+  "activityReconnecting": "Связь потеряна, продолжится, когда вернётся",
   "activityCopiedHere": "Скопировано сюда",
   "activityReceived": "Получено",
   "activitySent": "Отправлено",

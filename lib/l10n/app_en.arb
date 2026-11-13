@@ -891,6 +891,8 @@
   "@activityInProgress": {
     "description": "Timeline status: in progress"
   },
+  "activityReconnecting": "Connection lost, continuing when it's back",
+  "@activityReconnecting": {"description": "A file transfer whose connection dropped, waiting to continue"},
   "activityCopiedHere": "Copied here",
   "@activityCopiedHere": {
     "description": "Timeline status: clipboard received on this phone"

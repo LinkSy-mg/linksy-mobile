@@ -185,6 +185,7 @@
   "activityDeclined": "拒否",
   "activityFailed": "失敗",
   "activityInProgress": "進行中",
+  "activityReconnecting": "接続が切れました。戻りしだい続けます",
   "activityCopiedHere": "ここにコピー済み",
   "activityReceived": "受信済み",
   "activitySent": "送信済み",

@@ -1224,6 +1224,12 @@ abstract class AppLocalizations {
   /// **'In progress'**
   String get activityInProgress;
 
+  /// A file transfer whose connection dropped, waiting to continue
+  ///
+  /// In en, this message translates to:
+  /// **'Connection lost, continuing when it\'s back'**
+  String get activityReconnecting;
+
   /// Timeline status: clipboard received on this phone
   ///
   /// In en, this message translates to:

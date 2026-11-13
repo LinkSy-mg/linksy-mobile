@@ -185,6 +185,7 @@
   "activityDeclined": "Rifiutato",
   "activityFailed": "Non riuscito",
   "activityInProgress": "In corso",
+  "activityReconnecting": "Connessione persa, riprende appena torna",
   "activityCopiedHere": "Copiato qui",
   "activityReceived": "Ricevuto",
   "activitySent": "Inviato",

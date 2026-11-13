@@ -22,6 +22,7 @@ import '../ui/l10n.dart';
 import 'activity.dart';
 import 'network_state.dart';
 import 'platform.dart';
+import 'resume.dart';
 import 'terminals.dart';
 
 /// The Inbox is on by default since 0.3.4; until then the switch was off
@@ -667,6 +668,8 @@ class LinksyController extends ChangeNotifier with WidgetsBindingObserver {
           paths,
           i == 0 ? apps : const [],
         );
+        // Apps aren't offered again: their folders are named for the offer.
+        if (i > 0 || apps.isEmpty) _sends[transfer] = (deviceId, paths);
         if (_activity.every((a) => a.id != transfer)) {
           _add(
             Activity(
@@ -1389,10 +1392,19 @@ class LinksyController extends ChangeNotifier with WidgetsBindingObserver {
         final (name, total, since) =
             _logged.remove(transfer) ?? ('?', 0, DateTime.now());
         final s = DateTime.now().difference(since).inMilliseconds / 1000;
-        final speed = s > 0 && total > 0
+        // Carried on: some of it came before, or was there already.
+        final speed = _resumeTries.containsKey(transfer)
+            ? ', carried on'
+            : s > 0 && total > 0
             ? ', ${formatBytes(total ~/ s)}/s'
             : '';
         log.add('Transfer with $name done in ${s.toStringAsFixed(1)} s$speed');
+      case TransferFailed(:final transfer, :final reason)
+          when _canResume(transfer, reason):
+        final name = _logged.remove(transfer)?.$1 ?? '?';
+        log.add(
+          'Transfer with $name interrupted ($reason), continuing once it\'s back',
+        );
       case TransferFailed(:final transfer, :final reason):
         final name = _logged.remove(transfer)?.$1 ?? '?';
         log.add('Transfer with $name failed: $reason');
@@ -2208,7 +2220,276 @@ class LinksyController extends ChangeNotifier with WidgetsBindingObserver {
     notifyListeners();
   }
 
-  void _onEvent(LinksyEvent e) {
+  // Transfers cut off with their connection carry on (resume.dart).
+
+  /// Files each transfer offered, in order, as the core listed them.
+  final _offeredFiles = <String, List<OfferedFile>>{};
+
+  /// Sender: who files went to, and what was picked, to offer again.
+  final _sends = <String, (String, List<String>)>{};
+
+  /// Sender: transfers waiting to be offered again, and how often they were.
+  final _resuming = <String>{};
+  final _resumeTries = <String, int>{};
+
+  /// A transfer that carries on another: the one it continues, and the bytes
+  /// that one had before the files offered again.
+  final _aliasOf = <String, (String, int)>{};
+
+  /// The transfer carrying on each one, while it runs.
+  final _resumedAs = <String, String>{};
+
+  /// Sender: offered again but not answered yet, by device: events can come
+  /// before the offer returns its id.
+  final _resendingTo = <String, (String, int)>{};
+
+  /// Receiver: files that arrived before a lost connection and aren't
+  /// offered again, saved with the rest at the end.
+  final _earlier = <String, List<String>>{};
+
+  /// Receiver: a transfer from each device cut off a moment ago, waiting for
+  /// it to offer the rest.
+  final _interrupted =
+      <
+        String,
+        ({
+          String id,
+          List<OfferedFile> files,
+          int bytes,
+          DateTime since,
+          Timer timer,
+        })
+      >{};
+
+  LinksyEvent _aliased(LinksyEvent e) {
+    final transfer = switch (e) {
+      TransferStarted(:final transfer) ||
+      TransferProgress(:final transfer) ||
+      TransferComplete(:final transfer) ||
+      TransferFailed(:final transfer) ||
+      TransferRouted(:final transfer) => transfer,
+      _ => null,
+    };
+    if (transfer == null) return e;
+    var alias = _aliasOf[transfer];
+    if (alias == null && e is TransferStarted && e.peer != null) {
+      if (!e.incoming) {
+        // Offered again, before the offer returned: the rest of that one
+        final waiting = _resendingTo[e.peer!.id];
+        final had = waiting == null ? null : _offeredFiles[waiting.$1];
+        if (had != null && tailStart(had, e.files) != null) {
+          alias = _resendingTo.remove(e.peer!.id);
+        }
+      } else {
+        // Taken without asking (accepted on its own): carried on all the same
+        alias = _carryOn(e.peer!, transfer, e.files, rename: false);
+      }
+      if (alias != null) {
+        _aliasOf[transfer] = alias;
+        _resumedAs[alias.$1] = transfer;
+      }
+    }
+    if (alias == null) return e;
+    final (to, before) = alias;
+    if (e is TransferComplete || e is TransferFailed) {
+      _aliasOf.remove(transfer);
+      _resumedAs.remove(to);
+    }
+    return switch (e) {
+      TransferStarted() => TransferStarted(
+        to,
+        peer: e.peer,
+        incoming: e.incoming,
+        files: e.files,
+        total: e.total + before,
+        apps: e.apps,
+      ),
+      TransferProgress() => TransferProgress(
+        transfer: to,
+        bytes: e.bytes + before,
+        total: e.total + before,
+      ),
+      TransferComplete() => TransferComplete(
+        transfer: to,
+        saved: [...?_earlier.remove(to), ...e.saved],
+      ),
+      TransferFailed() => TransferFailed(transfer: to, reason: e.reason),
+      TransferRouted() => TransferRouted(
+        transfer: to,
+        route: e.route,
+        settingUpDirect: e.settingUpDirect,
+        whyNotDirect: e.whyNotDirect,
+      ),
+      _ => e,
+    };
+  }
+
+  /// A transfer of files that lost its connection, and can carry on: its
+  /// files known, no apps among them (their folders are named for the
+  /// offer), not an import, and not started again too often.
+  bool _canResume(String id, String reason) {
+    if (!lostConnection(reason) || _offeredFiles[id] == null) return false;
+    if (_imports.containsKey(id) || _transferApps.containsKey(id)) return false;
+    final a = _activity.where((a) => a.id == id).firstOrNull;
+    if (a == null || a.kind != ActivityKind.files) return false;
+    if ((_resumeTries[id] ?? 0) >= resumeTries) return false;
+    return a.incoming || _sends.containsKey(id);
+  }
+
+  void _resume(String id, String reason) {
+    final a = _activity.firstWhere((a) => a.id == id);
+    _resumeTries[id] = (_resumeTries[id] ?? 0) + 1;
+    LinksyPlatform.cancelNotice(id);
+    _update(id, (a) {
+      a
+        ..status = ActivityStatus.active
+        ..speed = 0
+        ..reason = tr.activityReconnecting;
+    });
+    if (a.incoming) {
+      _interrupted.remove(a.deviceId)?.timer.cancel();
+      _interrupted[a.deviceId] = (
+        id: id,
+        files: _offeredFiles[id]!,
+        bytes: a.bytes,
+        since: a.time,
+        timer: Timer(resumeWithin, () {
+          if (_interrupted[a.deviceId]?.id != id) return;
+          _interrupted.remove(a.deviceId);
+          _onEvent(TransferFailed(transfer: id, reason: reason));
+        }),
+      );
+    } else {
+      _resuming.add(id);
+      unawaited(_resend(id, a.deviceId, a.bytes, reason));
+    }
+  }
+
+  /// Sender: offers again, once the device is back, what it may not have
+  /// whole.
+  Future<void> _resend(
+    String id,
+    String deviceId,
+    int sent,
+    String reason,
+  ) async {
+    final files = _offeredFiles[id]!;
+    final (_, picked) = _sends[id]!;
+    final from = firstUnsure([for (final f in files) f.size], sent);
+    // Not what was picked (it can't be told apart): all of it, the receiver
+    // has what it has.
+    final (paths, before) = resendPaths(picked, files, from) ?? (picked, 0);
+    final until = DateTime.now().add(resumeWithin);
+    var wait = const Duration(seconds: 1);
+    while (DateTime.now().isBefore(until)) {
+      await Future<void>.delayed(wait);
+      wait = const Duration(seconds: 5);
+      if (!_resuming.contains(id)) return;
+      _resendingTo[deviceId] = (id, before);
+      try {
+        final next = await node.sendBundle(deviceId, paths, const []);
+        if (!_resuming.remove(id)) {
+          // Cancelled meanwhile
+          unawaited(node.cancel(next).catchError((Object _) {}));
+          return;
+        }
+        _resendingTo.remove(deviceId);
+        _aliasOf[next] = (id, before);
+        _resumedAs[id] = next;
+        _update(id, (a) => a.reason = null);
+        log.add(
+          'Transfer with ${_who(deviceId)}: offered again, '
+          '${paths.length} of ${picked.length} item(s)',
+        );
+        return;
+      } on LinksyException {
+        _resendingTo.remove(deviceId);
+      }
+    }
+    if (!_resuming.remove(id)) return;
+    _onEvent(TransferFailed(transfer: id, reason: reason));
+  }
+
+  /// Receiver: an offer that is the rest of a transfer cut off from the same
+  /// device is taken without asking, and carries on that transfer.
+  bool _continueIncoming(TransferRequest e) {
+    if (e.apps.isNotEmpty) return false;
+    final alias = _carryOn(e.from, e.transfer, e.files, rename: true);
+    if (alias == null) return false;
+    _aliasOf[e.transfer] = alias;
+    _resumedAs[alias.$1] = e.transfer;
+    log.add(
+      'Transfer with ${e.from.name}: carrying on, '
+      '${e.files.length} file(s) offered again',
+    );
+    unawaited(_run(() => node.respond(e.transfer, accept: true)));
+    return true;
+  }
+
+  /// Receiver: when [files] are the rest of what [from] was sending, takes
+  /// up that transfer and returns it and the bytes before them. With
+  /// [rename], before it's accepted: a file offered again that's here whole
+  /// already goes back to being its part, so the core checks it and nothing
+  /// of it is sent again (otherwise it would be saved twice, as "a (1).jpg").
+  (String, int)? _carryOn(
+    DeviceInfo from,
+    String transfer,
+    List<OfferedFile> files, {
+    required bool rename,
+  }) {
+    final w = _interrupted[from.id];
+    if (w == null) return null;
+    final start = tailStart(w.files, files);
+    if (start == null) return null;
+    _interrupted.remove(from.id);
+    w.timer.cancel();
+    final dir = settings?.downloadDir;
+    final earlier = <String>[];
+    final whole = wholeWithin(w.files, w.bytes);
+    for (var i = 0; dir != null && i < whole; i++) {
+      final path = '$dir/${w.files[i].path}';
+      try {
+        final file = File(path);
+        // Arrived for this transfer, whole, and not being resumed already
+        if (!file.existsSync() ||
+            file.lengthSync() != w.files[i].size ||
+            file.lastModifiedSync().isBefore(w.since) ||
+            File('$path.linksy-part').existsSync()) {
+          continue;
+        }
+        if (i < start) {
+          earlier.add(path);
+        } else if (rename) {
+          file.renameSync('$path.linksy-part');
+        }
+      } on FileSystemException {
+        continue;
+      }
+    }
+    _earlier[w.id] = earlier;
+    _update(w.id, (a) => a.reason = null);
+    var before = 0;
+    for (final f in w.files.take(start)) {
+      before += f.size;
+    }
+    return (w.id, before);
+  }
+
+  /// A transfer is over, for good: what was kept to carry it on goes.
+  void _ended(String id) {
+    _offeredFiles.remove(id);
+    _sends.remove(id);
+    _resumeTries.remove(id);
+    _earlier.remove(id);
+  }
+
+  void _onEvent(LinksyEvent raw) {
+    // A transfer that carries on after a lost connection is the one it
+    // continues, from where that one was.
+    final e = _aliased(raw);
+    if (e is TransferStarted && identical(e, raw)) {
+      _offeredFiles[e.transfer] = e.files;
+    }
     if (e is ClipboardReceived) _lastCopied = e.text;
     _logEvent(e);
     switch (e) {
@@ -2413,6 +2694,8 @@ class LinksyController extends ChangeNotifier with WidgetsBindingObserver {
       case SettingsChanged(:final settings):
         this.settings = settings;
         notifyListeners();
+      case TransferRequest() when _continueIncoming(e):
+        break;
       case TransferRequest(
         :final transfer,
         :final from,
@@ -2526,6 +2809,7 @@ class LinksyController extends ChangeNotifier with WidgetsBindingObserver {
         });
         _importEnded(transfer, ok: false, reason: reason);
       case TransferComplete(:final transfer, :final saved):
+        _ended(transfer);
         LinksyPlatform.cancelNotice(transfer);
         // An app's files stay where they are, to be installed from there.
         final apps = _transferApps[transfer] ?? const <AppInfo>[];
@@ -2552,7 +2836,11 @@ class LinksyController extends ChangeNotifier with WidgetsBindingObserver {
         }
         _lastSample.remove(transfer);
         _routes.remove(transfer);
+      case TransferFailed(:final transfer, :final reason)
+          when _canResume(transfer, reason):
+        _resume(transfer, reason);
       case TransferFailed(:final transfer, :final reason):
+        _ended(transfer);
         LinksyPlatform.cancelNotice(transfer);
         _routes.remove(transfer);
         // An app's files have nothing left to be: they go.
@@ -2633,6 +2921,9 @@ class LinksyController extends ChangeNotifier with WidgetsBindingObserver {
     }
     switch (e) {
       case SessionRequest(kind: SessionKind.sound):
+        break;
+      // Carries on a transfer cut off: taken without asking.
+      case TransferRequest(:final transfer) when _aliasOf.containsKey(transfer):
         break;
       case PairingRequest() ||
           PairingFailed() ||
@@ -2794,6 +3085,7 @@ class LinksyController extends ChangeNotifier with WidgetsBindingObserver {
     LinksyPlatform.sharedTo(deviceId);
     try {
       final transfer = await node.sendFiles(deviceId, paths);
+      _sends[transfer] = (deviceId, paths);
       // Progress events can race the return; only add if not seen yet.
       if (_activity.every((a) => a.id != transfer)) {
         _add(
@@ -3085,7 +3377,21 @@ class LinksyController extends ChangeNotifier with WidgetsBindingObserver {
     });
   }
 
-  Future<String?> cancel(String transfer) => _run(() => node.cancel(transfer));
+  Future<String?> cancel(String transfer) {
+    // Waiting to carry on: nothing runs to stop, it just ends here.
+    if (_resuming.remove(transfer) ||
+        _interrupted.values.any((w) => w.id == transfer)) {
+      _interrupted.removeWhere((_, w) {
+        if (w.id != transfer) return false;
+        w.timer.cancel();
+        return true;
+      });
+      _onEvent(TransferFailed(transfer: transfer, reason: 'cancelled'));
+      return Future.value();
+    }
+    final live = _resumedAs[transfer] ?? transfer;
+    return _run(() => node.cancel(live));
+  }
 
   Future<String?> respond(String request, {required bool accept}) async {
     LinksyPlatform.cancelNotice(request);
@@ -3248,6 +3554,10 @@ class LinksyController extends ChangeNotifier with WidgetsBindingObserver {
   @override
   void dispose() {
     _memoryTimer?.cancel();
+    for (final w in _interrupted.values) {
+      w.timer.cancel();
+    }
+    _resuming.clear();
     _volumeKeySub?.cancel();
     for (final t in _volumeCooling.values) {
       t.cancel();
