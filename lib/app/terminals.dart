@@ -74,6 +74,35 @@ class TerminalTab extends ChangeNotifier {
   /// A key from the key bar, as its xterm sequence.
   void key(String sequence) => _typed(sequence);
 
+  /// A key with no character (arrows, F1–F12, Home…), with Ctrl or Alt if
+  /// on: the terminal writes it as the program asked, so arrows work in
+  /// htop and vim too (application cursor mode).
+  void special(TerminalKey k) {
+    final withCtrl = ctrl, withAlt = alt;
+    if (ctrl || alt) {
+      ctrl = false;
+      alt = false;
+      notifyListeners();
+    }
+    // xterm 4.0.0 reads application cursor keys from the keypad mode
+    // instead of `?1h`: a program that sets only that (or only the keypad
+    // mode) would get the wrong arrows. Written here as that mode says.
+    final app = switch (k) {
+      TerminalKey.arrowUp => 'A',
+      TerminalKey.arrowDown => 'B',
+      TerminalKey.arrowRight => 'C',
+      TerminalKey.arrowLeft => 'D',
+      TerminalKey.home => 'H',
+      TerminalKey.end => 'F',
+      _ => null,
+    };
+    if (app != null && !withCtrl && !withAlt) {
+      _typed(term.cursorKeysMode ? '\x1bO$app' : '\x1b[$app');
+      return;
+    }
+    term.keyInput(k, ctrl: withCtrl, alt: withAlt);
+  }
+
   void toggleCtrl() {
     ctrl = !ctrl;
     notifyListeners();
