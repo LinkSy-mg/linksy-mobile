@@ -4,6 +4,11 @@ All notable changes to Linksy for Android. Format: [Keep a Changelog](https://ke
 
 ## [Unreleased]
 
+## [0.3.6] - 2026-11-13
+
+> [!IMPORTANT]
+> **If Play Protect stops the install,** pause **Scan apps with Play Protect** while installing (Play Store › your picture › Play Protect › the gear at the top right), then turn it back on.
+
 ### Added
 
 - **Start when the phone starts** (Settings › Connection): after a restart, Linksy comes back in the background with its quiet notification, and your computers see the phone without you opening the app. On once a computer is paired. Not after Force stop: Android keeps a force-stopped app closed until you open it.
