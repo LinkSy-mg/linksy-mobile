@@ -4,6 +4,40 @@ All notable changes to Linksy for Android. Format: [Keep a Changelog](https://ke
 
 ## [Unreleased]
 
+### Added
+
+- **Start when the phone starts** (Settings › Connection): after a restart, Linksy comes back in the background with its quiet notification, and your computers see the phone without you opening the app. On once a computer is paired. Not after Force stop: Android keeps a force-stopped app closed until you open it.
+- The phone's volume buttons step the computer's volume on the Deck too, as they do on its page. A held button no longer floods the computer.
+- A touchpad button on the Deck opens Remote Input in one tap.
+- Touchpad: double-tap and slide to drag (select text, move windows). The button stays down when you lift your finger, so you can keep going; a tap lets go.
+- The Deck's player: pick which of the computer's players it controls (tap its title), one row high, long titles that slide by, and words and buttons that grow with the tile. Buttons the player can't use are gone instead of grey.
+- Deck › Theme: Full screen, without the status and navigation bars, and Album art as it is, not redrawn in the theme's dots or pixels.
+- Terminal: Enter, F1 to F12, Delete, % and + on the key bar, for htop, btm and the like. Ctrl and Alt now work with the arrows and other keys too.
+- Remote Input: a key row under the touchpad with Ctrl, Alt, Shift and Super (tap for the next key or typed letter, hold to press alone), Esc, Tab, the arrows, Home, End, PgUp, PgDn, Delete, Insert, PrtSc and F1 to F12.
+- Remote Input: a Browser tab beside Slides, with Back, Forward, Reload, Home, tabs, page up and down, and Address to type in the address bar.
+- Slides: First, Last, Black screen, White screen and From here.
+- Settings › With your computers › Touchpad speed.
+- Switch between Remote Input, the Deck and the Terminal from their headers, without going back. What each had open stays open.
+- Logs: what Linksy takes of the phone's memory, under This phone, and a line a minute after it leaves the screen, then every half hour, for idle memory reports.
+
+### Changed
+
+- Your computer can set this phone's volumes, ringer, Do Not Disturb and flashlight from away too, and browse its Gallery, without Allow Everything From Away.
+
+### Fixed
+
+- On another phone's page, See all on Photos opens again.
+- See all for apps: a picked app gets a thin blue outline instead of a thick one, long notes stop at two lines, and the send bar no longer covers the list.
+- Terminal: the arrow keys work in full-screen programs (htop, vim) that switch to application cursor keys.
+- The Deck's player no longer loses or cuts off its buttons at some sizes.
+- The Deck turned the other way round in landscape keeps clear of the camera cut-out and the bars.
+- Tiles for actions the computer doesn't let this phone use are no longer shown greyed out on the Deck; they're left out.
+- The computer's volume on its page reads 100 % on one line.
+- Going from Remote Input to the Deck, Media or Terminal and back no longer starts a new session each time, so the computer stops announcing it again and again. The session stays open a minute after you leave the page, and ends at once when Linksy goes to the background or the network changes.
+- A Remote Input session reads "Touchpad and keyboard" in History and on the device card, not "Its screen".
+- This phone's notifications, battery and calls reach a paired computer even when no link is up, on the same Wi-Fi or from away. They used to stop once the link went quiet.
+- A deck left open stays ready: its tiles no longer go dim after a quiet minute, and a tap connects by itself. They dim only when the computer doesn't answer, and a tap on a dim tile tries it again.
+
 ## [0.3.5] - 2026-11-06
 
 > [!IMPORTANT]
