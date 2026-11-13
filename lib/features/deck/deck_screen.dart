@@ -41,6 +41,9 @@ class _DeckScreenState extends State<DeckScreen> with WidgetsBindingObserver {
   Timer? _idle;
   bool _dim = false;
 
+  /// The bars hidden (Full screen in the theme sheet).
+  bool _full = false;
+
   /// A computer that offers actions but sends no layouts: its deck is laid
   /// out here, once it's had a moment to send them.
   Timer? _grace;
@@ -66,6 +69,7 @@ class _DeckScreenState extends State<DeckScreen> with WidgetsBindingObserver {
     _show(false);
     _c.unwatchMedia(_id);
     _c.volumeKeysFor(this, null);
+    if (_full) LinksyPlatform.edgeToEdge();
     _idle?.cancel();
     _grace?.cancel();
     // The screen is the phone's again.
@@ -130,6 +134,15 @@ class _DeckScreenState extends State<DeckScreen> with WidgetsBindingObserver {
   Widget build(BuildContext context) {
     final c = LinksyScope.of(context);
     final connected = c.device(_id)?.connected ?? false;
+    // Full screen, as picked in the theme sheet (mobile#21), while in front.
+    final full =
+        c.deckFullScreen && (ModalRoute.of(context)?.isCurrent ?? false);
+    if (full != _full) {
+      _full = full;
+      full
+          ? SystemChrome.setEnabledSystemUIMode(SystemUiMode.immersiveSticky)
+          : LinksyPlatform.edgeToEdge();
+    }
     // In front with the computer's volume: the phone's keys step it (§7).
     final front = ModalRoute.of(context)?.isCurrent ?? false;
     final stepping = front && c.volume[_id] != null;

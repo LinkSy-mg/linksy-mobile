@@ -27,14 +27,15 @@ class DeckDraft {
   static List<(int, int)> sizesOf(String kind) => switch (kind) {
     'button' => const [(1, 1), (2, 1)],
     'volume' => const [(4, 1), (2, 1), (1, 3)],
-    'music' => const [(4, 2), (2, 2)],
+    'music' => const [(4, 2), (4, 1), (2, 2)],
     'clock' => const [(2, 1), (2, 2), (1, 1)],
     _ => const [],
   };
 
   /// Whether [kind] can be [w] × [h]: any size, as long as it still reads.
   static bool allows(String kind, int w, int h) => switch (kind) {
-    'music' => w >= 2 && h >= 2,
+    // One row high, on one line (mobile#21): wide enough for its buttons.
+    'music' => h == 1 ? w >= 3 : w >= 2,
     'volume' => w * h >= 2,
     _ => true,
   };

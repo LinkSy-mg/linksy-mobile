@@ -145,8 +145,7 @@ class _LaidDeckState extends State<LaidDeck> {
       for (final a in c.deckActions[_id] ?? const <DeckAction>[]) a.id: a,
     };
     final players = c.media[_id]?.players ?? const <MediaPlayer>[];
-    final player =
-        players.where((p) => p.playing).firstOrNull ?? players.firstOrNull;
+    final player = c.playerFor(_id);
     final scope = _Scope(
       deviceId: _id,
       deviceName: name,
@@ -155,8 +154,10 @@ class _LaidDeckState extends State<LaidDeck> {
       actions: c.deckActions[_id] == null ? null : actions,
       states: c.deckStates[_id] ?? const {},
       player: widget.live ? player : null,
+      players: widget.live ? players : const [],
       say: _say,
       hold: _edit,
+      hideBlocked: true,
     );
 
     Widget body;
@@ -260,19 +261,25 @@ class _LaidDeckState extends State<LaidDeck> {
   ) => Stack(
     fit: StackFit.expand,
     children: [
-      Row(
-        children: [
-          Expanded(
-            child: Column(
-              children: [
-                Expanded(child: body),
-                if (pages > 1)
-                  _Dots(look: look, count: pages, at: _page, height: 32),
-              ],
+      // Either way round (mobile#21): clear of the cut-out and the bars,
+      // whichever side they're on.
+      SafeArea(
+        top: false,
+        bottom: false,
+        child: Row(
+          children: [
+            Expanded(
+              child: Column(
+                children: [
+                  Expanded(child: body),
+                  if (pages > 1)
+                    _Dots(look: look, count: pages, at: _page, height: 32),
+                ],
+              ),
             ),
-          ),
-          _Rail(look: look, onEdit: widget.editable ? _edit : null),
-        ],
+            _Rail(look: look, onEdit: widget.editable ? _edit : null),
+          ],
+        ),
       ),
       if (_note != null)
         Positioned(left: 0, right: 0, bottom: 14, child: _noteLine(look)),
@@ -382,6 +389,7 @@ class DeckTileView extends StatelessWidget {
       actions: actions,
       states: states,
       player: null,
+      players: const [],
       say: (_) {},
       hold: null,
     ),
@@ -398,8 +406,10 @@ class _Scope {
     required this.actions,
     required this.states,
     required this.player,
+    required this.players,
     required this.say,
     required this.hold,
+    this.hideBlocked = false,
   });
 
   final String deviceId;
@@ -411,10 +421,17 @@ class _Scope {
   final Map<String, DeckAction>? actions;
   final Map<String, DeckState> states;
   final MediaPlayer? player;
+
+  /// Every player the computer has: a tap on the title picks among them.
+  final List<MediaPlayer> players;
   final void Function(String) say;
 
   /// Held down: to the editor, with this tile.
   final void Function([String? tile])? hold;
+
+  /// A tile whose action the computer doesn't let this phone use isn't
+  /// drawn at all (mobile#21); the editor still shows it.
+  final bool hideBlocked;
 }
 
 /// The deck's name (hold or tap it for the theme), the computer's under it
@@ -815,6 +832,9 @@ class _Tile extends StatelessWidget {
     final on = state?.on ?? false;
     final available = scope.live && known;
     final runs = const {'button', 'volume'}.contains(t.kind);
+    if (scope.hideBlocked && scope.live && runs && !known) {
+      return const SizedBox.shrink();
+    }
     final dimmed = t.kind != 'clock' && (!scope.live || runs && !known);
     final one = t.w == 1 && t.h == 1 && t.kind != 'clock';
     final pad = (one ? 5.0 : 9.0) * scale;
@@ -1260,6 +1280,20 @@ class _MusicFaceState extends State<_MusicFace> {
     return _cover;
   }
 
+  /// Which player the deck controls, when the computer has more than one.
+  Future<void> _pick() async {
+    final scope = widget.scope;
+    if (scope.players.length < 2) return;
+    final c = LinksyScope.read(context);
+    final picked = await showModalBottomSheet<String>(
+      context: context,
+      showDragHandle: true,
+      builder: (context) =>
+          _PlayerSheet(players: scope.players, current: scope.player?.id),
+    );
+    if (picked != null) await c.pickPlayer(scope.deviceId, picked);
+  }
+
   @override
   Widget build(BuildContext context) {
     final scope = widget.scope, look = scope.look, pen = widget.pen;
@@ -1267,13 +1301,20 @@ class _MusicFaceState extends State<_MusicFace> {
     final p = scope.player;
     final c = LinksyScope.read(context);
     final playing = p?.playing ?? false;
+    final several = scope.players.length > 1;
     final subtitle = [
+      if (several) p?.app,
       p?.artist,
       p?.album,
     ].whereType<String>().where((x) => x.isNotEmpty).join(' · ');
+    final title = p == null || p.title.isEmpty
+        ? context.l10n.deckNothingPlaying
+        : p.title;
+    // A timeline only when the player knows how long the track is.
+    final timeline = p?.lengthMs != null;
 
-    Widget control(String icon, String command, {bool big = false}) {
-      final size = (big ? 15.0 : 18.0) * s;
+    Widget control(String icon, String command, double f, {bool big = false}) {
+      final size = (big ? 15.0 : 18.0) * s * f;
       final glyph = DeckIcon(
         icon,
         size: look.icons == DeckStroke.pixel
@@ -1289,16 +1330,16 @@ class _MusicFaceState extends State<_MusicFace> {
         scale: 0.88,
         semanticLabel: command,
         child: Padding(
-          padding: EdgeInsets.all(4 * s),
+          padding: EdgeInsets.all(4 * s * f),
           child: big
               ? Container(
-                  width: 30 * s,
-                  height: 30 * s,
+                  width: 30 * s * f,
+                  height: 30 * s * f,
                   alignment: Alignment.center,
                   decoration: BoxDecoration(
                     color: look.play,
                     borderRadius: BorderRadius.circular(
-                      look.playRadius == 99 ? 15 * s : look.playRadius,
+                      look.playRadius == 99 ? 15 * s * f : look.playRadius,
                     ),
                     boxShadow: look.playShadow
                         ? const [BoxShadow(offset: Offset(2, 2))]
@@ -1311,48 +1352,138 @@ class _MusicFaceState extends State<_MusicFace> {
       );
     }
 
+    // What the player can't do isn't shown, rather than greyed (mobile#21).
+    Widget controls(double f) => Opacity(
+      opacity: p == null ? 0.5 : 1,
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          if (p?.canPrevious ?? false) control('prev', 'previous', f),
+          control(playing ? 'pause' : 'play', 'play_pause', f, big: true),
+          if (p?.canNext ?? false) control('next', 'next', f),
+        ],
+      ),
+    );
+
+    Widget words(double f, double width) => GestureDetector(
+      behavior: HitTestBehavior.opaque,
+      onTap: several ? _pick : null,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          _Marquee(
+            key: ValueKey(title),
+            width: width,
+            child: pen.words(
+              title,
+              size: 13 * f,
+              width: 4000,
+              pitches: const [1.5, 1.3],
+            ),
+          ),
+          if (subtitle.isNotEmpty) ...[
+            SizedBox(height: 2 * s * f),
+            _Marquee(
+              key: ValueKey(subtitle),
+              width: width,
+              child: pen.words(
+                subtitle,
+                size: 10.5 * f,
+                width: 4000,
+                opacity: 0.75,
+              ),
+            ),
+          ],
+        ],
+      ),
+    );
+
     return LayoutBuilder(
       builder: (context, box) {
-        final cover = widget.tile.w >= 4;
-        final side = box.maxHeight;
-        final meta = cover ? box.maxWidth - side - 9 * s : box.maxWidth;
+        final w = box.maxWidth, h = box.maxHeight;
+        // A tile one row high: everything on one line.
+        if (h < 64 * s) {
+          final side = h;
+          final cover = w >= side * 5;
+          final f = (h / (40 * s)).clamp(0.8, 1.2);
+          return Row(
+            children: [
+              if (cover) ...[
+                DeckCover(
+                  look: look,
+                  size: side,
+                  art: _coverOf(p),
+                  real: c.deckRealCovers,
+                ),
+                SizedBox(width: 8 * s),
+              ],
+              Expanded(
+                child: LayoutBuilder(
+                  builder: (context, inner) => Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      GestureDetector(
+                        behavior: HitTestBehavior.opaque,
+                        onTap: several ? _pick : null,
+                        child: _Marquee(
+                          key: ValueKey(title),
+                          width: inner.maxWidth,
+                          child: pen.words(
+                            title,
+                            size: 12 * f,
+                            width: 4000,
+                            pitches: const [1.3],
+                          ),
+                        ),
+                      ),
+                      if (timeline) ...[
+                        SizedBox(height: 5 * s),
+                        DeckBar(value: _progress, look: look),
+                      ],
+                    ],
+                  ),
+                ),
+              ),
+              SizedBox(width: 4 * s),
+              FittedBox(fit: BoxFit.scaleDown, child: controls(f)),
+            ],
+          );
+        }
+        // Taller: the cover beside when there's room for words too, and
+        // words and buttons as big as the tile allows, never cut.
+        final cover = w - h - 9 * s >= 110 * s;
+        final meta = cover ? w - h - 9 * s : w;
+        final need = (13 * 1.5 + 10.5 * 1.4 + 2 + 6 + 8 + 38 + 6) * s;
+        final f = math.min(h / need, meta / (100 * s)).clamp(0.7, 2.4);
         return Row(
           children: [
             if (cover) ...[
-              DeckCover(look: look, size: side, art: _coverOf(p)),
+              DeckCover(
+                look: look,
+                size: h,
+                art: _coverOf(p),
+                real: c.deckRealCovers,
+              ),
               SizedBox(width: 9 * s),
             ],
             Expanded(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  pen.words(
-                    p == null || p.title.isEmpty
-                        ? context.l10n.deckNothingPlaying
-                        : p.title,
-                    size: 13,
-                    width: meta,
-                    pitches: const [1.5, 1.3],
-                  ),
-                  if (subtitle.isNotEmpty) ...[
-                    SizedBox(height: 2 * s),
-                    pen.words(subtitle, size: 10.5, width: meta, opacity: 0.75),
+                  words(f, meta),
+                  if (timeline) ...[
+                    SizedBox(height: 6 * s * f),
+                    DeckBar(value: _progress, look: look),
                   ],
-                  SizedBox(height: 6 * s),
-                  DeckBar(value: _progress, look: look),
                   const Spacer(),
-                  Opacity(
-                    opacity: p == null ? 0.5 : 1,
-                    child: Row(
-                      children: [
-                        control('prev', 'previous'),
-                        control(
-                          playing ? 'pause' : 'play',
-                          'play_pause',
-                          big: true,
-                        ),
-                        control('next', 'next'),
-                      ],
+                  Align(
+                    alignment: Alignment.centerLeft,
+                    child: FittedBox(
+                      fit: BoxFit.scaleDown,
+                      alignment: Alignment.centerLeft,
+                      child: controls(f),
                     ),
                   ),
                 ],
@@ -1361,6 +1492,200 @@ class _MusicFaceState extends State<_MusicFace> {
           ],
         );
       },
+    );
+  }
+}
+
+/// A line too long for its tile slides by now and then, like an old
+/// stereo's display (mobile#21); not with reduced motion.
+class _Marquee extends StatefulWidget {
+  const _Marquee({super.key, required this.width, required this.child});
+
+  final double width;
+  final Widget child;
+
+  @override
+  State<_Marquee> createState() => _MarqueeState();
+}
+
+class _MarqueeState extends State<_Marquee> {
+  final _scroll = ScrollController();
+  bool _running = false;
+
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) => _run());
+  }
+
+  Future<void> _run() async {
+    if (_running || !mounted || !_scroll.hasClients) return;
+    if (motion(context) == Duration.zero) return;
+    _running = true;
+    while (mounted && _scroll.hasClients) {
+      final far = _scroll.position.maxScrollExtent;
+      if (far <= 0) break;
+      await Future<void>.delayed(const Duration(seconds: 2));
+      if (!mounted || !_scroll.hasClients) break;
+      await _scroll.animateTo(
+        far,
+        duration: Duration(milliseconds: (far * 28).round() + 300),
+        curve: Curves.linear,
+      );
+      await Future<void>.delayed(const Duration(milliseconds: 1500));
+      if (!mounted || !_scroll.hasClients) break;
+      _scroll.jumpTo(0);
+    }
+    _running = false;
+  }
+
+  @override
+  void dispose() {
+    _scroll.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) => SizedBox(
+    width: widget.width,
+    child: SingleChildScrollView(
+      controller: _scroll,
+      scrollDirection: Axis.horizontal,
+      physics: const NeverScrollableScrollPhysics(),
+      child: widget.child,
+    ),
+  );
+}
+
+/// A switch in the theme sheet.
+class _Toggle extends StatelessWidget {
+  const _Toggle({
+    required this.title,
+    required this.caption,
+    required this.value,
+    required this.onChanged,
+  });
+
+  final String title;
+  final String caption;
+  final bool value;
+  final ValueChanged<bool> onChanged;
+
+  @override
+  Widget build(BuildContext context) {
+    final s = Sig.of(context);
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 6),
+      child: Row(
+        children: [
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  title,
+                  style: TextStyle(
+                    fontWeight: FontWeight.w600,
+                    fontSize: 15,
+                    color: s.ink,
+                  ),
+                ),
+                Text(caption, style: TextStyle(fontSize: 13, color: s.muted)),
+              ],
+            ),
+          ),
+          const SizedBox(width: 12),
+          Switch(value: value, onChanged: onChanged),
+        ],
+      ),
+    );
+  }
+}
+
+/// The computer's players, to pick the one the deck controls.
+class _PlayerSheet extends StatelessWidget {
+  const _PlayerSheet({required this.players, required this.current});
+
+  final List<MediaPlayer> players;
+  final String? current;
+
+  @override
+  Widget build(BuildContext context) {
+    final s = Sig.of(context);
+    return SafeArea(
+      child: Padding(
+        padding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Padding(
+              padding: const EdgeInsets.fromLTRB(8, 0, 8, 12),
+              child: Text(
+                context.l10n.deckPickPlayer,
+                style: TextStyle(
+                  fontSize: 17,
+                  fontWeight: FontWeight.w700,
+                  color: s.ink,
+                ),
+              ),
+            ),
+            for (final p in players)
+              Pressable(
+                onTap: () => Navigator.of(context).pop(p.id),
+                scale: 0.97,
+                semanticLabel: p.app,
+                child: Container(
+                  margin: const EdgeInsets.only(bottom: 6),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 14,
+                    vertical: 12,
+                  ),
+                  decoration: BoxDecoration(
+                    color: p.id == current ? s.raised : null,
+                    borderRadius: BorderRadius.circular(Radii.lg),
+                    border: Border.all(
+                      color: p.id == current ? Sig.blue : s.line,
+                    ),
+                  ),
+                  child: Row(
+                    children: [
+                      Icon(
+                        p.playing ? PhFill.play : PhFill.pause,
+                        size: 18,
+                        color: p.playing ? Sig.blue : s.muted,
+                      ),
+                      const SizedBox(width: 12),
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              p.app,
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                              style: TextStyle(
+                                fontWeight: FontWeight.w600,
+                                color: s.ink,
+                              ),
+                            ),
+                            if (p.title.isNotEmpty)
+                              Text(
+                                p.title,
+                                maxLines: 1,
+                                overflow: TextOverflow.ellipsis,
+                                style: TextStyle(fontSize: 13, color: s.muted),
+                              ),
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+          ],
+        ),
+      ),
     );
   }
 }
@@ -1513,6 +1838,7 @@ class _ThemeSheet extends StatelessWidget {
   Widget build(BuildContext context) {
     final s = Sig.of(context);
     final l = context.l10n;
+    final c = LinksyScope.of(context);
     final accent = layout.theme.accent;
 
     Widget option(
@@ -1632,6 +1958,21 @@ class _ThemeSheet extends StatelessWidget {
                 result: (id,),
               ),
           ]),
+          const SizedBox(height: 18),
+          // mobile#21: the whole screen, and covers as they are.
+          SectionLabel(l.deckDisplay),
+          _Toggle(
+            title: l.deckFullScreen,
+            caption: l.deckFullScreenCaption,
+            value: c.deckFullScreen,
+            onChanged: c.setDeckFullScreen,
+          ),
+          _Toggle(
+            title: l.deckRealCovers,
+            caption: l.deckRealCoversCaption,
+            value: c.deckRealCovers,
+            onChanged: c.setDeckRealCovers,
+          ),
         ],
       ),
     );

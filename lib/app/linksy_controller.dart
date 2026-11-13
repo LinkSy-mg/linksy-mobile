@@ -1757,6 +1757,49 @@ class LinksyController extends ChangeNotifier with WidgetsBindingObserver {
     return _run(() => node.setVolume(id, level: level, muted: muted));
   }
 
+  /// What each player tells about where it is, on the Logs page when that
+  /// changes: a bar that stays empty is a missing position or length.
+  final Map<String, String> _playerFacts = {};
+
+  void _logPlayers(DeviceInfo from, MediaState state) {
+    for (final p in state.players) {
+      final facts =
+          '${p.playing ? 'playing' : 'paused'}, '
+          'position ${p.positionMs == null ? 'none' : '${p.positionMs! ~/ 1000} s'}, '
+          'length ${p.lengthMs == null ? 'none' : '${p.lengthMs! ~/ 1000} s'}';
+      final key = '${from.id}/${p.id}';
+      final shape = facts.replaceAll(RegExp(r'\d+ s'), 'n');
+      if (_playerFacts[key] == shape) continue;
+      _playerFacts[key] = shape;
+      log.add('Player ${p.app} on ${from.name}: $facts');
+    }
+  }
+
+  /// The player [id]'s deck and media notice control: the one picked on the
+  /// deck while it's there (ids are stable, desktop 0.13.2), else the one
+  /// playing, else the first (mobile#21).
+  MediaPlayer? playerFor(String id) {
+    final players = media[id]?.players ?? const <MediaPlayer>[];
+    final picked = prefs['player.$id'];
+    return players.where((p) => p.id == picked).firstOrNull ??
+        players.where((p) => p.playing).firstOrNull ??
+        players.firstOrNull;
+  }
+
+  Future<void> pickPlayer(String id, String player) =>
+      _setPref('player.$id', player);
+
+  /// The deck over the whole screen, without the status and navigation
+  /// bars (mobile#21).
+  bool get deckFullScreen => prefs['deck_full'] == 'on';
+  Future<void> setDeckFullScreen(bool on) =>
+      _setPref('deck_full', on ? 'on' : null);
+
+  /// Covers as they are, not drawn in the theme's dots or pixels.
+  bool get deckRealCovers => prefs['deck_real_art'] == 'on';
+  Future<void> setDeckRealCovers(bool on) =>
+      _setPref('deck_real_art', on ? 'on' : null);
+
   /// Pages showing a computer's volume, in front: the phone's volume keys
   /// step it there (5 % a press) instead of the phone's own (§7).
   final Map<Object, String> _volumeKeys = {};
@@ -2189,6 +2232,7 @@ class LinksyController extends ChangeNotifier with WidgetsBindingObserver {
         final known = media[from.id];
         if (known == null || state.seq >= known.seq) {
           media[from.id] = state;
+          _logPlayers(from, state);
           _showMediaNotice();
           notifyListeners();
         }

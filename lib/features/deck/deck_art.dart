@@ -619,17 +619,23 @@ class DeckCover extends StatelessWidget {
     required this.look,
     required this.size,
     this.art,
+    this.real = false,
   });
 
   final DeckLook look;
   final double size;
   final Uint8List? art;
 
+  /// The picture as it is, whatever the theme does to covers.
+  final bool real;
+
   @override
   Widget build(BuildContext context) {
     final art = this.art;
     final square = Size.square(size);
-    if (look.cover == DeckCovers.dots || look.cover == DeckCovers.pixel) {
+    final themed = !(real && art != null);
+    if (themed &&
+        (look.cover == DeckCovers.dots || look.cover == DeckCovers.pixel)) {
       final n = look.cover == DeckCovers.pixel ? 12 : (size / 6).floor();
       if (art == null) {
         return CustomPaint(size: square, painter: _CoverPainter(look, null, n));
