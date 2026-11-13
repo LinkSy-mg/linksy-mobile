@@ -107,32 +107,9 @@ class _DeviceScreenState extends State<DeviceScreen> {
   @override
   void dispose() {
     _c.unwatchMedia(deviceId);
-    _volumeSteps(false);
+    _c.volumeKeysFor(this, null);
     _scroll.dispose();
     super.dispose();
-  }
-
-  /// While this page is in front and shows the computer's volume, the
-  /// phone's volume keys step it (5 % a press) instead of the phone's.
-  bool _stepping = false;
-  StreamSubscription<bool>? _steps;
-
-  void _volumeSteps(bool on) {
-    if (on == _stepping) return;
-    _stepping = on;
-    LinksyPlatform.volumeSteps(on);
-    _steps?.cancel();
-    _steps = on
-        ? LinksyPlatform.volumeKeys.listen((up) {
-            final v = _c.volume[deviceId];
-            if (v == null) return;
-            _c.setVolume(
-              deviceId,
-              level: (v.level + (up ? 0.05 : -0.05)).clamp(0.0, 1.0),
-              muted: up && v.muted ? false : null,
-            );
-          })
-        : null;
   }
 
   @override
@@ -146,8 +123,11 @@ class _DeviceScreenState extends State<DeviceScreen> {
     if (!_isComputer(view.device)) return PhonePage(deviceId: deviceId);
     final volume = view.connected ? c.volume[deviceId] : null;
     final front = ModalRoute.of(context)?.isCurrent ?? false;
+    // In front with the computer's volume: the phone's keys step it.
     scheduleMicrotask(() {
-      if (mounted) _volumeSteps(front && volume != null);
+      if (mounted) {
+        _c.volumeKeysFor(this, front && volume != null ? deviceId : null);
+      }
     });
     final recent = c.activityFor(deviceId).take(8).toList();
     final players = c.media[deviceId]?.players ?? const <MediaPlayer>[];

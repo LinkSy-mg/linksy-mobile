@@ -65,6 +65,7 @@ class _DeckScreenState extends State<DeckScreen> with WidgetsBindingObserver {
     WidgetsBinding.instance.removeObserver(this);
     _show(false);
     _c.unwatchMedia(_id);
+    _c.volumeKeysFor(this, null);
     _idle?.cancel();
     _grace?.cancel();
     // The screen is the phone's again.
@@ -129,6 +130,12 @@ class _DeckScreenState extends State<DeckScreen> with WidgetsBindingObserver {
   Widget build(BuildContext context) {
     final c = LinksyScope.of(context);
     final connected = c.device(_id)?.connected ?? false;
+    // In front with the computer's volume: the phone's keys step it (§7).
+    final front = ModalRoute.of(context)?.isCurrent ?? false;
+    final stepping = front && c.volume[_id] != null;
+    scheduleMicrotask(() {
+      if (mounted) _c.volumeKeysFor(this, stepping ? _id : null);
+    });
     // Connected again: the computer needs telling the deck shows.
     if (connected && !_connected && _open) {
       WidgetsBinding.instance.addPostFrameCallback((_) => _c.openDeck(_id));

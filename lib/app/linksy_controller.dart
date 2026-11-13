@@ -1757,6 +1757,66 @@ class LinksyController extends ChangeNotifier with WidgetsBindingObserver {
     return _run(() => node.setVolume(id, level: level, muted: muted));
   }
 
+  /// Pages showing a computer's volume, in front: the phone's volume keys
+  /// step it there (5 % a press) instead of the phone's own (§7).
+  final Map<Object, String> _volumeKeys = {};
+  StreamSubscription<bool>? _volumeKeySub;
+
+  /// [owner] (a page) shows [id]'s volume in front, or no longer (null).
+  void volumeKeysFor(Object owner, String? id) {
+    if (id == null) {
+      _volumeKeys.remove(owner);
+    } else {
+      _volumeKeys[owner] = id;
+    }
+    final on = _volumeKeys.isNotEmpty;
+    if (on == (_volumeKeySub != null)) return;
+    LinksyPlatform.volumeSteps(on);
+    _volumeKeySub?.cancel();
+    _volumeKeySub = on
+        ? LinksyPlatform.volumeKeys.listen((up) {
+            if (_volumeKeys.isNotEmpty) stepVolume(_volumeKeys.values.last, up);
+          })
+        : null;
+  }
+
+  /// A volume key's press: shown at once, sent at most ten times a second
+  /// (a held key repeats faster), the newest level last.
+  void stepVolume(String id, bool up) {
+    final v = volume[id];
+    if (v == null) return;
+    final unmute = up && v.muted;
+    volume[id] = VolumeState(
+      seq: v.seq,
+      level: (v.level + (up ? 0.05 : -0.05)).clamp(0.0, 1.0),
+      muted: unmute ? false : v.muted,
+    );
+    if (unmute) _unmuting.add(id);
+    notifyListeners();
+    if (_volumeCooling.containsKey(id)) {
+      _volumeDirty.add(id);
+      return;
+    }
+    _sendVolume(id);
+  }
+
+  final Map<String, Timer> _volumeCooling = {};
+  final Set<String> _volumeDirty = {};
+  final Set<String> _unmuting = {};
+
+  void _sendVolume(String id) {
+    final v = volume[id];
+    if (v == null) return;
+    final unmute = _unmuting.remove(id);
+    node
+        .setVolume(id, level: v.level, muted: unmute ? false : null)
+        .catchError((Object _) {});
+    _volumeCooling[id] = Timer(const Duration(milliseconds: 100), () {
+      _volumeCooling.remove(id);
+      if (_volumeDirty.remove(id)) _sendVolume(id);
+    });
+  }
+
   /// `play_pause`, `next`, `previous`, or `seek` to [positionMs].
   Future<String?> mediaCommand(
     String id,
