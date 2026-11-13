@@ -2541,7 +2541,12 @@ class LinksyController extends ChangeNotifier with WidgetsBindingObserver {
       id: e.session,
       deviceId: e.peer.id,
       kind: switch (e.kind) {
-        _ when !e.sharing && e.kind != SessionKind.display =>
+        // A computer's screen watched from here. Not `input`: the phone
+        // doesn't share there either, but it's the touchpad (Discussion #79).
+        _
+            when !e.sharing &&
+                e.kind != SessionKind.display &&
+                e.kind != SessionKind.input =>
           ActivityKind.watch,
         SessionKind.screen => ActivityKind.screen,
         SessionKind.camera => ActivityKind.camera,

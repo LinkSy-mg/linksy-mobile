@@ -399,7 +399,8 @@ class DemoNode implements LinksyNode {
         session: session,
         peer: _devices[id]!.device,
         kind: SessionKind.input,
-        sharing: true,
+        // As the core says: only a display's requester shares.
+        sharing: false,
       ),
     );
     return session;
