@@ -11,6 +11,7 @@ import '../../core/models.dart';
 import '../../ui/components.dart';
 import '../../ui/l10n.dart';
 import '../../ui/sig.dart';
+import '../device/page_switcher.dart';
 import 'deck_editor.dart';
 import 'laid_deck.dart';
 
@@ -322,6 +323,8 @@ class _DeckScreenState extends State<DeckScreen> with WidgetsBindingObserver {
                           : Sig.blue.withValues(alpha: 0.1),
                       onTap: () => openDeckEditor(context, widget.device),
                     ),
+                  const SizedBox(width: 8),
+                  PageSwitchButton(deviceId: _id, current: DevicePage.deck),
                 ],
               ),
               const SizedBox(height: 16),

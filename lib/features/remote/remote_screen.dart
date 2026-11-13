@@ -10,6 +10,7 @@ import '../../core/models.dart';
 import '../../ui/components.dart';
 import '../../ui/l10n.dart';
 import '../../ui/sig.dart';
+import '../device/page_switcher.dart';
 
 /// X11 keysyms the computer understands (docs/protocol.md §4.8).
 abstract final class Keysym {
@@ -190,6 +191,7 @@ class _RemoteScreenState extends State<RemoteScreen> {
                         ],
                       ),
                     ),
+                    PageSwitchButton(deviceId: _id, current: DevicePage.remote),
                   ],
                 ),
                 const SizedBox(height: 16),

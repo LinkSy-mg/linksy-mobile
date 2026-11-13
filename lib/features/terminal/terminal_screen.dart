@@ -12,6 +12,7 @@ import '../../ui/components.dart';
 import '../../ui/format.dart';
 import '../../ui/l10n.dart';
 import '../../ui/sig.dart';
+import '../device/page_switcher.dart';
 
 /// Signal's navy, with the brand's blue and cyan in the palette.
 const _theme = TerminalTheme(
@@ -213,6 +214,7 @@ class _TerminalScreenState extends State<TerminalScreen> {
               child: Column(
                 children: [
                   _Header(
+                    deviceId: widget.deviceId,
                     name: _name,
                     tab: tab,
                     onDetach: tab == null || tab.state != TabState.live
@@ -339,8 +341,10 @@ class _Header extends StatelessWidget {
     required this.tab,
     required this.onDetach,
     required this.onClose,
+    required this.deviceId,
   });
 
+  final String deviceId;
   final String name;
   final TerminalTab? tab;
   final VoidCallback? onDetach;
@@ -397,6 +401,12 @@ class _Header extends StatelessWidget {
                 ),
               ],
             ),
+          ),
+          PageSwitchButton(
+            deviceId: deviceId,
+            current: DevicePage.terminal,
+            color: Colors.white,
+            round: false,
           ),
           if (tab != null && onDetach != null)
             PopupMenuButton<String>(

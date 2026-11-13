@@ -13,6 +13,7 @@ import '../../ui/components.dart';
 import '../../ui/format.dart';
 import '../../ui/l10n.dart';
 import '../../ui/sig.dart';
+import '../device/page_switcher.dart';
 import '../remote/remote_screen.dart';
 import 'deck_art.dart';
 import 'deck_editor.dart';
@@ -199,6 +200,7 @@ class _LaidDeckState extends State<LaidDeck> {
       onTheme: layout == null ? null : () => _pickTheme(layout, own),
       onEdit: widget.editable ? _edit : null,
       onTouchpad: _touchpad,
+      deviceId: widget.device.id,
     );
 
     final dark = look.brightness == Brightness.dark;
@@ -283,6 +285,7 @@ class _LaidDeckState extends State<LaidDeck> {
               look: look,
               onEdit: widget.editable ? _edit : null,
               onTouchpad: _touchpad,
+              deviceId: widget.device.id,
             ),
           ],
         ),
@@ -331,11 +334,13 @@ class _Rail extends StatelessWidget {
     required this.look,
     required this.onEdit,
     required this.onTouchpad,
+    required this.deviceId,
   });
 
   final DeckLook look;
   final VoidCallback? onEdit;
   final VoidCallback onTouchpad;
+  final String deviceId;
 
   Widget _button(IconData icon, String label, VoidCallback? onTap) => Pressable(
     onTap: onTap,
@@ -364,6 +369,19 @@ class _Rail extends StatelessWidget {
         ),
         const SizedBox(height: 10),
         _button(Ph.mouseSimple, context.l10n.remoteTouchpad, onTouchpad),
+        const SizedBox(height: 10),
+        Container(
+          decoration: BoxDecoration(
+            shape: BoxShape.circle,
+            border: Border.all(color: look.screenInk.withValues(alpha: 0.3)),
+          ),
+          child: PageSwitchButton(
+            deviceId: deviceId,
+            current: DevicePage.deck,
+            color: look.screenInk,
+            round: false,
+          ),
+        ),
         if (onEdit != null) ...[
           const SizedBox(height: 10),
           _button(Ph.pencilSimple, context.l10n.deckEdit, onEdit),
@@ -470,10 +488,12 @@ class _Header extends StatelessWidget {
     required this.onTheme,
     required this.onEdit,
     required this.onTouchpad,
+    required this.deviceId,
   });
 
   final VoidCallback? onEdit;
   final VoidCallback onTouchpad;
+  final String deviceId;
   final DeckLook look;
   final String title;
   final String subtitle;
@@ -558,6 +578,13 @@ class _Header extends StatelessWidget {
               height: compact ? 36 : 44,
               child: Icon(Ph.mouseSimple, color: look.screenInk, size: 22),
             ),
+          ),
+          PageSwitchButton(
+            deviceId: deviceId,
+            current: DevicePage.deck,
+            color: look.screenInk,
+            size: compact ? 40 : 44,
+            round: false,
           ),
           const SizedBox(width: 6),
           if (onEdit != null)
