@@ -98,6 +98,7 @@ abstract final class Ph {
   static const arrowClockwise = IconData(0xe036, fontFamily: 'PhosphorRegular');
   static const hand = IconData(0xe298, fontFamily: 'PhosphorRegular');
   static const handPointing = IconData(0xe29a, fontFamily: 'PhosphorRegular');
+  static const handGrabbing = IconData(0xe57c, fontFamily: 'PhosphorRegular');
   static const mouseSimple = IconData(0xe644, fontFamily: 'PhosphorRegular');
   static const keyboard = IconData(0xe2d8, fontFamily: 'PhosphorRegular');
   static const presentation = IconData(0xe654, fontFamily: 'PhosphorRegular');

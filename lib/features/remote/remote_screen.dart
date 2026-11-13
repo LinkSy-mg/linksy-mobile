@@ -304,7 +304,10 @@ class _Sliding extends StatelessWidget {
 }
 
 /// One finger moves the pointer, a tap clicks, a two-finger tap right-clicks,
-/// two fingers scroll. The keyboard types into whatever has focus there.
+/// two fingers scroll. Double-tap and slide drags (mobile#22): the button
+/// stays down when the finger lifts, so the drag goes on with the next
+/// stroke, until a tap lets go. The keyboard types into whatever has focus
+/// there.
 class _Touchpad extends StatefulWidget {
   const _Touchpad({required this.send, required this.onKey});
 
@@ -324,9 +327,20 @@ class _TouchpadState extends State<_Touchpad> {
   Offset _pending = Offset.zero;
   Timer? _flush;
 
+  /// The last tap, for a double-tap that turns into a drag.
+  DateTime? _tappedAt;
+
+  /// This touch came right after a tap: moving drags.
+  bool _armed = false;
+
+  /// The left button is held down on the computer.
+  bool _dragging = false;
+
   @override
   void dispose() {
     _flush?.cancel();
+    // Never leave the computer's button held down.
+    if (_dragging) _button('left', pressed: false);
     super.dispose();
   }
 
@@ -338,6 +352,11 @@ class _TouchpadState extends State<_Touchpad> {
       _downAt = DateTime.now();
       _travel = 0;
       _maxFingers = 0;
+      final tapped = _tappedAt;
+      _armed =
+          !_dragging &&
+          tapped != null &&
+          _downAt.difference(tapped) < const Duration(milliseconds: 300);
     }
     _pointers[e.pointer] = e.localPosition;
     _maxFingers = _pointers.length > _maxFingers
@@ -351,6 +370,14 @@ class _TouchpadState extends State<_Touchpad> {
     _travel += e.delta.distance;
     _pointers[e.pointer] = e.localPosition;
     if (_pointers.length == 1 && _maxFingers == 1) {
+      if (_armed && !_dragging && _travel >= 12) {
+        // Double-tap and slide: hold the button down, then move.
+        _armed = false;
+        _sendMove();
+        _button('left', pressed: true);
+        HapticFeedback.mediumImpact();
+        setState(() => _dragging = true);
+      }
       // Faster swipes go further, as on a laptop's touchpad.
       final speed = e.delta.distance;
       final gain = 1.4 + (speed / 12).clamp(0.0, 1.6);
@@ -389,12 +416,29 @@ class _TouchpadState extends State<_Touchpad> {
       return;
     }
     _scrollFrom = null;
+    _armed = false;
     final quick =
         DateTime.now().difference(_downAt) < const Duration(milliseconds: 220);
     if (quick && _travel < 12) {
+      if (_dragging) {
+        // A tap ends the drag: the button comes up where the pointer is.
+        _sendMove();
+        _button('left', pressed: false);
+        HapticFeedback.selectionClick();
+        setState(() => _dragging = false);
+        _tappedAt = null;
+        return;
+      }
       _click(_maxFingers >= 2 ? 'right' : 'left');
+      _tappedAt = _maxFingers >= 2 ? null : DateTime.now();
+    } else {
+      _tappedAt = null;
     }
   }
+
+  void _button(String button, {required bool pressed}) => widget.send([
+    {'type': 'button', 'button': button, 'pressed': pressed},
+  ]);
 
   void _click(String button) {
     HapticFeedback.selectionClick();
@@ -423,15 +467,32 @@ class _TouchpadState extends State<_Touchpad> {
                 borderRadius: BorderRadius.circular(Radii.xl),
               ),
               alignment: Alignment.center,
+              foregroundDecoration: _dragging
+                  ? BoxDecoration(
+                      borderRadius: BorderRadius.circular(Radii.xl),
+                      border: Border.all(color: Sig.blue, width: 2),
+                    )
+                  : null,
               child: Column(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  Icon(Ph.handPointing, size: 34, color: s.faint),
+                  Icon(
+                    _dragging ? Ph.handGrabbing : Ph.handPointing,
+                    size: 34,
+                    color: _dragging ? Sig.blue : s.faint,
+                  ),
                   const SizedBox(height: 10),
                   Text(
-                    context.l10n.remoteTouchpadHint,
+                    _dragging
+                        ? context.l10n.remoteDragging
+                        : '${context.l10n.remoteTouchpadHint}\n'
+                              '${context.l10n.remoteDragHint}',
                     textAlign: TextAlign.center,
-                    style: TextStyle(color: s.faint, height: 1.5),
+                    style: TextStyle(
+                      color: _dragging ? Sig.blue : s.faint,
+                      height: 1.5,
+                      fontWeight: _dragging ? FontWeight.w600 : null,
+                    ),
                   ),
                 ],
               ),
