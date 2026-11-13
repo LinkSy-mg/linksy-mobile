@@ -1224,15 +1224,22 @@ class _VolumeState extends State<_Volume> {
               ),
             ),
           ),
+          // One row at 100 % too, and with bigger text: never "100" over "%".
           SizedBox(
-            width: 40,
-            child: Text(
-              '${(level * 100).round()} %',
-              textAlign: TextAlign.end,
-              style: TextStyle(
-                fontSize: 13,
-                color: s.muted,
-                fontFeatures: const [FontFeature.tabularFigures()],
+            width: 48,
+            child: FittedBox(
+              fit: BoxFit.scaleDown,
+              alignment: Alignment.centerRight,
+              child: Text(
+                '${(level * 100).round()}\u202f%',
+                maxLines: 1,
+                softWrap: false,
+                textAlign: TextAlign.end,
+                style: TextStyle(
+                  fontSize: 13,
+                  color: s.muted,
+                  fontFeatures: const [FontFeature.tabularFigures()],
+                ),
               ),
             ),
           ),
