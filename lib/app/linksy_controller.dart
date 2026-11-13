@@ -20,6 +20,7 @@ import 'app_update.dart';
 import '../ui/format.dart';
 import '../ui/l10n.dart';
 import 'activity.dart';
+import 'network_state.dart';
 import 'platform.dart';
 import 'terminals.dart';
 
@@ -531,8 +532,12 @@ class LinksyController extends ChangeNotifier with WidgetsBindingObserver {
       (a) => respond(a.$1, accept: a.$2),
     );
     // Wi-Fi came or went, mobile data took over: the core checks its links.
-    _networkSub = LinksyPlatform.networkChanges.listen((_) {
-      log.add('Networks changed');
+    // Only then: it drops the ones that don't answer within 2 s, and Android
+    // reports much that no link notices (NetworkState).
+    _networkSub = LinksyPlatform.networkChanges.listen((snapshot) {
+      final what = networks.update(snapshot);
+      if (what == null) return;
+      log.add('Networks changed: $what');
       _endLeftRemotes();
       node.networkChanged();
     });
@@ -2001,6 +2006,9 @@ class LinksyController extends ChangeNotifier with WidgetsBindingObserver {
       notifyListeners();
     });
   }
+
+  /// This phone's networks, as last reported.
+  final networks = NetworkState();
 
   /// How long a remote stays open once its page is left: Deck, Media or
   /// Terminal and back shouldn't ask the computer again.

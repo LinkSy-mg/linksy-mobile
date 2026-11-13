@@ -54,10 +54,12 @@ abstract final class LinksyPlatform {
   static final _usbPorts = StreamController<int>.broadcast();
   static final _controlsChanges = StreamController<void>.broadcast();
   static final _screenRotations = StreamController<(String, int)>.broadcast();
-  static final _networkChanges = StreamController<void>.broadcast();
+  static final _networkChanges =
+      StreamController<Map<String, Object?>>.broadcast();
 
-  /// This phone's networks changed (at most once a second).
-  static Stream<void> get networkChanges {
+  /// What this phone's networks are, when they may have changed (at most once
+  /// a second); `NetworkState` says whether anything a link uses did.
+  static Stream<Map<String, Object?>> get networkChanges {
     _listen();
     return _networkChanges.stream;
   }
@@ -130,8 +132,8 @@ abstract final class LinksyPlatform {
         case 'appInstall' when call.arguments is Map:
           final a = call.arguments as Map;
           _appInstalls.add((a['package'] as String?, a['status'] as String));
-        case 'networkChanged':
-          _networkChanges.add(null);
+        case 'networkChanged' when call.arguments is Map:
+          _networkChanges.add((call.arguments as Map).cast<String, Object?>());
         case 'directStep' when call.arguments is Map:
           final a = (call.arguments as Map).cast<String, Object?>();
           final device = a.remove('device');

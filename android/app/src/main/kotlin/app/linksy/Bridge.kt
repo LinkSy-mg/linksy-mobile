@@ -48,7 +48,7 @@ class Bridge(context: Context, val engine: FlutterEngine) {
     private val inputWriter = Executors.newSingleThreadExecutor()
 
     init {
-        networks = NetworkWatcher(app) { channel.invokeMethod("networkChanged", null) }.apply { start() }
+        networks = NetworkWatcher(app) { channel.invokeMethod("networkChanged", it) }.apply { start() }
         ShareService.rotationListener = { session, degrees ->
             post { channel.invokeMethod("screenRotation", mapOf("session" to session, "degrees" to degrees)) }
         }
