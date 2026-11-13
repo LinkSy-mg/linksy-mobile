@@ -248,7 +248,7 @@ class _DeckEditorState extends State<DeckEditor> {
         device: widget.device,
         editable: false,
         layouts: _d.layouts.copyWith(active: _d.layoutId),
-        connected: LinksyScope.read(context).device(_id)?.connected ?? false,
+        live: LinksyScope.read(context).deckLive(_id),
       ),
     ),
   );
@@ -263,7 +263,7 @@ class _DeckEditorState extends State<DeckEditor> {
       gap: g.gap,
       device: widget.device,
       look: _look,
-      connected: true,
+      live: true,
       actions: c.deckActions[_id] == null
           ? null
           : {for (final a in c.deckActions[_id]!) a.id: a},

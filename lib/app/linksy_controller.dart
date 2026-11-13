@@ -585,8 +585,8 @@ class LinksyController extends ChangeNotifier with WidgetsBindingObserver {
     unawaited(
       LinksyPlatform.battery().then((b) {
         _battery ??= b;
-        for (final v in devices) {
-          if (v.connected || v.nearby) _tellBattery(v.device.id, always: true);
+        for (final id in _computers) {
+          _tellBattery(id, always: true);
         }
       }),
     );
@@ -1406,10 +1406,8 @@ class LinksyController extends ChangeNotifier with WidgetsBindingObserver {
 
   void _onCall(String state) {
     if (!pauseOnCalls) return;
-    for (final v in devices) {
-      if (v.trusted && _isComputer(v.device) && (v.connected || v.nearby)) {
-        node.sendCallState(v.device.id, state).catchError((Object _) {});
-      }
+    for (final id in _computers) {
+      _dialing(id, () => node.sendCallState(id, state));
     }
   }
 
@@ -1603,26 +1601,17 @@ class LinksyController extends ChangeNotifier with WidgetsBindingObserver {
     return gallery;
   }
 
-  /// The computers that get them: paired and around.
-  Iterable<String> get _noticeTargets => [
-    for (final v in devices)
-      if (v.trusted && _isComputer(v.device) && (v.connected || v.nearby))
-        v.device.id,
-  ];
-
   void _onPhoneNotification(Map<String, Object?> n) {
     if (!mirroring) return;
-    for (final id in _noticeTargets) {
-      node.postNotification(id, n).catchError((Object _) {});
+    for (final id in _computers) {
+      _dialing(id, () => node.postNotification(id, n));
     }
   }
 
   void _onPhoneNotificationGone((String, bool) gone) {
     final (key, kept) = gone;
-    for (final id in _noticeTargets) {
-      node
-          .removeNotification(id, key, replyKept: kept)
-          .catchError((Object _) {});
+    for (final id in _computers) {
+      _dialing(id, () => node.removeNotification(id, key, replyKept: kept));
     }
   }
 
@@ -1955,10 +1944,41 @@ class LinksyController extends ChangeNotifier with WidgetsBindingObserver {
   bool _isComputer(DeviceInfo d) =>
       d.kind == DeviceKind.desktop || d.kind == DeviceKind.laptop;
 
+  // Sends connect first, on the network or from away, so they don't wait for
+  // a link (§4.13). One that can't be dialed is left alone for a minute.
+
+  final Map<String, DateTime> _undialable = {};
+
+  bool _resting(String id) => _undialable[id]?.isAfter(DateTime.now()) ?? false;
+
+  /// The paired computers worth a message now.
+  Iterable<String> get _computers => [
+    for (final v in devices)
+      if (v.trusted &&
+          _isComputer(v.device) &&
+          (v.connected || !_resting(v.device.id)))
+        v.device.id,
+  ];
+
+  /// Runs [send] to computer [id]; whether it went.
+  Future<bool> _dialing(String id, Future<void> Function() send) async {
+    try {
+      await send();
+      _undialable.remove(id);
+      return true;
+    } on Object {
+      if (device(id)?.connected != true) {
+        _undialable[id] = DateTime.now().add(const Duration(seconds: 60));
+        notifyListeners();
+      }
+      return false;
+    }
+  }
+
   void _onBattery(Battery b) {
     _battery = b;
-    for (final v in devices) {
-      if (v.trusted && (v.connected || v.nearby)) _tellBattery(v.device.id);
+    for (final id in _computers) {
+      _tellBattery(id);
     }
   }
 
@@ -1974,10 +1994,8 @@ class LinksyController extends ChangeNotifier with WidgetsBindingObserver {
       return;
     }
     _toldBattery[id] = b;
-    try {
-      await node.sendBattery(id, b);
-    } on LinksyException {
-      // Not around after all: say it again next time it connects.
+    // Not around after all: say it again next time it connects.
+    if (!await _dialing(id, () => node.sendBattery(id, b))) {
       _toldBattery.remove(id);
     }
   }
@@ -2770,7 +2788,14 @@ class LinksyController extends ChangeNotifier with WidgetsBindingObserver {
 
   /// The deck shows: the computer sends what it may do, then its state.
   Future<void> openDeck(String id) =>
-      node.deckOpen(id, open: true).catchError((Object _) {});
+      _dialing(id, () => node.deckOpen(id, open: true));
+
+  /// A deck's tiles work: a tap dials, so no link has to be up. Not once
+  /// the computer failed to answer.
+  bool deckLive(String id) {
+    final v = device(id);
+    return v != null && (v.connected || v.reachable && !_resting(id));
+  }
 
   /// …and stopped: it stops sending.
   Future<void> closeDeck(String id) =>
@@ -2795,8 +2820,18 @@ class LinksyController extends ChangeNotifier with WidgetsBindingObserver {
           text: was?.text,
         );
         notifyListeners();
+        _dialing(id, () => node.deckRun(id, action)).then((went) {
+          if (went) return;
+          if (was == null) {
+            states.remove(action);
+          } else {
+            states[action] = was;
+          }
+          notifyListeners();
+        });
+        return;
       }
-      node.deckRun(id, action).catchError((Object _) {});
+      _dialing(id, () => node.deckRun(id, action));
       return;
     }
     final key = '$id $action';
@@ -2805,7 +2840,7 @@ class LinksyController extends ChangeNotifier with WidgetsBindingObserver {
     bool send() {
       final v = _slid.remove(key);
       if (v == null) return false;
-      node.deckRun(id, action, value: v).catchError((Object _) {});
+      if (deckLive(id)) _dialing(id, () => node.deckRun(id, action, value: v));
       return true;
     }
 

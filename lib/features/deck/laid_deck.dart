@@ -26,13 +26,13 @@ class LaidDeck extends StatefulWidget {
     super.key,
     required this.device,
     required this.layouts,
-    required this.connected,
+    required this.live,
     this.editable = true,
   });
 
   final DeviceInfo device;
   final DeckLayouts layouts;
-  final bool connected;
+  final bool live;
 
   /// False while trying a deck out from the editor.
   final bool editable;
@@ -151,10 +151,10 @@ class _LaidDeckState extends State<LaidDeck> {
       deviceId: _id,
       deviceName: name,
       look: look,
-      connected: widget.connected,
+      live: widget.live,
       actions: c.deckActions[_id] == null ? null : actions,
       states: c.deckStates[_id] ?? const {},
-      player: widget.connected ? player : null,
+      player: widget.live ? player : null,
       say: _say,
       hold: _edit,
     );
@@ -190,7 +190,7 @@ class _LaidDeckState extends State<LaidDeck> {
       look: look,
       title: layout?.name ?? name,
       subtitle: name,
-      connected: widget.connected,
+      live: widget.live,
       page: _page,
       pages: pages.length,
       compact: landscape,
@@ -355,7 +355,7 @@ class DeckTileView extends StatelessWidget {
     required this.gap,
     required this.device,
     required this.look,
-    required this.connected,
+    required this.live,
     required this.actions,
     required this.states,
   });
@@ -365,7 +365,7 @@ class DeckTileView extends StatelessWidget {
   final double gap;
   final DeviceInfo device;
   final DeckLook look;
-  final bool connected;
+  final bool live;
   final Map<String, DeckAction>? actions;
   final Map<String, DeckState> states;
 
@@ -378,7 +378,7 @@ class DeckTileView extends StatelessWidget {
       deviceId: device.id,
       deviceName: device.name,
       look: look,
-      connected: connected,
+      live: live,
       actions: actions,
       states: states,
       player: null,
@@ -394,7 +394,7 @@ class _Scope {
     required this.deviceId,
     required this.deviceName,
     required this.look,
-    required this.connected,
+    required this.live,
     required this.actions,
     required this.states,
     required this.player,
@@ -405,7 +405,7 @@ class _Scope {
   final String deviceId;
   final String deviceName;
   final DeckLook look;
-  final bool connected;
+  final bool live;
 
   /// What the computer offers, by id; null until it said.
   final Map<String, DeckAction>? actions;
@@ -425,7 +425,7 @@ class _Header extends StatelessWidget {
     required this.look,
     required this.title,
     required this.subtitle,
-    required this.connected,
+    required this.live,
     required this.page,
     required this.pages,
     required this.compact,
@@ -437,7 +437,7 @@ class _Header extends StatelessWidget {
   final DeckLook look;
   final String title;
   final String subtitle;
-  final bool connected;
+  final bool live;
   final int page;
   final int pages;
   final bool compact;
@@ -543,7 +543,7 @@ class _Header extends StatelessWidget {
                 ),
               ),
             ),
-          if (!connected)
+          if (!live)
             Container(
               padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
               decoration: BoxDecoration(
@@ -813,9 +813,9 @@ class _Tile extends StatelessWidget {
     final known = action == null || scope.actions == null || offered != null;
     final state = action == null ? null : scope.states[action];
     final on = state?.on ?? false;
-    final available = scope.connected && known;
+    final available = scope.live && known;
     final runs = const {'button', 'volume'}.contains(t.kind);
-    final dimmed = t.kind != 'clock' && (!scope.connected || runs && !known);
+    final dimmed = t.kind != 'clock' && (!scope.live || runs && !known);
     final one = t.w == 1 && t.h == 1 && t.kind != 'clock';
     final pad = (one ? 5.0 : 9.0) * scale;
     final paint = look.paint(
@@ -827,10 +827,16 @@ class _Tile extends StatelessWidget {
         : offered?.name ?? _named(action) ?? t.kind;
 
     void why() => scope.say(
-      scope.connected
+      scope.live
           ? context.l10n.deckNotAvailable(scope.deviceName)
           : context.l10n.deckAwayNote(scope.deviceName),
     );
+
+    // Dimmed, a tap says why and tries the computer again.
+    void retry() {
+      why();
+      LinksyScope.read(context).openDeck(scope.deviceId);
+    }
 
     Widget shell(Widget child, {bool down = false}) {
       final fill = down ? Color.lerp(paint.fill, paint.ink, 0.14)! : paint.fill;
@@ -904,7 +910,7 @@ class _Tile extends StatelessWidget {
         final shown = state?.text ?? label;
         built = Pressable.builder(
           onTap: () {
-            if (!scope.connected) return why();
+            if (!scope.live) return retry();
             // Before the computer said what it offers: nothing to run yet.
             if (scope.actions == null) return;
             offered == null ? why() : _run(context, offered);

@@ -134,6 +134,7 @@ class _DeckScreenState extends State<DeckScreen> with WidgetsBindingObserver {
       WidgetsBinding.instance.addPostFrameCallback((_) => _c.openDeck(_id));
     }
     _connected = connected;
+    final live = c.deckLive(_id);
     final layouts = c.deckLayouts(_id);
     final actions = c.deckActions[_id];
     if (layouts == null && actions != null && _grace == null) {
@@ -143,13 +144,9 @@ class _DeckScreenState extends State<DeckScreen> with WidgetsBindingObserver {
     }
     final Widget deck;
     if (layouts != null) {
-      deck = LaidDeck(
-        device: widget.device,
-        layouts: layouts,
-        connected: connected,
-      );
+      deck = LaidDeck(device: widget.device, layouts: layouts, live: live);
     } else {
-      deck = _ownDeck(context, connected, waiting: connected && !_waited);
+      deck = _ownDeck(context, live, waiting: live && !_waited);
     }
     return Listener(
       onPointerDown: (_) {
@@ -174,11 +171,7 @@ class _DeckScreenState extends State<DeckScreen> with WidgetsBindingObserver {
   }
 
   /// The deck laid out on the phone, for a computer that sends no layouts.
-  Widget _ownDeck(
-    BuildContext context,
-    bool connected, {
-    required bool waiting,
-  }) {
+  Widget _ownDeck(BuildContext context, bool live, {required bool waiting}) {
     final s = Sig.of(context);
     final c = LinksyScope.of(context);
     final l = context.l10n;
@@ -191,8 +184,8 @@ class _DeckScreenState extends State<DeckScreen> with WidgetsBindingObserver {
     Widget body;
     if (layout == null || pages.isEmpty) {
       body = _Message(
-        busy: connected && (actions == null || waiting),
-        text: !connected
+        busy: live && (actions == null || waiting),
+        text: !live
             ? l.deckAway(name)
             : actions == null || waiting
             ? l.deckAsking(name)
@@ -212,7 +205,7 @@ class _DeckScreenState extends State<DeckScreen> with WidgetsBindingObserver {
                 actions: actions,
                 states: c.deckStates[_id] ?? const {},
                 editing: _editing,
-                enabled: connected,
+                enabled: live,
                 onChanged: () => _edit((_) {}),
                 onTileEdit: (t) => _editTile(pages[i], t),
                 onAdd: () => _addTile(pages[i]),
