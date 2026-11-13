@@ -328,16 +328,6 @@ class LinksyController extends ChangeNotifier with WidgetsBindingObserver {
     DeviceInfo from,
     Map<String, Object?> change,
   ) async {
-    final view = device(from.id);
-    // Not among what's always allowed from away (§4.13).
-    if ((view?.away ?? false) && !(view?.awayAll ?? false)) {
-      for (final what in change.keys) {
-        await node
-            .refuseControls(from.id, what, 'away')
-            .catchError((Object _) {});
-      }
-      return;
-    }
     final refused = await LinksyPlatform.controlsSet(change);
     for (final MapEntry(key: what, value: why) in refused.entries) {
       await node
