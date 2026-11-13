@@ -561,7 +561,7 @@ class AppLocalizationsEs extends AppLocalizations {
 
   @override
   String get deviceAwayAllOff =>
-      'Desde fuera: solo portapapeles, enlaces, archivos y timbre';
+      'Desde fuera: portapapeles, enlaces, archivos, timbre, fotos y controles';
 
   @override
   String get deviceNothingShared => 'Todavía no se ha compartido nada';
@@ -1193,6 +1193,13 @@ class AppLocalizationsEs extends AppLocalizations {
       'Los archivos, la copia de fotos y las llamadas siguen funcionando cuando Linksy está cerrado. Muestra una notificación discreta.';
 
   @override
+  String get settingsStartAtBoot => 'Iniciar al encender el teléfono';
+
+  @override
+  String get settingsStartAtBootCaption =>
+      'Tras reiniciar, tus ordenadores ven este teléfono sin abrir Linksy. Muestra una notificación discreta.';
+
+  @override
   String get settingsAwayFromHome => 'Fuera de casa';
 
   @override
@@ -1425,6 +1432,14 @@ class AppLocalizationsEs extends AppLocalizations {
       'Mueve con un dedo, toca para hacer clic\nDesplaza con dos dedos, toca con dos para clic derecho';
 
   @override
+  String get remoteDragHint =>
+      'Toca dos veces y desliza para arrastrar, toca para soltar';
+
+  @override
+  String get remoteDragging =>
+      'Arrastrando. Levanta el dedo y sigue, toca para soltar';
+
+  @override
   String get remoteLeftClick => 'Clic izquierdo';
 
   @override
@@ -1454,6 +1469,74 @@ class AppLocalizationsEs extends AppLocalizations {
   @override
   String get remoteVolumeHint =>
       'Bajar volumen: siguiente · Subir volumen: atrás. La pantalla sigue encendida.';
+
+  @override
+  String get remoteBrowser => 'Navegador';
+
+  @override
+  String get remoteWebBack => 'Atrás';
+
+  @override
+  String get remoteWebForward => 'Adelante';
+
+  @override
+  String get remoteWebReload => 'Recargar';
+
+  @override
+  String get remoteWebHome => 'Inicio';
+
+  @override
+  String get remoteWebNewTab => 'Nueva pestaña';
+
+  @override
+  String get remoteWebCloseTab => 'Cerrar pestaña';
+
+  @override
+  String get remoteWebNextTab => 'Pestaña siguiente';
+
+  @override
+  String get remoteWebPrevTab => 'Pestaña anterior';
+
+  @override
+  String get remoteWebAddress => 'Dirección';
+
+  @override
+  String get remoteWebHint =>
+      'Controla el navegador en primer plano del ordenador.';
+
+  @override
+  String get remoteFirstSlide => 'Primera';
+
+  @override
+  String get remoteLastSlide => 'Última';
+
+  @override
+  String get remoteBlackScreen => 'Pantalla negra';
+
+  @override
+  String get remoteWhiteScreen => 'Pantalla blanca';
+
+  @override
+  String get remoteFromHere => 'Desde aquí';
+
+  @override
+  String get remoteModHint => 'Toca: con la siguiente tecla. Mantén: sola.';
+
+  @override
+  String get switchTitle => 'Cambiar a';
+
+  @override
+  String get switchHere => 'Aquí';
+
+  @override
+  String get switchOpen => 'Abierto';
+
+  @override
+  String get settingsPointerSpeed => 'Velocidad del panel táctil';
+
+  @override
+  String get settingsPointerSpeedCaption =>
+      'Cuánto avanza el puntero del ordenador con el mismo gesto';
 
   @override
   String get ringTitle => '¡Aquí estoy!';
@@ -2679,6 +2762,25 @@ class AppLocalizationsEs extends AppLocalizations {
 
   @override
   String get deckNothingPlaying => 'Nada en reproducción';
+
+  @override
+  String get deckPickPlayer => 'Qué reproductor controlar';
+
+  @override
+  String get deckDisplay => 'Pantalla';
+
+  @override
+  String get deckFullScreen => 'Pantalla completa';
+
+  @override
+  String get deckFullScreenCaption =>
+      'Oculta las barras de estado y de navegación. Desliza desde el borde para verlas.';
+
+  @override
+  String get deckRealCovers => 'Portadas tal cual';
+
+  @override
+  String get deckRealCoversCaption => 'Sin los puntos ni píxeles del tema';
 
   @override
   String deckNoLayouts(String name) {

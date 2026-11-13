@@ -564,7 +564,7 @@ class AppLocalizationsMg extends AppLocalizations {
 
   @override
   String get deviceAwayAllOff =>
-      'Avy lavitra: clipboard, rohy, rakitra ary feo fiantsoana ihany';
+      'Avy lavitra: clipboard, rohy, rakitra, feo fiantsoana, sary ary fanaraha-maso';
 
   @override
   String get deviceNothingShared => 'Mbola tsy misy nozaraina';
@@ -1194,6 +1194,13 @@ class AppLocalizationsMg extends AppLocalizations {
       'Mbola mandeha ny rakitra, ny fitahirizana sary ary ny antso na dia mikatona aza i Linksy. Misy fampahafantarana mangina.';
 
   @override
+  String get settingsStartAtBoot => 'Mandeha rehefa mandeha ny finday';
+
+  @override
+  String get settingsStartAtBootCaption =>
+      'Aorian\'ny famerenana alefa, hitan\'ny solosainao ity finday ity na tsy sokafana aza i Linksy. Mampiseho fampahafantarana mangina.';
+
+  @override
   String get settingsAwayFromHome => 'Lavitra ny trano';
 
   @override
@@ -1424,6 +1431,14 @@ class AppLocalizationsMg extends AppLocalizations {
       'Rantsantanana iray hanetsehana, tsindrio hipihana\nRantsantanana roa hanakodiavana, tsindrio amin\'ny roa ho an\'ny pitika havanana';
 
   @override
+  String get remoteDragHint =>
+      'Tsindrio indroa dia asosay mba hitarihana, tsindrio raha hamela';
+
+  @override
+  String get remoteDragging =>
+      'Mitarika. Aingao ny rantsantanana dia tohizo, tsindrio raha hamela';
+
+  @override
   String get remoteLeftClick => 'Pitika havia';
 
   @override
@@ -1453,6 +1468,75 @@ class AppLocalizationsMg extends AppLocalizations {
   @override
   String get remoteVolumeHint =>
       'Feo midina: manaraka · Feo miakatra: hiverina. Mijanona mirehitra ny efijery.';
+
+  @override
+  String get remoteBrowser => 'Navigatera';
+
+  @override
+  String get remoteWebBack => 'Hiverina';
+
+  @override
+  String get remoteWebForward => 'Mandroso';
+
+  @override
+  String get remoteWebReload => 'Avaozina';
+
+  @override
+  String get remoteWebHome => 'Fandraisana';
+
+  @override
+  String get remoteWebNewTab => 'Tabilao vaovao';
+
+  @override
+  String get remoteWebCloseTab => 'Hidio ny tabilao';
+
+  @override
+  String get remoteWebNextTab => 'Tabilao manaraka';
+
+  @override
+  String get remoteWebPrevTab => 'Tabilao teo aloha';
+
+  @override
+  String get remoteWebAddress => 'Adiresy';
+
+  @override
+  String get remoteWebHint =>
+      'Mifehy ny navigatera eo anoloana amin’ny solosaina.';
+
+  @override
+  String get remoteFirstSlide => 'Voalohany';
+
+  @override
+  String get remoteLastSlide => 'Farany';
+
+  @override
+  String get remoteBlackScreen => 'Efijery mainty';
+
+  @override
+  String get remoteWhiteScreen => 'Efijery fotsy';
+
+  @override
+  String get remoteFromHere => 'Manomboka eto';
+
+  @override
+  String get remoteModHint =>
+      'Tsindrio: miaraka amin’ny lakile manaraka. Tazony: irery.';
+
+  @override
+  String get switchTitle => 'Hifindra amin’ny';
+
+  @override
+  String get switchHere => 'Eto';
+
+  @override
+  String get switchOpen => 'Misokatra';
+
+  @override
+  String get settingsPointerSpeed => 'Hafainganan’ny touchpad';
+
+  @override
+  String get settingsPointerSpeedCaption =>
+      'Hatraiza no mandeha ny tondro amin’ny solosaina amin’ny fikasihana iray ihany';
 
   @override
   String get ringTitle => 'Ato aho!';
@@ -2681,6 +2765,26 @@ class AppLocalizationsMg extends AppLocalizations {
 
   @override
   String get deckNothingPlaying => 'Tsy misy mandeha';
+
+  @override
+  String get deckPickPlayer => 'Mpamaky inona no fehezina';
+
+  @override
+  String get deckDisplay => 'Fisehoana';
+
+  @override
+  String get deckFullScreen => 'Efijery feno';
+
+  @override
+  String get deckFullScreenCaption =>
+      'Manafina ny bara ambony sy ambany. Asosay avy eo amin\'ny sisiny raha hijery azy.';
+
+  @override
+  String get deckRealCovers => 'Sarin\'ny rakikira tsy ovaina';
+
+  @override
+  String get deckRealCoversCaption =>
+      'Tsy averina ho teboka na piksely araka ny lohahevitra';
 
   @override
   String deckNoLayouts(String name) {

@@ -559,7 +559,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get deviceAwayAllOff =>
-      'From away: clipboard, links, files and ring only';
+      'From away: clipboard, links, files, ring, photos and controls';
 
   @override
   String get deviceNothingShared => 'Nothing shared yet';
@@ -1186,6 +1186,13 @@ class AppLocalizationsEn extends AppLocalizations {
       'Files, photo backup and calls keep working when Linksy is closed. Shows a quiet notification.';
 
   @override
+  String get settingsStartAtBoot => 'Start when the phone starts';
+
+  @override
+  String get settingsStartAtBootCaption =>
+      'After a restart, your computers see this phone without opening Linksy. Shows a quiet notification.';
+
+  @override
   String get settingsAwayFromHome => 'Away from home';
 
   @override
@@ -1414,6 +1421,12 @@ class AppLocalizationsEn extends AppLocalizations {
       'Move with one finger, tap to click\nTwo fingers scroll, two-finger tap right-clicks';
 
   @override
+  String get remoteDragHint => 'Double-tap and slide to drag, tap to let go';
+
+  @override
+  String get remoteDragging => 'Dragging. Lift and keep going, tap to let go';
+
+  @override
   String get remoteLeftClick => 'Left click';
 
   @override
@@ -1443,6 +1456,73 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get remoteVolumeHint =>
       'Volume down: next · Volume up: back. The screen stays on.';
+
+  @override
+  String get remoteBrowser => 'Browser';
+
+  @override
+  String get remoteWebBack => 'Back';
+
+  @override
+  String get remoteWebForward => 'Forward';
+
+  @override
+  String get remoteWebReload => 'Reload';
+
+  @override
+  String get remoteWebHome => 'Home';
+
+  @override
+  String get remoteWebNewTab => 'New tab';
+
+  @override
+  String get remoteWebCloseTab => 'Close tab';
+
+  @override
+  String get remoteWebNextTab => 'Next tab';
+
+  @override
+  String get remoteWebPrevTab => 'Previous tab';
+
+  @override
+  String get remoteWebAddress => 'Address';
+
+  @override
+  String get remoteWebHint => 'Works on the browser in front on the computer.';
+
+  @override
+  String get remoteFirstSlide => 'First';
+
+  @override
+  String get remoteLastSlide => 'Last';
+
+  @override
+  String get remoteBlackScreen => 'Black screen';
+
+  @override
+  String get remoteWhiteScreen => 'White screen';
+
+  @override
+  String get remoteFromHere => 'From here';
+
+  @override
+  String get remoteModHint => 'Tap: with the next key. Hold: press it alone.';
+
+  @override
+  String get switchTitle => 'Switch to';
+
+  @override
+  String get switchHere => 'Here';
+
+  @override
+  String get switchOpen => 'Open';
+
+  @override
+  String get settingsPointerSpeed => 'Touchpad speed';
+
+  @override
+  String get settingsPointerSpeedCaption =>
+      'How far the computer’s pointer goes for the same swipe';
 
   @override
   String get ringTitle => 'Here I am!';
@@ -2658,6 +2738,26 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get deckNothingPlaying => 'Nothing playing';
+
+  @override
+  String get deckPickPlayer => 'Control which player';
+
+  @override
+  String get deckDisplay => 'Display';
+
+  @override
+  String get deckFullScreen => 'Full screen';
+
+  @override
+  String get deckFullScreenCaption =>
+      'Hides the status and navigation bars. Swipe from the edge to see them.';
+
+  @override
+  String get deckRealCovers => 'Album art as it is';
+
+  @override
+  String get deckRealCoversCaption =>
+      'Not redrawn in the theme\'s dots or pixels';
 
   @override
   String deckNoLayouts(String name) {

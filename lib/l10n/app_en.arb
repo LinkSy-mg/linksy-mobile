@@ -724,7 +724,7 @@
   "@deviceAwayAllOn": {
     "description": "Detail of Allow everything from away, on"
   },
-  "deviceAwayAllOff": "From away: clipboard, links, files and ring only",
+  "deviceAwayAllOff": "From away: clipboard, links, files, ring, photos and controls",
   "@deviceAwayAllOff": {
     "description": "Detail of Allow everything from away, off"
   },
@@ -1593,6 +1593,10 @@
   "@settingsKeepRunningCaption": {
     "description": "Caption of the background switch"
   },
+  "settingsStartAtBoot": "Start when the phone starts",
+  "@settingsStartAtBoot": {"description": "Settings switch: start Linksy in the background when the phone restarts"},
+  "settingsStartAtBootCaption": "After a restart, your computers see this phone without opening Linksy. Shows a quiet notification.",
+  "@settingsStartAtBootCaption": {"description": "Caption of the start-at-boot switch"},
   "settingsAwayFromHome": "Away from home",
   "@settingsAwayFromHome": {
     "description": "Settings switch: reach computers over the internet"
@@ -1885,6 +1889,10 @@
   "@remoteTouchpadHint": {
     "description": "Hint on the touchpad area (two lines)"
   },
+  "remoteDragHint": "Double-tap and slide to drag, tap to let go",
+  "@remoteDragHint": {"description": "Touchpad hint line: double tap and slide to drag"},
+  "remoteDragging": "Dragging. Lift and keep going, tap to let go",
+  "@remoteDragging": {"description": "Touchpad while dragging (button held down)"},
   "remoteLeftClick": "Left click",
   "@remoteLeftClick": {
     "description": "Touchpad button"
@@ -1925,6 +1933,50 @@
   "@remoteVolumeHint": {
     "description": "Hint under the slide buttons"
   },
+  "remoteBrowser": "Browser",
+  "@remoteBrowser": {"description": "Remote mode tab: browser controls"},
+  "remoteWebBack": "Back",
+  "@remoteWebBack": {"description": "Browser remote: go back a page"},
+  "remoteWebForward": "Forward",
+  "@remoteWebForward": {"description": "Browser remote: go forward a page"},
+  "remoteWebReload": "Reload",
+  "@remoteWebReload": {"description": "Browser remote: reload the page"},
+  "remoteWebHome": "Home",
+  "@remoteWebHome": {"description": "Browser remote: home page"},
+  "remoteWebNewTab": "New tab",
+  "@remoteWebNewTab": {"description": "Browser remote: open a new tab"},
+  "remoteWebCloseTab": "Close tab",
+  "@remoteWebCloseTab": {"description": "Browser remote: close the tab"},
+  "remoteWebNextTab": "Next tab",
+  "@remoteWebNextTab": {"description": "Browser remote: next tab"},
+  "remoteWebPrevTab": "Previous tab",
+  "@remoteWebPrevTab": {"description": "Browser remote: previous tab"},
+  "remoteWebAddress": "Address",
+  "@remoteWebAddress": {"description": "Browser remote: go to the address bar and type"},
+  "remoteWebHint": "Works on the browser in front on the computer.",
+  "@remoteWebHint": {"description": "Browser remote: hint under the buttons"},
+  "remoteFirstSlide": "First",
+  "@remoteFirstSlide": {"description": "Slides remote: go to the first slide (Home)"},
+  "remoteLastSlide": "Last",
+  "@remoteLastSlide": {"description": "Slides remote: go to the last slide (End)"},
+  "remoteBlackScreen": "Black screen",
+  "@remoteBlackScreen": {"description": "Slides remote: black screen (B)"},
+  "remoteWhiteScreen": "White screen",
+  "@remoteWhiteScreen": {"description": "Slides remote: white screen (W)"},
+  "remoteFromHere": "From here",
+  "@remoteFromHere": {"description": "Slides remote: start the show from the current slide (Shift+F5)"},
+  "remoteModHint": "Tap: with the next key. Hold: press it alone.",
+  "@remoteModHint": {"description": "Tooltip of Ctrl/Alt/Shift/Super on the touchpad's key row"},
+  "switchTitle": "Switch to",
+  "@switchTitle": {"description": "Sheet title: jump to another page for this computer"},
+  "switchHere": "Here",
+  "@switchHere": {"description": "Switcher: the page you're on"},
+  "switchOpen": "Open",
+  "@switchOpen": {"description": "Switcher: its session is still open"},
+  "settingsPointerSpeed": "Touchpad speed",
+  "@settingsPointerSpeed": {"description": "Setting: touchpad pointer speed"},
+  "settingsPointerSpeedCaption": "How far the computer’s pointer goes for the same swipe",
+  "@settingsPointerSpeedCaption": {"description": "Setting caption: touchpad pointer speed"},
   "ringTitle": "Here I am!",
   "@ringTitle": {
     "description": "Big title while the phone rings because a computer is looking for it"
@@ -3573,6 +3625,18 @@
   "@deckNothingPlaying": {
     "description": "The deck's music tile when the computer plays nothing"
   },
+  "deckPickPlayer": "Control which player",
+  "@deckPickPlayer": {"description": "Title of the sheet to choose which of the computer's media players the deck controls"},
+  "deckDisplay": "Display",
+  "@deckDisplay": {"description": "Deck theme sheet section: how the deck shows"},
+  "deckFullScreen": "Full screen",
+  "@deckFullScreen": {"description": "Deck switch: hide the status and navigation bars"},
+  "deckFullScreenCaption": "Hides the status and navigation bars. Swipe from the edge to see them.",
+  "@deckFullScreenCaption": {"description": "Caption of the deck full screen switch"},
+  "deckRealCovers": "Album art as it is",
+  "@deckRealCovers": {"description": "Deck switch: show album art unchanged by the theme"},
+  "deckRealCoversCaption": "Not redrawn in the theme's dots or pixels",
+  "@deckRealCoversCaption": {"description": "Caption of the album art switch"},
   "deckNoLayouts": "{name} has no deck for this phone yet. Make one in Linksy on the computer.",
   "@deckNoLayouts": {
     "description": "Deck screen when the computer sent layouts but none for this phone",

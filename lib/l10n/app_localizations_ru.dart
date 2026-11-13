@@ -568,7 +568,7 @@ class AppLocalizationsRu extends AppLocalizations {
 
   @override
   String get deviceAwayAllOff =>
-      'Вне дома: только буфер обмена, ссылки, файлы и звонок';
+      'Вне дома: буфер обмена, ссылки, файлы, звонок, фото и управление';
 
   @override
   String get deviceNothingShared => 'Пока ничего не отправлено';
@@ -1214,6 +1214,13 @@ class AppLocalizationsRu extends AppLocalizations {
       'Файлы, копирование фото и звонки работают, даже когда Linksy закрыт. Показывается тихое уведомление.';
 
   @override
+  String get settingsStartAtBoot => 'Запускать вместе с телефоном';
+
+  @override
+  String get settingsStartAtBootCaption =>
+      'После перезагрузки компьютеры видят этот телефон, даже если Linksy не открыт. Показывает тихое уведомление.';
+
+  @override
   String get settingsAwayFromHome => 'Вне дома';
 
   @override
@@ -1445,6 +1452,14 @@ class AppLocalizationsRu extends AppLocalizations {
       'Ведите одним пальцем, коснитесь для щелчка\nДвумя пальцами — прокрутка, касание двумя — правый щелчок';
 
   @override
+  String get remoteDragHint =>
+      'Двойное касание и сдвиг — перетаскивание, касание — отпустить';
+
+  @override
+  String get remoteDragging =>
+      'Перетаскивание. Поднимите палец и продолжайте, коснитесь, чтобы отпустить';
+
+  @override
   String get remoteLeftClick => 'Левый щелчок';
 
   @override
@@ -1474,6 +1489,75 @@ class AppLocalizationsRu extends AppLocalizations {
   @override
   String get remoteVolumeHint =>
       'Громкость вниз: далее · Громкость вверх: назад. Экран не гаснет.';
+
+  @override
+  String get remoteBrowser => 'Браузер';
+
+  @override
+  String get remoteWebBack => 'Назад';
+
+  @override
+  String get remoteWebForward => 'Вперёд';
+
+  @override
+  String get remoteWebReload => 'Обновить';
+
+  @override
+  String get remoteWebHome => 'Домой';
+
+  @override
+  String get remoteWebNewTab => 'Новая вкладка';
+
+  @override
+  String get remoteWebCloseTab => 'Закрыть вкладку';
+
+  @override
+  String get remoteWebNextTab => 'Следующая вкладка';
+
+  @override
+  String get remoteWebPrevTab => 'Предыдущая вкладка';
+
+  @override
+  String get remoteWebAddress => 'Адрес';
+
+  @override
+  String get remoteWebHint =>
+      'Управляет браузером на переднем плане компьютера.';
+
+  @override
+  String get remoteFirstSlide => 'Первый';
+
+  @override
+  String get remoteLastSlide => 'Последний';
+
+  @override
+  String get remoteBlackScreen => 'Чёрный экран';
+
+  @override
+  String get remoteWhiteScreen => 'Белый экран';
+
+  @override
+  String get remoteFromHere => 'С текущего';
+
+  @override
+  String get remoteModHint =>
+      'Касание: вместе со следующей клавишей. Удержание: нажать отдельно.';
+
+  @override
+  String get switchTitle => 'Перейти к';
+
+  @override
+  String get switchHere => 'Здесь';
+
+  @override
+  String get switchOpen => 'Открыто';
+
+  @override
+  String get settingsPointerSpeed => 'Скорость тачпада';
+
+  @override
+  String get settingsPointerSpeedCaption =>
+      'Насколько сдвигается указатель компьютера при том же жесте';
 
   @override
   String get ringTitle => 'Я здесь!';
@@ -2700,6 +2784,25 @@ class AppLocalizationsRu extends AppLocalizations {
 
   @override
   String get deckNothingPlaying => 'Ничего не играет';
+
+  @override
+  String get deckPickPlayer => 'Каким плеером управлять';
+
+  @override
+  String get deckDisplay => 'Отображение';
+
+  @override
+  String get deckFullScreen => 'Во весь экран';
+
+  @override
+  String get deckFullScreenCaption =>
+      'Скрывает строку состояния и панель навигации. Проведите от края, чтобы их увидеть.';
+
+  @override
+  String get deckRealCovers => 'Обложки как есть';
+
+  @override
+  String get deckRealCoversCaption => 'Без точек и пикселей темы';
 
   @override
   String deckNoLayouts(String name) {

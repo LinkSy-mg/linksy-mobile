@@ -999,7 +999,7 @@ abstract class AppLocalizations {
   /// Detail of Allow everything from away, off
   ///
   /// In en, this message translates to:
-  /// **'From away: clipboard, links, files and ring only'**
+  /// **'From away: clipboard, links, files, ring, photos and controls'**
   String get deviceAwayAllOff;
 
   /// Empty device timeline title
@@ -1980,6 +1980,18 @@ abstract class AppLocalizations {
   /// **'Files, photo backup and calls keep working when Linksy is closed. Shows a quiet notification.'**
   String get settingsKeepRunningCaption;
 
+  /// Settings switch: start Linksy in the background when the phone restarts
+  ///
+  /// In en, this message translates to:
+  /// **'Start when the phone starts'**
+  String get settingsStartAtBoot;
+
+  /// Caption of the start-at-boot switch
+  ///
+  /// In en, this message translates to:
+  /// **'After a restart, your computers see this phone without opening Linksy. Shows a quiet notification.'**
+  String get settingsStartAtBootCaption;
+
   /// Settings switch: reach computers over the internet
   ///
   /// In en, this message translates to:
@@ -2358,6 +2370,18 @@ abstract class AppLocalizations {
   /// **'Move with one finger, tap to click\nTwo fingers scroll, two-finger tap right-clicks'**
   String get remoteTouchpadHint;
 
+  /// Touchpad hint line: double tap and slide to drag
+  ///
+  /// In en, this message translates to:
+  /// **'Double-tap and slide to drag, tap to let go'**
+  String get remoteDragHint;
+
+  /// Touchpad while dragging (button held down)
+  ///
+  /// In en, this message translates to:
+  /// **'Dragging. Lift and keep going, tap to let go'**
+  String get remoteDragging;
+
   /// Touchpad button
   ///
   /// In en, this message translates to:
@@ -2417,6 +2441,138 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Volume down: next · Volume up: back. The screen stays on.'**
   String get remoteVolumeHint;
+
+  /// Remote mode tab: browser controls
+  ///
+  /// In en, this message translates to:
+  /// **'Browser'**
+  String get remoteBrowser;
+
+  /// Browser remote: go back a page
+  ///
+  /// In en, this message translates to:
+  /// **'Back'**
+  String get remoteWebBack;
+
+  /// Browser remote: go forward a page
+  ///
+  /// In en, this message translates to:
+  /// **'Forward'**
+  String get remoteWebForward;
+
+  /// Browser remote: reload the page
+  ///
+  /// In en, this message translates to:
+  /// **'Reload'**
+  String get remoteWebReload;
+
+  /// Browser remote: home page
+  ///
+  /// In en, this message translates to:
+  /// **'Home'**
+  String get remoteWebHome;
+
+  /// Browser remote: open a new tab
+  ///
+  /// In en, this message translates to:
+  /// **'New tab'**
+  String get remoteWebNewTab;
+
+  /// Browser remote: close the tab
+  ///
+  /// In en, this message translates to:
+  /// **'Close tab'**
+  String get remoteWebCloseTab;
+
+  /// Browser remote: next tab
+  ///
+  /// In en, this message translates to:
+  /// **'Next tab'**
+  String get remoteWebNextTab;
+
+  /// Browser remote: previous tab
+  ///
+  /// In en, this message translates to:
+  /// **'Previous tab'**
+  String get remoteWebPrevTab;
+
+  /// Browser remote: go to the address bar and type
+  ///
+  /// In en, this message translates to:
+  /// **'Address'**
+  String get remoteWebAddress;
+
+  /// Browser remote: hint under the buttons
+  ///
+  /// In en, this message translates to:
+  /// **'Works on the browser in front on the computer.'**
+  String get remoteWebHint;
+
+  /// Slides remote: go to the first slide (Home)
+  ///
+  /// In en, this message translates to:
+  /// **'First'**
+  String get remoteFirstSlide;
+
+  /// Slides remote: go to the last slide (End)
+  ///
+  /// In en, this message translates to:
+  /// **'Last'**
+  String get remoteLastSlide;
+
+  /// Slides remote: black screen (B)
+  ///
+  /// In en, this message translates to:
+  /// **'Black screen'**
+  String get remoteBlackScreen;
+
+  /// Slides remote: white screen (W)
+  ///
+  /// In en, this message translates to:
+  /// **'White screen'**
+  String get remoteWhiteScreen;
+
+  /// Slides remote: start the show from the current slide (Shift+F5)
+  ///
+  /// In en, this message translates to:
+  /// **'From here'**
+  String get remoteFromHere;
+
+  /// Tooltip of Ctrl/Alt/Shift/Super on the touchpad's key row
+  ///
+  /// In en, this message translates to:
+  /// **'Tap: with the next key. Hold: press it alone.'**
+  String get remoteModHint;
+
+  /// Sheet title: jump to another page for this computer
+  ///
+  /// In en, this message translates to:
+  /// **'Switch to'**
+  String get switchTitle;
+
+  /// Switcher: the page you're on
+  ///
+  /// In en, this message translates to:
+  /// **'Here'**
+  String get switchHere;
+
+  /// Switcher: its session is still open
+  ///
+  /// In en, this message translates to:
+  /// **'Open'**
+  String get switchOpen;
+
+  /// Setting: touchpad pointer speed
+  ///
+  /// In en, this message translates to:
+  /// **'Touchpad speed'**
+  String get settingsPointerSpeed;
+
+  /// Setting caption: touchpad pointer speed
+  ///
+  /// In en, this message translates to:
+  /// **'How far the computer’s pointer goes for the same swipe'**
+  String get settingsPointerSpeedCaption;
 
   /// Big title while the phone rings because a computer is looking for it
   ///
@@ -4409,6 +4565,42 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Nothing playing'**
   String get deckNothingPlaying;
+
+  /// Title of the sheet to choose which of the computer's media players the deck controls
+  ///
+  /// In en, this message translates to:
+  /// **'Control which player'**
+  String get deckPickPlayer;
+
+  /// Deck theme sheet section: how the deck shows
+  ///
+  /// In en, this message translates to:
+  /// **'Display'**
+  String get deckDisplay;
+
+  /// Deck switch: hide the status and navigation bars
+  ///
+  /// In en, this message translates to:
+  /// **'Full screen'**
+  String get deckFullScreen;
+
+  /// Caption of the deck full screen switch
+  ///
+  /// In en, this message translates to:
+  /// **'Hides the status and navigation bars. Swipe from the edge to see them.'**
+  String get deckFullScreenCaption;
+
+  /// Deck switch: show album art unchanged by the theme
+  ///
+  /// In en, this message translates to:
+  /// **'Album art as it is'**
+  String get deckRealCovers;
+
+  /// Caption of the album art switch
+  ///
+  /// In en, this message translates to:
+  /// **'Not redrawn in the theme\'s dots or pixels'**
+  String get deckRealCoversCaption;
 
   /// Deck screen when the computer sent layouts but none for this phone
   ///

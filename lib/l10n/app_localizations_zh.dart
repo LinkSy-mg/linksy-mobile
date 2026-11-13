@@ -542,7 +542,7 @@ class AppLocalizationsZh extends AppLocalizations {
   String get deviceAwayAllOn => '离家时也可使用：本机屏幕、摄像头、麦克风和文件';
 
   @override
-  String get deviceAwayAllOff => '离家时仅限：剪贴板、链接、文件和响铃';
+  String get deviceAwayAllOff => '离家时可用:剪贴板、链接、文件、响铃、照片和控制';
 
   @override
   String get deviceNothingShared => '还没有共享任何内容';
@@ -1154,6 +1154,13 @@ class AppLocalizationsZh extends AppLocalizations {
       'Linksy 关闭后，文件、照片备份和来电功能仍可使用。会显示一条安静的通知。';
 
   @override
+  String get settingsStartAtBoot => '手机启动时启动';
+
+  @override
+  String get settingsStartAtBootCaption =>
+      '重启后，无需打开 Linksy，你的电脑也能看到这部手机。会显示一条静默通知。';
+
+  @override
   String get settingsAwayFromHome => '离家时';
 
   @override
@@ -1368,6 +1375,12 @@ class AppLocalizationsZh extends AppLocalizations {
   String get remoteTouchpadHint => '单指移动，轻点即单击\n双指滚动，双指轻点即右键单击';
 
   @override
+  String get remoteDragHint => '双击并滑动即可拖动，轻点即可松开';
+
+  @override
+  String get remoteDragging => '正在拖动。抬起手指可继续，轻点即可松开';
+
+  @override
   String get remoteLeftClick => '左键';
 
   @override
@@ -1396,6 +1409,72 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get remoteVolumeHint => '音量减：下一张 · 音量加：上一张。屏幕保持常亮。';
+
+  @override
+  String get remoteBrowser => '浏览器';
+
+  @override
+  String get remoteWebBack => '后退';
+
+  @override
+  String get remoteWebForward => '前进';
+
+  @override
+  String get remoteWebReload => '刷新';
+
+  @override
+  String get remoteWebHome => '主页';
+
+  @override
+  String get remoteWebNewTab => '新标签页';
+
+  @override
+  String get remoteWebCloseTab => '关闭标签页';
+
+  @override
+  String get remoteWebNextTab => '下一个标签页';
+
+  @override
+  String get remoteWebPrevTab => '上一个标签页';
+
+  @override
+  String get remoteWebAddress => '地址';
+
+  @override
+  String get remoteWebHint => '控制电脑上最前面的浏览器。';
+
+  @override
+  String get remoteFirstSlide => '第一张';
+
+  @override
+  String get remoteLastSlide => '最后一张';
+
+  @override
+  String get remoteBlackScreen => '黑屏';
+
+  @override
+  String get remoteWhiteScreen => '白屏';
+
+  @override
+  String get remoteFromHere => '从当前开始';
+
+  @override
+  String get remoteModHint => '轻点：与下一个键组合。长按：单独按下。';
+
+  @override
+  String get switchTitle => '切换到';
+
+  @override
+  String get switchHere => '当前';
+
+  @override
+  String get switchOpen => '已打开';
+
+  @override
+  String get settingsPointerSpeed => '触控板速度';
+
+  @override
+  String get settingsPointerSpeedCaption => '同样的滑动让电脑指针移动多远';
 
   @override
   String get ringTitle => '我在这儿！';
@@ -2564,6 +2643,24 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get deckNothingPlaying => '没有正在播放的内容';
+
+  @override
+  String get deckPickPlayer => '控制哪个播放器';
+
+  @override
+  String get deckDisplay => '显示';
+
+  @override
+  String get deckFullScreen => '全屏';
+
+  @override
+  String get deckFullScreenCaption => '隐藏状态栏和导航栏。从边缘滑动即可显示。';
+
+  @override
+  String get deckRealCovers => '保持专辑封面原样';
+
+  @override
+  String get deckRealCoversCaption => '不使用主题的点阵或像素效果';
 
   @override
   String deckNoLayouts(String name) {

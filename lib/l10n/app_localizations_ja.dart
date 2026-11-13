@@ -549,7 +549,7 @@ class AppLocalizationsJa extends AppLocalizations {
   String get deviceAwayAllOn => '外出先からも: この画面、ウェブカメラ、マイク、ファイル';
 
   @override
-  String get deviceAwayAllOff => '外出先から: クリップボード、リンク、ファイル、呼び出しのみ';
+  String get deviceAwayAllOff => '外出先から: クリップボード、リンク、ファイル、呼び出し、写真、コントロール';
 
   @override
   String get deviceNothingShared => 'まだ何も共有していません';
@@ -1166,6 +1166,13 @@ class AppLocalizationsJa extends AppLocalizations {
       'Linksy を閉じても、ファイル、写真のバックアップ、通話の機能が動き続けます。控えめな通知が表示されます。';
 
   @override
+  String get settingsStartAtBoot => 'スマートフォンの起動時に開始';
+
+  @override
+  String get settingsStartAtBootCaption =>
+      '再起動後、Linksy を開かなくてもコンピューターからこのスマートフォンが見えます。控えめな通知が表示されます。';
+
+  @override
   String get settingsAwayFromHome => '外出先から';
 
   @override
@@ -1387,6 +1394,12 @@ class AppLocalizationsJa extends AppLocalizations {
   String get remoteTouchpadHint => '1 本指で移動、タップでクリック\n2 本指でスクロール、2 本指タップで右クリック';
 
   @override
+  String get remoteDragHint => 'ダブルタップしてスライドでドラッグ、タップで離す';
+
+  @override
+  String get remoteDragging => 'ドラッグ中。指を離して続けられます。タップで離します';
+
+  @override
   String get remoteLeftClick => '左クリック';
 
   @override
@@ -1415,6 +1428,72 @@ class AppLocalizationsJa extends AppLocalizations {
 
   @override
   String get remoteVolumeHint => '音量ダウン: 次へ · 音量アップ: 戻る。画面はオンのままです。';
+
+  @override
+  String get remoteBrowser => 'ブラウザ';
+
+  @override
+  String get remoteWebBack => '戻る';
+
+  @override
+  String get remoteWebForward => '進む';
+
+  @override
+  String get remoteWebReload => '再読み込み';
+
+  @override
+  String get remoteWebHome => 'ホーム';
+
+  @override
+  String get remoteWebNewTab => '新しいタブ';
+
+  @override
+  String get remoteWebCloseTab => 'タブを閉じる';
+
+  @override
+  String get remoteWebNextTab => '次のタブ';
+
+  @override
+  String get remoteWebPrevTab => '前のタブ';
+
+  @override
+  String get remoteWebAddress => 'アドレス';
+
+  @override
+  String get remoteWebHint => 'コンピューターの前面にあるブラウザを操作します。';
+
+  @override
+  String get remoteFirstSlide => '最初';
+
+  @override
+  String get remoteLastSlide => '最後';
+
+  @override
+  String get remoteBlackScreen => '黒画面';
+
+  @override
+  String get remoteWhiteScreen => '白画面';
+
+  @override
+  String get remoteFromHere => 'ここから';
+
+  @override
+  String get remoteModHint => 'タップ：次のキーと一緒に。長押し：単独で押す。';
+
+  @override
+  String get switchTitle => '切り替え';
+
+  @override
+  String get switchHere => '表示中';
+
+  @override
+  String get switchOpen => '接続中';
+
+  @override
+  String get settingsPointerSpeed => 'タッチパッドの速度';
+
+  @override
+  String get settingsPointerSpeedCaption => '同じスワイプでコンピューターのポインターが動く距離';
 
   @override
   String get ringTitle => 'ここにいます！';
@@ -2600,6 +2679,25 @@ class AppLocalizationsJa extends AppLocalizations {
 
   @override
   String get deckNothingPlaying => '再生中のものはありません';
+
+  @override
+  String get deckPickPlayer => '操作するプレーヤー';
+
+  @override
+  String get deckDisplay => '表示';
+
+  @override
+  String get deckFullScreen => '全画面';
+
+  @override
+  String get deckFullScreenCaption =>
+      'ステータスバーとナビゲーションバーを隠します。端からスワイプすると表示されます。';
+
+  @override
+  String get deckRealCovers => 'アルバムアートをそのまま表示';
+
+  @override
+  String get deckRealCoversCaption => 'テーマのドットやピクセルで描き直しません';
 
   @override
   String deckNoLayouts(String name) {
