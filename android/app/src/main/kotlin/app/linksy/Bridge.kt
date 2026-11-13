@@ -155,6 +155,8 @@ class Bridge(context: Context, val engine: FlutterEngine) {
             "phoneMaker" -> result.success(mapOf("maker" to Build.MANUFACTURER, "sdk" to Build.VERSION.SDK_INT))
             "directHost" -> result.success(DirectHost.supported(app))
             "deviceReport" -> result.success(deviceReport())
+            // Idle with no activity at all: started with the phone, or swiped away.
+            "memory" -> result.success(memory() + if (activity == null) ", without its screen" else "")
             "directWanted" -> {
                 DirectHost.want(app, call.argument<String>("device")!!, directGroup(call))
                 result.success(null)
@@ -575,6 +577,19 @@ class Bridge(context: Context, val engine: FlutterEngine) {
         return mapOf("level" to (level * 100 / scale).coerceIn(0, 100), "charging" to charging)
     }
 
+    /// What Linksy takes of the phone's memory (mobile#3), as `dumpsys meminfo`
+    /// sums it: all of it (PSS), then its parts, in MB.
+    fun memory(): String {
+        val info = android.os.Debug.MemoryInfo()
+        android.os.Debug.getMemoryInfo(info)
+        fun mb(stat: String) = ((info.getMemoryStat(stat)?.toIntOrNull() ?: 0) + 512) / 1024
+        val total = (info.totalPss + 512) / 1024
+        return "$total MB (Java ${mb("summary.java-heap")}, native ${mb("summary.native-heap")}, " +
+            "code ${mb("summary.code")}, graphics ${mb("summary.graphics")}, " +
+            "stack ${mb("summary.stack")}, other ${mb("summary.private-other")}, " +
+            "system ${mb("summary.system")})"
+    }
+
     /// Settings › Logs: what this phone is and what its Wi-Fi can do, as label → value.
     /// Nothing that identifies the user (no network name, no addresses).
     private fun deviceReport(): Map<String, String> {
@@ -586,6 +601,7 @@ class Bridge(context: Context, val engine: FlutterEngine) {
         val yes = { b: Boolean -> if (b) "yes" else "no" }
         return linkedMapOf(
             "Device" to "${Build.MANUFACTURER} ${Build.MODEL}",
+            "Memory now" to memory(),
             "Android" to "${Build.VERSION.RELEASE} (API ${Build.VERSION.SDK_INT})",
             "CPU" to (Build.SUPPORTED_ABIS.firstOrNull() ?: "?"),
             "Wi-Fi" to if (!wifi.isWifiEnabled) "off"

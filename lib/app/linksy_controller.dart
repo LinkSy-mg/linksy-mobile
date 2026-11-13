@@ -806,6 +806,7 @@ class LinksyController extends ChangeNotifier with WidgetsBindingObserver {
   @override
   void didChangeAppLifecycleState(AppLifecycleState state) {
     if (state == AppLifecycleState.resumed) {
+      _watchMemory(idle: false);
       _importAll();
       unawaited(_sendCopied());
       unawaited(_readCamera());
@@ -821,6 +822,7 @@ class LinksyController extends ChangeNotifier with WidgetsBindingObserver {
       _readShareProtections();
     } else if (state == AppLifecycleState.hidden) {
       _endLeftRemotes();
+      _watchMemory(idle: true);
       // Out of sight: decoded pictures go, they're read again on return.
       PaintingBinding.instance.imageCache
         ..clear()
@@ -828,11 +830,36 @@ class LinksyController extends ChangeNotifier with WidgetsBindingObserver {
     }
   }
 
+  /// Idle memory (mobile#3) in the log: a minute after Linksy leaves the
+  /// screen, or starts without one (with the phone), then every half hour
+  /// until it's back. The log people share then says what it took.
+  Timer? _memoryTimer;
+
+  void _watchMemory({required bool idle}) {
+    _memoryTimer?.cancel();
+    _memoryTimer = null;
+    if (!idle) return;
+    _memoryTimer = Timer(const Duration(minutes: 1), () {
+      unawaited(_logMemory());
+      _memoryTimer = Timer.periodic(
+        const Duration(minutes: 30),
+        (_) => unawaited(_logMemory()),
+      );
+    });
+  }
+
+  Future<void> _logMemory() async {
+    final line = await LinksyPlatform.memory().catchError((Object _) => null);
+    if (line != null) log.add('Memory, idle: $line');
+  }
+
   /// Android-side settings and folders; not awaited by [start] (tests have
   /// no Android side).
   Future<void> _loadPlatform() async {
     prefs = await LinksyPlatform.prefs();
     _noteComputer();
+    // Started with the phone: no screen, so idle from the start.
+    if (Platform.isAndroid && !_onScreen) _watchMemory(idle: true);
     locale.value = resolveLocale(languageCode);
     useLocale(locale.value);
     themeMode.value = themeFrom(prefs['theme']);
@@ -3212,6 +3239,7 @@ class LinksyController extends ChangeNotifier with WidgetsBindingObserver {
 
   @override
   void dispose() {
+    _memoryTimer?.cancel();
     _volumeKeySub?.cancel();
     for (final t in _volumeCooling.values) {
       t.cancel();

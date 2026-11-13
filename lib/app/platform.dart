@@ -469,6 +469,9 @@ abstract final class LinksyPlatform {
   static Future<Map<String, String>> deviceReport() async =>
       (await _call<Map>('deviceReport'))?.cast<String, String>() ?? {};
 
+  /// What Linksy takes of the phone's memory, as one line for the log.
+  static Future<String?> memory() => _call<String>('memory');
+
   static Future<bool> directHost() async =>
       await _call<bool>('directHost') ?? false;
 
