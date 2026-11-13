@@ -110,6 +110,9 @@ class _PhonePageState extends State<PhonePage> {
             CustomScrollView(
               controller: _scroll,
               slivers: [
+                // One sliver, moved up as one over the header's foot: a
+                // sliver takes taps only inside its own box, so a second one
+                // moved up lost the top of its first shelf (Photos' See all).
                 SliverToBoxAdapter(
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -117,38 +120,36 @@ class _PhonePageState extends State<PhonePage> {
                       _Header(view: view),
                       Transform.translate(
                         offset: const Offset(0, -_overlap),
-                        child: Padding(
-                          padding: const EdgeInsets.symmetric(horizontal: 16),
-                          child: _Quick(view: view),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.stretch,
+                          children: [
+                            Padding(
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 16,
+                              ),
+                              child: _Quick(view: view),
+                            ),
+                            PhotosShelf(
+                              library: _library,
+                              allowed: c.photoAccess,
+                              name: d.name,
+                              onAllow: c.allowPhotos,
+                            ),
+                            if (d.features.contains('apps'))
+                              AppsShelf(library: _library, name: d.name),
+                            FilesShelf(flow: _flow),
+                            if (recent.isNotEmpty) ...[
+                              ShelfTitle(
+                                l.phoneHistory,
+                                onSeeAll: () =>
+                                    openHistory(context, _library, d),
+                              ),
+                              HistoryThread(entries: recent, device: d),
+                            ],
+                          ],
                         ),
                       ),
                     ],
-                  ),
-                ),
-                SliverToBoxAdapter(
-                  child: Transform.translate(
-                    offset: const Offset(0, -_overlap),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.stretch,
-                      children: [
-                        PhotosShelf(
-                          library: _library,
-                          allowed: c.photoAccess,
-                          name: d.name,
-                          onAllow: c.allowPhotos,
-                        ),
-                        if (d.features.contains('apps'))
-                          AppsShelf(library: _library, name: d.name),
-                        FilesShelf(flow: _flow),
-                        if (recent.isNotEmpty) ...[
-                          ShelfTitle(
-                            l.phoneHistory,
-                            onSeeAll: () => openHistory(context, _library, d),
-                          ),
-                          HistoryThread(entries: recent, device: d),
-                        ],
-                      ],
-                    ),
                   ),
                 ),
                 SliverToBoxAdapter(

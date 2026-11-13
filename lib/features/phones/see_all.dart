@@ -44,7 +44,7 @@ Future<void> openHistory(
 );
 
 /// A See all page: the blue bar of the phone's page, what's in it, and Send
-/// floating over it.
+/// under it, never over the list (its notes covered rows).
 class _Page extends StatelessWidget {
   const _Page({
     required this.title,
@@ -64,34 +64,37 @@ class _Page extends StatelessWidget {
     return AnnotatedRegion<SystemUiOverlayStyle>(
       value: overlayFor(Theme.of(context).brightness),
       child: Scaffold(
-        body: Stack(
+        body: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            Column(
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: [
-                SafeArea(
-                  bottom: false,
-                  child: Padding(
-                    padding: const EdgeInsets.fromLTRB(12, 8, 16, 4),
-                    child: Row(
-                      children: [
-                        RoundButton(
-                          icon: Ph.arrowLeft,
-                          tooltip: MaterialLocalizations.of(context)
-                              .backButtonTooltip,
-                          onTap: () => Navigator.of(context).maybePop(),
-                        ),
-                        const SizedBox(width: 10),
-                        Text(title, style: sora(22, color: s.ink)),
-                      ],
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  SafeArea(
+                    bottom: false,
+                    child: Padding(
+                      padding: const EdgeInsets.fromLTRB(12, 8, 16, 4),
+                      child: Row(
+                        children: [
+                          RoundButton(
+                            icon: Ph.arrowLeft,
+                            tooltip: MaterialLocalizations.of(context)
+                                .backButtonTooltip,
+                            onTap: () => Navigator.of(context).maybePop(),
+                          ),
+                          const SizedBox(width: 10),
+                          Text(title, style: sora(22, color: s.ink)),
+                        ],
+                      ),
                     ),
                   ),
-                ),
-                ...children,
-              ],
+                  ...children,
+                ],
+              ),
             ),
-            Align(
-              alignment: Alignment.bottomCenter,
+            SafeArea(
+              top: false,
               child: SendBar(
                 flow: library.flow,
                 name: name,
@@ -255,9 +258,7 @@ class _AllPhotos extends StatelessWidget {
                         ),
                       ),
                     ],
-                    const SliverToBoxAdapter(
-                      child: SizedBox(height: SendBar.room),
-                    ),
+                    const SliverToBoxAdapter(child: SizedBox(height: 16)),
                   ],
                 ),
               ),
@@ -370,12 +371,7 @@ class _AllAppsState extends State<_AllApps> {
                       ),
                     )
                   : ListView.separated(
-                      padding: const EdgeInsets.fromLTRB(
-                        16,
-                        8,
-                        16,
-                        SendBar.room,
-                      ),
+                      padding: const EdgeInsets.fromLTRB(16, 8, 16, 16),
                       itemCount: apps.length,
                       separatorBuilder: (_, _) => const SizedBox(height: 8),
                       itemBuilder: (context, i) => _AppRow(
@@ -425,23 +421,23 @@ class _AppRow extends StatelessWidget {
     final dim = there == AppThere.same && !on;
     return Opacity(
       opacity: !can || dim ? 0.55 : 1,
-      child: Pressable(
+      child: Pressable.builder(
         // What's there already takes a long press, so nobody sends it twice
         // by accident. What can't go doesn't react at all.
         onTap: !can || dim ? null : onToggle,
         onLongPress: can ? onToggle : null,
         scale: 0.985,
         semanticLabel: app.label,
-        child: AnimatedContainer(
+        // Picked or pressed: a thin blue line and a blue tint, no more.
+        builder: (context, down) => AnimatedContainer(
           duration: motion(context, 120),
-          padding: const EdgeInsets.fromLTRB(12, 10, 12, 10),
+          padding: const EdgeInsets.fromLTRB(12, 10, 14, 10),
           decoration: BoxDecoration(
-            color: s.card,
+            color: on || down
+                ? Color.alphaBlend(Sig.blue.withValues(alpha: 0.06), s.card)
+                : s.card,
             borderRadius: BorderRadius.circular(18),
-            border: Border.all(
-              color: on ? Sig.blue : Colors.transparent,
-              width: 2,
-            ),
+            border: Border.all(color: on || down ? Sig.blue : s.line),
           ),
           child: Row(
             children: [
@@ -468,6 +464,8 @@ class _AppRow extends StatelessWidget {
                     if (mark != null)
                       Text(
                         mark,
+                        maxLines: 2,
+                        overflow: TextOverflow.ellipsis,
                         style: TextStyle(
                           fontSize: 13,
                           height: 1.3,
@@ -480,11 +478,34 @@ class _AppRow extends StatelessWidget {
                   ],
                 ),
               ),
-              if (can) ...[const SizedBox(width: 10), PickMark(on: on)],
+              if (can) ...[const SizedBox(width: 10), _RowMark(on: on)],
             ],
           ),
         ),
       ),
     );
   }
+}
+
+/// A row's pick: an empty ring, or a blue check.
+class _RowMark extends StatelessWidget {
+  const _RowMark({required this.on});
+
+  final bool on;
+
+  @override
+  Widget build(BuildContext context) => AnimatedContainer(
+    duration: motion(context, 120),
+    width: 24,
+    height: 24,
+    decoration: BoxDecoration(
+      shape: BoxShape.circle,
+      color: on ? Sig.blue : null,
+      border: Border.all(
+        color: on ? Sig.blue : Sig.of(context).faint,
+        width: 1.5,
+      ),
+    ),
+    child: on ? const Icon(PhBold.check, size: 13, color: Colors.white) : null,
+  );
 }
