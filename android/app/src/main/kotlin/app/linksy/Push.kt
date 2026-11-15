@@ -51,6 +51,11 @@ class Push : FirebaseMessagingService() {
             }.onFailure { done(null) }
         }
 
+        /// The payload's link, only when it is https: a push message is
+        /// remote input, and a plain-http link can be rewritten in transit.
+        fun safeLink(url: String?): String? =
+            url?.takeIf { it.startsWith("https://", ignoreCase = true) }
+
         fun show(context: Context, title: String, body: String, url: String?) {
             val manager = context.getSystemService(NotificationManager::class.java)
             if (Build.VERSION.SDK_INT >= 26) {
@@ -58,7 +63,7 @@ class Push : FirebaseMessagingService() {
                     NotificationChannel(CHANNEL, Lang.str(context, R.string.channel_news), NotificationManager.IMPORTANCE_DEFAULT),
                 )
             }
-            val open = url?.takeIf { it.startsWith("https://") || it.startsWith("http://") }
+            val open = safeLink(url)
                 ?.let { Intent(Intent.ACTION_VIEW, android.net.Uri.parse(it)) }
                 ?: Intent(context, MainActivity::class.java)
             val tap = PendingIntent.getActivity(

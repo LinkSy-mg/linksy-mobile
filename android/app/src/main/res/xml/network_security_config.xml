@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- No plain-http from the app's own HTTP stack: the update check and relay
+     use https, and peers talk over QUIC (not covered by this config). -->
+<network-security-config>
+    <base-config cleartextTrafficPermitted="false"/>
+</network-security-config>

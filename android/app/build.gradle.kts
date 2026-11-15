@@ -56,9 +56,31 @@ android {
 
     buildTypes {
         release {
-            signingConfig = if (hasReleaseKey) signingConfigs.getByName("release") else signingConfigs.getByName("debug")
+            // No fallback to the debug key: a release APK signed with it
+            // would be installable (and updatable) by anyone with that key.
+            // The guard below fails the build when the release key is missing.
+            if (hasReleaseKey) signingConfig = signingConfigs.getByName("release")
             isMinifyEnabled = true
             isShrinkResources = true
+        }
+    }
+}
+
+// Refuse to package a release without the release key, instead of silently
+// signing it with the debug key. Debug builds and tests are unaffected.
+gradle.taskGraph.whenReady {
+    val packaging = allTasks.any {
+        it.project == project && (it.name == "packageRelease" || it.name == "packageReleaseBundle")
+    }
+    if (packaging) {
+        val missing = listOf("storeFile", "storePassword", "keyAlias", "keyPassword")
+            .filter { keyProps.getProperty(it).isNullOrBlank() }
+        if (!hasReleaseKey || missing.isNotEmpty() || !file(keyProps.getProperty("storeFile")).exists()) {
+            throw GradleException(
+                "Release build needs the release keystore: create android/key.properties with " +
+                    "storeFile, storePassword, keyAlias and keyPassword (see tool/release.sh). " +
+                    "Refusing to sign a release with the debug key.",
+            )
         }
     }
 }
@@ -80,4 +102,6 @@ dependencies {
     // Flutter plugin, no analytics.
     implementation(platform("com.google.firebase:firebase-bom:34.4.0"))
     implementation("com.google.firebase:firebase-messaging")
+
+    testImplementation("junit:junit:4.13.2")
 }
