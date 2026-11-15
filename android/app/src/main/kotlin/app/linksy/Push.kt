@@ -5,6 +5,7 @@ import android.app.NotificationManager
 import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
+import android.net.Uri
 import android.os.Build
 import android.util.Log
 import androidx.core.app.NotificationCompat
@@ -51,10 +52,23 @@ class Push : FirebaseMessagingService() {
             }.onFailure { done(null) }
         }
 
-        /// The payload's link, only when it is https: a push message is
+        /// Opens the link only for https, else the app: a push message is
         /// remote input, and a plain-http link can be rewritten in transit.
-        fun safeLink(url: String?): String? =
-            url?.takeIf { it.startsWith("https://", ignoreCase = true) }
+        /// `scheme` must already be normalized (lower case).
+        internal fun <T> linkOrApp(scheme: String?, link: () -> T, app: () -> T): T =
+            if (scheme == "https") link() else app()
+
+        /// What a tap on the notification opens for the payload's `url`.
+        fun tapIntent(context: Context, url: String?): Intent {
+            // normalizeScheme so "HTTPS://" matches intent filters (they match
+            // case-sensitively on the lower-case scheme).
+            val uri = url?.let { Uri.parse(it).normalizeScheme() }
+            return linkOrApp(
+                uri?.scheme,
+                { Intent(Intent.ACTION_VIEW, uri).addCategory(Intent.CATEGORY_BROWSABLE) },
+                { Intent(context, MainActivity::class.java) },
+            )
+        }
 
         fun show(context: Context, title: String, body: String, url: String?) {
             val manager = context.getSystemService(NotificationManager::class.java)
@@ -63,9 +77,7 @@ class Push : FirebaseMessagingService() {
                     NotificationChannel(CHANNEL, Lang.str(context, R.string.channel_news), NotificationManager.IMPORTANCE_DEFAULT),
                 )
             }
-            val open = safeLink(url)
-                ?.let { Intent(Intent.ACTION_VIEW, android.net.Uri.parse(it)) }
-                ?: Intent(context, MainActivity::class.java)
+            val open = tapIntent(context, url)
             val tap = PendingIntent.getActivity(
                 context, title.hashCode(), open.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK),
                 PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT,

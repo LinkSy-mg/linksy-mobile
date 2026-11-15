@@ -628,7 +628,9 @@ class Bridge(context: Context, val engine: FlutterEngine) {
     private fun granted(permission: String) =
         app.checkSelfPermission(permission) == PackageManager.PERMISSION_GRANTED
 
-    /// A link a computer sent, in the browser. Web links only.
+    /// A link a computer sent, in the browser. Web links only. Plain http is
+    /// allowed on purpose: the user's own computer sent it and the browser
+    /// (not this app) loads it and shows the insecure-connection state.
     private fun openUrl(url: String): Boolean {
         val uri = android.net.Uri.parse(url.trim())
         if (uri.scheme?.lowercase() !in setOf("http", "https")) return false
