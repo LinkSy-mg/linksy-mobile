@@ -4,6 +4,15 @@ All notable changes to Linksy for Android. Format: [Keep a Changelog](https://ke
 
 ## [Unreleased]
 
+## [0.3.9] - 2026-11-17
+
+> [!IMPORTANT]
+> **If Play Protect stops the install,** pause **Scan apps with Play Protect** while installing (Play Store › your picture › Play Protect › the gear at the top right), then turn it back on.
+
+### Added
+
+- The deck has its own **Remote** page: the touchpad button goes there and back instead of opening the separate Remote page. It's made the first time for your screen, upright and sideways: a big touchpad, left and right click, the keyboard, Esc, Tab and the arrows, all in the deck's theme. Its tiles can be moved, resized or added to any page like the others (Touchpad, Left click, Right click, Keyboard in Add).
+
 ## [0.3.8] - 2026-11-17
 
 > [!IMPORTANT]
