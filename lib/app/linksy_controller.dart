@@ -2022,6 +2022,33 @@ class LinksyController extends ChangeNotifier with WidgetsBindingObserver {
     });
   }
 
+  /// A deck shortcut or snippet ([messages], as Remote Input sends them):
+  /// through Remote Input, asked for when it isn't open (the computer allows
+  /// it once), and left open a minute after as its page leaves it, so the
+  /// next tap doesn't ask again. Null when it went, else why not.
+  Future<String?> deckInput(
+    String id,
+    List<Map<String, Object>> messages,
+  ) async {
+    // Its page open (no minute counting down): it stays the page's.
+    final paged = remotes.containsKey(id) && !_remoteGrace.containsKey(id);
+    final error = await startRemote(id);
+    if (error != null) return error;
+    final went = await remoteSend(id, messages);
+    if (!paged) leaveRemote(id);
+    return went ? null : tr.remoteFailed;
+  }
+
+  /// [key] with [mods] held around it.
+  Future<String?> deckKeys(String id, List<int> mods, int key) =>
+      deckInput(id, [
+        for (final m in mods) {'type': 'key', 'keysym': m, 'pressed': true},
+        {'type': 'key', 'keysym': key, 'pressed': true},
+        {'type': 'key', 'keysym': key, 'pressed': false},
+        for (final m in mods.reversed)
+          {'type': 'key', 'keysym': m, 'pressed': false},
+      ]);
+
   /// This phone's networks, as last reported.
   final networks = NetworkState();
 

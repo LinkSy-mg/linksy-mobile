@@ -6,6 +6,7 @@ import 'package:flutter/services.dart';
 import '../../app/scope.dart';
 import '../../core/deck_draft.dart';
 import '../../core/deck_layouts.dart';
+import '../../core/deck_phone.dart';
 import '../../core/models.dart';
 import '../../ui/components.dart';
 import '../../ui/l10n.dart';
@@ -151,11 +152,26 @@ class _DeckEditorState extends State<DeckEditor> {
     if (picked == null || !mounted) return;
     final (kind, action) = picked;
     DeckTile? made;
+    // A phone tile says what it does in its props, not as an action.
+    final phone = kind == 'phone';
+    DeckTile? put() => _d.add(
+      kind,
+      action: phone ? null : action,
+      props: phone ? {'do': action!} : const {},
+      x: x,
+      y: y,
+    );
     _do(() {
-      made = _d.add(kind, action: action, x: x, y: y);
+      made = put();
+      // A full page (a starting deck fills it): on a new one.
+      if (made == null && _d.addPage()) made = put();
       _selected = made?.id;
     });
-    if (made == null) _say(l.deckNoRoom);
+    if (made == null) return _say(l.deckNoRoom);
+    // Keys, text or a link to set: straight to them.
+    if (phone && const {'shortcut', 'text', 'link'}.contains(action)) {
+      await _editTile(made!);
+    }
   }
 
   Future<void> _editTile(DeckTile tile) async {
@@ -1191,6 +1207,18 @@ class _AddSheetState extends State<_AddSheet> {
     void pick(String kind, [String? action]) =>
         Navigator.of(context).pop((kind, action));
     final volume = widget.offered.where((a) => a.kind == DeckKind.slider);
+    final own = [
+      for (final (d, name) in [
+        (DeckPhoneDo.shortcut, l.deckShortcut),
+        (DeckPhoneDo.text, l.deckTypeText),
+        (DeckPhoneDo.link, l.deckOpenLink),
+        (DeckPhoneDo.clipboard, l.phoneClipboard),
+        (DeckPhoneDo.ping, l.devicePing),
+        (DeckPhoneDo.find, l.deviceFindIt),
+      ])
+        if (shows(name))
+          _cell(deckPhoneIcon(d), name, () => pick('phone', d.name)),
+    ];
     final live = [
       if (shows(l.deckMusic)) _cell('music', l.deckMusic, () => pick('music')),
       for (final a in volume)
@@ -1252,6 +1280,10 @@ class _AddSheetState extends State<_AddSheet> {
                   padding: const EdgeInsets.only(bottom: 16),
                   children: [
                     if (live.isNotEmpty) ...[_label(l.deckLive), _grid(live)],
+                    if (own.isNotEmpty) ...[
+                      _label(l.deckFromPhone),
+                      _grid(own),
+                    ],
                     if (fresh.isNotEmpty && find.isEmpty) ...[
                       _label(l.deckSuggested),
                       _grid([for (final a in fresh) action(a)]),
@@ -1296,7 +1328,8 @@ class _TileSheet extends StatefulWidget {
 class _TileSheetState extends State<_TileSheet> {
   static const _icons = [
     'lock', 'mic', 'volume', 'terminal', 'moon', 'wifi', //
-    'power', 'restart', 'leaf', 'gauge', 'music', 'bluetooth',
+    'power', 'restart', 'leaf', 'gauge', 'music', 'bluetooth', //
+    'keys', 'type', 'link', 'clipboard', 'bell', 'find',
   ];
 
   late final _name = TextEditingController(
@@ -1304,6 +1337,182 @@ class _TileSheetState extends State<_TileSheet> {
   );
 
   DeckTile? get _t => widget.draft.tile(widget.id);
+
+  // A phone tile's settings: a shortcut's modifiers and key, the text to
+  // type, the link to open.
+  late final Set<String> _mods = {
+    for (final m in (_t?.props['keys'] ?? '').split('+'))
+      if (deckModifiers.containsKey(m.trim().toLowerCase()))
+        m.trim().toLowerCase(),
+  };
+  late final _key = TextEditingController(
+    text: (_t?.props['keys'] ?? '')
+        .split('+')
+        .where((p) => !deckModifiers.containsKey(p.trim().toLowerCase()))
+        .join('+'),
+  );
+  late final _text = TextEditingController(text: _t?.props['text'] ?? '');
+  late final _url = TextEditingController(text: _t?.props['url'] ?? '');
+
+  void _prop(DeckTile t, String key, String value) =>
+      _change(t.copyWith(props: {...t.props, key: value}));
+
+  void _keys(DeckTile t) =>
+      _prop(t, 'keys', deckShortcutKeys(_mods, _key.text));
+
+  Widget _field(
+    TextEditingController controller,
+    String hint,
+    ValueChanged<String> onChanged, {
+    int lines = 1,
+    TextInputType? type,
+  }) => TextField(
+    controller: controller,
+    onChanged: onChanged,
+    minLines: lines,
+    maxLines: lines,
+    keyboardType: type,
+    autocorrect: type == null,
+    style: const TextStyle(color: _ink),
+    decoration: InputDecoration(
+      hintText: hint,
+      hintStyle: const TextStyle(color: _muted),
+      isDense: true,
+      filled: true,
+      fillColor: Colors.black,
+      border: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(14),
+        borderSide: const BorderSide(color: _edge),
+      ),
+      enabledBorder: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(14),
+        borderSide: const BorderSide(color: _edge),
+      ),
+    ),
+  );
+
+  /// One of a few for [prop] (null: the usual, kept out of the props).
+  Widget _choice(DeckTile t, String prop, Map<String?, String> options) => Row(
+    children: [
+      for (final MapEntry(key: value, value: name) in options.entries) ...[
+        Expanded(
+          child: Pressable(
+            onTap: () => _change(
+              t.copyWith(
+                props: {
+                  for (final e in t.props.entries)
+                    if (e.key != prop) e.key: e.value,
+                  ...?value == null ? null : {prop: value},
+                },
+              ),
+            ),
+            semanticLabel: name,
+            child: Container(
+              height: 40,
+              alignment: Alignment.center,
+              decoration: BoxDecoration(
+                color: t.props[prop] == value ? _accent : Colors.black,
+                borderRadius: BorderRadius.circular(12),
+                border: Border.all(
+                  color: t.props[prop] == value ? _accent : _edge,
+                ),
+              ),
+              child: Text(
+                name,
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+                style: TextStyle(
+                  color: t.props[prop] == value ? Colors.white : _ink,
+                  fontWeight: FontWeight.w600,
+                  fontSize: 13,
+                ),
+              ),
+            ),
+          ),
+        ),
+        if (name != options.values.last) const SizedBox(width: 8),
+      ],
+    ],
+  );
+
+  List<Widget> _phoneFields(DeckTile t) {
+    final l = context.l10n;
+    switch (deckPhoneDo(t.props['do'])) {
+      case DeckPhoneDo.shortcut:
+        final bad =
+            _key.text.trim().isNotEmpty &&
+            deckShortcut(t.props['keys']) == null;
+        return [
+          _label(l.deckKeys),
+          Row(
+            children: [
+              for (final m in deckModifiers.keys) ...[
+                Expanded(
+                  child: Pressable(
+                    onTap: () {
+                      _mods.contains(m) ? _mods.remove(m) : _mods.add(m);
+                      _keys(t);
+                    },
+                    semanticLabel: m,
+                    child: Container(
+                      height: 40,
+                      alignment: Alignment.center,
+                      decoration: BoxDecoration(
+                        color: _mods.contains(m) ? _accent : Colors.black,
+                        borderRadius: BorderRadius.circular(12),
+                        border: Border.all(
+                          color: _mods.contains(m) ? _accent : _edge,
+                        ),
+                      ),
+                      child: Text(
+                        deckShortcutLabel(m),
+                        style: TextStyle(
+                          color: _mods.contains(m) ? Colors.white : _ink,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+                if (m != deckModifiers.keys.last) const SizedBox(width: 8),
+              ],
+            ],
+          ),
+          const SizedBox(height: 8),
+          _field(
+            _key,
+            l.deckKeyHint,
+            (_) => _keys(t),
+            type: TextInputType.text,
+          ),
+          if (bad)
+            Padding(
+              padding: const EdgeInsets.only(top: 6),
+              child: Text(
+                l.deckKeyHint,
+                style: const TextStyle(color: Color(0xFFFF8A9A), fontSize: 12),
+              ),
+            ),
+        ];
+      case DeckPhoneDo.text:
+        return [
+          _label(l.deckTypeText),
+          _field(_text, l.deckTextHint, (v) => _prop(t, 'text', v), lines: 3),
+        ];
+      case DeckPhoneDo.link:
+        return [
+          _label(l.deckOpenLink),
+          _field(
+            _url,
+            l.deckLinkHint,
+            (v) => _prop(t, 'url', v.trim()),
+            type: TextInputType.url,
+          ),
+        ];
+      default:
+        return const [];
+    }
+  }
 
   void _change(DeckTile next) {
     setState(() => widget.draft.replace(next));
@@ -1313,6 +1522,9 @@ class _TileSheetState extends State<_TileSheet> {
   @override
   void dispose() {
     _name.dispose();
+    _key.dispose();
+    _text.dispose();
+    _url.dispose();
     super.dispose();
   }
 
@@ -1363,6 +1575,7 @@ class _TileSheetState extends State<_TileSheet> {
         .firstOrNull
         ?.name;
     final runs = t.kind == 'button';
+    final phone = t.kind == 'phone';
     return FractionallySizedBox(
       heightFactor: MediaQuery.orientationOf(context) == Orientation.landscape
           ? 0.96
@@ -1411,38 +1624,41 @@ class _TileSheetState extends State<_TileSheet> {
                 ),
               ),
             ),
-            if (runs) ...[
-              _label(l.deckDoes),
-              Pressable(
-                onTap: () => _pickAction(t),
-                semanticLabel: l.deckDoes,
-                child: Container(
-                  height: 46,
-                  padding: const EdgeInsets.symmetric(horizontal: 14),
-                  decoration: BoxDecoration(
-                    color: Colors.black,
-                    borderRadius: BorderRadius.circular(14),
-                    border: Border.all(color: _edge),
-                  ),
-                  child: Row(
-                    children: [
-                      Expanded(
-                        child: Text(
-                          name ?? t.action ?? '',
-                          maxLines: 1,
-                          overflow: TextOverflow.ellipsis,
-                          style: const TextStyle(
-                            color: _ink,
-                            fontSize: 14,
-                            fontWeight: FontWeight.w600,
+            if (runs || phone) ...[
+              if (runs) ...[
+                _label(l.deckDoes),
+                Pressable(
+                  onTap: () => _pickAction(t),
+                  semanticLabel: l.deckDoes,
+                  child: Container(
+                    height: 46,
+                    padding: const EdgeInsets.symmetric(horizontal: 14),
+                    decoration: BoxDecoration(
+                      color: Colors.black,
+                      borderRadius: BorderRadius.circular(14),
+                      border: Border.all(color: _edge),
+                    ),
+                    child: Row(
+                      children: [
+                        Expanded(
+                          child: Text(
+                            name ?? t.action ?? '',
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                            style: const TextStyle(
+                              color: _ink,
+                              fontSize: 14,
+                              fontWeight: FontWeight.w600,
+                            ),
                           ),
                         ),
-                      ),
-                      const Icon(Ph.caretRight, size: 15, color: _muted),
-                    ],
+                        const Icon(Ph.caretRight, size: 15, color: _muted),
+                      ],
+                    ),
                   ),
                 ),
-              ),
+              ],
+              if (phone) ..._phoneFields(t),
               _label(l.deckIcon),
               Wrap(
                 spacing: 8,
@@ -1474,6 +1690,20 @@ class _TileSheetState extends State<_TileSheet> {
                     ),
                 ],
               ),
+            ],
+            if (runs || phone) ...[
+              _label(l.deckShow),
+              _choice(t, 'show', {
+                null: l.deckShowBoth,
+                'icon': l.deckShowIcon,
+                'name': l.deckShowName,
+              }),
+              _label(l.deckLookSize),
+              _choice(t, 'size', {
+                's': l.deckSmall,
+                null: l.deckMedium,
+                'l': l.deckLarge,
+              }),
             ],
             _label(l.deckColor),
             Row(

@@ -8,6 +8,7 @@ import 'package:flutter/services.dart';
 import '../../app/platform.dart';
 import '../../app/scope.dart';
 import '../../core/deck_layouts.dart';
+import '../../core/deck_phone.dart';
 import '../../core/models.dart';
 import '../../ui/components.dart';
 import '../../ui/format.dart';
@@ -1082,6 +1083,78 @@ class _Tile extends StatelessWidget {
     final iconSize = look.icons == DeckStroke.pixel
         ? math.max(12.0, (grown / 12).roundToDouble() * 12)
         : grown;
+    // A tile that runs something: its icon over its words, or both in the
+    // corner of a bigger one.
+    // A tile that runs something: its icon over its words, or both in the
+    // corner of a bigger one; or only one of them, smaller or bigger, as set
+    // in the editor (`show`: icon, name; `size`: s, l).
+    Widget press(
+      String iconName,
+      String shown,
+      String semantic,
+      VoidCallback onTap,
+    ) {
+      final show = t.props['show'];
+      final f = switch (t.props['size']) {
+        's' => 0.8,
+        'l' => 1.35,
+        _ => 1.0,
+      };
+      Widget icon([double more = 1]) {
+        final size = iconSize * f * more;
+        return DeckIcon(
+          iconName,
+          size: look.icons == DeckStroke.pixel
+              ? math.max(12.0, (size / 12).roundToDouble() * 12)
+              : size,
+          color: paint.icon,
+          stroke: look.icons,
+        );
+      }
+
+      Widget words(double size, {int lines = 1, bool center = false}) =>
+          pen.words(
+            shown,
+            size: size * f,
+            width: inner,
+            lines: lines,
+            center: center,
+            pitches: [1.3 * f, 1.1 * f],
+            weight: look.prefix.isEmpty ? null : FontWeight.w400,
+            label: true,
+          );
+
+      return Pressable.builder(
+        onTap: onTap,
+        scale: 0.95,
+        semanticLabel: semantic,
+        builder: (context, down) => shell(
+          down: down,
+          show == 'icon'
+              ? Center(child: icon(1.5))
+              : show == 'name'
+              ? Center(child: words(13, lines: 3, center: true))
+              : one
+              ? Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    icon(),
+                    SizedBox(height: 3 * scale),
+                    words(10, lines: look.prefix.isEmpty ? 2 : 1, center: true),
+                  ],
+                )
+              : Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    icon(),
+                    const Spacer(),
+                    words(look.prefix.isEmpty ? 11 : 12, lines: 2),
+                  ],
+                ),
+        ),
+      );
+    }
+
     final Widget built;
     switch (t.kind) {
       case 'clock':
@@ -1109,56 +1182,28 @@ class _Tile extends StatelessWidget {
         );
       case 'button':
         final playing = scope.player?.playing ?? false;
-        final icon = DeckIcon(
+        built = press(
           t.props['icon'] ?? deckIconName(action, playing: playing),
-          size: iconSize,
-          color: paint.icon,
-          stroke: look.icons,
-        );
-        final shown = state?.text ?? label;
-        built = Pressable.builder(
-          onTap: () {
+          state?.text ?? label,
+          state?.text == null ? label : '$label, ${state!.text}',
+          () {
             if (!scope.live) return retry();
             // Before the computer said what it offers: nothing to run yet.
             if (scope.actions == null) return;
             offered == null ? why() : _run(context, offered);
           },
-          scale: 0.95,
-          semanticLabel: state?.text == null ? label : '$label, ${state!.text}',
-          builder: (context, down) => shell(
-            down: down,
-            one
-                ? Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      icon,
-                      SizedBox(height: 3 * scale),
-                      pen.words(
-                        shown,
-                        size: 10,
-                        width: inner,
-                        lines: look.prefix.isEmpty ? 2 : 1,
-                        center: true,
-                        weight: look.prefix.isEmpty ? null : FontWeight.w400,
-                        label: true,
-                      ),
-                    ],
-                  )
-                : Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      icon,
-                      const Spacer(),
-                      pen.words(
-                        shown,
-                        size: look.prefix.isEmpty ? 11 : 12,
-                        width: inner,
-                        pitches: const [1.3],
-                        label: true,
-                      ),
-                    ],
-                  ),
-          ),
+        );
+      case 'phone':
+        final does = deckPhoneDo(t.props['do']);
+        final shown = t.label.isNotEmpty ? t.label : _phoneLabel(context, t);
+        built = press(
+          t.props['icon'] ?? (does == null ? 'app' : deckPhoneIcon(does)),
+          shown,
+          shown,
+          () {
+            if (!scope.live) return retry();
+            _runPhone(context, t);
+          },
         );
       default:
         built = shell(
@@ -1234,6 +1279,69 @@ class _Tile extends StatelessWidget {
     final last = action.split('.').last.replaceAll('_', ' ');
     if (last.isEmpty || action.startsWith('command.')) return null;
     return last[0].toUpperCase() + last.substring(1);
+  }
+
+  /// A phone tile's name when it has none of its own: its keys, the start
+  /// of its text, its link's site, or what it does.
+  static String _phoneLabel(BuildContext context, DeckTile t) {
+    final l = context.l10n;
+    String set(String? v, String Function(String) shown, String none) =>
+        v == null || v.trim().isEmpty ? none : shown(v.trim());
+    return switch (deckPhoneDo(t.props['do'])) {
+      // Spaced, so a small tile can wrap it.
+      DeckPhoneDo.shortcut => set(
+        t.props['keys'],
+        (v) => deckShortcutLabel(v).replaceAll('+', ' + '),
+        l.deckShortcut,
+      ),
+      DeckPhoneDo.text => set(
+        t.props['text'],
+        (v) => v.length > 24 ? '${v.substring(0, 23)}…' : v,
+        l.deckTypeText,
+      ),
+      DeckPhoneDo.link => set(
+        t.props['url'],
+        (v) => Uri.tryParse(v)?.host.replaceFirst('www.', '') ?? v,
+        l.deckOpenLink,
+      ),
+      DeckPhoneDo.clipboard => l.phoneClipboard,
+      DeckPhoneDo.ping => l.devicePing,
+      DeckPhoneDo.find => l.deviceFindIt,
+      null => t.kind,
+    };
+  }
+
+  /// Runs a phone tile: keys and text through Remote Input, a link, or what
+  /// the computer's page does. A light tap when it went; else why not.
+  Future<void> _runPhone(BuildContext context, DeckTile t) async {
+    final c = LinksyScope.read(context);
+    final l = context.l10n;
+    final id = scope.deviceId;
+    final text = t.props['text'] ?? '';
+    final url = (t.props['url'] ?? '').trim();
+    final error = switch (deckPhoneDo(t.props['do'])) {
+      DeckPhoneDo.shortcut => switch (deckShortcut(t.props['keys'])) {
+        final k? => await c.deckKeys(id, k.mods, k.key),
+        null => l.deckSetUpFirst,
+      },
+      DeckPhoneDo.text when text.isNotEmpty => await c.deckInput(id, [
+        {'type': 'text', 'text': text},
+      ]),
+      DeckPhoneDo.link when url.isNotEmpty => await c.openUrl(
+        id,
+        url.contains('://') ? url : 'https://$url',
+      ),
+      DeckPhoneDo.clipboard => await c.sendClipboard(id),
+      DeckPhoneDo.ping => await c.ping(id),
+      DeckPhoneDo.find => await c.find(id),
+      _ => l.deckSetUpFirst,
+    };
+    if (error == null) {
+      HapticFeedback.lightImpact();
+    } else {
+      HapticFeedback.heavyImpact();
+      scope.say(error);
+    }
   }
 
   /// Runs it, asking first when the computer wants that.

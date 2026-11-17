@@ -25,7 +25,7 @@ class DeckDraft {
   /// The sizes [kind] takes, its usual one first. One this phone doesn't know
   /// stays the size it came.
   static List<(int, int)> sizesOf(String kind) => switch (kind) {
-    'button' => const [(1, 1), (2, 1)],
+    'button' || 'phone' => const [(1, 1), (2, 1)],
     'volume' => const [(4, 1), (2, 1), (1, 3)],
     'music' => const [(4, 2), (4, 1), (2, 2)],
     'clock' => const [(2, 1), (2, 2), (1, 1)],
@@ -158,7 +158,13 @@ class DeckDraft {
 
   /// A tile of [kind], at ([x], [y]) when it fits there, else the first free
   /// spot. Its usual size, or the next that fits. Null: no room.
-  DeckTile? add(String kind, {String? action, int? x, int? y}) {
+  DeckTile? add(
+    String kind, {
+    String? action,
+    Map<String, String> props = const {},
+    int? x,
+    int? y,
+  }) {
     if (tiles.length >= maxTiles) return null;
     for (final (w, h) in sizesOf(kind)) {
       final at = x != null && y != null && fits(x, y, w, h)
@@ -173,6 +179,7 @@ class DeckDraft {
         w: w,
         h: h,
         action: action,
+        props: props,
       );
       _setTiles([...tiles, tile]);
       return tile;
@@ -210,6 +217,27 @@ class DeckDraft {
     for (final o in tiles) {
       if (o.id == id) continue;
       (over(o) ? moved : next).add(o);
+    }
+    // Swapped, when they fit where it was: moved by as much the other way.
+    // A full deck has no other room.
+    if (moved.isNotEmpty) {
+      final swapped = [
+        for (final o in moved)
+          o.copyWith(x: o.x - (x - t.x), y: o.y - (y - t.y)),
+      ];
+      final all = [...next];
+      var fit = true;
+      for (final o in swapped) {
+        if (!fits(o.x, o.y, o.w, o.h, on: all)) {
+          fit = false;
+          break;
+        }
+        all.add(o);
+      }
+      if (fit) {
+        final order = {for (final (i, o) in tiles.indexed) o.id: i};
+        return all..sort((a, b) => order[a.id]! - order[b.id]!);
+      }
     }
     // The ones nearest it first, each to the spot nearest where it was.
     int far(DeckTile o) => (o.x - x).abs() + (o.y - y).abs();
