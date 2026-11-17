@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
@@ -528,13 +529,25 @@ class _TouchpadSurfaceState extends State<TouchpadSurface> {
   }
 
   @override
-  Widget build(BuildContext context) => Listener(
+  // A touch that starts here is the touchpad's from its first moment: on a
+  // deck page, sliding a finger would otherwise turn the page instead.
+  Widget build(BuildContext context) => RawGestureDetector(
     behavior: HitTestBehavior.opaque,
-    onPointerDown: _down,
-    onPointerMove: _move,
-    onPointerUp: _up,
-    onPointerCancel: _up,
-    child: widget.builder(context, _dragging),
+    gestures: {
+      EagerGestureRecognizer:
+          GestureRecognizerFactoryWithHandlers<EagerGestureRecognizer>(
+            EagerGestureRecognizer.new,
+            (_) {},
+          ),
+    },
+    child: Listener(
+      behavior: HitTestBehavior.opaque,
+      onPointerDown: _down,
+      onPointerMove: _move,
+      onPointerUp: _up,
+      onPointerCancel: _up,
+      child: widget.builder(context, _dragging),
+    ),
   );
 }
 
