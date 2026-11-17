@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -739,6 +740,33 @@ class _Label extends StatelessWidget {
     builder: (context, box) {
       // A small tile has room for the icon and two short lines.
       final tight = box.maxHeight < 70;
+      final text = note ?? name;
+      var style = TextStyle(
+        color: color,
+        fontSize: big ? 16 : (tight ? 11.5 : 12.5),
+        fontWeight: FontWeight.w600,
+        height: 1.2,
+      );
+      // A word wider than the tile: the label a little smaller rather than
+      // the word cut in two ("micr / ophone").
+      final scaler = MediaQuery.textScalerOf(context);
+      final widest = text.split(' ').fold(0.0, (most, word) {
+        final p = TextPainter(
+          text: TextSpan(text: word, style: style),
+          textDirection: Directionality.of(context),
+          textScaler: scaler,
+          maxLines: 1,
+        )..layout();
+        final wide = p.width;
+        p.dispose();
+        return math.max(most, wide);
+      });
+      if (widest > box.maxWidth) {
+        style = style.copyWith(
+          fontSize:
+              style.fontSize! * math.max(0.7, box.maxWidth / widest * 0.98),
+        );
+      }
       return Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
