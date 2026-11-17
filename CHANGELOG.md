@@ -4,6 +4,30 @@ All notable changes to Linksy for Android. Format: [Keep a Changelog](https://ke
 
 ## [Unreleased]
 
+## [0.3.7] - 2026-11-17
+
+> [!IMPORTANT]
+> **If Play Protect stops the install,** pause **Scan apps with Play Protect** while installing (Play Store › your picture › Play Protect › the gear at the top right), then turn it back on.
+
+### Added
+
+- Deck: tiles the phone runs itself, under **From this phone** in Add: **Shortcut** (keys pressed together on the computer, like Ctrl+Shift+T), **Type text**, **Open link**, **Send clipboard**, **Ping** and **Find it**. Shortcuts and text go through Remote Input, which the computer allows once.
+- Deck: each tile can show its icon and name, only one of them, smaller or bigger.
+- Deck: the player has 10 s back and forward when the player can seek and there's room, and picks up the whole tile.
+
+### Changed
+
+- The deck takes the whole screen upright too, with no status bar, navigation bar or header; a swipe down from the top brings them back. Full screen can be turned off in the deck's Theme.
+- Deck tiles are square and as many as fit the screen, so tablets and unfolded phones get more of them instead of huge tiles, and the deck fills the screen edge to edge with the same room around the tiles as between them.
+- A new deck fills the screen both ways up: what the computer offers, then the phone's own tiles, the bigger tiles taking what's left.
+- The deck's clock is as big as its tile, with the date in full when it fits.
+- In the editor, a tile dropped on others swaps with them, so a full deck can still be rearranged; one added to a full page goes on a new page.
+- The files on the transfer lane run faster the faster the transfer goes.
+
+### Fixed
+
+- A deck label with a word too wide for its tile is a little smaller instead of broken in two ("Mute micr / ophone").
+
 ## [0.3.6] - 2026-11-13
 
 > [!IMPORTANT]
