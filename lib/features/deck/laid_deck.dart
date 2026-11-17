@@ -850,10 +850,18 @@ class _Pen {
         pitches: [pitch, pitch * 0.85, pitch * 0.7],
       );
     }
-    return Text(
-      s,
-      maxLines: '\n'.allMatches(s).length + 1,
-      style: look.text(px * scale, color: color).copyWith(height: 1.05),
+    // Never wider than the tile: a little smaller instead.
+    return SizedBox(
+      width: width,
+      child: FittedBox(
+        fit: BoxFit.scaleDown,
+        alignment: Alignment.centerLeft,
+        child: Text(
+          s,
+          maxLines: '\n'.allMatches(s).length + 1,
+          style: look.text(px * scale, color: color).copyWith(height: 1.05),
+        ),
+      ),
     );
   }
 }
@@ -1215,41 +1223,56 @@ class _ClockFaceState extends State<_ClockFace> {
         ? now.hour.toString().padLeft(2, '0')
         : '${now.hour % 12 == 0 ? 12 : now.hour % 12}';
     final mm = now.minute.toString().padLeft(2, '0');
-    final date = shortDate(now);
-    final w = widget.width;
-    if (t.w == 1) {
-      return Center(child: pen.number('$hh\n$mm', px: 17, width: w));
-    }
-    if (t.h == 1) {
-      return Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          pen.number('$hh:$mm', px: 18.5, width: w),
-          SizedBox(height: 2 * pen.scale),
-          pen.words(
-            date,
-            size: 10.5,
+    final w = widget.width, scale = pen.scale;
+    final time = '$hh:$mm';
+    // As big as the tile takes (mobile#21): the time as high as its share of
+    // the tile, unless its width says less, and the date in full when that
+    // fits. Glyphs are 6 dots wide and 7 high; a font's digits a bit narrower.
+    return LayoutBuilder(
+      builder: (context, box) {
+        final h = box.maxHeight.isFinite ? box.maxHeight : w;
+        double high(double share, int chars) =>
+            math.min(h * share, w * 7 / (6 * chars)) / scale;
+        Widget dateLine(double px) {
+          final pitch = math.max(1.0, px * 0.34 / 7);
+          final long = longDate(now);
+          final fits = long.length * 6 * pitch * scale <= w;
+          return pen.words(
+            fits ? long : shortDate(now),
+            size: px * 0.36,
             width: w,
-            pitches: const [1.1, 1.0],
+            pitches: [pitch, pitch * 0.85, pitch * 0.7, 1],
             opacity: 0.75,
-          ),
-        ],
-      );
-    }
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        pen.number('$hh:$mm', px: 29, width: w),
-        const Spacer(),
-        pen.words(
-          date,
-          size: 10.5,
-          width: w,
-          pitches: const [1.3, 1.1],
-          opacity: 0.75,
-        ),
-      ],
+          );
+        }
+
+        if (t.w == 1) {
+          return Center(
+            child: pen.number('$hh\n$mm', px: high(0.4, 2), width: w),
+          );
+        }
+        if (t.h == 1) {
+          final px = high(0.5, time.length);
+          return Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              pen.number(time, px: px, width: w),
+              SizedBox(height: px * 0.08 * scale),
+              dateLine(px),
+            ],
+          );
+        }
+        final px = high(0.55, time.length);
+        return Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            pen.number(time, px: px, width: w),
+            const Spacer(),
+            dateLine(px),
+          ],
+        );
+      },
     );
   }
 }
@@ -1374,7 +1397,32 @@ class _MusicFaceState extends State<_MusicFace> {
     // A timeline only when the player knows how long the track is.
     final timeline = p?.lengthMs != null;
 
-    Widget control(String icon, String command, double f, {bool big = false}) {
+    // Where it is now, for 10 s back and on.
+    final position = p?.positionMs == null
+        ? null
+        : p!.playing
+        ? p.positionMs! + DateTime.now().difference(_since).inMilliseconds
+        : p.positionMs!;
+    final seekable = (p?.canSeek ?? false) && position != null;
+    void seek(int by) {
+      if (p == null || position == null) return;
+      final length = p.lengthMs;
+      final to = math.max(0, position + by);
+      c.mediaCommand(
+        scope.deviceId,
+        p.id,
+        'seek',
+        positionMs: length == null ? to : math.min(to, length),
+      );
+    }
+
+    Widget control(
+      String icon,
+      String command,
+      double f, {
+      bool big = false,
+      VoidCallback? onTap,
+    }) {
       final size = (big ? 15.0 : 18.0) * s * f;
       final glyph = DeckIcon(
         icon,
@@ -1387,7 +1435,7 @@ class _MusicFaceState extends State<_MusicFace> {
       return Pressable(
         onTap: p == null
             ? null
-            : () => c.mediaCommand(scope.deviceId, p.id, command),
+            : onTap ?? () => c.mediaCommand(scope.deviceId, p.id, command),
         scale: 0.88,
         semanticLabel: command,
         child: Padding(
@@ -1414,17 +1462,36 @@ class _MusicFaceState extends State<_MusicFace> {
     }
 
     // What the player can't do isn't shown, rather than greyed (mobile#21).
-    Widget controls(double f) => Opacity(
+    // With [seeks], 10 s back and on around them; spread over [width] when
+    // given, rather than bunched at one end.
+    Widget controls(double f, {bool seeks = false, double? width}) => Opacity(
       opacity: p == null ? 0.5 : 1,
-      child: Row(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          if (p?.canPrevious ?? false) control('prev', 'previous', f),
-          control(playing ? 'pause' : 'play', 'play_pause', f, big: true),
-          if (p?.canNext ?? false) control('next', 'next', f),
-        ],
+      child: SizedBox(
+        width: width,
+        child: Row(
+          mainAxisSize: width == null ? MainAxisSize.min : MainAxisSize.max,
+          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+          children: [
+            if (seeks && seekable)
+              control('rewind', 'seek', f, onTap: () => seek(-10000)),
+            if (p?.canPrevious ?? false) control('prev', 'previous', f),
+            control(playing ? 'pause' : 'play', 'play_pause', f, big: true),
+            if (p?.canNext ?? false) control('next', 'next', f),
+            if (seeks && seekable)
+              control('forward', 'seek', f, onTap: () => seek(10000)),
+          ],
+        ),
       ),
     );
+
+    /// How wide the buttons are at [f]: 38 for play, 26 each for the rest.
+    double controlsWide(double f, {bool seeks = false}) {
+      final small =
+          ((p?.canPrevious ?? false) ? 1 : 0) +
+          ((p?.canNext ?? false) ? 1 : 0) +
+          (seeks && seekable ? 2 : 0);
+      return (38 + 26 * small) * s * f;
+    }
 
     Widget words(double f, double width) => GestureDetector(
       behavior: HitTestBehavior.opaque,
@@ -1512,12 +1579,23 @@ class _MusicFaceState extends State<_MusicFace> {
             ],
           );
         }
-        // Taller: the cover beside when there's room for words too, and
-        // words and buttons as big as the tile allows, never cut.
+        // Taller: the cover beside when there's room for words too, the
+        // words as big as the tile takes, and the buttons in a row across
+        // the rest of it, 10 s back and on too when they fit (mobile#21).
         final cover = w - h - 9 * s >= 110 * s;
         final meta = cover ? w - h - 9 * s : w;
-        final need = (13 * 1.5 + 10.5 * 1.4 + 2 + 6 + 8 + 38 + 6) * s;
-        final f = math.min(h / need, meta / (100 * s)).clamp(0.7, 2.4);
+        final wordsNeed = (13 * 1.5 + 10.5 * 1.4 + 2) * s;
+        final barNeed = timeline ? 6 * s : 0.0;
+        // Words take up to half the height, and no more than the width
+        // keeps readable.
+        final f = math
+            .min(h * 0.45 / wordsNeed, meta / (90 * s))
+            .clamp(0.7, 3.0);
+        final left = h - wordsNeed * f - barNeed * f - 8 * s;
+        final seeks = controlsWide(1, seeks: true) * 1.3 <= meta;
+        final g = math
+            .min(left / (38 * s), meta / controlsWide(1, seeks: seeks) * 0.85)
+            .clamp(0.6, 3.0);
         return Row(
           children: [
             if (cover) ...[
@@ -1538,13 +1616,12 @@ class _MusicFaceState extends State<_MusicFace> {
                     SizedBox(height: 6 * s * f),
                     DeckBar(value: _progress, look: look),
                   ],
-                  const Spacer(),
-                  Align(
-                    alignment: Alignment.centerLeft,
-                    child: FittedBox(
-                      fit: BoxFit.scaleDown,
-                      alignment: Alignment.centerLeft,
-                      child: controls(f),
+                  Expanded(
+                    child: Center(
+                      child: FittedBox(
+                        fit: BoxFit.scaleDown,
+                        child: controls(g, seeks: seeks, width: meta),
+                      ),
                     ),
                   ),
                 ],

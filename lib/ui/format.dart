@@ -61,6 +61,9 @@ String formatDayHeading(DateTime t, {DateTime? now}) {
       : DateFormat.yMMMd(locale).format(day);
 }
 
+/// A day in full, as a wide clock shows it: "Tuesday 3 November".
+String longDate(DateTime t) => DateFormat.MMMMEEEEd(_dateLocale()).format(t);
+
 /// A day in short, as a clock shows it: "Tue, 3 Nov".
 String shortDate(DateTime t) => DateFormat.MMMEd(_dateLocale()).format(t);
 
