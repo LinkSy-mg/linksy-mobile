@@ -12,7 +12,15 @@ void main() {
     DeckAction(id: 'command.1', name: 'Deploy', kind: DeckKind.button),
   ];
 
-  DeckDraft draft() => DeckDraft(DeckDraft.starter('Work', offered));
+  /// The starting deck fills every cell; these take its top half, with the
+  /// rows under it free to work in.
+  DeckDraft draft() {
+    final d = DeckDraft(DeckDraft.starter('Work', offered));
+    for (final t in [...d.tiles]) {
+      if (t.y + t.h > 4) d.remove(t.id);
+    }
+    return d;
+  }
 
   /// No tile outside the grid or over another.
   void sound(DeckDraft d) {
@@ -107,10 +115,11 @@ void main() {
   });
 
   test('a new deck has a landscape too, with every tile that fits', () {
-    final d = draft();
-    final tall = d.tiles.length;
+    final d = DeckDraft(DeckDraft.starter('Work', offered));
+    String what(DeckTile t) => '${t.kind}:${t.action ?? t.props['do']}';
+    final tall = {for (final t in d.tiles) what(t)};
     d.landscape = true;
-    expect(d.tiles.length, tall);
+    expect({for (final t in d.tiles) what(t)}, containsAll(tall));
     sound(d);
   });
 

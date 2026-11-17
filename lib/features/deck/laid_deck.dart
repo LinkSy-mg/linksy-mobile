@@ -778,6 +778,25 @@ double deckGap(DeckFace face, {required bool sideways}) =>
   return (columns: cols, rows: rows, wide: fill(box.width, cols), tall: cell);
 }
 
+/// The grid a new layout gets on this screen, upright or sideways whichever
+/// way it's held now: as many square cells as fit the full-screen deck.
+(int, int) deckFit(BuildContext context, {required bool sideways}) {
+  final size = MediaQuery.sizeOf(context);
+  final short = math.min(size.width, size.height);
+  final long = math.max(size.width, size.height);
+  final face = DeckFace(
+    columns: sideways ? 9 : 4,
+    rows: sideways ? 4 : 8,
+    pages: const [[]],
+  );
+  final g = deckGrid(
+    sideways ? Size(long - _Rail.width, short) : Size(short, long),
+    face,
+    deckGap(face, sideways: sideways),
+  );
+  return (g.columns, g.rows);
+}
+
 /// Where a deck page lays out on this phone: the screen, less the bars, the
 /// header (or the side rail) and the page dots. For the editor, which draws
 /// its grid with the deck's own cell shape.

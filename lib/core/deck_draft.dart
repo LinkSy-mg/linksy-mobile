@@ -397,9 +397,28 @@ class DeckDraft {
   }
 
   /// A new layout, shown. False at the limit.
-  bool newLayout(String name, DeckStart start, List<DeckAction> offered) {
+  bool newLayout(
+    String name,
+    DeckStart start,
+    List<DeckAction> offered, {
+    (int, int) portrait = portraitGrid,
+    (int, int) landscape = landscapeGrid,
+  }) {
     if (layouts.layouts.length >= maxLayouts) return false;
-    final made = _withLandscape(_make(_newId('l'), name, start, offered));
+    final made = _complete(
+      _withLandscape(
+        _make(
+          _newId('l'),
+          name,
+          start,
+          offered,
+          portrait: portrait,
+          landscape: landscape,
+        ),
+      ),
+      offered,
+      full: start != DeckStart.blank,
+    );
     _commit(
       layouts.copyWith(layouts: [...layouts.layouts, made], active: made.id),
     );
@@ -451,12 +470,173 @@ class DeckDraft {
     return l.copyWith(landscape: wide.withPages(pages));
   }
 
-  /// What a computer that sent no layouts starts from.
-  static DeckLayouts starter(String name, List<DeckAction> offered) {
-    final made = _withLandscape(
-      _make('deck', name, DeckStart.media, offered, full: true),
+  /// What a computer that sent no layouts starts from: both ways up, every
+  /// cell of this screen's grid ([portrait], [landscape]) taken.
+  static DeckLayouts starter(
+    String name,
+    List<DeckAction> offered, {
+    (int, int) portrait = portraitGrid,
+    (int, int) landscape = landscapeGrid,
+  }) {
+    final made = _complete(
+      _withLandscape(
+        _make(
+          'deck',
+          name,
+          DeckStart.media,
+          offered,
+          full: true,
+          portrait: portrait,
+          landscape: landscape,
+        ),
+      ),
+      offered,
+      full: true,
     );
     return DeckLayouts(version: 0, active: made.id, layouts: [made]);
+  }
+
+  /// Both faces of a starting layout, full ([full]): see [filled].
+  static DeckLayout _complete(
+    DeckLayout l,
+    List<DeckAction> offered, {
+    required bool full,
+  }) {
+    if (!full) return l;
+    DeckFace face(DeckFace f) => f.withPages([
+      for (final p in f.pages)
+        filled(p, f.columns, f.rows, offered, tall: f.rows >= f.columns),
+    ]);
+    return l.copyWith(portrait: face(l.portrait), landscape: face(l.landscape));
+  }
+
+  /// [tiles] on a [columns] × [rows] grid with no cell left empty, as far as
+  /// it goes: free cells take what the computer offers that isn't there yet,
+  /// then the phone's own tiles; lines left empty at the end (rows when
+  /// [tall], else columns) make the big tiles bigger; a cell still empty
+  /// goes to the tile beside or above it.
+  static List<DeckTile> filled(
+    List<DeckTile> tiles,
+    int columns,
+    int rows,
+    List<DeckAction> offered, {
+    required bool tall,
+  }) {
+    var next = [...tiles];
+    var made = 0;
+    final there = {for (final t in next) t.action ?? t.props['do']};
+    final pool = <DeckTile Function(int, int)>[
+      for (final a in offered)
+        if (a.kind != DeckKind.slider && !there.contains(a.id))
+          (x, y) => DeckTile(
+            id: 'f${made++}${a.id}',
+            kind: 'button',
+            x: x,
+            y: y,
+            w: 1,
+            h: 1,
+            action: a.id,
+          ),
+      for (final d in ['clipboard', 'ping', 'find'])
+        if (!there.contains(d))
+          (x, y) => DeckTile(
+            id: 'f${made++}$d',
+            kind: 'phone',
+            x: x,
+            y: y,
+            w: 1,
+            h: 1,
+            props: {'do': d},
+          ),
+    ];
+    bool taken(int x, int y) =>
+        next.any((t) => x >= t.x && x < t.x + t.w && y >= t.y && y < t.y + t.h);
+    List<(int, int)> holes() => [
+      for (var y = 0; y < rows; y++)
+        for (var x = 0; x < columns; x++)
+          if (!taken(x, y)) (x, y),
+    ];
+    // An empty line at the end: the last row (or column) nothing is in.
+    bool lastEmpty() => tall
+        ? !next.any((t) => t.y + t.h >= rows)
+        : !next.any((t) => t.x + t.w >= columns);
+    void fillHoles() {
+      for (final (x, y) in holes()) {
+        if (pool.isEmpty || next.length >= maxTiles) return;
+        next.add(pool.removeAt(0)(x, y));
+      }
+    }
+
+    // Grows [t] by a line after it: what's after moves along, and a tile
+    // across that line grows with it.
+    void grow(DeckTile t) {
+      final at = tall ? t.y + t.h : t.x + t.w;
+      next = [
+        for (final o in next)
+          if (o.id == t.id)
+            tall ? o.copyWith(h: o.h + 1) : o.copyWith(w: o.w + 1)
+          else if ((tall ? o.y : o.x) >= at)
+            tall ? o.copyWith(y: o.y + 1) : o.copyWith(x: o.x + 1)
+          else if ((tall ? o.y + o.h : o.x + o.w) > at)
+            tall ? o.copyWith(h: o.h + 1) : o.copyWith(w: o.w + 1)
+          else
+            o,
+      ];
+    }
+
+    fillHoles();
+    // Big tiles first, then the ones that span the grid (no gap beside them).
+    const order = ['music', 'volume', 'clock'];
+    var guard = 0;
+    while (lastEmpty() && next.isNotEmpty && guard++ < 24) {
+      final across = next.where((t) => tall ? t.w == columns : t.h == rows);
+      // In turn, so no one tile grows huge.
+      DeckTile? pick;
+      for (var k = 0; k < order.length && pick == null; k++) {
+        final kind = order[(guard + k) % order.length];
+        pick = next
+            .where((t) => t.kind == kind)
+            .where(
+              (t) => allows(t.kind, tall ? t.w : t.w + 1, tall ? t.h + 1 : t.h),
+            )
+            .firstOrNull;
+      }
+      pick ??= across.firstOrNull ?? next.last;
+      grow(pick);
+      fillHoles();
+    }
+    // Cells nothing reached: a tile beside them grows over them, where its
+    // whole edge is free (right, down, left, up), until none is left.
+    bool free(int x0, int y0, int w, int h) {
+      if (x0 < 0 || y0 < 0 || x0 + w > columns || y0 + h > rows) return false;
+      for (var y = y0; y < y0 + h; y++) {
+        for (var x = x0; x < x0 + w; x++) {
+          if (taken(x, y)) return false;
+        }
+      }
+      return true;
+    }
+
+    for (var changed = true; changed && holes().isNotEmpty;) {
+      changed = false;
+      for (var i = 0; i < next.length; i++) {
+        final t = next[i];
+        final DeckTile? grown = free(t.x + t.w, t.y, 1, t.h)
+            ? t.copyWith(w: t.w + 1)
+            : free(t.x, t.y + t.h, t.w, 1)
+            ? t.copyWith(h: t.h + 1)
+            : free(t.x - 1, t.y, 1, t.h)
+            ? t.copyWith(x: t.x - 1, w: t.w + 1)
+            : free(t.x, t.y - 1, t.w, 1)
+            ? t.copyWith(y: t.y - 1, h: t.h + 1)
+            : null;
+        if (grown != null && allows(grown.kind, grown.w, grown.h)) {
+          next[i] = grown;
+          changed = true;
+        }
+      }
+    }
+    return next;
   }
 
   static DeckLayout _make(
@@ -465,6 +645,8 @@ class DeckDraft {
     DeckStart start,
     List<DeckAction> offered, {
     bool full = false,
+    (int, int) portrait = portraitGrid,
+    (int, int) landscape = landscapeGrid,
   }) {
     final has = {for (final a in offered) a.id};
     final tiles = <DeckTile>[];
@@ -529,8 +711,8 @@ class DeckDraft {
         }
         row(['media.previous', 'media.next', 'system.lock']);
     }
-    final (pc, pr) = portraitGrid;
-    final (lc, lr) = landscapeGrid;
+    final (pc, pr) = portrait;
+    final (lc, lr) = landscape;
     return DeckLayout(
       id: id,
       name: name,

@@ -36,7 +36,12 @@ Future<void> openDeckEditor(
   final offered = c.deckActions[device.id] ?? const <DeckAction>[];
   final start =
       c.deckLayouts(device.id) ??
-      DeckDraft.starter(context.l10n.deviceDeck, offered);
+      DeckDraft.starter(
+        context.l10n.deviceDeck,
+        offered,
+        portrait: deckFit(context, sideways: false),
+        landscape: deckFit(context, sideways: true),
+      );
   return Navigator.of(context).push(
     PageRouteBuilder<void>(
       transitionDuration: const Duration(milliseconds: 160),
@@ -1961,7 +1966,13 @@ class _LayoutsPageState extends State<_LayoutsPage> {
     final name = await _ask(l.deckNewLayout, label);
     if (name == null || name.trim().isEmpty) return;
     setState(() {
-      if (!_d.newLayout(name.trim(), start, widget.offered)) {
+      if (!_d.newLayout(
+        name.trim(),
+        start,
+        widget.offered,
+        portrait: deckFit(context, sideways: false),
+        landscape: deckFit(context, sideways: true),
+      )) {
         showMessage(context, l.deckNoRoom);
       }
     });

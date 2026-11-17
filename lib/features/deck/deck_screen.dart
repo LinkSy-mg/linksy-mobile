@@ -8,6 +8,7 @@ import '../../app/linksy_controller.dart';
 import '../../app/platform.dart';
 import '../../app/scope.dart';
 import '../../core/deck.dart';
+import '../../core/deck_draft.dart';
 import '../../core/models.dart';
 import '../../ui/components.dart';
 import '../../ui/l10n.dart';
@@ -170,6 +171,19 @@ class _DeckScreenState extends State<DeckScreen> with WidgetsBindingObserver {
     final Widget deck;
     if (layouts != null) {
       deck = LaidDeck(device: widget.device, layouts: layouts, live: live);
+    } else if (actions != null && actions.isNotEmpty && _waited) {
+      // Nothing laid out yet: the starting deck, made of what it offers and
+      // filling this screen both ways up, until it's edited and kept.
+      deck = LaidDeck(
+        device: widget.device,
+        layouts: DeckDraft.starter(
+          context.l10n.deviceDeck,
+          actions,
+          portrait: deckFit(context, sideways: false),
+          landscape: deckFit(context, sideways: true),
+        ),
+        live: live,
+      );
     } else {
       deck = _ownDeck(context, live, waiting: live && !_waited);
     }
