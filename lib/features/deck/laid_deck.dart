@@ -1242,7 +1242,6 @@ class _Tile extends StatelessWidget {
           ),
         );
     }
-    final confirm = offered?.confirm != null;
     return GestureDetector(
       onLongPress: scope.hold == null ? null : () => scope.hold!(t.id),
       child: AnimatedOpacity(
@@ -1258,31 +1257,6 @@ class _Tile extends StatelessWidget {
                 child: GestureDetector(
                   behavior: HitTestBehavior.opaque,
                   onTap: why,
-                ),
-              ),
-            if (confirm)
-              Positioned(
-                top: 5 * scale,
-                right: 5 * scale,
-                child: IgnorePointer(
-                  child: Container(
-                    width: 13 * scale,
-                    height: 13 * scale,
-                    alignment: Alignment.center,
-                    decoration: BoxDecoration(
-                      color: const Color(0xFFFFB020),
-                      shape: look.bevel ? BoxShape.rectangle : BoxShape.circle,
-                    ),
-                    child: Text(
-                      '!',
-                      style: TextStyle(
-                        color: const Color(0xFF1D1D20),
-                        fontSize: 9 * scale,
-                        fontWeight: FontWeight.w800,
-                        height: 1,
-                      ),
-                    ),
-                  ),
                 ),
               ),
           ],
