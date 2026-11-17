@@ -4,6 +4,15 @@ All notable changes to Linksy for Android. Format: [Keep a Changelog](https://ke
 
 ## [Unreleased]
 
+## [0.3.8] - 2026-11-17
+
+> [!IMPORTANT]
+> **If Play Protect stops the install,** pause **Scan apps with Play Protect** while installing (Play Store › your picture › Play Protect › the gear at the top right), then turn it back on.
+
+### Fixed
+
+- No more yellow mark in the corner of deck tiles that ask before they run (Restart, turning off and the like). They still ask.
+
 ## [0.3.7] - 2026-11-17
 
 > [!IMPORTANT]
