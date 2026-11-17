@@ -107,6 +107,24 @@ class DeckDraft {
     _setFace(face.withPages(pages));
   }
 
+  /// The face's grid as this screen fits it (square cells, as many as fit):
+  /// every cell the editor shows takes a tile. Not a step to undo; never
+  /// fewer cells than the tiles use, which the caller sees to.
+  void fitGrid(int columns, int rows) {
+    final next = DeckFace(columns: columns, rows: rows, pages: face.pages);
+    layouts = layouts.copyWith(
+      layouts: [
+        for (final l in layouts.layouts)
+          if (l.id != layoutId)
+            l
+          else if (landscape)
+            l.copyWith(landscape: next)
+          else
+            l.copyWith(portrait: next),
+      ],
+    );
+  }
+
   String _newId(String prefix) =>
       '$prefix${DateTime.now().microsecondsSinceEpoch}-${_made++}';
 

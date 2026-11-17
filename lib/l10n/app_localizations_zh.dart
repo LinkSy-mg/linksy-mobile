@@ -2660,6 +2660,9 @@ class AppLocalizationsZh extends AppLocalizations {
   String get deckFullScreenCaption => '隐藏状态栏和导航栏。从边缘滑动即可显示。';
 
   @override
+  String get deckSwipeForMenu => '从顶部下滑打开菜单';
+
+  @override
   String get deckRealCovers => '保持专辑封面原样';
 
   @override

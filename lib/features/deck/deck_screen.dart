@@ -137,8 +137,11 @@ class _DeckScreenState extends State<DeckScreen> with WidgetsBindingObserver {
     final c = LinksyScope.of(context);
     final connected = c.device(_id)?.connected ?? false;
     // Full screen, as picked in the theme sheet (mobile#21), while in front.
+    // A laid-out deck hides the bars itself, with its header.
     final full =
-        c.deckFullScreen && (ModalRoute.of(context)?.isCurrent ?? false);
+        c.deckFullScreen &&
+        c.deckLayouts(_id) == null &&
+        (ModalRoute.of(context)?.isCurrent ?? false);
     if (full != _full) {
       _full = full;
       full
@@ -287,7 +290,8 @@ class _DeckScreenState extends State<DeckScreen> with WidgetsBindingObserver {
     return Scaffold(
       body: SafeArea(
         child: Padding(
-          padding: const EdgeInsets.fromLTRB(16, 8, 16, 16),
+          // Under the tiles as much room as between them.
+          padding: const EdgeInsets.fromLTRB(16, 8, 16, _Grid._gap),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
@@ -328,7 +332,7 @@ class _DeckScreenState extends State<DeckScreen> with WidgetsBindingObserver {
                   PageSwitchButton(deviceId: _id, current: DevicePage.deck),
                 ],
               ),
-              const SizedBox(height: 16),
+              const SizedBox(height: _Grid._gap),
               Expanded(
                 child: AnimatedSwitcher(
                   duration: motion(context),
@@ -527,23 +531,28 @@ class _Grid extends StatelessWidget {
     return LayoutBuilder(
       builder: (context, box) {
         final cell = (box.maxWidth - 3 * _gap) / 4;
-        Rect rect(int i) {
-          final (col, row) = at[i];
-          final s = sizes[i];
-          return Rect.fromLTWH(
-            col * (cell + _gap),
-            row * (cell + _gap),
-            s.columns * cell + (s.columns - 1) * _gap,
-            s.rows * cell + (s.rows - 1) * _gap,
-          );
-        }
-
         var rows = 0;
         for (var i = 0; i < sizes.length; i++) {
           final (_, row) = at[i];
           rows = rows > row + sizes[i].rows ? rows : row + sizes[i].rows;
         }
-        final height = rows == 0 ? 0.0 : rows * cell + (rows - 1) * _gap;
+        // The rows grow to fill the page (mobile#21), so no band is left
+        // empty under them; while editing they stay square, room for more.
+        final tall = editing || rows == 0
+            ? cell
+            : math.max(cell, (box.maxHeight - (rows - 1) * _gap) / rows);
+        Rect rect(int i) {
+          final (col, row) = at[i];
+          final s = sizes[i];
+          return Rect.fromLTWH(
+            col * (cell + _gap),
+            row * (tall + _gap),
+            s.columns * cell + (s.columns - 1) * _gap,
+            s.rows * tall + (s.rows - 1) * _gap,
+          );
+        }
+
+        final height = rows == 0 ? 0.0 : rows * tall + (rows - 1) * _gap;
         return SingleChildScrollView(
           child: SizedBox(
             height: height,
@@ -773,16 +782,11 @@ class _Label extends StatelessWidget {
         children: [
           Icon(icon, size: big ? 34 : (tight ? 20 : 24), color: color),
           Text(
-            note ?? name,
+            text,
             // "Not available" gets two lines even on a small tile.
             maxLines: tight && note == null ? 1 : 2,
             overflow: TextOverflow.ellipsis,
-            style: TextStyle(
-              color: color,
-              fontSize: big ? 16 : (tight ? 11.5 : 12.5),
-              fontWeight: FontWeight.w600,
-              height: 1.2,
-            ),
+            style: style,
           ),
         ],
       );

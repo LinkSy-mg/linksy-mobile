@@ -2780,6 +2780,9 @@ class AppLocalizationsEs extends AppLocalizations {
       'Oculta las barras de estado y de navegación. Desliza desde el borde para verlas.';
 
   @override
+  String get deckSwipeForMenu => 'Desliza desde arriba para ver el menú';
+
+  @override
   String get deckRealCovers => 'Portadas tal cual';
 
   @override

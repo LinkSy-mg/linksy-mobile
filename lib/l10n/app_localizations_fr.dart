@@ -2786,6 +2786,9 @@ class AppLocalizationsFr extends AppLocalizations {
       'Masque les barres d\'état et de navigation. Balayez depuis le bord pour les voir.';
 
   @override
+  String get deckSwipeForMenu => 'Glissez depuis le haut pour le menu';
+
+  @override
   String get deckRealCovers => 'Pochettes telles quelles';
 
   @override

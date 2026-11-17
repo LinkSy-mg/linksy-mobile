@@ -2697,6 +2697,9 @@ class AppLocalizationsJa extends AppLocalizations {
       'ステータスバーとナビゲーションバーを隠します。端からスワイプすると表示されます。';
 
   @override
+  String get deckSwipeForMenu => '上からスワイプでメニュー';
+
+  @override
   String get deckRealCovers => 'アルバムアートをそのまま表示';
 
   @override

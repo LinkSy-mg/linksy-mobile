@@ -4596,6 +4596,12 @@ abstract class AppLocalizations {
   /// **'Hides the status and navigation bars. Swipe from the edge to see them.'**
   String get deckFullScreenCaption;
 
+  /// Shown once on the full-screen deck: how to bring back its header and the bars
+  ///
+  /// In en, this message translates to:
+  /// **'Swipe down from the top for the menu'**
+  String get deckSwipeForMenu;
+
   /// Deck switch: show album art unchanged by the theme
   ///
   /// In en, this message translates to:

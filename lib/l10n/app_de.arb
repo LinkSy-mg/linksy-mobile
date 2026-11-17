@@ -747,6 +747,7 @@
   "deckDisplay": "Anzeige",
   "deckFullScreen": "Vollbild",
   "deckFullScreenCaption": "Blendet Status- und Navigationsleiste aus. Vom Rand wischen, um sie zu sehen.",
+  "deckSwipeForMenu": "Für das Menü von oben nach unten wischen",
   "deckRealCovers": "Cover unverändert",
   "deckRealCoversCaption": "Nicht in Punkten oder Pixeln des Themes",
   "deckNoLayouts": "{name} hat noch kein Deck für dieses Telefon. Erstelle eins in Linksy auf dem Computer.",

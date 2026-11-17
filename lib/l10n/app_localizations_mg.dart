@@ -2784,6 +2784,9 @@ class AppLocalizationsMg extends AppLocalizations {
       'Manafina ny bara ambony sy ambany. Asosay avy eo amin\'ny sisiny raha hijery azy.';
 
   @override
+  String get deckSwipeForMenu => 'Asosay avy any ambony ho an\'ny menio';
+
+  @override
   String get deckRealCovers => 'Sarin\'ny rakikira tsy ovaina';
 
   @override

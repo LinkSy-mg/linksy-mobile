@@ -1845,9 +1845,10 @@ class LinksyController extends ChangeNotifier with WidgetsBindingObserver {
 
   /// The deck over the whole screen, without the status and navigation
   /// bars (mobile#21).
-  bool get deckFullScreen => prefs['deck_full'] == 'on';
+  /// On unless turned off: the deck has the whole screen either way up.
+  bool get deckFullScreen => prefs['deck_full'] != 'off';
   Future<void> setDeckFullScreen(bool on) =>
-      _setPref('deck_full', on ? 'on' : null);
+      _setPref('deck_full', on ? null : 'off');
 
   /// Covers as they are, not drawn in the theme's dots or pixels.
   bool get deckRealCovers => prefs['deck_real_art'] == 'on';

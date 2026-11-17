@@ -260,6 +260,7 @@ class _DeckEditorState extends State<DeckEditor> {
     return DeckTileView(
       tile: t,
       cell: g.wide,
+      tall: g.tall,
       gap: g.gap,
       device: widget.device,
       look: _look,
@@ -533,16 +534,36 @@ class _DeckEditorState extends State<DeckEditor> {
         final face = _d.face;
         final cols = face.columns, rows = face.rows;
         final gap = rows > cols ? 8.0 : 6.0;
-        final square = math
-            .max(
-              8.0,
-              math.min(
-                (box.maxWidth - gap * (cols - 1)) / cols,
-                (box.maxHeight - gap * (rows - 1)) / rows,
-              ),
-            )
+        // Cells shaped as on the deck, which fills its page: what's laid
+        // out here is what it looks like there.
+        // Cells shaped as on the deck, square and as many as fit there: what's
+        // laid out here is what it looks like there, every cell usable.
+        final deck = deckGrid(
+          deckPageBox(
+            context,
+            sideways: wide,
+            pages: face.pages.length,
+            full: LinksyScope.read(context).deckFullScreen,
+          ),
+          face,
+          deckGap(face, sideways: wide),
+        );
+        if (deck.columns != face.columns || deck.rows != face.rows) {
+          WidgetsBinding.instance.addPostFrameCallback((_) {
+            if (mounted) setState(() => _d.fitGrid(deck.columns, deck.rows));
+          });
+        }
+        final shape = deck.tall / deck.wide;
+        final across = (box.maxWidth - gap * (cols - 1)) / cols;
+        final down = (box.maxHeight - gap * (rows - 1)) / rows;
+        final cellWide = math
+            .max(8.0, math.min(across, down / shape))
             .floorToDouble();
-        final g = _Cells(wide: square, tall: square, gap: gap);
+        final g = _Cells(
+          wide: cellWide,
+          tall: (cellWide * shape).floorToDouble(),
+          gap: gap,
+        );
         final taken = <(int, int)>{
           for (final t in _shown)
             for (var y = t.y; y < t.y + t.h; y++)

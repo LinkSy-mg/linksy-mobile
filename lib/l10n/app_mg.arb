@@ -747,6 +747,7 @@
   "deckDisplay": "Fisehoana",
   "deckFullScreen": "Efijery feno",
   "deckFullScreenCaption": "Manafina ny bara ambony sy ambany. Asosay avy eo amin'ny sisiny raha hijery azy.",
+  "deckSwipeForMenu": "Asosay avy any ambony ho an'ny menio",
   "deckRealCovers": "Sarin'ny rakikira tsy ovaina",
   "deckRealCoversCaption": "Tsy averina ho teboka na piksely araka ny lohahevitra",
   "deckNoLayouts": "Mbola tsy manana deck ho an'ity finday ity i {name}. Mamorona iray ao amin'ny Linksy eo amin'ny solosaina.",

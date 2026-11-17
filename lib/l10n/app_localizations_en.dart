@@ -2757,6 +2757,9 @@ class AppLocalizationsEn extends AppLocalizations {
       'Hides the status and navigation bars. Swipe from the edge to see them.';
 
   @override
+  String get deckSwipeForMenu => 'Swipe down from the top for the menu';
+
+  @override
   String get deckRealCovers => 'Album art as it is';
 
   @override

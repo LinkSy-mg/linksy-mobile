@@ -2776,6 +2776,9 @@ class AppLocalizationsDe extends AppLocalizations {
       'Blendet Status- und Navigationsleiste aus. Vom Rand wischen, um sie zu sehen.';
 
   @override
+  String get deckSwipeForMenu => 'Für das Menü von oben nach unten wischen';
+
+  @override
   String get deckRealCovers => 'Cover unverändert';
 
   @override

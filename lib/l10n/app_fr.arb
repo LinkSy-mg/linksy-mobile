@@ -747,6 +747,7 @@
   "deckDisplay": "Affichage",
   "deckFullScreen": "Plein écran",
   "deckFullScreenCaption": "Masque les barres d'état et de navigation. Balayez depuis le bord pour les voir.",
+  "deckSwipeForMenu": "Glissez depuis le haut pour le menu",
   "deckRealCovers": "Pochettes telles quelles",
   "deckRealCoversCaption": "Sans les points ou pixels du thème",
   "deckNoLayouts": "{name} n'a pas encore de deck pour ce téléphone. Créez-en un dans Linksy sur l'ordinateur.",

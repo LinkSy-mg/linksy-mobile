@@ -747,6 +747,7 @@
   "deckDisplay": "表示",
   "deckFullScreen": "全画面",
   "deckFullScreenCaption": "ステータスバーとナビゲーションバーを隠します。端からスワイプすると表示されます。",
+  "deckSwipeForMenu": "上からスワイプでメニュー",
   "deckRealCovers": "アルバムアートをそのまま表示",
   "deckRealCoversCaption": "テーマのドットやピクセルで描き直しません",
   "deckNoLayouts": "{name} にはまだこのスマホ用のデッキがありません。コンピュータの Linksy で作成してください。",

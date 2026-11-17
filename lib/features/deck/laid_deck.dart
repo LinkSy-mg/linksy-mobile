@@ -51,8 +51,9 @@ class _LaidDeckState extends State<LaidDeck> {
   String? _note;
   Timer? _noteTimer;
 
-  /// Held sideways, the deck has the whole screen: no bars, no header. A
-  /// swipe from the edge brings them back for a moment.
+  /// The deck has the whole screen, either way up (unless Full screen is
+  /// off in its theme): no bars, no header. A swipe from the edge brings
+  /// them back for a moment.
   bool _fullScreen = false;
   bool _chrome = false;
   Timer? _chromeTimer;
@@ -127,9 +128,18 @@ class _LaidDeckState extends State<LaidDeck> {
 
     final landscape =
         MediaQuery.orientationOf(context) == Orientation.landscape;
-    if (landscape != _fullScreen) {
+    // Only while in front: the touchpad or the editor over it get the bars.
+    final front = ModalRoute.of(context)?.isCurrent ?? true;
+    final full = front && (landscape || c.deckFullScreen);
+    if (full != _fullScreen) {
       WidgetsBinding.instance.addPostFrameCallback((_) {
-        if (mounted) _setFullScreen(landscape);
+        if (!mounted) return;
+        _setFullScreen(full);
+        // The first time upright: where the header went.
+        if (full && !landscape && c.prefs['deck_swipe_told'] == null) {
+          c.setPref('deck_swipe_told', '1');
+          _say(context.l10n.deckSwipeForMenu);
+        }
       });
     }
     var face = layout == null
@@ -184,7 +194,6 @@ class _LaidDeckState extends State<LaidDeck> {
           tiles: pages[i],
           scope: scope,
           sideways: landscape,
-          dotsBelow: pages.length > 1,
         ),
       );
     }
@@ -216,19 +225,28 @@ class _LaidDeckState extends State<LaidDeck> {
           decoration: BoxDecoration(gradient: look.gradient),
           child: CustomPaint(
             painter: DeckBackdropPainter(look, accent),
-            child: landscape
-                ? _sideways(context, body, look, pages.length, header())
+            child: landscape || full
+                ? _sideways(
+                    context,
+                    body,
+                    look,
+                    pages.length,
+                    header(),
+                    rail: landscape,
+                  )
                 : SafeArea(
                     child: Column(
                       children: [
                         header(),
                         Expanded(child: body),
-                        _Dots(
-                          look: look,
-                          count: pages.length,
-                          at: _page,
-                          height: 44,
-                        ),
+                        // Room for them only when there's more than a page.
+                        if (pages.length > 1)
+                          _Dots(
+                            look: look,
+                            count: pages.length,
+                            at: _page,
+                            height: 44,
+                          ),
                         _noteLine(look),
                       ],
                     ),
@@ -261,15 +279,15 @@ class _LaidDeckState extends State<LaidDeck> {
     Widget body,
     DeckLook look,
     int pages,
-    Widget header,
-  ) => Stack(
+    Widget header, {
+    bool rail = true,
+  }) => Stack(
     fit: StackFit.expand,
     children: [
-      // Either way round (mobile#21): clear of the cut-out and the bars,
-      // whichever side they're on.
-      SafeArea(
-        top: false,
-        bottom: false,
+      // Edge to edge, cut-out and all: the bars are gone, and the tiles take
+      // the whole screen with the same room around them as between them.
+      // Only the side buttons keep clear of a cut-out on their side.
+      Positioned.fill(
         child: Row(
           children: [
             Expanded(
@@ -281,12 +299,18 @@ class _LaidDeckState extends State<LaidDeck> {
                 ],
               ),
             ),
-            _Rail(
-              look: look,
-              onEdit: widget.editable ? _edit : null,
-              onTouchpad: _touchpad,
-              deviceId: widget.device.id,
-            ),
+            if (rail)
+              SafeArea(
+                left: false,
+                top: false,
+                bottom: false,
+                child: _Rail(
+                  look: look,
+                  onEdit: widget.editable ? _edit : null,
+                  onTouchpad: _touchpad,
+                  deviceId: widget.device.id,
+                ),
+              ),
           ],
         ),
       ),
@@ -297,7 +321,8 @@ class _LaidDeckState extends State<LaidDeck> {
         curve: Curves.easeOutCubic,
         left: 0,
         right: 0,
-        top: _chrome ? 0 : -90,
+        // Out of sight above the screen, cut-out and all.
+        top: _chrome ? 0 : -200,
         child: ColoredBox(
           color: look.background.withValues(alpha: 0.92),
           child: SafeArea(bottom: false, child: header),
@@ -330,6 +355,9 @@ class _LaidDeckState extends State<LaidDeck> {
 
 /// Sideways, beside the tiles: the way back, the touchpad and Edit under it.
 class _Rail extends StatelessWidget {
+  /// Its buttons and the room right of them.
+  static const width = 56.0;
+
   const _Rail({
     required this.look,
     required this.onEdit,
@@ -398,6 +426,7 @@ class DeckTileView extends StatelessWidget {
     super.key,
     required this.tile,
     required this.cell,
+    this.tall,
     required this.gap,
     required this.device,
     required this.look,
@@ -408,6 +437,9 @@ class DeckTileView extends StatelessWidget {
 
   final DeckTile tile;
   final double cell;
+
+  /// A cell's height when it isn't square (the deck fills its page).
+  final double? tall;
   final double gap;
   final DeviceInfo device;
   final DeckLook look;
@@ -419,6 +451,7 @@ class DeckTileView extends StatelessWidget {
   Widget build(BuildContext context) => _Tile(
     tile: tile,
     cell: cell,
+    tall: tall ?? cell,
     gap: gap,
     scope: _Scope(
       deviceId: device.id,
@@ -477,6 +510,9 @@ class _Scope {
 /// (beside it when [compact], in landscape), and whether that's away or
 /// which page this is.
 class _Header extends StatelessWidget {
+  /// Upright: its buttons and the room above and below them.
+  static const height = 56.0;
+
   const _Header({
     required this.look,
     required this.title,
@@ -686,15 +722,102 @@ class _Dots extends StatelessWidget {
   );
 }
 
-/// One page: square cells, as many as the face's grid, as big as fit; each
-/// tile where the computer put it.
+/// The room between a deck's tiles, and around them: a tall grid's a little
+/// wider, as on the editor.
+double deckGap(DeckFace face, {required bool sideways}) =>
+    face.rows > face.columns || sideways ? 10.0 : 8.0;
+
+/// A deck page's grid on this screen: square cells, as many as fit (a home
+/// screen's way). Upright the layout's columns set the size and the rows are
+/// as many as the height holds; sideways its rows do and the columns follow.
+/// Never fewer than its tiles use, so folding a phone or turning a tablet
+/// never pushes a tile off; the last few pixels go to the cells, so the page
+/// is filled with [gap] around and between them.
+({int columns, int rows, double wide, double tall}) deckGrid(
+  Size box,
+  DeckFace face,
+  double gap,
+) {
+  var usedX = 1, usedY = 1;
+  for (final page in face.pages) {
+    for (final t in page) {
+      usedX = math.max(usedX, t.x + t.w);
+      usedY = math.max(usedY, t.y + t.h);
+    }
+  }
+  // At most this big a square: a tablet or an unfolded phone gets more
+  // columns (or rows, sideways) rather than huge tiles; a phone keeps the
+  // layout's own.
+  const most = 120.0;
+  int fit(double room) => ((room - gap) / (most + gap)).floor();
+  double fill(double room, int n) =>
+      math.max(8.0, (room - gap * (n + 1)) / n).floorToDouble();
+  // From the page's own shape, so fitting the grid never flips it.
+  final byWidth = box.width <= box.height;
+  if (byWidth) {
+    final cols = math.max(math.max(face.columns, usedX), fit(box.width));
+    final cell = fill(box.width, cols);
+    final rows = math.max(
+      usedY,
+      math.max(1, ((box.height - gap) / (cell + gap)).floor()),
+    );
+    return (
+      columns: cols,
+      rows: rows,
+      wide: cell,
+      tall: fill(box.height, rows),
+    );
+  }
+  final rows = math.max(math.max(face.rows, usedY), fit(box.height));
+  final cell = fill(box.height, rows);
+  final cols = math.max(
+    usedX,
+    math.max(1, ((box.width - gap) / (cell + gap)).floor()),
+  );
+  return (columns: cols, rows: rows, wide: fill(box.width, cols), tall: cell);
+}
+
+/// Where a deck page lays out on this phone: the screen, less the bars, the
+/// header (or the side rail) and the page dots. For the editor, which draws
+/// its grid with the deck's own cell shape.
+Size deckPageBox(
+  BuildContext context, {
+  required bool sideways,
+  int pages = 1,
+  bool full = false,
+}) {
+  final m = MediaQuery.of(context);
+  final pad = m.padding;
+  // Full screen: the whole screen, cut-out and all, less the side buttons
+  // sideways (and a cut-out on their side).
+  if (full && !sideways) {
+    return Size(m.size.width, m.size.height - (pages > 1 ? 32 : 0));
+  }
+  if (sideways) {
+    return Size(
+      m.size.width - pad.right - _Rail.width,
+      m.size.height - (pages > 1 ? 32 : 0),
+    );
+  }
+  return Size(
+    m.size.width - pad.left - pad.right,
+    m.size.height -
+        pad.top -
+        pad.bottom -
+        _Header.height -
+        (pages > 1 ? 44 : 0),
+  );
+}
+
+/// One page: square cells, as many as fit this screen ([deckGrid]), filling
+/// it with the same room around them as between them; each tile where it
+/// was put.
 class _Page extends StatelessWidget {
   const _Page({
     required this.face,
     required this.tiles,
     required this.scope,
     this.sideways = false,
-    this.dotsBelow = false,
   });
 
   final DeckFace face;
@@ -703,57 +826,48 @@ class _Page extends StatelessWidget {
 
   final bool sideways;
 
-  /// Sideways, the dots under the page bring their own room.
-  final bool dotsBelow;
-
   @override
-  Widget build(BuildContext context) => Padding(
-    padding: sideways
-        ? EdgeInsets.fromLTRB(18, 16, 14, dotsBelow ? 0 : 16)
-        : const EdgeInsets.fromLTRB(14, 6, 14, 6),
-    child: LayoutBuilder(
-      builder: (context, box) {
-        final cols = face.columns, rows = face.rows;
-        final gap = face.rows > face.columns || sideways ? 10.0 : 8.0;
-        final cell = math
-            .max(
-              8.0,
-              math.min(
-                (box.maxWidth - gap * (cols - 1)) / cols,
-                (box.maxHeight - gap * (rows - 1)) / rows,
+  Widget build(BuildContext context) => LayoutBuilder(
+    builder: (context, box) {
+      final gap = deckGap(face, sideways: sideways);
+      final cell = deckGrid(box.biggest, face, gap);
+      final cols = cell.columns, rows = cell.rows;
+      double across(int n) => n * cell.wide + (n - 1) * gap;
+      double down(int n) => n * cell.tall + (n - 1) * gap;
+      return Center(
+        child: SizedBox(
+          width: across(cols) + 2 * gap,
+          height: down(rows) + 2 * gap,
+          child: Stack(
+            clipBehavior: Clip.none,
+            children: [
+              // Held on nothing: the same as holding a tile.
+              Positioned.fill(
+                child: GestureDetector(
+                  behavior: HitTestBehavior.opaque,
+                  onLongPress: scope.hold,
+                ),
               ),
-            )
-            .floorToDouble();
-        double span(int n) => n * cell + (n - 1) * gap;
-        return Center(
-          child: SizedBox(
-            width: span(cols),
-            height: span(rows),
-            child: Stack(
-              clipBehavior: Clip.none,
-              children: [
-                // Held on nothing: the same as holding a tile.
-                Positioned.fill(
-                  child: GestureDetector(
-                    behavior: HitTestBehavior.opaque,
-                    onLongPress: scope.hold,
+              for (final t in tiles)
+                Positioned(
+                  key: ValueKey(t.id),
+                  left: gap + t.x * (cell.wide + gap),
+                  top: gap + t.y * (cell.tall + gap),
+                  width: across(t.w),
+                  height: down(t.h),
+                  child: _Tile(
+                    tile: t,
+                    cell: cell.wide,
+                    tall: cell.tall,
+                    gap: gap,
+                    scope: scope,
                   ),
                 ),
-                for (final t in tiles)
-                  Positioned(
-                    key: ValueKey(t.id),
-                    left: t.x * (cell + gap),
-                    top: t.y * (cell + gap),
-                    width: span(t.w),
-                    height: span(t.h),
-                    child: _Tile(tile: t, cell: cell, gap: gap, scope: scope),
-                  ),
-              ],
-            ),
+            ],
           ),
-        );
-      },
-    ),
+        ),
+      );
+    },
   );
 }
 
@@ -873,13 +987,16 @@ class _Tile extends StatelessWidget {
   const _Tile({
     required this.tile,
     required this.cell,
+    required this.tall,
     required this.gap,
     required this.scope,
   });
 
   final DeckTile tile;
 
+  /// A cell's width and height: the deck fills its page, so not square.
   final double cell;
+  final double tall;
 
   final double gap;
   final _Scope scope;
@@ -888,7 +1005,8 @@ class _Tile extends StatelessWidget {
   Widget build(BuildContext context) {
     final t = tile;
     final look = scope.look;
-    final scale = cell / 58;
+    // Words and icons for the cell's short side, so they always fit.
+    final scale = math.min(cell, tall) / 58;
     final action = t.action;
     final offered = action == null
         ? null
@@ -959,7 +1077,8 @@ class _Tile extends StatelessWidget {
     final pen = _Pen(look, scale, paint.ink);
     final inner = cell * t.w + (t.w - 1) * gap - 2 * pad;
     // A big tile, a big icon.
-    final grown = cell * 0.36 * (1 + (math.min(t.w, t.h) - 1) * 0.6);
+    final grown =
+        math.min(cell, tall) * 0.36 * (1 + (math.min(t.w, t.h) - 1) * 0.6);
     final iconSize = look.icons == DeckStroke.pixel
         ? math.max(12.0, (grown / 12).roundToDouble() * 12)
         : grown;

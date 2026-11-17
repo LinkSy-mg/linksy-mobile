@@ -2803,6 +2803,9 @@ class AppLocalizationsRu extends AppLocalizations {
       'Скрывает строку состояния и панель навигации. Проведите от края, чтобы их увидеть.';
 
   @override
+  String get deckSwipeForMenu => 'Проведите сверху вниз, чтобы открыть меню';
+
+  @override
   String get deckRealCovers => 'Обложки как есть';
 
   @override

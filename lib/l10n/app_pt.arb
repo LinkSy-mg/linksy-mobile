@@ -747,6 +747,7 @@
   "deckDisplay": "Exibição",
   "deckFullScreen": "Tela cheia",
   "deckFullScreenCaption": "Oculta as barras de status e de navegação. Deslize da borda para vê-las.",
+  "deckSwipeForMenu": "Deslize de cima para ver o menu",
   "deckRealCovers": "Capas como são",
   "deckRealCoversCaption": "Sem os pontos ou pixels do tema",
   "deckNoLayouts": "{name} ainda não tem um deck para este telefone. Crie um no Linksy no computador.",

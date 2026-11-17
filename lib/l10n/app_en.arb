@@ -3635,6 +3635,8 @@
   "@deckFullScreen": {"description": "Deck switch: hide the status and navigation bars"},
   "deckFullScreenCaption": "Hides the status and navigation bars. Swipe from the edge to see them.",
   "@deckFullScreenCaption": {"description": "Caption of the deck full screen switch"},
+  "deckSwipeForMenu": "Swipe down from the top for the menu",
+  "@deckSwipeForMenu": {"description": "Shown once on the full-screen deck: how to bring back its header and the bars"},
   "deckRealCovers": "Album art as it is",
   "@deckRealCovers": {"description": "Deck switch: show album art unchanged by the theme"},
   "deckRealCoversCaption": "Not redrawn in the theme's dots or pixels",
