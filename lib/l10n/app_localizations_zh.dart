@@ -2663,6 +2663,57 @@ class AppLocalizationsZh extends AppLocalizations {
   String get deckSwipeForMenu => '从顶部下滑打开菜单';
 
   @override
+  String get deckFromPhone => '来自此手机';
+
+  @override
+  String get deckShortcut => '快捷键';
+
+  @override
+  String get deckTypeText => '输入文字';
+
+  @override
+  String get deckOpenLink => '打开链接';
+
+  @override
+  String get deckKeys => '按键';
+
+  @override
+  String get deckKeyHint => '一个键：T、F5、Tab、Left…';
+
+  @override
+  String get deckTextHint => '要在电脑上输入的内容';
+
+  @override
+  String get deckLinkHint => '地址，例如 example.com';
+
+  @override
+  String get deckSetUpFirst => '请先设置：长按即可编辑';
+
+  @override
+  String get deckShow => '显示';
+
+  @override
+  String get deckShowBoth => '图标和名称';
+
+  @override
+  String get deckShowIcon => '图标';
+
+  @override
+  String get deckShowName => '名称';
+
+  @override
+  String get deckLookSize => '显示内容大小';
+
+  @override
+  String get deckSmall => '小';
+
+  @override
+  String get deckMedium => '中';
+
+  @override
+  String get deckLarge => '大';
+
+  @override
   String get deckRealCovers => '保持专辑封面原样';
 
   @override

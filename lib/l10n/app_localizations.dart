@@ -4602,6 +4602,108 @@ abstract class AppLocalizations {
   /// **'Swipe down from the top for the menu'**
   String get deckSwipeForMenu;
 
+  /// Deck editor, Add: tiles the phone runs itself
+  ///
+  /// In en, this message translates to:
+  /// **'From this phone'**
+  String get deckFromPhone;
+
+  /// Deck tile: a key combination sent to the computer
+  ///
+  /// In en, this message translates to:
+  /// **'Shortcut'**
+  String get deckShortcut;
+
+  /// Deck tile: types saved text on the computer
+  ///
+  /// In en, this message translates to:
+  /// **'Type text'**
+  String get deckTypeText;
+
+  /// Deck tile: opens a link on the computer
+  ///
+  /// In en, this message translates to:
+  /// **'Open link'**
+  String get deckOpenLink;
+
+  /// Deck editor: the keys of a shortcut tile
+  ///
+  /// In en, this message translates to:
+  /// **'Keys'**
+  String get deckKeys;
+
+  /// Deck editor: hint of the key field of a shortcut
+  ///
+  /// In en, this message translates to:
+  /// **'A key: T, F5, Tab, Left…'**
+  String get deckKeyHint;
+
+  /// Deck editor: hint of the text of a Type text tile
+  ///
+  /// In en, this message translates to:
+  /// **'What to type on the computer'**
+  String get deckTextHint;
+
+  /// Deck editor: hint of the address of an Open link tile
+  ///
+  /// In en, this message translates to:
+  /// **'Address, like example.com'**
+  String get deckLinkHint;
+
+  /// Deck: tapped a shortcut, text or link tile with nothing set
+  ///
+  /// In en, this message translates to:
+  /// **'Set it up first: hold it to edit'**
+  String get deckSetUpFirst;
+
+  /// Deck editor: what a tile shows
+  ///
+  /// In en, this message translates to:
+  /// **'Shows'**
+  String get deckShow;
+
+  /// Deck editor: icon and name
+  ///
+  /// In en, this message translates to:
+  /// **'Icon and name'**
+  String get deckShowBoth;
+
+  /// Deck editor: icon only
+  ///
+  /// In en, this message translates to:
+  /// **'Icon'**
+  String get deckShowIcon;
+
+  /// Deck editor: name only
+  ///
+  /// In en, this message translates to:
+  /// **'Name'**
+  String get deckShowName;
+
+  /// Deck editor: how big the icon and words are
+  ///
+  /// In en, this message translates to:
+  /// **'Size of what it shows'**
+  String get deckLookSize;
+
+  /// Deck editor: small
+  ///
+  /// In en, this message translates to:
+  /// **'Small'**
+  String get deckSmall;
+
+  /// Deck editor: medium
+  ///
+  /// In en, this message translates to:
+  /// **'Medium'**
+  String get deckMedium;
+
+  /// Deck editor: large
+  ///
+  /// In en, this message translates to:
+  /// **'Large'**
+  String get deckLarge;
+
   /// Deck switch: show album art unchanged by the theme
   ///
   /// In en, this message translates to:

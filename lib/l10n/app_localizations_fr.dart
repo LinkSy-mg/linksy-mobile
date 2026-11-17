@@ -2789,6 +2789,58 @@ class AppLocalizationsFr extends AppLocalizations {
   String get deckSwipeForMenu => 'Glissez depuis le haut pour le menu';
 
   @override
+  String get deckFromPhone => 'Depuis ce téléphone';
+
+  @override
+  String get deckShortcut => 'Raccourci';
+
+  @override
+  String get deckTypeText => 'Taper du texte';
+
+  @override
+  String get deckOpenLink => 'Ouvrir un lien';
+
+  @override
+  String get deckKeys => 'Touches';
+
+  @override
+  String get deckKeyHint => 'Une touche : T, F5, Tab, Left…';
+
+  @override
+  String get deckTextHint => 'Ce qu\'il faut taper sur l\'ordinateur';
+
+  @override
+  String get deckLinkHint => 'Adresse, comme example.com';
+
+  @override
+  String get deckSetUpFirst =>
+      'Configurez-le d\'abord : maintenez-le pour le modifier';
+
+  @override
+  String get deckShow => 'Affiche';
+
+  @override
+  String get deckShowBoth => 'Icône et nom';
+
+  @override
+  String get deckShowIcon => 'Icône';
+
+  @override
+  String get deckShowName => 'Nom';
+
+  @override
+  String get deckLookSize => 'Taille du contenu';
+
+  @override
+  String get deckSmall => 'Petit';
+
+  @override
+  String get deckMedium => 'Moyen';
+
+  @override
+  String get deckLarge => 'Grand';
+
+  @override
   String get deckRealCovers => 'Pochettes telles quelles';
 
   @override

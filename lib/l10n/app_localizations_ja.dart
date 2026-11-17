@@ -2700,6 +2700,57 @@ class AppLocalizationsJa extends AppLocalizations {
   String get deckSwipeForMenu => '上からスワイプでメニュー';
 
   @override
+  String get deckFromPhone => 'このスマホから';
+
+  @override
+  String get deckShortcut => 'ショートカット';
+
+  @override
+  String get deckTypeText => 'テキスト入力';
+
+  @override
+  String get deckOpenLink => 'リンクを開く';
+
+  @override
+  String get deckKeys => 'キー';
+
+  @override
+  String get deckKeyHint => 'キー：T、F5、Tab、Left…';
+
+  @override
+  String get deckTextHint => 'コンピューターで入力する内容';
+
+  @override
+  String get deckLinkHint => 'アドレス（例：example.com）';
+
+  @override
+  String get deckSetUpFirst => '先に設定してください：長押しで編集';
+
+  @override
+  String get deckShow => '表示';
+
+  @override
+  String get deckShowBoth => 'アイコンと名前';
+
+  @override
+  String get deckShowIcon => 'アイコン';
+
+  @override
+  String get deckShowName => '名前';
+
+  @override
+  String get deckLookSize => '表示の大きさ';
+
+  @override
+  String get deckSmall => '小';
+
+  @override
+  String get deckMedium => '中';
+
+  @override
+  String get deckLarge => '大';
+
+  @override
   String get deckRealCovers => 'アルバムアートをそのまま表示';
 
   @override

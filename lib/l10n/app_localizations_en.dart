@@ -2760,6 +2760,57 @@ class AppLocalizationsEn extends AppLocalizations {
   String get deckSwipeForMenu => 'Swipe down from the top for the menu';
 
   @override
+  String get deckFromPhone => 'From this phone';
+
+  @override
+  String get deckShortcut => 'Shortcut';
+
+  @override
+  String get deckTypeText => 'Type text';
+
+  @override
+  String get deckOpenLink => 'Open link';
+
+  @override
+  String get deckKeys => 'Keys';
+
+  @override
+  String get deckKeyHint => 'A key: T, F5, Tab, Left…';
+
+  @override
+  String get deckTextHint => 'What to type on the computer';
+
+  @override
+  String get deckLinkHint => 'Address, like example.com';
+
+  @override
+  String get deckSetUpFirst => 'Set it up first: hold it to edit';
+
+  @override
+  String get deckShow => 'Shows';
+
+  @override
+  String get deckShowBoth => 'Icon and name';
+
+  @override
+  String get deckShowIcon => 'Icon';
+
+  @override
+  String get deckShowName => 'Name';
+
+  @override
+  String get deckLookSize => 'Size of what it shows';
+
+  @override
+  String get deckSmall => 'Small';
+
+  @override
+  String get deckMedium => 'Medium';
+
+  @override
+  String get deckLarge => 'Large';
+
+  @override
   String get deckRealCovers => 'Album art as it is';
 
   @override

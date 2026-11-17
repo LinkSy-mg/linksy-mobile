@@ -2787,6 +2787,57 @@ class AppLocalizationsMg extends AppLocalizations {
   String get deckSwipeForMenu => 'Asosay avy any ambony ho an\'ny menio';
 
   @override
+  String get deckFromPhone => 'Avy amin\'ity finday ity';
+
+  @override
+  String get deckShortcut => 'Hitsin-dalana';
+
+  @override
+  String get deckTypeText => 'Manoratra lahatsoratra';
+
+  @override
+  String get deckOpenLink => 'Sokafy rohy';
+
+  @override
+  String get deckKeys => 'Lakile';
+
+  @override
+  String get deckKeyHint => 'Lakile iray: T, F5, Tab, Left…';
+
+  @override
+  String get deckTextHint => 'Izay hosoratana amin\'ny solosaina';
+
+  @override
+  String get deckLinkHint => 'Adiresy, toy ny example.com';
+
+  @override
+  String get deckSetUpFirst => 'Amboary aloha: tazony mba hanovana';
+
+  @override
+  String get deckShow => 'Asehony';
+
+  @override
+  String get deckShowBoth => 'Kisary sy anarana';
+
+  @override
+  String get deckShowIcon => 'Kisary';
+
+  @override
+  String get deckShowName => 'Anarana';
+
+  @override
+  String get deckLookSize => 'Haben\'ny asehony';
+
+  @override
+  String get deckSmall => 'Kely';
+
+  @override
+  String get deckMedium => 'Antonony';
+
+  @override
+  String get deckLarge => 'Lehibe';
+
+  @override
   String get deckRealCovers => 'Sarin\'ny rakikira tsy ovaina';
 
   @override

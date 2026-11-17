@@ -2806,6 +2806,57 @@ class AppLocalizationsRu extends AppLocalizations {
   String get deckSwipeForMenu => 'Проведите сверху вниз, чтобы открыть меню';
 
   @override
+  String get deckFromPhone => 'С этого телефона';
+
+  @override
+  String get deckShortcut => 'Сочетание клавиш';
+
+  @override
+  String get deckTypeText => 'Ввести текст';
+
+  @override
+  String get deckOpenLink => 'Открыть ссылку';
+
+  @override
+  String get deckKeys => 'Клавиши';
+
+  @override
+  String get deckKeyHint => 'Клавиша: T, F5, Tab, Left…';
+
+  @override
+  String get deckTextHint => 'Что ввести на компьютере';
+
+  @override
+  String get deckLinkHint => 'Адрес, например example.com';
+
+  @override
+  String get deckSetUpFirst => 'Сначала настройте: удерживайте, чтобы изменить';
+
+  @override
+  String get deckShow => 'Показывать';
+
+  @override
+  String get deckShowBoth => 'Значок и название';
+
+  @override
+  String get deckShowIcon => 'Значок';
+
+  @override
+  String get deckShowName => 'Название';
+
+  @override
+  String get deckLookSize => 'Размер содержимого';
+
+  @override
+  String get deckSmall => 'Мелкий';
+
+  @override
+  String get deckMedium => 'Средний';
+
+  @override
+  String get deckLarge => 'Крупный';
+
+  @override
   String get deckRealCovers => 'Обложки как есть';
 
   @override
