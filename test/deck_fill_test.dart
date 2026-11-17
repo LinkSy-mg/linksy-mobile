@@ -97,4 +97,24 @@ void main() {
     expect(draft.tile('a')!.x, 1);
     expect(draft.tile('b')!.x, 0);
   });
+
+  test('the Remote page fills the grid both ways up, the touchpad biggest', () {
+    for (final (columns, rows, tall) in [
+      (4, 9, true),
+      (6, 10, true),
+      (10, 4, false),
+      (11, 6, false),
+    ]) {
+      final tiles = DeckDraft.remotePage(columns, rows, tall: tall);
+      expectFull(DeckFace(columns: columns, rows: rows, pages: [tiles]));
+      final pad = tiles.singleWhere((t) => t.kind == 'touchpad');
+      expect(pad.w * pad.h, greaterThan(columns * rows ~/ 2));
+      expect(
+        tiles
+            .where((t) => t.props['do'] == 'click')
+            .map((t) => t.props['button']),
+        unorderedEquals(['left', 'right']),
+      );
+    }
+  });
 }

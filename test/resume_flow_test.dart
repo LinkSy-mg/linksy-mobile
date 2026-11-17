@@ -225,10 +225,10 @@ void main() {
       );
       await settle();
       expect(node.answers.last, ('t2', true));
-    // Nor is it put to the user.
-    expect(prompted.whereType<TransferRequest>().map((r) => r.transfer), [
-      't1',
-    ]);
+      // Nor is it put to the user.
+      expect(prompted.whereType<TransferRequest>().map((r) => r.transfer), [
+        't1',
+      ]);
       expect(c.activityFor(peer.id).where((a) => a.id == 't2'), isEmpty);
       // b goes back to its part: the core finds it whole and sends none of it.
       expect(File('${dir.path}/b.jpg').existsSync(), isFalse);

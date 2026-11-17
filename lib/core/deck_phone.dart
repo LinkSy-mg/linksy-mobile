@@ -8,10 +8,22 @@
 /// - `text`: `text` typed on the computer, the same way.
 /// - `link`: `url` opened on the computer (§4.3, open_url).
 /// - `clipboard`, `ping`, `find`: as on the computer's page.
+/// - `click`: the mouse's `button` (left, right), and `keyboard`: the
+///   phone's keyboard typing on the computer, both through Remote Input, as
+///   on the deck's Remote page with its `touchpad` tile.
 library;
 
 /// What a phone tile does.
-enum DeckPhoneDo { shortcut, text, link, clipboard, ping, find }
+enum DeckPhoneDo {
+  shortcut,
+  text,
+  link,
+  clipboard,
+  ping,
+  find,
+  click,
+  keyboard,
+}
 
 DeckPhoneDo? deckPhoneDo(String? name) =>
     DeckPhoneDo.values.where((d) => d.name == name).firstOrNull;
@@ -24,6 +36,8 @@ String deckPhoneIcon(DeckPhoneDo d) => switch (d) {
   DeckPhoneDo.clipboard => 'clipboard',
   DeckPhoneDo.ping => 'bell',
   DeckPhoneDo.find => 'find',
+  DeckPhoneDo.click => 'click',
+  DeckPhoneDo.keyboard => 'keys',
 };
 
 /// Modifiers, as written and as X11 keysyms (left ones).

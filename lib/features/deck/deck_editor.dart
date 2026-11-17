@@ -159,10 +159,15 @@ class _DeckEditorState extends State<DeckEditor> {
     DeckTile? made;
     // A phone tile says what it does in its props, not as an action.
     final phone = kind == 'phone';
+    // A click says which button after a dot: click.right.
+    final (does, button) = switch (action?.split('.')) {
+      [final d, final b] when phone => (d, b),
+      _ => (action, null),
+    };
     DeckTile? put() => _d.add(
       kind,
       action: phone ? null : action,
-      props: phone ? {'do': action!} : const {},
+      props: phone ? {'do': does!, 'button': ?button} : const {},
       x: x,
       y: y,
     );
@@ -1223,6 +1228,17 @@ class _AddSheetState extends State<_AddSheet> {
       ])
         if (shows(name))
           _cell(deckPhoneIcon(d), name, () => pick('phone', d.name)),
+      // The Remote page's own: the touchpad, its clicks and the keyboard.
+      if (shows(l.remoteTouchpad))
+        _cell('touch', l.remoteTouchpad, () => pick('touchpad')),
+      for (final (button, name) in [
+        ('left', l.remoteLeftClick),
+        ('right', l.remoteRightClick),
+      ])
+        if (shows(name))
+          _cell('click', name, () => pick('phone', 'click.$button')),
+      if (shows(l.remoteKeyboard))
+        _cell('keys', l.remoteKeyboard, () => pick('phone', 'keyboard')),
     ];
     final live = [
       if (shows(l.deckMusic)) _cell('music', l.deckMusic, () => pick('music')),

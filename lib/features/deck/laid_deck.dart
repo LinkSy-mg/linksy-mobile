@@ -7,6 +7,7 @@ import 'package:flutter/services.dart';
 
 import '../../app/platform.dart';
 import '../../app/scope.dart';
+import '../../core/deck_draft.dart';
 import '../../core/deck_layouts.dart';
 import '../../core/deck_phone.dart';
 import '../../core/models.dart';
@@ -106,6 +107,7 @@ class _LaidDeckState extends State<LaidDeck> {
 
   @override
   void dispose() {
+    if (_remoting) LinksyScope.read(context).leaveRemote(_id);
     _noteTimer?.cancel();
     _chromeTimer?.cancel();
     if (_fullScreen) {
@@ -153,6 +155,11 @@ class _LaidDeckState extends State<LaidDeck> {
     }
     final pages = face?.pages ?? const <List<DeckTile>>[];
     if (_page >= pages.length && pages.isNotEmpty) _page = pages.length - 1;
+    _face = face;
+    final shown = pages.isEmpty ? const <DeckTile>[] : pages[_page];
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (mounted) _remoteFor(shown);
+    });
 
     final actions = {
       for (final a in c.deckActions[_id] ?? const <DeckAction>[]) a.id: a,
@@ -334,11 +341,97 @@ class _LaidDeckState extends State<LaidDeck> {
 
   /// Remote Input in one tap (Discussion #79); back is the deck again, and
   /// the remote stays open a minute for the next time.
-  void _touchpad() => Navigator.of(context).push(
-    MaterialPageRoute<void>(
-      builder: (_) => RemoteScreen(device: widget.device),
-    ),
+  /// The face shown now, its pages as the deck has them.
+  DeckFace? _face;
+
+  /// The page the Remote page was opened from, to go back to.
+  int? _back;
+
+  /// The page in front has Remote Input's tiles (touchpad, clicks,
+  /// keyboard): their session is open while it is, and stays a minute
+  /// after, as the Remote page leaves it.
+  bool _remoting = false;
+
+  static bool _remoteTile(DeckTile t) =>
+      t.kind == 'touchpad' ||
+      t.kind == 'phone' && const {'click', 'keyboard'}.contains(t.props['do']);
+
+  void _remoteFor(List<DeckTile> front) {
+    final wants = widget.live && front.any(_remoteTile);
+    if (wants == _remoting) return;
+    _remoting = wants;
+    final c = LinksyScope.read(context);
+    wants ? c.startRemote(_id) : c.leaveRemote(_id);
+  }
+
+  void _go(int page) => _pages.animateToPage(
+    page,
+    duration: motion(context, 260),
+    curve: Curves.easeOutCubic,
   );
+
+  /// To the deck's Remote page and back: the touchpad, clicks, keyboard and
+  /// keys in the deck's own look, a page like the others (Discussion #79).
+  /// The first time, it's made for this screen both ways up and kept with
+  /// the deck, to edit like any page.
+  void _touchpad() {
+    final face = _face;
+    final layout = widget.layouts.shown;
+    if (face == null || layout == null) return;
+    int? remote(DeckFace f) {
+      final i = f.pages.indexWhere((p) => p.any((t) => t.kind == 'touchpad'));
+      return i < 0 ? null : i;
+    }
+
+    if (remote(face) case final at?) {
+      if (_page == at) {
+        _go(_back ?? 0);
+      } else {
+        _back = _page;
+        _go(at);
+      }
+      return;
+    }
+    if (face.pages.length >= DeckDraft.maxPages) return;
+    // Upright and sideways, each on the grid this screen gives it; a face
+    // never made (it shows the other) stays so.
+    DeckFace withRemote(DeckFace f, bool tall) {
+      if (f.isEmpty) return f;
+      final (fc, fr) = deckFit(
+        context,
+        sideways: !tall,
+        pages: f.pages.length + 1,
+      );
+      final columns = math.max(f.columns, fc), rows = math.max(f.rows, fr);
+      return DeckFace(
+        columns: columns,
+        rows: rows,
+        pages: [
+          ...f.pages,
+          DeckDraft.remotePage(columns, rows, tall: tall),
+        ],
+      );
+    }
+
+    final made = layout.copyWith(
+      portrait: withRemote(layout.portrait, true),
+      landscape: withRemote(layout.landscape, false),
+    );
+    final c = LinksyScope.read(context);
+    _back = _page;
+    c.saveDeckHere(
+      _id,
+      widget.layouts.copyWith(
+        layouts: [
+          for (final l in widget.layouts.layouts) l.id == made.id ? made : l,
+        ],
+      ),
+    );
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      final at = _face == null ? null : remote(_face!);
+      if (mounted && at != null) _go(at);
+    });
+  }
 
   Future<void> _pickTheme(DeckLayout layout, String? own) async {
     final c = LinksyScope.read(context);
@@ -465,6 +558,7 @@ class DeckTileView extends StatelessWidget {
       players: const [],
       say: (_) {},
       hold: null,
+      preview: true,
     ),
   );
 }
@@ -483,12 +577,16 @@ class _Scope {
     required this.say,
     required this.hold,
     this.hideBlocked = false,
+    this.preview = false,
   });
 
   final String deviceId;
   final String deviceName;
   final DeckLook look;
   final bool live;
+
+  /// Drawn in the editor: the touchpad and the keyboard only look the part.
+  final bool preview;
 
   /// What the computer offers, by id; null until it said.
   final Map<String, DeckAction>? actions;
@@ -780,7 +878,11 @@ double deckGap(DeckFace face, {required bool sideways}) =>
 
 /// The grid a new layout gets on this screen, upright or sideways whichever
 /// way it's held now: as many square cells as fit the full-screen deck.
-(int, int) deckFit(BuildContext context, {required bool sideways}) {
+(int, int) deckFit(
+  BuildContext context, {
+  required bool sideways,
+  int pages = 1,
+}) {
   final size = MediaQuery.sizeOf(context);
   final short = math.min(size.width, size.height);
   final long = math.max(size.width, size.height);
@@ -789,8 +891,12 @@ double deckGap(DeckFace face, {required bool sideways}) =>
     rows: sideways ? 4 : 8,
     pages: const [[]],
   );
+  // With more than a page, the dots under it take a strip.
+  final dots = pages > 1 ? 32.0 : 0.0;
   final g = deckGrid(
-    sideways ? Size(long - _Rail.width, short) : Size(short, long),
+    sideways
+        ? Size(long - _Rail.width, short - dots)
+        : Size(short, long - dots),
     face,
     deckGap(face, sideways: sideways),
   );
@@ -1212,6 +1318,72 @@ class _Tile extends StatelessWidget {
             offered == null ? why() : _run(context, offered);
           },
         );
+      case 'phone' when t.props['do'] == 'keyboard' && !scope.preview:
+        // The phone's keyboard, typing on the computer (Remote Input).
+        final c = LinksyScope.read(context);
+        final shown = t.label.isNotEmpty ? t.label : _phoneLabel(context, t);
+        built = RemoteKeyboard(
+          send: (m) => c.remoteSend(scope.deviceId, m),
+          onKey: (k) => c.deckKeys(scope.deviceId, const [], k),
+          builder: (context, toggle) => press(
+            t.props['icon'] ?? 'keys',
+            shown,
+            shown,
+            () => scope.live ? toggle() : retry(),
+          ),
+        );
+      case 'touchpad':
+        final c = LinksyScope.read(context);
+        final l = context.l10n;
+        Widget face(bool dragging) => shell(
+          Stack(
+            fit: StackFit.expand,
+            children: [
+              Center(
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    DeckIcon(
+                      dragging ? 'click' : 'touch',
+                      size: iconSize * 1.2,
+                      color: paint.icon,
+                      stroke: look.icons,
+                    ),
+                    SizedBox(height: 6 * scale),
+                    pen.words(
+                      dragging
+                          ? l.remoteDragging
+                          : t.label.isNotEmpty
+                          ? t.label
+                          : l.remoteTouchpad,
+                      size: 11,
+                      width: inner,
+                      lines: 2,
+                      center: true,
+                      opacity: 0.7,
+                      label: true,
+                    ),
+                  ],
+                ),
+              ),
+              if (dragging)
+                Positioned.fill(
+                  child: DecoratedBox(
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(look.radius),
+                      border: Border.all(color: paint.icon, width: 2),
+                    ),
+                  ),
+                ),
+            ],
+          ),
+        );
+        built = scope.preview
+            ? face(false)
+            : TouchpadSurface(
+                send: (m) => c.remoteSend(scope.deviceId, m),
+                builder: (context, dragging) => face(dragging),
+              );
       case 'phone':
         final does = deckPhoneDo(t.props['do']);
         final shown = t.label.isNotEmpty ? t.label : _phoneLabel(context, t);
@@ -1243,7 +1415,10 @@ class _Tile extends StatelessWidget {
         );
     }
     return GestureDetector(
-      onLongPress: scope.hold == null ? null : () => scope.hold!(t.id),
+      // A finger resting on the touchpad is no hold to edit.
+      onLongPress: scope.hold == null || t.kind == 'touchpad'
+          ? null
+          : () => scope.hold!(t.id),
       child: AnimatedOpacity(
         opacity: dimmed ? 0.45 : 1,
         duration: motion(context),
@@ -1300,6 +1475,9 @@ class _Tile extends StatelessWidget {
       DeckPhoneDo.clipboard => l.phoneClipboard,
       DeckPhoneDo.ping => l.devicePing,
       DeckPhoneDo.find => l.deviceFindIt,
+      DeckPhoneDo.click =>
+        t.props['button'] == 'right' ? l.remoteRightClick : l.remoteLeftClick,
+      DeckPhoneDo.keyboard => l.remoteKeyboard,
       null => t.kind,
     };
   }
@@ -1327,6 +1505,14 @@ class _Tile extends StatelessWidget {
       DeckPhoneDo.clipboard => await c.sendClipboard(id),
       DeckPhoneDo.ping => await c.ping(id),
       DeckPhoneDo.find => await c.find(id),
+      DeckPhoneDo.click => await c.deckInput(id, [
+        for (final down in [true, false])
+          {
+            'type': 'button',
+            'button': t.props['button'] == 'right' ? 'right' : 'left',
+            'pressed': down,
+          },
+      ]),
       _ => l.deckSetUpFirst,
     };
     if (error == null) {

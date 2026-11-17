@@ -26,6 +26,7 @@ class DeckDraft {
   /// stays the size it came.
   static List<(int, int)> sizesOf(String kind) => switch (kind) {
     'button' || 'phone' => const [(1, 1), (2, 1)],
+    'touchpad' => const [(4, 4), (4, 3), (3, 3), (2, 2)],
     'volume' => const [(4, 1), (2, 1), (1, 3)],
     'music' => const [(4, 2), (4, 1), (2, 2)],
     'clock' => const [(2, 1), (2, 2), (1, 1)],
@@ -37,6 +38,8 @@ class DeckDraft {
     // One row high, on one line (mobile#21): wide enough for its buttons.
     'music' => h == 1 ? w >= 3 : w >= 2,
     'volume' => w * h >= 2,
+    // Room to move a finger on.
+    'touchpad' => w >= 2 && h >= 2,
     _ => true,
   };
 
@@ -496,6 +499,74 @@ class DeckDraft {
     return DeckLayouts(version: 0, active: made.id, layouts: [made]);
   }
 
+  /// The deck's Remote page on a [columns] × [rows] grid: the touchpad as
+  /// big as it can be, and around it the clicks, the keyboard and the keys
+  /// it lacks (Esc, Tab, the arrows), every cell taken. Upright ([tall])
+  /// the rest goes under it, sideways beside it.
+  static List<DeckTile> remotePage(
+    int columns,
+    int rows, {
+    required bool tall,
+  }) {
+    var made = 0;
+    DeckTile phone(
+      String does,
+      int x,
+      int y,
+      int w, [
+      Map<String, String>? more,
+    ]) => DeckTile(
+      id: 'r${made++}$does',
+      kind: 'phone',
+      x: x,
+      y: y,
+      w: w,
+      h: 1,
+      props: {'do': does, ...?more},
+    );
+    DeckTile key(String keys, int x, int y) => phone('shortcut', x, y, 1, {
+      'keys': keys,
+      if (const {'left', 'up', 'down', 'right'}.contains(keys)) 'icon': keys,
+    });
+    final tiles = <DeckTile>[];
+    if (tall && columns >= 2 && rows >= 5) {
+      final pad = rows - 3;
+      final half = columns ~/ 2;
+      tiles.addAll([
+        DeckTile(id: 'rpad', kind: 'touchpad', x: 0, y: 0, w: columns, h: pad),
+        phone('click', 0, pad, half, {'button': 'left'}),
+        phone('click', half, pad, columns - half, {'button': 'right'}),
+        phone('keyboard', 0, pad + 1, math.min(2, columns)),
+        if (columns >= 4) ...[
+          key('escape', 2, pad + 1),
+          key('tab', 3, pad + 1),
+        ],
+        if (columns >= 4)
+          for (final (i, k) in ['left', 'up', 'down', 'right'].indexed)
+            key(k, i, pad + 2),
+      ]);
+    } else if (!tall && columns >= 5 && rows >= 3) {
+      final pad = columns - 3;
+      tiles.addAll([
+        DeckTile(id: 'rpad', kind: 'touchpad', x: 0, y: 0, w: pad, h: rows),
+        phone('click', pad, 0, 1, {'button': 'left'}),
+        phone('click', pad + 1, 0, 1, {'button': 'right'}),
+        phone('keyboard', pad + 2, 0, 1),
+        key('escape', pad, 1),
+        key('up', pad + 1, 1),
+        key('tab', pad + 2, 1),
+        key('left', pad, 2),
+        key('down', pad + 1, 2),
+        key('right', pad + 2, 2),
+      ]);
+    } else {
+      tiles.add(
+        DeckTile(id: 'rpad', kind: 'touchpad', x: 0, y: 0, w: columns, h: rows),
+      );
+    }
+    return filled(tiles, columns, rows, const [], tall: tall, more: false);
+  }
+
   /// Both faces of a starting layout, full ([full]): see [filled].
   static DeckLayout _complete(
     DeckLayout l,
@@ -521,33 +592,36 @@ class DeckDraft {
     int rows,
     List<DeckAction> offered, {
     required bool tall,
+    bool more = true,
   }) {
     var next = [...tiles];
     var made = 0;
     final there = {for (final t in next) t.action ?? t.props['do']};
     final pool = <DeckTile Function(int, int)>[
-      for (final a in offered)
-        if (a.kind != DeckKind.slider && !there.contains(a.id))
-          (x, y) => DeckTile(
-            id: 'f${made++}${a.id}',
-            kind: 'button',
-            x: x,
-            y: y,
-            w: 1,
-            h: 1,
-            action: a.id,
-          ),
-      for (final d in ['clipboard', 'ping', 'find'])
-        if (!there.contains(d))
-          (x, y) => DeckTile(
-            id: 'f${made++}$d',
-            kind: 'phone',
-            x: x,
-            y: y,
-            w: 1,
-            h: 1,
-            props: {'do': d},
-          ),
+      if (more) ...[
+        for (final a in offered)
+          if (a.kind != DeckKind.slider && !there.contains(a.id))
+            (x, y) => DeckTile(
+              id: 'f${made++}${a.id}',
+              kind: 'button',
+              x: x,
+              y: y,
+              w: 1,
+              h: 1,
+              action: a.id,
+            ),
+        for (final d in ['clipboard', 'ping', 'find'])
+          if (!there.contains(d))
+            (x, y) => DeckTile(
+              id: 'f${made++}$d',
+              kind: 'phone',
+              x: x,
+              y: y,
+              w: 1,
+              h: 1,
+              props: {'do': d},
+            ),
+      ],
     ];
     bool taken(int x, int y) =>
         next.any((t) => x >= t.x && x < t.x + t.w && y >= t.y && y < t.y + t.h);
@@ -586,7 +660,7 @@ class DeckDraft {
 
     fillHoles();
     // Big tiles first, then the ones that span the grid (no gap beside them).
-    const order = ['music', 'volume', 'clock'];
+    const order = ['touchpad', 'music', 'volume', 'clock'];
     var guard = 0;
     while (lastEmpty() && next.isNotEmpty && guard++ < 24) {
       final across = next.where((t) => tall ? t.w == columns : t.h == rows);

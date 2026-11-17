@@ -380,28 +380,22 @@ class _Sliding extends StatelessWidget {
 /// stays down when the finger lifts, so the drag goes on with the next
 /// stroke, until a tap lets go. The keyboard types into whatever has focus
 /// there.
-class _Touchpad extends StatefulWidget {
-  const _Touchpad({
-    required this.send,
-    required this.onKey,
-    required this.mods,
-    required this.onMod,
-    required this.onModAlone,
-  });
+/// The touchpad itself, on the remote's page and as a deck tile: one finger
+/// moves the pointer, a tap clicks, a two-finger tap right-clicks, two
+/// fingers scroll. Double-tap and slide drags (mobile#22): the button stays
+/// down when the finger lifts, so the drag goes on with the next stroke,
+/// until a tap lets go. [builder] draws it, with whether it's dragging.
+class TouchpadSurface extends StatefulWidget {
+  const TouchpadSurface({super.key, required this.send, required this.builder});
 
   final void Function(List<Map<String, Object>>) send;
-  final void Function(int keysym) onKey;
-
-  /// The modifiers tapped for the next key.
-  final Set<int> mods;
-  final ValueChanged<int> onMod;
-  final ValueChanged<int> onModAlone;
+  final Widget Function(BuildContext context, bool dragging) builder;
 
   @override
-  State<_Touchpad> createState() => _TouchpadState();
+  State<TouchpadSurface> createState() => _TouchpadSurfaceState();
 }
 
-class _TouchpadState extends State<_Touchpad> {
+class _TouchpadSurfaceState extends State<TouchpadSurface> {
   final _pointers = <int, Offset>{};
   int _maxFingers = 0;
   DateTime _downAt = DateTime.now();
@@ -534,25 +528,57 @@ class _TouchpadState extends State<_Touchpad> {
   }
 
   @override
+  Widget build(BuildContext context) => Listener(
+    behavior: HitTestBehavior.opaque,
+    onPointerDown: _down,
+    onPointerMove: _move,
+    onPointerUp: _up,
+    onPointerCancel: _up,
+    child: widget.builder(context, _dragging),
+  );
+}
+
+class _Touchpad extends StatelessWidget {
+  const _Touchpad({
+    required this.send,
+    required this.onKey,
+    required this.mods,
+    required this.onMod,
+    required this.onModAlone,
+  });
+
+  final void Function(List<Map<String, Object>>) send;
+  final void Function(int keysym) onKey;
+
+  /// The modifiers tapped for the next key.
+  final Set<int> mods;
+  final ValueChanged<int> onMod;
+  final ValueChanged<int> onModAlone;
+
+  void _click(String button) {
+    HapticFeedback.selectionClick();
+    send([
+      {'type': 'button', 'button': button, 'pressed': true},
+      {'type': 'button', 'button': button, 'pressed': false},
+    ]);
+  }
+
+  @override
   Widget build(BuildContext context) {
     final s = Sig.of(context);
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
         Expanded(
-          child: Listener(
-            behavior: HitTestBehavior.opaque,
-            onPointerDown: _down,
-            onPointerMove: _move,
-            onPointerUp: _up,
-            onPointerCancel: _up,
-            child: Container(
+          child: TouchpadSurface(
+            send: send,
+            builder: (context, dragging) => Container(
               decoration: BoxDecoration(
                 color: s.card,
                 borderRadius: BorderRadius.circular(Radii.xl),
               ),
               alignment: Alignment.center,
-              foregroundDecoration: _dragging
+              foregroundDecoration: dragging
                   ? BoxDecoration(
                       borderRadius: BorderRadius.circular(Radii.xl),
                       border: Border.all(color: Sig.blue, width: 2),
@@ -562,21 +588,21 @@ class _TouchpadState extends State<_Touchpad> {
                 mainAxisSize: MainAxisSize.min,
                 children: [
                   Icon(
-                    _dragging ? Ph.handGrabbing : Ph.handPointing,
+                    dragging ? Ph.handGrabbing : Ph.handPointing,
                     size: 34,
-                    color: _dragging ? Sig.blue : s.faint,
+                    color: dragging ? Sig.blue : s.faint,
                   ),
                   const SizedBox(height: 10),
                   Text(
-                    _dragging
+                    dragging
                         ? context.l10n.remoteDragging
                         : '${context.l10n.remoteTouchpadHint}\n'
                               '${context.l10n.remoteDragHint}',
                     textAlign: TextAlign.center,
                     style: TextStyle(
-                      color: _dragging ? Sig.blue : s.faint,
+                      color: dragging ? Sig.blue : s.faint,
                       height: 1.5,
-                      fontWeight: _dragging ? FontWeight.w600 : null,
+                      fontWeight: dragging ? FontWeight.w600 : null,
                     ),
                   ),
                 ],
@@ -603,18 +629,9 @@ class _TouchpadState extends State<_Touchpad> {
           ],
         ),
         const SizedBox(height: 10),
-        _KeyRow(
-          mods: widget.mods,
-          onMod: widget.onMod,
-          onModAlone: widget.onModAlone,
-          onKey: widget.onKey,
-        ),
+        _KeyRow(mods: mods, onMod: onMod, onModAlone: onModAlone, onKey: onKey),
         const SizedBox(height: 10),
-        _Keyboard(
-          send: widget.send,
-          onKey: widget.onKey,
-          modded: widget.mods.isNotEmpty,
-        ),
+        RemoteKeyboard(send: send, onKey: onKey, modded: mods.isNotEmpty),
       ],
     );
   }
@@ -725,12 +742,14 @@ class _KeyRow extends StatelessWidget {
 
 /// A button that brings up the phone's keyboard, which types into whatever
 /// has focus on the computer.
-class _Keyboard extends StatefulWidget {
-  const _Keyboard({
+class RemoteKeyboard extends StatefulWidget {
+  const RemoteKeyboard({
+    super.key,
     required this.send,
     required this.onKey,
     this.modded = false,
     this.focus,
+    this.builder,
   });
 
   final void Function(List<Map<String, Object>>) send;
@@ -743,11 +762,15 @@ class _Keyboard extends StatefulWidget {
   /// Given by a page that brings the keyboard up itself (Address).
   final FocusNode? focus;
 
+  /// What to tap to bring it up or put it away (a deck tile); the Keyboard
+  /// button when none.
+  final Widget Function(BuildContext context, VoidCallback toggle)? builder;
+
   @override
-  State<_Keyboard> createState() => _KeyboardState();
+  State<RemoteKeyboard> createState() => _RemoteKeyboardState();
 }
 
-class _KeyboardState extends State<_Keyboard> {
+class _RemoteKeyboardState extends State<RemoteKeyboard> {
   // The keyboard: a hidden field that always holds one placeholder, so
   // Backspace on an empty field still shows up as a change.
   static const _placeholder = '​';
@@ -762,6 +785,15 @@ class _KeyboardState extends State<_Keyboard> {
     _field.dispose();
     if (widget.focus == null) _focus.dispose();
     super.dispose();
+  }
+
+  void _toggle() {
+    if (_focus.hasFocus) {
+      _focus.unfocus();
+    } else {
+      _focus.requestFocus();
+      SystemChannels.textInput.invokeMethod<void>('TextInput.show');
+    }
   }
 
   void _typed(String value) {
@@ -791,43 +823,47 @@ class _KeyboardState extends State<_Keyboard> {
 
   @override
   Widget build(BuildContext context) {
+    // Off screen, but focusable: it brings up the keyboard.
+    final field = SizedBox(
+      height: 0,
+      child: Opacity(
+        opacity: 0,
+        child: TextField(
+          controller: _field,
+          focusNode: _focus,
+          autocorrect: false,
+          enableSuggestions: false,
+          keyboardType: TextInputType.text,
+          textInputAction: TextInputAction.send,
+          onChanged: _typed,
+          onSubmitted: (_) {
+            widget.onKey(Keysym.enter);
+            _focus.requestFocus();
+          },
+        ),
+      ),
+    );
+    // A deck tile: the whole tile to tap, the field out of sight behind it.
+    if (widget.builder case final builder?) {
+      return Stack(
+        fit: StackFit.expand,
+        children: [
+          Positioned(left: 0, top: 0, width: 1, child: field),
+          builder(context, _toggle),
+        ],
+      );
+    }
     return Column(
       mainAxisSize: MainAxisSize.min,
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
-        // Off screen, but focusable: it brings up the keyboard.
-        SizedBox(
-          height: 0,
-          child: Opacity(
-            opacity: 0,
-            child: TextField(
-              controller: _field,
-              focusNode: _focus,
-              autocorrect: false,
-              enableSuggestions: false,
-              keyboardType: TextInputType.text,
-              textInputAction: TextInputAction.send,
-              onChanged: _typed,
-              onSubmitted: (_) {
-                widget.onKey(Keysym.enter);
-                _focus.requestFocus();
-              },
-            ),
-          ),
-        ),
+        field,
         SigButton(
           label: context.l10n.remoteKeyboard,
           icon: Ph.keyboard,
           kind: SigButtonKind.secondary,
           expand: true,
-          onTap: () {
-            if (_focus.hasFocus) {
-              _focus.unfocus();
-            } else {
-              _focus.requestFocus();
-              SystemChannels.textInput.invokeMethod<void>('TextInput.show');
-            }
-          },
+          onTap: _toggle,
         ),
       ],
     );
@@ -1019,7 +1055,7 @@ class _Slides extends StatelessWidget {
             ),
             const SizedBox(width: 10),
             Expanded(
-              child: _Keyboard(send: send, onKey: onKey),
+              child: RemoteKeyboard(send: send, onKey: onKey),
             ),
           ],
         ),
@@ -1331,7 +1367,7 @@ class _BrowserState extends State<_Browser> {
             ),
             gap,
             Expanded(
-              child: _Keyboard(
+              child: RemoteKeyboard(
                 send: widget.send,
                 onKey: widget.onKey,
                 focus: _focus,
