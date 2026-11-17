@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
@@ -972,9 +973,13 @@ class _FlowState extends State<_Flow> with SingleTickerProviderStateMixin {
     final dt = (now - _last).inMicroseconds / 1e6;
     _last = now;
     if (_still) return;
-    // 1 MB/s crawls, 100 MB/s races; past that it stays readable.
+    // Lanes a second: racing (3.2) from about 70 MB/s, slower in step below
+    // it on a log scale: 35 MB/s runs (2.7), 10 MB/s jogs (1.8), 1 MB/s
+    // walks (0.5).
     final mb = widget.speed / 1e6;
-    final target = mb <= 0 ? 0.0 : (0.12 + mb / 80).clamp(0.12, 1.6);
+    final target = mb <= 0
+        ? 0.0
+        : (3.2 * math.log(1 + mb) / math.log(71)).clamp(0.3, 3.2);
     _pace += (target - _pace) * (dt * 3).clamp(0.0, 1.0);
     if (widget.scanning) _scan = (_scan + dt / 1.4) % 1;
     if (_pace < 0.001 && !widget.scanning) return;
