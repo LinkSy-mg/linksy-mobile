@@ -1339,29 +1339,32 @@ class _Tile extends StatelessWidget {
           Stack(
             fit: StackFit.expand,
             children: [
-              Center(
-                child: Column(
+              // Small, in the corner: the tile is for the finger. While
+              // dragging, what that means beside it.
+              Align(
+                alignment: Alignment.bottomRight,
+                child: Row(
                   mainAxisSize: MainAxisSize.min,
+                  crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
+                    if (dragging) ...[
+                      ConstrainedBox(
+                        constraints: BoxConstraints(maxWidth: inner * 0.7),
+                        child: pen.words(
+                          l.remoteDragging,
+                          size: 10,
+                          width: inner * 0.7,
+                          lines: 2,
+                          opacity: 0.7,
+                        ),
+                      ),
+                      SizedBox(width: 6 * scale),
+                    ],
                     DeckIcon(
                       dragging ? 'click' : 'touch',
-                      size: iconSize * 1.2,
-                      color: paint.icon,
+                      size: iconSize * 0.75,
+                      color: paint.icon.withValues(alpha: 0.7),
                       stroke: look.icons,
-                    ),
-                    SizedBox(height: 6 * scale),
-                    pen.words(
-                      dragging
-                          ? l.remoteDragging
-                          : t.label.isNotEmpty
-                          ? t.label
-                          : l.remoteTouchpad,
-                      size: 11,
-                      width: inner,
-                      lines: 2,
-                      center: true,
-                      opacity: 0.7,
-                      label: true,
                     ),
                   ],
                 ),
