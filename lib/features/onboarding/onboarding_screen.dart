@@ -148,6 +148,10 @@ class _LanguagePage extends StatelessWidget {
       selected: c.locale.value.languageCode,
       onChanged: c.setLanguage,
       height: room.clamp(120, 340).toDouble(),
+      // With a TV remote: up and down to choose, the centre button (or A)
+      // to take it and go on.
+      onPicked: onContinue,
+      autofocus: true,
     );
 
     // Sideways: the welcome on the left, the wheel and Continue beside it.

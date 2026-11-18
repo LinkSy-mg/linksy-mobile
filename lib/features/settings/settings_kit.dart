@@ -258,12 +258,15 @@ class SettingRow extends StatelessWidget {
     var trailing = this.trailing;
     var onTap = this.onTap;
     if (trailing case Switch(:final value, onChanged: final changed?)) {
-      trailing = Switch(
-        value: value,
-        onChanged: (v) {
-          HapticFeedback.selectionClick();
-          changed(v);
-        },
+      trailing = ExcludeFocus(
+        // The row is the one stop for a remote; picking it flips the switch.
+        child: Switch(
+          value: value,
+          onChanged: (v) {
+            HapticFeedback.selectionClick();
+            changed(v);
+          },
+        ),
       );
       onTap ??= () => changed(!value);
     }

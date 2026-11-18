@@ -10,9 +10,11 @@ import '../core/models.dart';
 import 'format.dart';
 import 'icons.dart';
 import 'l10n.dart';
+import 'remote_input.dart';
 import 'sig.dart';
 
 export 'icons.dart';
+export 'remote_input.dart';
 
 /// [ms] long, or done by the next frame when motion is reduced (the
 /// phone's setting, or Settings › This app › Reduce motion). Not zero:
@@ -24,6 +26,10 @@ Duration motion(BuildContext context, [int ms = 200]) =>
 
 /// Shrinks a little while pressed, instead of an ink ripple; dims instead
 /// when motion is reduced.
+///
+/// Also a stop for a TV remote, a game pad or a keyboard ([RemoteKeys]): the
+/// D-pad moves onto it and rings it, the centre button or A taps it (on
+/// release, held a moment for [onLongPress]), menu, X or Y long-press it.
 class Pressable extends StatefulWidget {
   const Pressable({
     super.key,
@@ -32,6 +38,7 @@ class Pressable extends StatefulWidget {
     this.onLongPress,
     this.scale = 0.97,
     this.semanticLabel,
+    this.autofocus = false,
   }) : builder = null;
 
   /// Built with whether it's held, for keys that also light up.
@@ -42,6 +49,7 @@ class Pressable extends StatefulWidget {
     this.onLongPress,
     this.scale = 0.97,
     this.semanticLabel,
+    this.autofocus = false,
   }) : child = null;
 
   final Widget? child;
@@ -51,6 +59,9 @@ class Pressable extends StatefulWidget {
   final double scale;
   final String? semanticLabel;
 
+  /// Focused when first shown, for a remote's first press to land here.
+  final bool autofocus;
+
   @override
   State<Pressable> createState() => _PressableState();
 }
@@ -59,6 +70,36 @@ class _PressableState extends State<Pressable> {
   bool _down = false;
   DateTime _since = DateTime(0);
   Timer? _release;
+
+  final _focus = FocusNode(debugLabel: 'Pressable');
+
+  /// Has the focus itself, not only one of its buttons.
+  bool _focused = false;
+
+  /// The centre button or A went down here (not on the page before).
+  bool _keyDown = false;
+  Timer? _hold;
+  bool _held = false;
+
+  bool get _enabled => widget.onTap != null || widget.onLongPress != null;
+
+  @override
+  void initState() {
+    super.initState();
+    FocusManager.instance.addHighlightModeListener(_highlightChanged);
+    // A card's ring moves to its button and back: the focus is in the card
+    // all along, but the card itself has it or not.
+    _focus.addListener(_focusMoved);
+  }
+
+  void _highlightChanged(FocusHighlightMode _) {
+    if (mounted && _focused) setState(() {});
+  }
+
+  void _focusMoved() {
+    final own = _focus.hasPrimaryFocus;
+    if (mounted && own != _focused) setState(() => _focused = own);
+  }
 
   void _press() {
     _release?.cancel();
@@ -81,49 +122,234 @@ class _PressableState extends State<Pressable> {
     if (mounted && _down) setState(() => _down = false);
   }
 
+  void _tap() {
+    HapticFeedback.selectionClick();
+    widget.onTap!();
+  }
+
+  void _longPress() {
+    _up();
+    HapticFeedback.mediumImpact();
+    widget.onLongPress!();
+  }
+
+  void _endKey() {
+    _hold?.cancel();
+    _keyDown = false;
+  }
+
+  /// The Pressable this one sits in: a card's own button (Send on a
+  /// device's row), reached from the card with right and left.
+  FocusNode? get _outer => _PressableScope.maybeOf(context);
+
+  /// A card's buttons sit at its right end, where the D-pad going down the
+  /// list never lands on the card itself: right goes into the card's first
+  /// button, left back out to the card, and up and down from a button move
+  /// on from the card, row by row.
+  KeyEventResult _arrow(LogicalKeyboardKey key) {
+    final outer = _outer?.canRequestFocus == true ? _outer : null;
+    switch (key) {
+      case LogicalKeyboardKey.arrowRight:
+        for (final inner in _focus.traversalDescendants) {
+          if (inner.canRequestFocus) {
+            _entering = inner;
+            inner.requestFocus();
+            return KeyEventResult.handled;
+          }
+        }
+      case LogicalKeyboardKey.arrowLeft when outer != null:
+        outer.requestFocus();
+        return KeyEventResult.handled;
+      case LogicalKeyboardKey.arrowUp when outer != null:
+        _moveOn(outer, TraversalDirection.up);
+        return KeyEventResult.handled;
+      case LogicalKeyboardKey.arrowDown when outer != null:
+        _moveOn(outer, TraversalDirection.down);
+        return KeyEventResult.handled;
+    }
+    return KeyEventResult.ignored;
+  }
+
+  /// A card's button being moved into from the card, with right.
+  static FocusNode? _entering;
+
+  /// A card's button reached from outside the card (down the list from the
+  /// top bar): the card takes it, so the list goes row by row.
+  void _cameFromOutside() {
+    final outer = _outer;
+    if (outer == null || !outer.canRequestFocus) return;
+    if (_entering == _focus) {
+      _entering = null;
+      return;
+    }
+    if (FocusManager.instance.highlightMode != FocusHighlightMode.traditional) {
+      return;
+    }
+    outer.requestFocus();
+  }
+
+  /// From the card [outer], as if it had the focus: on to the next row, or
+  /// staying on the card at the end of the list.
+  static void _moveOn(FocusNode outer, TraversalDirection direction) {
+    outer.requestFocus();
+    // Directional moves start from the page's focused control.
+    FocusManager.instance.applyFocusChangesIfNeeded();
+    outer.focusInDirection(direction);
+  }
+
+  KeyEventResult _key(FocusNode node, KeyEvent e) {
+    if (!_enabled) return KeyEventResult.ignored;
+    final key = e.logicalKey;
+    // Only for the control that has the focus, not one it sits in.
+    if (!node.hasPrimaryFocus) return KeyEventResult.ignored;
+    if (e is! KeyUpEvent) {
+      final moved = _arrow(key);
+      if (moved == KeyEventResult.handled) return moved;
+    }
+    if (RemoteKeys.holds(key)) {
+      if (widget.onLongPress == null) return KeyEventResult.ignored;
+      if (e is KeyDownEvent) _longPress();
+      return KeyEventResult.handled;
+    }
+    if (!RemoteKeys.activates(key)) return KeyEventResult.ignored;
+    switch (e) {
+      case KeyDownEvent():
+        _keyDown = true;
+        _held = false;
+        _press();
+        _hold?.cancel();
+        if (widget.onLongPress != null) {
+          _hold = Timer(RemoteKeys.hold, () {
+            if (!mounted || !_keyDown) return;
+            _held = true;
+            _longPress();
+          });
+        }
+      case KeyRepeatEvent():
+        break;
+      case KeyUpEvent():
+        // Went down on whatever had focus before (a page that just closed).
+        if (!_keyDown) return KeyEventResult.ignored;
+        final held = _held;
+        _endKey();
+        _lift();
+        if (!held && widget.onTap != null) _tap();
+    }
+    return KeyEventResult.handled;
+  }
+
   @override
   void dispose() {
     _release?.cancel();
+    _hold?.cancel();
+    FocusManager.instance.removeHighlightModeListener(_highlightChanged);
+    _focus
+      ..removeListener(_focusMoved)
+      ..dispose();
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
-    final enabled = widget.onTap != null || widget.onLongPress != null;
+    final enabled = _enabled;
     final reduced = MediaQuery.disableAnimationsOf(context);
-    return Semantics(
-      button: enabled,
-      label: widget.semanticLabel,
-      child: GestureDetector(
-        behavior: HitTestBehavior.opaque,
-        onTapDown: enabled ? (_) => _press() : null,
-        onTapUp: enabled ? (_) => _lift() : null,
-        onTapCancel: enabled ? _up : null,
-        onTap: widget.onTap == null
-            ? null
-            : () {
-                HapticFeedback.selectionClick();
-                widget.onTap!();
-              },
-        onLongPress: widget.onLongPress == null
-            ? null
-            : () {
-                _up();
-                HapticFeedback.mediumImpact();
-                widget.onLongPress!();
-              },
-        child: Opacity(
-          opacity: reduced && _down ? 0.6 : 1,
-          child: AnimatedScale(
-            scale: !reduced && _down ? widget.scale : 1,
-            duration: const Duration(milliseconds: 120),
-            curve: Curves.easeOut,
-            child: widget.builder?.call(context, _down) ?? widget.child,
+    // Rung only for keys: a finger on the screen shows nothing new.
+    final ring =
+        _focused &&
+        enabled &&
+        FocusManager.instance.highlightMode == FocusHighlightMode.traditional;
+    return Focus(
+      focusNode: _focus,
+      autofocus: widget.autofocus && enabled,
+      canRequestFocus: enabled,
+      skipTraversal: !enabled,
+      onKeyEvent: _key,
+      onFocusChange: (on) {
+        if (!on && _keyDown) {
+          _endKey();
+          _up();
+        }
+        if (on) _cameFromOutside();
+      },
+      child: _PressableScope(
+        node: _focus,
+        child: Semantics(
+          button: enabled,
+          label: widget.semanticLabel,
+          child: GestureDetector(
+            behavior: HitTestBehavior.opaque,
+            onTapDown: enabled ? (_) => _press() : null,
+            onTapUp: enabled ? (_) => _lift() : null,
+            onTapCancel: enabled ? _up : null,
+            onTap: widget.onTap == null ? null : _tap,
+            onLongPress: widget.onLongPress == null ? null : _longPress,
+            child: CustomPaint(
+              foregroundPainter: ring ? const _FocusRing() : null,
+              child: Opacity(
+                opacity: reduced && _down ? 0.6 : 1,
+                child: AnimatedScale(
+                  scale: !reduced && _down ? widget.scale : 1,
+                  duration: const Duration(milliseconds: 120),
+                  curve: Curves.easeOut,
+                  child: widget.builder?.call(context, _down) ?? widget.child,
+                ),
+              ),
+            ),
           ),
         ),
       ),
     );
   }
+}
+
+/// The focus of the Pressable around, for one inside it.
+class _PressableScope extends InheritedWidget {
+  const _PressableScope({required this.node, required super.child});
+
+  final FocusNode node;
+
+  static FocusNode? maybeOf(BuildContext context) =>
+      context.getInheritedWidgetOfExactType<_PressableScope>()?.node;
+
+  @override
+  bool updateShouldNotify(_PressableScope old) => old.node != node;
+}
+
+/// Where a remote's focus is: a blue ring just inside the control's edge,
+/// rounded like it (round buttons, pills and cards alike), with a thin white
+/// line inside it for the blue panels, and a faint blue wash.
+class _FocusRing extends CustomPainter {
+  const _FocusRing();
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    if (size.isEmpty) return;
+    final radius = min(size.shortestSide / 2, Radii.lg);
+    final rect = Offset.zero & size;
+    RRect inset(double by) => RRect.fromRectAndRadius(
+      rect.deflate(by),
+      Radius.circular(max(0, radius - by)),
+    );
+    canvas
+      ..drawRRect(inset(0), Paint()..color = Sig.blue.withValues(alpha: 0.10))
+      ..drawRRect(
+        inset(1.5),
+        Paint()
+          ..style = PaintingStyle.stroke
+          ..strokeWidth = 3
+          ..color = Sig.blue,
+      )
+      ..drawRRect(
+        inset(3.75),
+        Paint()
+          ..style = PaintingStyle.stroke
+          ..strokeWidth = 1.5
+          ..color = Colors.white.withValues(alpha: 0.9),
+      );
+  }
+
+  @override
+  bool shouldRepaint(_FocusRing old) => false;
 }
 
 /// A flat surface: white on the grey page in light, a step up from the page
@@ -170,6 +396,7 @@ class SigButton extends StatelessWidget {
     this.kind = SigButtonKind.primary,
     this.expand = false,
     this.height = 54,
+    this.autofocus = false,
   });
 
   final String label;
@@ -178,6 +405,9 @@ class SigButton extends StatelessWidget {
   final SigButtonKind kind;
   final bool expand;
   final double height;
+
+  /// Where a remote's focus starts ([Pressable.autofocus]).
+  final bool autofocus;
 
   @override
   Widget build(BuildContext context) {
@@ -231,6 +461,7 @@ class SigButton extends StatelessWidget {
       child: Pressable(
         onTap: onTap,
         semanticLabel: label,
+        autofocus: autofocus,
         child: AnimatedContainer(
           duration: motion(context, 150),
           height: height,

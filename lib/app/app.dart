@@ -20,6 +20,7 @@ import '../features/sharing/webcam_screen.dart';
 import '../features/transfer/incoming_sheet.dart';
 import '../ui/icons.dart';
 import '../ui/l10n.dart';
+import '../ui/remote_input.dart';
 import '../ui/sig.dart';
 import 'launch_intro.dart';
 import 'linksy_controller.dart';
@@ -386,6 +387,10 @@ class _LinksyAppState extends State<LinksyApp> {
         locale: widget.controller.locale.value,
         supportedLocales: [for (final l in languages) Locale(l.code)],
         localizationsDelegates: localizationsDelegates,
+        // A TV remote or a game pad around the app (B for Back, the
+        // shoulders to page), over Flutter's own D-pad moves.
+        shortcuts: RemoteKeys.shortcuts,
+        actions: RemoteKeys.actions,
         // The launch intro over everything, until the mark has landed; and
         // Reduce motion, read like the phone's own setting.
         builder: (context, child) {

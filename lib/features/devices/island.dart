@@ -28,10 +28,10 @@ class Island extends StatefulWidget {
   final List<DeviceView> paired;
 
   @override
-  State<Island> createState() => _IslandState();
+  State<Island> createState() => IslandState();
 }
 
-class _IslandState extends State<Island> with SingleTickerProviderStateMixin {
+class IslandState extends State<Island> with SingleTickerProviderStateMixin {
   _Open? _open;
 
   static const _growFor = Duration(milliseconds: 460);
@@ -54,12 +54,50 @@ class _IslandState extends State<Island> with SingleTickerProviderStateMixin {
     HapticFeedback.lightImpact();
     if (what == _Open.add) LinksyScope.read(context).node.pairingMode(true);
     setState(() => _open = what);
+    _focusInside();
   }
 
   void _close() {
     HapticFeedback.selectionClick();
     if (_open == _Open.add) LinksyScope.read(context).node.pairingMode(false);
     setState(() => _open = null);
+    _focusInside();
+  }
+
+  /// Around the island, for a remote's focus to follow it.
+  final _island = FocusNode(debugLabel: 'Island', skipTraversal: true);
+
+  /// Down past the end of the page: the island's control nearest under
+  /// [from] (Send files, from the middle of a row), the way into it for a
+  /// remote: it floats over the page, at the same height as the last row.
+  void focusFrom(FocusNode from) {
+    final x = from.rect.center.dx;
+    FocusNode? best;
+    for (final node in _island.traversalDescendants) {
+      if (!node.canRequestFocus) continue;
+      if (best == null ||
+          (node.rect.center.dx - x).abs() < (best.rect.center.dx - x).abs()) {
+        best = node;
+      }
+    }
+    best?.requestFocus();
+  }
+
+  /// Opened or closed with a remote: its focus goes into the card, or back
+  /// to the pill, instead of staying on what just went away.
+  void _focusInside() {
+    if (FocusManager.instance.highlightMode != FocusHighlightMode.traditional) {
+      return;
+    }
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted) return;
+      for (final node in _island.traversalDescendants) {
+        if (node.canRequestFocus) {
+          node.requestFocus();
+          return;
+        }
+      }
+    });
   }
 
   /// Shrinks, then runs [then] once the pill is back.
@@ -75,6 +113,7 @@ class _IslandState extends State<Island> with SingleTickerProviderStateMixin {
     if (_open == _Open.add) {
       LinksyScope.read(context).node.pairingMode(false);
     }
+    _island.dispose();
     super.dispose();
   }
 
@@ -113,115 +152,127 @@ class _IslandState extends State<Island> with SingleTickerProviderStateMixin {
           ),
           Align(
             alignment: Alignment.bottomCenter,
-            child: Padding(
-              padding: EdgeInsets.fromLTRB(
-                12,
-                0,
-                12,
-                16 + MediaQuery.paddingOf(context).bottom,
-              ),
-              child: AnimatedContainer(
-                duration: duration,
-                curve: curve,
-                decoration: BoxDecoration(
-                  color: s.card,
-                  borderRadius: BorderRadius.circular(open ? 30 : 99),
-                  border: Border.all(color: s.ink.withValues(alpha: 0.04)),
-                  // Wide and barely there; a little more once it's a card.
-                  boxShadow: [
-                    BoxShadow(
-                      color: const Color(0xFF0A1024)
-                          .withValues(alpha: open ? 0.06 : 0.02),
-                      blurRadius: 40,
-                      spreadRadius: 4,
-                      offset: const Offset(0, 10),
-                    ),
-                  ],
+            child: Focus(
+              focusNode: _island,
+              canRequestFocus: false,
+              skipTraversal: true,
+              child: Padding(
+                padding: EdgeInsets.fromLTRB(
+                  12,
+                  0,
+                  12,
+                  16 + MediaQuery.paddingOf(context).bottom,
                 ),
-                clipBehavior: Clip.antiAlias,
-                child: PhasedSize(
-                  vsync: this,
-                  grow: _grow,
-                  growCurve: _growCurve,
-                  shrink: _shrink,
-                  shrinkWidth: _shrinkWidth,
-                  shrinkHeight: _shrinkHeight,
-                  child: AnimatedSwitcher(
-                    // Closing, as long as the island's own shrink, so the
-                    // pill comes back with it.
-                    duration: open ? motion(context, 340) : _shrink,
-                    // Only what's coming sets the size, so the island starts
-                    // moving at once; what's leaving keeps its own size,
-                    // clipped, while it fades.
-                    layoutBuilder: (current, previous) => Stack(
-                      alignment: Alignment.bottomCenter,
-                      children: [
-                        for (final p in previous)
-                          Positioned.fill(
-                            child: OverflowBox(
-                              alignment: Alignment.bottomCenter,
-                              maxWidth: double.infinity,
-                              maxHeight: double.infinity,
-                              child: p,
-                            ),
-                          ),
-                        ?current,
-                      ],
-                    ),
-                    // The old leaves in the first half, the new comes in the
-                    // second: they never show together. The pill's content
-                    // never shows inside the card: opening, it's gone in a
-                    // frame or two; closing, it comes back in the bounce,
-                    // once the island is the pill's size again.
-                    transitionBuilder: (child, animation) => FadeTransition(
-                      opacity: CurvedAnimation(
-                        parent: animation,
-                        curve: child.key == const ValueKey('pill')
-                            ? Interval(open ? 0.98 : 0.85, 1)
-                            : const Interval(0.5, 1, curve: Curves.easeOut),
+                child: AnimatedContainer(
+                  duration: duration,
+                  curve: curve,
+                  decoration: BoxDecoration(
+                    color: s.card,
+                    borderRadius: BorderRadius.circular(open ? 30 : 99),
+                    border: Border.all(color: s.ink.withValues(alpha: 0.04)),
+                    // Wide and barely there; a little more once it's a card.
+                    boxShadow: [
+                      BoxShadow(
+                        color: const Color(0xFF0A1024)
+                            .withValues(alpha: open ? 0.06 : 0.02),
+                        blurRadius: 40,
+                        spreadRadius: 4,
+                        offset: const Offset(0, 10),
                       ),
-                      child: ScaleTransition(
-                        scale: Tween(begin: 0.96, end: 1.0).animate(animation),
+                    ],
+                  ),
+                  clipBehavior: Clip.antiAlias,
+                  child: PhasedSize(
+                    vsync: this,
+                    grow: _grow,
+                    growCurve: _growCurve,
+                    shrink: _shrink,
+                    shrinkWidth: _shrinkWidth,
+                    shrinkHeight: _shrinkHeight,
+                    child: AnimatedSwitcher(
+                      // Closing, as long as the island's own shrink, so the
+                      // pill comes back with it.
+                      duration: open ? motion(context, 340) : _shrink,
+                      // Only what's coming sets the size, so the island starts
+                      // moving at once; what's leaving keeps its own size,
+                      // clipped, while it fades.
+                      layoutBuilder: (current, previous) => Stack(
                         alignment: Alignment.bottomCenter,
-                        child: child,
+                        children: [
+                          for (final p in previous)
+                            Positioned.fill(
+                              child: OverflowBox(
+                                alignment: Alignment.bottomCenter,
+                                maxWidth: double.infinity,
+                                maxHeight: double.infinity,
+                                // What's leaving takes no remote's focus.
+                                child: ExcludeFocus(child: p),
+                              ),
+                            ),
+                          ?current,
+                        ],
                       ),
-                    ),
-                    child: switch (_open) {
-                      null => _Pill(
-                        key: const ValueKey('pill'),
-                        paired: widget.paired,
-                        onOpen: _show,
-                      ),
-                      final what => SizedBox(
-                        key: ValueKey(what),
-                        width: (width - 24).clamp(0, 520),
-                        child: Padding(
-                          padding: const EdgeInsets.fromLTRB(18, 18, 18, 14),
-                          child: switch (what) {
-                            _Open.transfers => TransfersPeek(
-                              onMore: () =>
-                                  _closeThen(() => openTransfers(context)),
-                            ),
-                            _Open.send => _SendPanel(
-                              paired: widget.paired,
-                              onPick: (id) =>
-                                  _closeThen(() => pickAndSend(context, id)),
-                              onAdd: () => setState(() {
-                                LinksyScope.read(context).node
-                                    .pairingMode(true);
-                                _open = _Open.add;
-                              }),
-                            ),
-                            _Open.add => _AddPanel(
-                              onScan: () =>
-                                  _closeThen(() => scanAndPair(context)),
-                              onAddress: () =>
-                                  _closeThen(() => pairByAddress(context)),
-                            ),
-                          },
+                      // The old leaves in the first half, the new comes in the
+                      // second: they never show together. The pill's content
+                      // never shows inside the card: opening, it's gone in a
+                      // frame or two; closing, it comes back in the bounce,
+                      // once the island is the pill's size again.
+                      transitionBuilder: (child, animation) => FadeTransition(
+                        opacity: CurvedAnimation(
+                          parent: animation,
+                          curve: child.key == const ValueKey('pill')
+                              ? Interval(open ? 0.98 : 0.85, 1)
+                              : const Interval(0.5, 1, curve: Curves.easeOut),
+                        ),
+                        child: ScaleTransition(
+                          scale: Tween(
+                            begin: 0.96,
+                            end: 1.0,
+                          ).animate(animation),
+                          alignment: Alignment.bottomCenter,
+                          child: child,
                         ),
                       ),
-                    },
+                      child: switch (_open) {
+                        null => _Pill(
+                          key: const ValueKey('pill'),
+                          paired: widget.paired,
+                          onOpen: _show,
+                        ),
+                        final what => SizedBox(
+                          key: ValueKey(what),
+                          width: (width - 24).clamp(0, 520),
+                          child: Padding(
+                            padding: const EdgeInsets.fromLTRB(18, 18, 18, 14),
+                            child: switch (what) {
+                              _Open.transfers => TransfersPeek(
+                                onMore: () =>
+                                    _closeThen(() => openTransfers(context)),
+                              ),
+                              _Open.send => _SendPanel(
+                                paired: widget.paired,
+                                onPick: (id) =>
+                                    _closeThen(() => pickAndSend(context, id)),
+                                onAdd: () {
+                                  setState(() {
+                                    LinksyScope.read(context).node
+                                        .pairingMode(true);
+                                    _open = _Open.add;
+                                  });
+                                  _focusInside();
+                                },
+                              ),
+                              _Open.add => _AddPanel(
+                                onScan: () =>
+                                    _closeThen(() => scanAndPair(context)),
+                                onAddress: () =>
+                                    _closeThen(() => pairByAddress(context)),
+                              ),
+                            },
+                          ),
+                        ),
+                      },
+                    ),
                   ),
                 ),
               ),

@@ -1,13 +1,19 @@
 <?xml version="1.0" encoding="utf-8"?>
-<resources>
+<resources xmlns:tools="http://schemas.android.com/tools">
     <!-- Android 12+: the system splash shows the mark on the page colour; the app's first
          frame draws the same in the same spot, then the launch intro flies it home. -->
     <style name="LaunchTheme" parent="@android:style/Theme.Light.NoTitleBar">
         <item name="android:windowBackground">@drawable/launch_background</item>
+        <!-- No system outline around the app on first touch on handhelds with
+             built-in controls (a Retroid Pocket): Linksy rings what has the focus itself. -->
+        <item name="android:defaultFocusHighlightEnabled" tools:targetApi="o">false</item>
         <item name="android:windowSplashScreenBackground">@color/splash_bg</item>
         <item name="android:windowSplashScreenAnimatedIcon">@drawable/ic_splash_mark</item>
     </style>
     <style name="NormalTheme" parent="@android:style/Theme.Light.NoTitleBar">
         <item name="android:windowBackground">?android:colorBackground</item>
+        <!-- No system outline around the app on first touch on handhelds with
+             built-in controls (a Retroid Pocket): Linksy rings what has the focus itself. -->
+        <item name="android:defaultFocusHighlightEnabled" tools:targetApi="o">false</item>
     </style>
 </resources>

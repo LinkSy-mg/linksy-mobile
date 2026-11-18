@@ -1,5 +1,6 @@
 package app.linksy
 
+import android.util.Log
 import android.Manifest
 import android.content.BroadcastReceiver
 import android.content.Context
@@ -120,7 +121,12 @@ class MainActivity : FlutterActivity() {
                 // Android's own page for it; the app hears back on resume.
                 runCatching {
                     startActivity(Intent(Settings.ACTION_MANAGE_APP_ALL_FILES_ACCESS_PERMISSION, android.net.Uri.parse("package:$packageName")))
-                }.onFailure { runCatching { startActivity(Intent(Settings.ACTION_MANAGE_ALL_FILES_ACCESS_PERMISSION)) } }
+                }.recoverCatching {
+                    startActivity(Intent(Settings.ACTION_MANAGE_ALL_FILES_ACCESS_PERMISSION))
+                }.recoverCatching {
+                    // Android TV has neither page: the app's own, at least.
+                    startActivity(Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS, android.net.Uri.parse("package:$packageName")))
+                }
                 result.success(null)
             }
             "volumeSteps" -> {
@@ -159,7 +165,10 @@ class MainActivity : FlutterActivity() {
             "pickSendFolder" -> {
                 pendingSendFolder?.success(null)
                 pendingSendFolder = result
-                startActivityForResult(Intent(Intent.ACTION_OPEN_DOCUMENT_TREE), REQUEST_SEND_FOLDER)
+                if (!launchPicker(Intent(Intent.ACTION_OPEN_DOCUMENT_TREE), REQUEST_SEND_FOLDER)) {
+                    pendingSendFolder = null
+                    result.success(null)
+                }
             }
             "openDndAccess" -> {
                 runCatching { startActivity(Intent(android.provider.Settings.ACTION_NOTIFICATION_POLICY_ACCESS_SETTINGS)) }
@@ -449,14 +458,25 @@ class MainActivity : FlutterActivity() {
     private fun pickPicture(device: String, result: MethodChannel.Result) {
         pendingPicture?.second?.success(null)
         pendingPicture = device to result
+        val fallback = Intent(Intent.ACTION_GET_CONTENT).setType("image/*").addCategory(Intent.CATEGORY_OPENABLE)
         val intent = if (Build.VERSION.SDK_INT >= 33) {
             Intent(android.provider.MediaStore.ACTION_PICK_IMAGES)
         } else {
-            Intent(Intent.ACTION_GET_CONTENT).setType("image/*").addCategory(Intent.CATEGORY_OPENABLE)
+            fallback
         }
-        @Suppress("DEPRECATION")
-        startActivityForResult(intent, REQUEST_PICTURE)
+        if (!launchPicker(intent, REQUEST_PICTURE) && (intent === fallback || !launchPicker(fallback, REQUEST_PICTURE))) {
+            pendingPicture = null
+            result.success(null)
+        }
     }
+
+    /// Android TV (a Shield) and some handhelds have no photo or document
+    /// picker, or only some of them: no app for [intent] is a cancelled pick,
+    /// not a crash.
+    private fun launchPicker(intent: Intent, request: Int): Boolean = runCatching {
+        @Suppress("DEPRECATION")
+        startActivityForResult(intent, request)
+    }.onFailure { Log.w("Linksy", "No picker for ${intent.action}", it) }.isSuccess
 
     /// Android's folder picker; the grant is kept across restarts.
     private fun pickFolder(kind: String, result: MethodChannel.Result) {
@@ -472,8 +492,10 @@ class MainActivity : FlutterActivity() {
                 android.provider.DocumentsContract.buildDocumentUri("com.android.externalstorage.documents", "primary:DCIM"),
             )
         }
-        @Suppress("DEPRECATION")
-        startActivityForResult(intent, REQUEST_FOLDER)
+        if (!launchPicker(intent, REQUEST_FOLDER)) {
+            pendingFolder = null
+            result.success(null)
+        }
     }
 
 
@@ -515,8 +537,20 @@ class MainActivity : FlutterActivity() {
 
     // mDNS presence needs multicast, which Android filters out unless an app
     // holds a lock. Hold it only while the app is on screen.
+    /// Android's own focus outline off for every view, the Flutter view
+    /// included: some handhelds (a Retroid Pocket) draw it in green around
+    /// the whole app on the first touch. Linksy shows its own focus ring.
+    private fun noFocusHighlight(view: android.view.View) {
+        if (Build.VERSION.SDK_INT < 26) return
+        view.defaultFocusHighlightEnabled = false
+        if (view is android.view.ViewGroup) {
+            for (i in 0 until view.childCount) noFocusHighlight(view.getChildAt(i))
+        }
+    }
+
     override fun onStart() {
         super.onStart()
+        noFocusHighlight(window.decorView)
         val wifi = applicationContext.getSystemService(Context.WIFI_SERVICE) as WifiManager
         multicastLock = wifi.createMulticastLock("linksy").apply {
             setReferenceCounted(false)
@@ -607,8 +641,10 @@ class MainActivity : FlutterActivity() {
         } else {
             manager.createScreenCaptureIntent()
         }
-        @Suppress("DEPRECATION")
-        startActivityForResult(intent, REQUEST_CAPTURE)
+        if (!launchPicker(intent, REQUEST_CAPTURE)) {
+            pendingCapture = null
+            result.success(false)
+        }
     }
 
     private fun granted(permission: String) =
@@ -681,8 +717,15 @@ class MainActivity : FlutterActivity() {
             .addCategory(Intent.CATEGORY_OPENABLE)
             .setType("*/*")
             .putExtra(Intent.EXTRA_ALLOW_MULTIPLE, true)
-        @Suppress("DEPRECATION")
-        startActivityForResult(intent, REQUEST_PICK)
+        // No document picker (some TVs): any app that hands out files.
+        val fallback = Intent(Intent.ACTION_GET_CONTENT)
+            .addCategory(Intent.CATEGORY_OPENABLE)
+            .setType("*/*")
+            .putExtra(Intent.EXTRA_ALLOW_MULTIPLE, true)
+        if (!launchPicker(intent, REQUEST_PICK) && !launchPicker(fallback, REQUEST_PICK)) {
+            pendingPick = null
+            result.success(emptyList<String>())
+        }
     }
 
     /// Android's photo picker: the gallery, many photos and videos at once,
@@ -693,18 +736,30 @@ class MainActivity : FlutterActivity() {
         pendingPick = result
         val picker = Build.VERSION.SDK_INT >= 33 ||
             (Build.VERSION.SDK_INT >= 30 && android.os.ext.SdkExtensions.getExtensionVersion(Build.VERSION_CODES.R) >= 2)
-        val intent = if (picker) {
-            Intent(android.provider.MediaStore.ACTION_PICK_IMAGES)
-                .putExtra(android.provider.MediaStore.EXTRA_PICK_IMAGES_MAX, android.provider.MediaStore.getPickImagesMaxLimit())
-        } else {
-            Intent(Intent.ACTION_OPEN_DOCUMENT)
-                .addCategory(Intent.CATEGORY_OPENABLE)
-                .setType("*/*")
-                .putExtra(Intent.EXTRA_MIME_TYPES, arrayOf("image/*", "video/*"))
-                .putExtra(Intent.EXTRA_ALLOW_MULTIPLE, true)
+        val documents = Intent(Intent.ACTION_OPEN_DOCUMENT)
+            .addCategory(Intent.CATEGORY_OPENABLE)
+            .setType("*/*")
+            .putExtra(Intent.EXTRA_MIME_TYPES, arrayOf("image/*", "video/*"))
+            .putExtra(Intent.EXTRA_ALLOW_MULTIPLE, true)
+        val content = Intent(Intent.ACTION_GET_CONTENT)
+            .addCategory(Intent.CATEGORY_OPENABLE)
+            .setType("*/*")
+            .putExtra(Intent.EXTRA_MIME_TYPES, arrayOf("image/*", "video/*"))
+            .putExtra(Intent.EXTRA_ALLOW_MULTIPLE, true)
+        val tries = buildList {
+            if (picker) {
+                add(
+                    Intent(android.provider.MediaStore.ACTION_PICK_IMAGES)
+                        .putExtra(android.provider.MediaStore.EXTRA_PICK_IMAGES_MAX, android.provider.MediaStore.getPickImagesMaxLimit()),
+                )
+            }
+            add(documents)
+            add(content)
         }
-        @Suppress("DEPRECATION")
-        startActivityForResult(intent, REQUEST_PICK)
+        if (tries.none { launchPicker(it, REQUEST_PICK) }) {
+            pendingPick = null
+            result.success(emptyList<String>())
+        }
     }
 
     /// Opens a received file in another app: "done", "missing" or "noApp".
