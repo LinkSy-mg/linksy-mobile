@@ -4,6 +4,19 @@ All notable changes to Linksy for Android. Format: [Keep a Changelog](https://ke
 
 ## [Unreleased]
 
+### Responsive
+
+- Linksy now fits a phone held sideways, a tablet and an unfolded phone, both ways up.
+- Onboarding sideways: the welcome sits beside the language list and Continue, and Set up sits beside its choices. Before, Continue was off the screen.
+- A computer's or phone's page puts its picture in a pane on the left, with the page beside it, instead of the header filling the first screen.
+- The Remote's touchpad, Next and Back keep the full height on the left, with the buttons in a column on the right.
+- Home, Settings, Logs, Transfers and What's new stay a phone's width and centred on a wide screen. Photos get more columns, not bigger ones.
+- Sheets stay centred on a wide screen, and sideways they show everything they hold. Send files lost its second choice before.
+
+### Fixed
+
+- On the deck's Remote page, sliding a finger on the touchpad moves the pointer and no longer turns the page.
+
 ## [0.3.9] - 2026-11-17
 
 > [!IMPORTANT]
