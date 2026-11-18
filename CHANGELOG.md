@@ -4,6 +4,11 @@ All notable changes to Linksy for Android. Format: [Keep a Changelog](https://ke
 
 ## [Unreleased]
 
+## [0.3.10] - 2026-11-18
+
+> [!IMPORTANT]
+> **If Play Protect stops the install,** pause **Scan apps with Play Protect** while installing (Play Store › your picture › Play Protect › the gear at the top right), then turn it back on.
+
 ### Responsive
 
 - Linksy now fits a phone held sideways, a tablet and an unfolded phone, both ways up.
