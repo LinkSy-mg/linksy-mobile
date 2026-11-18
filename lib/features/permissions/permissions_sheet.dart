@@ -4,16 +4,16 @@ import '../../app/platform.dart';
 import '../../ui/components.dart';
 import '../../ui/l10n.dart';
 import '../../ui/sig.dart';
+import '../../ui/responsive.dart';
 
 /// What Linksy asks Android for, why, and a button that brings up Android's
 /// own dialog (or, for remote control, its settings page). Re-reads when the
 /// user comes back from Android's settings.
-Future<void> showPermissions(BuildContext context) =>
-    showModalBottomSheet<void>(
-      context: context,
-      isScrollControlled: true,
-      builder: (_) => const _PermissionsSheet(),
-    );
+Future<void> showPermissions(BuildContext context) => showSheet<void>(
+  context: context,
+  isScrollControlled: true,
+  builder: (_) => const _PermissionsSheet(),
+);
 
 class _PermissionsSheet extends StatefulWidget {
   const _PermissionsSheet();

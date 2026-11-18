@@ -5,6 +5,7 @@ import '../../app/scope.dart';
 import '../../ui/components.dart';
 import '../../ui/l10n.dart';
 import '../../ui/sig.dart';
+import '../../ui/responsive.dart';
 
 /// Turns on this phone's notifications on its computers (§4.5). On Android
 /// 13 and up, the steps for a switch Android greys out come first: most
@@ -20,7 +21,7 @@ Future<void> allowPhoneNotifications(BuildContext context) async {
     return;
   }
   if (!context.mounted) return;
-  await showModalBottomSheet<void>(
+  await showSheet<void>(
     context: context,
     isScrollControlled: true,
     builder: (_) => _AccessGuide(restricted: c.sdk >= 33),

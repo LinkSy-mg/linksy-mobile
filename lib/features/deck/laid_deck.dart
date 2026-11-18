@@ -20,6 +20,7 @@ import '../remote/remote_screen.dart';
 import 'deck_art.dart';
 import 'deck_editor.dart';
 import 'deck_looks.dart';
+import '../../ui/responsive.dart';
 
 /// The deck as a computer laid it out (docs/protocol.md §4.20): its active
 /// layout, the face for how the phone is held, pages swiped sideways, in
@@ -435,7 +436,7 @@ class _LaidDeckState extends State<LaidDeck> {
 
   Future<void> _pickTheme(DeckLayout layout, String? own) async {
     final c = LinksyScope.read(context);
-    final picked = await showModalBottomSheet<(String?,)>(
+    final picked = await showSheet<(String?,)>(
       context: context,
       isScrollControlled: true,
       showDragHandle: true,
@@ -1778,7 +1779,7 @@ class _MusicFaceState extends State<_MusicFace> {
     final scope = widget.scope;
     if (scope.players.length < 2) return;
     final c = LinksyScope.read(context);
-    final picked = await showModalBottomSheet<String>(
+    final picked = await showSheet<String>(
       context: context,
       showDragHandle: true,
       builder: (context) =>

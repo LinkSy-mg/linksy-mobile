@@ -8,6 +8,7 @@ import '../../core/models.dart';
 import '../../ui/components.dart';
 import '../../ui/format.dart';
 import '../../ui/l10n.dart';
+import '../../ui/responsive.dart';
 import '../../ui/sig.dart';
 import '../device/device_screen.dart'
     show FindAction, GridBanner, HeroFade, QuickAction;
@@ -453,13 +454,12 @@ class _Quick extends StatelessWidget {
 
   final DeviceView view;
 
-  Future<void> _note(BuildContext context, String id) =>
-      showModalBottomSheet<void>(
-        context: context,
-        isScrollControlled: true,
-        showDragHandle: true,
-        builder: (_) => _NoteSheet(deviceId: id),
-      );
+  Future<void> _note(BuildContext context, String id) => showSheet<void>(
+    context: context,
+    isScrollControlled: true,
+    showDragHandle: true,
+    builder: (_) => _NoteSheet(deviceId: id),
+  );
 
   @override
   Widget build(BuildContext context) {

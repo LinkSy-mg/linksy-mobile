@@ -9,6 +9,7 @@ import '../../ui/format.dart';
 import '../../ui/l10n.dart';
 import '../../ui/sig.dart';
 import '../sharing/webcam_screen.dart';
+import '../../ui/responsive.dart';
 
 IconData activityIcon(Activity a) => switch (a.kind) {
   ActivityKind.files when a.names.length > 1 =>
@@ -347,7 +348,7 @@ class TimelineEntry extends StatelessWidget {
       return;
     }
     if (a.saved.length == 1) return _openFile(context, a.saved.single);
-    await showModalBottomSheet<void>(
+    await showSheet<void>(
       context: context,
       builder: (sheet) {
         final s = Sig.of(sheet);

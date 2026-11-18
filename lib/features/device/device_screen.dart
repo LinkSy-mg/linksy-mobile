@@ -13,6 +13,7 @@ import '../../core/models.dart';
 import '../../ui/components.dart';
 import '../../ui/format.dart';
 import '../../ui/l10n.dart';
+import '../../ui/responsive.dart';
 import '../../ui/sig.dart';
 import '../phones/phone_page.dart';
 import '../phones/shelves.dart';
@@ -30,7 +31,7 @@ import '../transfer/transfer_bubble.dart';
 /// is picked goes as one offer, so the computer asks once.
 Future<void> pickAndSend(BuildContext context, String deviceId) async {
   final c = LinksyScope.read(context);
-  final media = await showModalBottomSheet<bool>(
+  final media = await showSheet<bool>(
     context: context,
     builder: (sheet) {
       final l10n = sheet.l10n;
@@ -1384,7 +1385,7 @@ class _Tile extends StatelessWidget {
 /// A computer's screen on this phone: just watch it, or drive it with touch.
 /// Its user allows it and picks the screen there.
 Future<void> _watchScreen(BuildContext context, DeviceView view) =>
-    showModalBottomSheet<void>(
+    showSheet<void>(
       context: context,
       builder: (sheet) {
         final s = Sig.of(sheet);

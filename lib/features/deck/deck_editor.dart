@@ -10,6 +10,7 @@ import '../../core/deck_phone.dart';
 import '../../core/models.dart';
 import '../../ui/components.dart';
 import '../../ui/l10n.dart';
+import '../../ui/responsive.dart';
 import '../../ui/sig.dart';
 import 'deck_art.dart';
 import 'deck_looks.dart';
@@ -144,11 +145,11 @@ class _DeckEditorState extends State<DeckEditor> {
 
   Future<void> _add({int? x, int? y}) async {
     final l = context.l10n;
-    final picked = await showModalBottomSheet<(String, String?)>(
+    final picked = await showSheet<(String, String?)>(
       context: context,
       isScrollControlled: true,
       backgroundColor: _panel,
-      constraints: const BoxConstraints(maxWidth: double.infinity),
+      constraints: const BoxConstraints(maxWidth: sheetWidth),
       builder: (_) => _AddSheet(
         offered: _offered,
         placed: {for (final t in _d.tiles) ?t.action},
@@ -185,11 +186,11 @@ class _DeckEditorState extends State<DeckEditor> {
   }
 
   Future<void> _editTile(DeckTile tile) async {
-    await showModalBottomSheet<void>(
+    await showSheet<void>(
       context: context,
       isScrollControlled: true,
       backgroundColor: _panel,
-      constraints: const BoxConstraints(maxWidth: double.infinity),
+      constraints: const BoxConstraints(maxWidth: sheetWidth),
       builder: (_) => _TileSheet(
         draft: _d,
         id: tile.id,
@@ -203,10 +204,10 @@ class _DeckEditorState extends State<DeckEditor> {
 
   Future<void> _toPage(DeckTile tile) async {
     final l = context.l10n;
-    final to = await showModalBottomSheet<int>(
+    final to = await showSheet<int>(
       context: context,
       backgroundColor: _panel,
-      constraints: const BoxConstraints(maxWidth: double.infinity),
+      constraints: const BoxConstraints(maxWidth: sheetWidth),
       builder: (sheet) => SafeArea(
         child: Column(
           mainAxisSize: MainAxisSize.min,
@@ -244,10 +245,10 @@ class _DeckEditorState extends State<DeckEditor> {
   }
 
   Future<void> _theme() async {
-    await showModalBottomSheet<void>(
+    await showSheet<void>(
       context: context,
       backgroundColor: _panel,
-      constraints: const BoxConstraints(maxWidth: double.infinity),
+      constraints: const BoxConstraints(maxWidth: sheetWidth),
       barrierColor: Colors.black26,
       isScrollControlled: true,
       builder: (_) => _ThemeSheet(draft: _d, onChanged: () => setState(() {})),
@@ -1197,10 +1198,9 @@ class _AddSheetState extends State<_AddSheet> {
     ),
   );
 
-  Widget _grid(List<Widget> cells) => GridView.count(
-    crossAxisCount: MediaQuery.orientationOf(context) == Orientation.landscape
-        ? 7
-        : 4,
+  // Four across on a phone, more on a wider sheet.
+  Widget _grid(List<Widget> cells) => GridView.extent(
+    maxCrossAxisExtent: 100,
     mainAxisSpacing: 8,
     crossAxisSpacing: 8,
     childAspectRatio: 1.08,
@@ -1560,11 +1560,11 @@ class _TileSheetState extends State<_TileSheet> {
   }
 
   Future<void> _pickAction(DeckTile t) async {
-    final picked = await showModalBottomSheet<String>(
+    final picked = await showSheet<String>(
       context: context,
       isScrollControlled: true,
       backgroundColor: _panel,
-      constraints: const BoxConstraints(maxWidth: double.infinity),
+      constraints: const BoxConstraints(maxWidth: sheetWidth),
       builder: (sheet) => FractionallySizedBox(
         heightFactor: 0.7,
         child: ListView(

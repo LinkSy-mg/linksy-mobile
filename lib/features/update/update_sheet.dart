@@ -7,10 +7,11 @@ import '../../core/updates.dart';
 import '../../ui/components.dart';
 import '../../ui/l10n.dart';
 import '../../ui/sig.dart';
+import '../../ui/responsive.dart';
 
 /// "Linksy X Is Available": what changed, the APK it installs, and Update
 /// Now filling with its progress.
-Future<void> showUpdate(BuildContext context) => showModalBottomSheet<void>(
+Future<void> showUpdate(BuildContext context) => showSheet<void>(
   context: context,
   isScrollControlled: true,
   builder: (_) => const _UpdateSheet(),

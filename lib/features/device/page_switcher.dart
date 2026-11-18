@@ -9,6 +9,7 @@ import '../../ui/sig.dart';
 import '../deck/deck_screen.dart';
 import '../remote/remote_screen.dart';
 import '../terminal/terminal_screen.dart';
+import '../../ui/responsive.dart';
 
 /// The pages that drive one computer, which the switcher goes between.
 enum DevicePage { remote, deck, terminal }
@@ -72,7 +73,7 @@ Future<void> switchPage(
   DeviceInfo d,
   DevicePage current,
 ) async {
-  final picked = await showModalBottomSheet<DevicePage>(
+  final picked = await showSheet<DevicePage>(
     context: context,
     showDragHandle: true,
     builder: (_) => _Sheet(device: d, current: current),

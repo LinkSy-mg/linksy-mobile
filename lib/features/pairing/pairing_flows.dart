@@ -11,6 +11,7 @@ import '../../ui/components.dart';
 import '../../ui/l10n.dart';
 import '../../ui/sig.dart';
 import 'scan_screen.dart';
+import '../../ui/responsive.dart';
 
 /// "Add a device": the QR scanner first, pairing by address as the fallback.
 /// While it's open, computers that aren't paired can see this phone
@@ -44,46 +45,45 @@ Future<void> _findable(
 
 enum _Add { scan, address }
 
-Future<_Add?> _addDeviceSheet(BuildContext context) =>
-    showModalBottomSheet<_Add>(
-      context: context,
-      builder: (sheet) {
-        final s = Sig.of(sheet);
-        final l10n = sheet.l10n;
-        return SafeArea(
-          child: Padding(
-            padding: const EdgeInsets.fromLTRB(20, 0, 20, 16),
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: [
-                Text(l10n.pairingAddDevice, style: sora(24, color: s.ink)),
-                const SizedBox(height: 6),
-                Text(
-                  l10n.pairingAddDeviceHint,
-                  style: TextStyle(color: s.muted, fontSize: 14.5, height: 1.4),
-                ),
-                const SizedBox(height: 22),
-                SheetOption(
-                  icon: PhBold.scan,
-                  title: l10n.pairingScanQr,
-                  caption: l10n.pairingScanQrCaption,
-                  primary: true,
-                  onTap: () => Navigator.of(sheet).pop(_Add.scan),
-                ),
-                const SizedBox(height: 10),
-                SheetOption(
-                  icon: Ph.network,
-                  title: l10n.pairingByAddress,
-                  caption: l10n.pairingByAddressCaption,
-                  onTap: () => Navigator.of(sheet).pop(_Add.address),
-                ),
-              ],
+Future<_Add?> _addDeviceSheet(BuildContext context) => showSheet<_Add>(
+  context: context,
+  builder: (sheet) {
+    final s = Sig.of(sheet);
+    final l10n = sheet.l10n;
+    return SafeArea(
+      child: Padding(
+        padding: const EdgeInsets.fromLTRB(20, 0, 20, 16),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            Text(l10n.pairingAddDevice, style: sora(24, color: s.ink)),
+            const SizedBox(height: 6),
+            Text(
+              l10n.pairingAddDeviceHint,
+              style: TextStyle(color: s.muted, fontSize: 14.5, height: 1.4),
             ),
-          ),
-        );
-      },
+            const SizedBox(height: 22),
+            SheetOption(
+              icon: PhBold.scan,
+              title: l10n.pairingScanQr,
+              caption: l10n.pairingScanQrCaption,
+              primary: true,
+              onTap: () => Navigator.of(sheet).pop(_Add.scan),
+            ),
+            const SizedBox(height: 10),
+            SheetOption(
+              icon: Ph.network,
+              title: l10n.pairingByAddress,
+              caption: l10n.pairingByAddressCaption,
+              onTap: () => Navigator.of(sheet).pop(_Add.address),
+            ),
+          ],
+        ),
+      ),
     );
+  },
+);
 
 /// Scanning is the user's consent: no code is shown unless the desktop falls
 /// back to the code flow (expired or reused token), which arrives as a normal

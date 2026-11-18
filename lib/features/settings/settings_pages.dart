@@ -17,6 +17,7 @@ import 'doctor.dart';
 import 'phone_notifications.dart';
 import 'turn_on.dart';
 import 'settings_kit.dart';
+import '../../ui/responsive.dart';
 
 /// The settings pages the hub opens.
 enum SettingsArea { files, connection, computers, app }
@@ -1388,7 +1389,7 @@ Future<String?> askSettingText(
   TextInputType? keyboardType,
 }) {
   final text = TextEditingController(text: current);
-  return showModalBottomSheet<String>(
+  return showSheet<String>(
     context: context,
     isScrollControlled: true,
     builder: (sheet) {

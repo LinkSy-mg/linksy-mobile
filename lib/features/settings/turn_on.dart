@@ -5,6 +5,7 @@ import '../../app/scope.dart';
 import '../../ui/components.dart';
 import '../../ui/l10n.dart';
 import '../../ui/sig.dart';
+import '../../ui/responsive.dart';
 import 'phone_notifications.dart';
 
 /// Turns on what a computer's tab needs, the same way from the setup page,
@@ -42,7 +43,7 @@ Future<void> askTurnOn(
   String computer,
   String feature,
 ) async {
-  final go = await showModalBottomSheet<bool>(
+  final go = await showSheet<bool>(
     context: context,
     isScrollControlled: true,
     showDragHandle: true,

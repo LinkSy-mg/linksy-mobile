@@ -13,6 +13,7 @@ import '../../ui/format.dart';
 import '../../ui/l10n.dart';
 import '../../ui/sig.dart';
 import '../device/page_switcher.dart';
+import '../../ui/responsive.dart';
 
 /// Signal's navy, with the brand's blue and cyan in the palette.
 const _theme = TerminalTheme(
@@ -858,7 +859,7 @@ Future<bool> askCodeAndOpen(
   TerminalTab tab,
   String name,
 ) async =>
-    await showModalBottomSheet<bool>(
+    await showSheet<bool>(
       context: context,
       isScrollControlled: true,
       showDragHandle: true,

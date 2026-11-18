@@ -16,6 +16,7 @@ import '../../ui/sig.dart';
 import '../device/page_switcher.dart';
 import 'deck_editor.dart';
 import 'laid_deck.dart';
+import '../../ui/responsive.dart';
 
 /// The deck (docs/protocol.md §4.19): this phone as buttons for a computer.
 /// The layouts the computer makes and sends (§4.20, [LaidDeck]), or, from a
@@ -365,7 +366,7 @@ class _DeckScreenState extends State<DeckScreen> with WidgetsBindingObserver {
 
   Future<void> _addTile(PhoneDeckPage page) async {
     final actions = _c.deckActions[_id] ?? const <DeckAction>[];
-    final picked = await showModalBottomSheet<DeckAction>(
+    final picked = await showSheet<DeckAction>(
       context: context,
       isScrollControlled: true,
       showDragHandle: true,
@@ -391,7 +392,7 @@ class _DeckScreenState extends State<DeckScreen> with WidgetsBindingObserver {
   }
 
   Future<void> _editTile(PhoneDeckPage page, PhoneDeckTile tile) =>
-      showModalBottomSheet<void>(
+      showSheet<void>(
         context: context,
         isScrollControlled: true,
         showDragHandle: true,

@@ -5,6 +5,7 @@ import '../../ui/components.dart';
 import '../../ui/l10n.dart';
 import '../../app/scope.dart';
 import '../../ui/sig.dart';
+import '../../ui/responsive.dart';
 
 /// The 10 languages on a wheel: each in its own name, the English one
 /// under it, the one in the middle chosen. Scrolling, or tapping one, picks.
@@ -124,38 +125,37 @@ class _LanguageWheelState extends State<LanguageWheel> {
 
 /// Settings › Language: the same wheel in a sheet; the app follows as it
 /// turns.
-Future<void> showLanguagePicker(BuildContext context) =>
-    showModalBottomSheet<void>(
-      context: context,
-      showDragHandle: true,
-      isScrollControlled: true,
-      builder: (sheet) {
-        final c = LinksyScope.read(sheet);
-        return SafeArea(
-          child: Padding(
-            padding: const EdgeInsets.fromLTRB(20, 0, 20, 16),
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Text(
-                  sheet.l10n.settingsLanguage,
-                  style: sora(21, color: Sig.of(sheet).ink),
-                ),
-                const SizedBox(height: 8),
-                LanguageWheel(
-                  height: 300,
-                  selected: c.locale.value.languageCode,
-                  onChanged: c.setLanguage,
-                ),
-                const SizedBox(height: 12),
-                SigButton(
-                  label: sheet.l10n.languageDone,
-                  expand: true,
-                  onTap: () => Navigator.of(sheet).pop(),
-                ),
-              ],
+Future<void> showLanguagePicker(BuildContext context) => showSheet<void>(
+  context: context,
+  showDragHandle: true,
+  isScrollControlled: true,
+  builder: (sheet) {
+    final c = LinksyScope.read(sheet);
+    return SafeArea(
+      child: Padding(
+        padding: const EdgeInsets.fromLTRB(20, 0, 20, 16),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Text(
+              sheet.l10n.settingsLanguage,
+              style: sora(21, color: Sig.of(sheet).ink),
             ),
-          ),
-        );
-      },
+            const SizedBox(height: 8),
+            LanguageWheel(
+              height: 300,
+              selected: c.locale.value.languageCode,
+              onChanged: c.setLanguage,
+            ),
+            const SizedBox(height: 12),
+            SigButton(
+              label: sheet.l10n.languageDone,
+              expand: true,
+              onTap: () => Navigator.of(sheet).pop(),
+            ),
+          ],
+        ),
+      ),
     );
+  },
+);

@@ -25,6 +25,7 @@ import 'launch_intro.dart';
 import 'linksy_controller.dart';
 import 'platform.dart';
 import 'scope.dart';
+import '../ui/responsive.dart';
 
 class LinksyApp extends StatefulWidget {
   const LinksyApp({super.key, required this.controller});
@@ -172,7 +173,7 @@ class _LinksyAppState extends State<LinksyApp> {
     }
     final context = _navigator.currentContext;
     if (context == null || !context.mounted) return;
-    showModalBottomSheet<void>(
+    showSheet<void>(
       context: context,
       isScrollControlled: true,
       showDragHandle: true,
@@ -293,7 +294,7 @@ class _LinksyAppState extends State<LinksyApp> {
         );
       case AppsReceived():
         HapticFeedback.lightImpact();
-        showModalBottomSheet<void>(
+        showSheet<void>(
           context: context,
           isDismissible: false,
           enableDrag: false,
@@ -320,7 +321,7 @@ class _LinksyAppState extends State<LinksyApp> {
         }
       case TransferRequest():
         HapticFeedback.lightImpact();
-        showModalBottomSheet<void>(
+        showSheet<void>(
           context: context,
           isDismissible: false,
           enableDrag: false,
