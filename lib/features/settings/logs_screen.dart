@@ -5,6 +5,7 @@ import '../../app/platform.dart';
 import '../../app/scope.dart';
 import '../../ui/components.dart';
 import '../../ui/l10n.dart';
+import '../../ui/responsive.dart';
 import '../../ui/sig.dart';
 
 /// Settings › Logs: this phone and what its Wi-Fi can do, then what happened
@@ -60,7 +61,12 @@ class _LogsScreenState extends State<LogsScreen> {
             // Newest first to read; copied oldest first, as it happened
             final lines = log.lines.reversed.toList();
             return ListView(
-              padding: const EdgeInsets.fromLTRB(16, 8, 16, 40),
+              padding: EdgeInsets.fromLTRB(
+                readableSide(context),
+                8,
+                readableSide(context),
+                40,
+              ),
               children: [
                 Row(
                   children: [

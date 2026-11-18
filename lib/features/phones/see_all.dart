@@ -6,6 +6,7 @@ import '../../core/models.dart';
 import '../../ui/components.dart';
 import '../../ui/format.dart';
 import '../../ui/l10n.dart';
+import '../../ui/responsive.dart';
 import '../../ui/sig.dart';
 import 'library.dart';
 import 'selection.dart';
@@ -242,9 +243,10 @@ class _AllPhotos extends StatelessWidget {
                       SliverPadding(
                         padding: const EdgeInsets.symmetric(horizontal: 4),
                         sliver: SliverGrid.builder(
+                          // Four across on a phone, more on a wider screen.
                           gridDelegate:
-                              const SliverGridDelegateWithFixedCrossAxisCount(
-                                crossAxisCount: 4,
+                              const SliverGridDelegateWithMaxCrossAxisExtent(
+                                maxCrossAxisExtent: 132,
                                 crossAxisSpacing: 3,
                                 mainAxisSpacing: 3,
                               ),
@@ -305,13 +307,14 @@ class _AllAppsState extends State<_AllApps> {
             if (a.label.toLowerCase().contains(query)) a,
         ];
         if (_bySize) apps.sort((a, b) => b.size.compareTo(a.size));
+        final side = readableSide(context);
         return _Page(
           title: l.phoneApps,
           library: library,
           name: widget.name,
           children: [
             Padding(
-              padding: const EdgeInsets.fromLTRB(16, 12, 16, 4),
+              padding: EdgeInsets.fromLTRB(side, 12, side, 4),
               child: Row(
                 children: [
                   Expanded(
@@ -356,7 +359,7 @@ class _AllAppsState extends State<_AllApps> {
               ),
             ),
             Padding(
-              padding: const EdgeInsets.fromLTRB(20, 8, 20, 4),
+              padding: EdgeInsets.fromLTRB(side + 4, 8, side + 4, 4),
               child: Text(
                 l.phoneAppsNote,
                 style: TextStyle(fontSize: 13, height: 1.35, color: s.muted),
@@ -371,7 +374,7 @@ class _AllAppsState extends State<_AllApps> {
                       ),
                     )
                   : ListView.separated(
-                      padding: const EdgeInsets.fromLTRB(16, 8, 16, 16),
+                      padding: EdgeInsets.fromLTRB(side, 8, side, 16),
                       itemCount: apps.length,
                       separatorBuilder: (_, _) => const SizedBox(height: 8),
                       itemBuilder: (context, i) => _AppRow(

@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
+import 'responsive.dart';
+
 /// "Signal", Linksy's own look. Blue is the sender, cyan the receiver
 /// (`brand/README.md` in linksy-desktop): outgoing things are blue, incoming
 /// things cyan, everywhere.
@@ -204,6 +206,8 @@ ThemeData buildTheme(Brightness brightness) {
       backgroundColor: s.card,
       surfaceTintColor: Colors.transparent,
       modalBarrierColor: Colors.black.withValues(alpha: 0.45),
+      // A phone's width at most, centred on a wide screen (responsive.dart).
+      constraints: const BoxConstraints(maxWidth: sheetWidth),
       showDragHandle: true,
       dragHandleColor: s.line,
       shape: const RoundedRectangleBorder(

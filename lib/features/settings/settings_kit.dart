@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
 import '../../ui/components.dart';
+import '../../ui/responsive.dart';
 import '../../ui/sig.dart';
 
 /// A settings page: a round back button with the page it came from beside it,
@@ -48,11 +49,12 @@ class SettingsPage extends StatelessWidget {
                   top: top,
                 ),
               ),
+              // A phone's width, centred on a wide screen.
               SliverPadding(
                 padding: EdgeInsets.fromLTRB(
-                  16,
+                  readableSide(context),
                   4,
-                  16,
+                  readableSide(context),
                   40 + MediaQuery.paddingOf(context).bottom,
                 ),
                 sliver: SliverList.list(children: children),
@@ -103,74 +105,81 @@ class _Header extends SliverPersistentHeaderDelegate {
     final settledTop = top + 12 + (_button - _titleHeight * _small) / 2;
     return ColoredBox(
       color: s.bg,
-      child: Stack(
-        fit: StackFit.expand,
-        children: [
-          Positioned(
-            left: 16,
-            top: top + 12,
-            child: RoundButton(
-              icon: Ph.arrowLeft,
-              tooltip: MaterialLocalizations.of(context).backButtonTooltip,
-              onTap: () => Navigator.of(context).maybePop(),
-            ),
-          ),
-          if (backLabel case final label?)
+      // Over the page's column, on a wide screen as on a phone.
+      child: Padding(
+        padding: EdgeInsets.symmetric(horizontal: readableSide(context) - 16),
+        child: Stack(
+          fit: StackFit.expand,
+          children: [
             Positioned(
-              left: 16 + _button + 10,
+              left: 16,
               top: top + 12,
-              height: _button,
-              child: Opacity(
-                opacity: (1 - p * 2.5).clamp(0.0, 1.0),
-                child: Align(
-                  alignment: Alignment.centerLeft,
-                  child: Text(
-                    label,
-                    style: TextStyle(
-                      color: s.ink,
-                      fontSize: 15,
-                      fontWeight: FontWeight.w600,
+              child: RoundButton(
+                icon: Ph.arrowLeft,
+                tooltip: MaterialLocalizations.of(context).backButtonTooltip,
+                onTap: () => Navigator.of(context).maybePop(),
+              ),
+            ),
+            if (backLabel case final label?)
+              Positioned(
+                left: 16 + _button + 10,
+                top: top + 12,
+                height: _button,
+                child: Opacity(
+                  opacity: (1 - p * 2.5).clamp(0.0, 1.0),
+                  child: Align(
+                    alignment: Alignment.centerLeft,
+                    child: Text(
+                      label,
+                      style: TextStyle(
+                        color: s.ink,
+                        fontSize: 15,
+                        fontWeight: FontWeight.w600,
+                      ),
                     ),
                   ),
                 ),
               ),
-            ),
-          if (lead case final lead?)
+            if (lead case final lead?)
+              Positioned(
+                left: 20,
+                top: top + _bar - 4,
+                child: Opacity(
+                  opacity: (1 - p * 2).clamp(0.0, 1.0),
+                  child: lead,
+                ),
+              ),
             Positioned(
-              left: 20,
-              top: top + _bar - 4,
-              child: Opacity(opacity: (1 - p * 2).clamp(0.0, 1.0), child: lead),
-            ),
-          Positioned(
-            left: lerpDouble(20, 16 + _button + 12, p),
-            top: lerpDouble(openTop, settledTop, p),
-            right: 16,
-            child: Transform.scale(
-              scale: lerpDouble(1, _small, p),
-              alignment: Alignment.topLeft,
-              child: SizedBox(
-                height: _titleHeight,
-                child: Text(
-                  title,
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
-                  style: big,
+              left: lerpDouble(20, 16 + _button + 12, p),
+              top: lerpDouble(openTop, settledTop, p),
+              right: 16,
+              child: Transform.scale(
+                scale: lerpDouble(1, _small, p),
+                alignment: Alignment.topLeft,
+                child: SizedBox(
+                  height: _titleHeight,
+                  child: Text(
+                    title,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: big,
+                  ),
                 ),
               ),
             ),
-          ),
-          // A hairline once the page runs under the bar.
-          Positioned(
-            left: 0,
-            right: 0,
-            bottom: 0,
-            height: 1,
-            child: Opacity(
-              opacity: p,
-              child: ColoredBox(color: s.line),
+            // A hairline once the page runs under the bar.
+            Positioned(
+              left: 0,
+              right: 0,
+              bottom: 0,
+              height: 1,
+              child: Opacity(
+                opacity: p,
+                child: ColoredBox(color: s.line),
+              ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }

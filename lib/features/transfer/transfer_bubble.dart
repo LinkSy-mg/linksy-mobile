@@ -11,6 +11,7 @@ import '../../core/models.dart';
 import '../../ui/components.dart';
 import '../../ui/format.dart';
 import '../../ui/l10n.dart';
+import '../../ui/responsive.dart';
 import '../../ui/sig.dart';
 import '../device/activity_tile.dart' show openReceived;
 
@@ -438,9 +439,9 @@ class TransfersScreen extends StatelessWidget {
       appBar: AppBar(title: Text(l.transfersTitle)),
       body: ListView(
         padding: EdgeInsets.fromLTRB(
-          16,
+          readableSide(context),
           8,
-          16,
+          readableSide(context),
           24 + MediaQuery.paddingOf(context).bottom,
         ),
         children: [

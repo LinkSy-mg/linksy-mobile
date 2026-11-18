@@ -11,6 +11,7 @@ import '../../app/scope.dart';
 import '../../core/models.dart';
 import '../../ui/components.dart';
 import '../../ui/l10n.dart';
+import '../../ui/responsive.dart';
 import '../../ui/sig.dart';
 import '../device/activity_tile.dart';
 import '../device/device_screen.dart';
@@ -42,7 +43,7 @@ class HomeScreen extends StatelessWidget {
               SliverAppBar(
                 pinned: true,
                 toolbarHeight: 68,
-                titleSpacing: 20,
+                titleSpacing: readableSide(context) + 4,
                 backgroundColor: s.bg,
                 // The launch intro's mark lands in this logo.
                 title: Wordmark(
@@ -57,55 +58,59 @@ class HomeScreen extends StatelessWidget {
                       MaterialPageRoute(builder: (_) => const SettingsScreen()),
                     ),
                   ),
-                  const SizedBox(width: 16),
+                  SizedBox(width: readableSide(context)),
                 ],
               ),
-              SliverToBoxAdapter(child: _Visible(controller: c)),
-              SliverToBoxAdapter(
-                child: ListenableBuilder(
-                  listenable: c.updates,
-                  builder: (_, _) => _Notices(controller: c),
-                ),
+              ReadableSlivers(
+                slivers: [
+                  SliverToBoxAdapter(child: _Visible(controller: c)),
+                  SliverToBoxAdapter(
+                    child: ListenableBuilder(
+                      listenable: c.updates,
+                      builder: (_, _) => _Notices(controller: c),
+                    ),
+                  ),
+                  SliverToBoxAdapter(child: SharingBanners(controller: c)),
+                  if (paired.isEmpty)
+                    const SliverToBoxAdapter(child: _GetStarted())
+                  else ...[
+                    SliverToBoxAdapter(
+                      child: _Title(
+                        context.l10n.homeYourDevices,
+                        trailing: Text(
+                          '${paired.length}',
+                          style: sora(13, color: s.muted),
+                        ),
+                      ),
+                    ),
+                    SliverList.separated(
+                      itemCount: paired.length,
+                      separatorBuilder: (_, _) => const SizedBox(height: 10),
+                      itemBuilder: (context, i) => Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 16),
+                        child: _DeviceRow(
+                          view: paired[i],
+                          controller: c,
+                          onTap: () => open(paired[i]),
+                        ),
+                      ),
+                    ),
+                  ],
+                  if (unpaired.isNotEmpty) ...[
+                    SliverToBoxAdapter(
+                      child: _Title(context.l10n.homeNearbyNotPaired),
+                    ),
+                    SliverList.separated(
+                      itemCount: unpaired.length,
+                      separatorBuilder: (_, _) => const SizedBox(height: 10),
+                      itemBuilder: (context, i) => Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 16),
+                        child: _NearbyRow(view: unpaired[i]),
+                      ),
+                    ),
+                  ],
+                ],
               ),
-              SliverToBoxAdapter(child: SharingBanners(controller: c)),
-              if (paired.isEmpty)
-                const SliverToBoxAdapter(child: _GetStarted())
-              else ...[
-                SliverToBoxAdapter(
-                  child: _Title(
-                    context.l10n.homeYourDevices,
-                    trailing: Text(
-                      '${paired.length}',
-                      style: sora(13, color: s.muted),
-                    ),
-                  ),
-                ),
-                SliverList.separated(
-                  itemCount: paired.length,
-                  separatorBuilder: (_, _) => const SizedBox(height: 10),
-                  itemBuilder: (context, i) => Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 16),
-                    child: _DeviceRow(
-                      view: paired[i],
-                      controller: c,
-                      onTap: () => open(paired[i]),
-                    ),
-                  ),
-                ),
-              ],
-              if (unpaired.isNotEmpty) ...[
-                SliverToBoxAdapter(
-                  child: _Title(context.l10n.homeNearbyNotPaired),
-                ),
-                SliverList.separated(
-                  itemCount: unpaired.length,
-                  separatorBuilder: (_, _) => const SizedBox(height: 10),
-                  itemBuilder: (context, i) => Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 16),
-                    child: _NearbyRow(view: unpaired[i]),
-                  ),
-                ),
-              ],
               _PageEnd(arrow: paired.isEmpty),
             ],
           ),

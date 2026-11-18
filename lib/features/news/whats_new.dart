@@ -5,6 +5,7 @@ import '../../app/platform.dart';
 import '../../core/updates.dart';
 import '../../ui/components.dart';
 import '../../ui/l10n.dart';
+import '../../ui/responsive.dart';
 import '../../ui/sig.dart';
 
 /// What's New: the few things each version brings, shown once the first time
@@ -243,7 +244,12 @@ class WhatsNewScreen extends StatelessWidget {
     return Scaffold(
       body: SafeArea(
         child: ListView(
-          padding: const EdgeInsets.fromLTRB(24, 40, 24, 24),
+          padding: EdgeInsets.fromLTRB(
+            readableSide(context, least: 24),
+            40,
+            readableSide(context, least: 24),
+            24,
+          ),
           children: [
             const Center(child: AppIcon(size: 64)),
             const SizedBox(height: 20),
