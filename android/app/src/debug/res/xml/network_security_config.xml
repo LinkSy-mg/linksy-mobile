@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Debug builds only: the LINKSY_RELEASES test hook points the update check
+     at a local http server. Replaces the main config, which forbids cleartext. -->
+<network-security-config>
+    <base-config cleartextTrafficPermitted="true"/>
+</network-security-config>

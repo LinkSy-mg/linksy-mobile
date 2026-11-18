@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Forbids plain http for Android-side HTTP clients (HttpURLConnection,
+     OkHttp, WebView). It does NOT cover the Dart HttpClient (dart:io) used by
+     the update check and service info, nor QUIC peer traffic; those rely on
+     their own https-only checks in lib/core. -->
+<network-security-config>
+    <base-config cleartextTrafficPermitted="false"/>
+</network-security-config>
