@@ -1,3 +1,5 @@
+import 'dart:math' as math;
+
 import 'dart:async';
 
 import 'package:flutter/gestures.dart';
@@ -10,6 +12,7 @@ import '../../app/scope.dart';
 import '../../core/models.dart';
 import '../../ui/components.dart';
 import '../../ui/l10n.dart';
+import '../../ui/responsive.dart';
 import '../../ui/sig.dart';
 import '../device/page_switcher.dart';
 
@@ -160,6 +163,9 @@ class _RemoteScreenState extends State<RemoteScreen> {
     // Read above the Scaffold, which takes the keyboard out of its body's.
     final typing = MediaQuery.viewInsetsOf(context).bottom > 0;
     final name = widget.device.name;
+    // Sideways the height is short: the modes go up beside the title.
+    final side = sideBySide(context);
+    final modes = _ModeSwitch(mode: _mode, onChanged: _setMode);
     return AnnotatedRegion<SystemUiOverlayStyle>(
       value: overlayFor(Theme.of(context).brightness),
       child: Scaffold(
@@ -187,15 +193,22 @@ class _RemoteScreenState extends State<RemoteScreen> {
                           ),
                           Text(
                             name,
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
                             style: TextStyle(color: s.muted, fontSize: 13),
                           ),
                         ],
                       ),
                     ),
+                    if (side && live) ...[
+                      const SizedBox(width: 16),
+                      SizedBox(width: 420, child: modes),
+                      const SizedBox(width: 16),
+                    ],
                     PageSwitchButton(deviceId: _id, current: DevicePage.remote),
                   ],
                 ),
-                const SizedBox(height: 16),
+                SizedBox(height: side ? 12 : 16),
                 Expanded(
                   child: AnimatedSwitcher(
                     duration: motion(context),
@@ -212,8 +225,7 @@ class _RemoteScreenState extends State<RemoteScreen> {
                             key: const ValueKey(true),
                             crossAxisAlignment: CrossAxisAlignment.stretch,
                             children: [
-                              _ModeSwitch(mode: _mode, onChanged: _setMode),
-                              const SizedBox(height: 14),
+                              if (!side) ...[modes, const SizedBox(height: 14)],
                               Expanded(
                                 child: _Sliding(
                                   index: _mode.index,
@@ -579,51 +591,47 @@ class _Touchpad extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final s = Sig.of(context);
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.stretch,
-      children: [
-        Expanded(
-          child: TouchpadSurface(
-            send: send,
-            builder: (context, dragging) => Container(
-              decoration: BoxDecoration(
-                color: s.card,
-                borderRadius: BorderRadius.circular(Radii.xl),
+    return _Split(
+      main: TouchpadSurface(
+        send: send,
+        builder: (context, dragging) => Container(
+          decoration: BoxDecoration(
+            color: s.card,
+            borderRadius: BorderRadius.circular(Radii.xl),
+          ),
+          alignment: Alignment.center,
+          foregroundDecoration: dragging
+              ? BoxDecoration(
+                  borderRadius: BorderRadius.circular(Radii.xl),
+                  border: Border.all(color: Sig.blue, width: 2),
+                )
+              : null,
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Icon(
+                dragging ? Ph.handGrabbing : Ph.handPointing,
+                size: 34,
+                color: dragging ? Sig.blue : s.faint,
               ),
-              alignment: Alignment.center,
-              foregroundDecoration: dragging
-                  ? BoxDecoration(
-                      borderRadius: BorderRadius.circular(Radii.xl),
-                      border: Border.all(color: Sig.blue, width: 2),
-                    )
-                  : null,
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Icon(
-                    dragging ? Ph.handGrabbing : Ph.handPointing,
-                    size: 34,
-                    color: dragging ? Sig.blue : s.faint,
-                  ),
-                  const SizedBox(height: 10),
-                  Text(
-                    dragging
-                        ? context.l10n.remoteDragging
-                        : '${context.l10n.remoteTouchpadHint}\n'
-                              '${context.l10n.remoteDragHint}',
-                    textAlign: TextAlign.center,
-                    style: TextStyle(
-                      color: dragging ? Sig.blue : s.faint,
-                      height: 1.5,
-                      fontWeight: dragging ? FontWeight.w600 : null,
-                    ),
-                  ),
-                ],
+              const SizedBox(height: 10),
+              Text(
+                dragging
+                    ? context.l10n.remoteDragging
+                    : '${context.l10n.remoteTouchpadHint}\n'
+                          '${context.l10n.remoteDragHint}',
+                textAlign: TextAlign.center,
+                style: TextStyle(
+                  color: dragging ? Sig.blue : s.faint,
+                  height: 1.5,
+                  fontWeight: dragging ? FontWeight.w600 : null,
+                ),
               ),
-            ),
+            ],
           ),
         ),
-        const SizedBox(height: 10),
+      ),
+      controls: [
         Row(
           children: [
             Expanded(
@@ -937,74 +945,77 @@ class _Slides extends StatelessWidget {
     // The keyboard and the number pad don't both fit: the pad steps aside
     // while the keyboard is up, and comes back when it goes.
     final numpad = c.slidesNumpad && !typing;
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.stretch,
-      children: [
-        Expanded(
-          flex: 3,
-          child: Pressable.builder(
-            onTap: () => onKey(Keysym.right),
-            semanticLabel: context.l10n.remoteNextSlide,
-            builder: (context, down) => AnimatedContainer(
-              duration: motion(context, 90),
-              decoration: BoxDecoration(
-                color: down ? Sig.deep : Sig.blue,
-                borderRadius: BorderRadius.circular(Radii.xl),
+    return _Split(
+      main: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          Expanded(
+            flex: 3,
+            child: Pressable.builder(
+              onTap: () => onKey(Keysym.right),
+              semanticLabel: context.l10n.remoteNextSlide,
+              builder: (context, down) => AnimatedContainer(
+                duration: motion(context, 90),
+                decoration: BoxDecoration(
+                  color: down ? Sig.deep : Sig.blue,
+                  borderRadius: BorderRadius.circular(Radii.xl),
+                ),
+                // Smaller while the number pad takes room.
+                child: TweenAnimationBuilder<double>(
+                  tween: Tween(end: numpad ? 0 : 1),
+                  duration: motion(context, 220),
+                  curve: Curves.easeOutCubic,
+                  builder: (context, big, _) => Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Icon(
+                        Ph.caretRight,
+                        color: Colors.white,
+                        size: 40 + 16 * big,
+                      ),
+                      Text(
+                        context.l10n.remoteNext,
+                        style: sora(
+                          20 + 6 * big,
+                          weight: FontWeight.w700,
+                          color: Colors.white,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
               ),
-              // Smaller while the number pad takes room.
-              child: TweenAnimationBuilder<double>(
-                tween: Tween(end: numpad ? 0 : 1),
-                duration: motion(context, 220),
-                curve: Curves.easeOutCubic,
-                builder: (context, big, _) => Column(
+            ),
+          ),
+          const SizedBox(height: 12),
+          Expanded(
+            flex: 2,
+            child: Pressable.builder(
+              onTap: () => onKey(Keysym.left),
+              semanticLabel: context.l10n.remotePreviousSlide,
+              builder: (context, down) => AnimatedContainer(
+                duration: motion(context, 90),
+                decoration: BoxDecoration(
+                  color: down ? s.raised : s.card,
+                  borderRadius: BorderRadius.circular(Radii.xl),
+                ),
+                child: Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    Icon(
-                      Ph.caretRight,
-                      color: Colors.white,
-                      size: 40 + 16 * big,
-                    ),
+                    Icon(Ph.caretLeft, color: s.ink, size: 32),
+                    const SizedBox(width: 6),
                     Text(
-                      context.l10n.remoteNext,
-                      style: sora(
-                        20 + 6 * big,
-                        weight: FontWeight.w700,
-                        color: Colors.white,
-                      ),
+                      context.l10n.remoteSlideBack,
+                      style: sora(20, color: s.ink),
                     ),
                   ],
                 ),
               ),
             ),
           ),
-        ),
-        const SizedBox(height: 12),
-        Expanded(
-          flex: 2,
-          child: Pressable.builder(
-            onTap: () => onKey(Keysym.left),
-            semanticLabel: context.l10n.remotePreviousSlide,
-            builder: (context, down) => AnimatedContainer(
-              duration: motion(context, 90),
-              decoration: BoxDecoration(
-                color: down ? s.raised : s.card,
-                borderRadius: BorderRadius.circular(Radii.xl),
-              ),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Icon(Ph.caretLeft, color: s.ink, size: 32),
-                  const SizedBox(width: 6),
-                  Text(
-                    context.l10n.remoteSlideBack,
-                    style: sora(20, color: s.ink),
-                  ),
-                ],
-              ),
-            ),
-          ),
-        ),
-        const SizedBox(height: 10),
+        ],
+      ),
+      controls: [
         // The keys Impress, PowerPoint and most PDF viewers share.
         _ChipRow(
           chips: [
@@ -1298,30 +1309,26 @@ class _BrowserState extends State<_Browser> {
       ),
     );
     const gap = SizedBox(width: 10);
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.stretch,
-      children: [
-        Expanded(
-          child: Row(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              big(
-                Ph.arrowLeft,
-                l.remoteWebBack,
-                () => _chord(alt, Keysym.left),
-                false,
-              ),
-              gap,
-              big(
-                Ph.arrowRight,
-                l.remoteWebForward,
-                () => _chord(alt, Keysym.right),
-                false,
-              ),
-            ],
+    return _Split(
+      main: Row(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          big(
+            Ph.arrowLeft,
+            l.remoteWebBack,
+            () => _chord(alt, Keysym.left),
+            false,
           ),
-        ),
-        const SizedBox(height: 10),
+          gap,
+          big(
+            Ph.arrowRight,
+            l.remoteWebForward,
+            () => _chord(alt, Keysym.right),
+            false,
+          ),
+        ],
+      ),
+      controls: [
         Row(
           children: [
             small(
@@ -1393,6 +1400,53 @@ class _BrowserState extends State<_Browser> {
           l.remoteWebHint,
           textAlign: TextAlign.center,
           style: TextStyle(color: s.muted, fontSize: 13),
+        ),
+      ],
+    );
+  }
+}
+
+/// A mode's main surface and its controls: the controls under it on a phone
+/// held upright; sideways, beside it on the right, in a column that scrolls
+/// when it must, so the surface keeps the height.
+class _Split extends StatelessWidget {
+  const _Split({required this.main, required this.controls});
+
+  final Widget main;
+  final List<Widget> controls;
+
+  @override
+  Widget build(BuildContext context) {
+    if (!sideBySide(context)) {
+      return Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          Expanded(child: main),
+          const SizedBox(height: 10),
+          ...controls,
+        ],
+      );
+    }
+    final width = math.min(MediaQuery.sizeOf(context).width * .42, 400.0);
+    return Row(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        Expanded(child: main),
+        const SizedBox(width: 14),
+        SizedBox(
+          width: width,
+          child: LayoutBuilder(
+            builder: (context, box) => SingleChildScrollView(
+              child: ConstrainedBox(
+                constraints: BoxConstraints(minHeight: box.maxHeight),
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.end,
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: controls,
+                ),
+              ),
+            ),
+          ),
         ),
       ],
     );
