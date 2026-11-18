@@ -5,6 +5,7 @@ import '../../app/platform.dart';
 import '../../app/scope.dart';
 import '../../ui/components.dart';
 import '../../ui/l10n.dart';
+import '../../ui/responsive.dart';
 import '../../ui/sig.dart';
 import '../settings/turn_on.dart';
 import 'language_wheel.dart';
@@ -103,54 +104,96 @@ class _LanguagePage extends StatelessWidget {
     final s = Sig.of(context);
     final c = LinksyScope.of(context);
     final t = context.l10n;
-    return Padding(
-      padding: const EdgeInsets.fromLTRB(24, 28, 24, 20),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: [
-          const Center(child: LinksyMark(size: 52)),
-          const SizedBox(height: 20),
-          // Each language crossfades into the next as the wheel turns.
-          AnimatedSwitcher(
-            duration: motion(context, 150),
-            child: Column(
-              key: ValueKey(t.localeName),
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: [
-                Text(
-                  t.onboardingWelcome,
-                  textAlign: TextAlign.center,
-                  style: sora(30, weight: FontWeight.w700, color: s.ink),
+    final welcome = Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        const Center(child: LinksyMark(size: 52)),
+        const SizedBox(height: 20),
+        // Each language crossfades into the next as the wheel turns.
+        AnimatedSwitcher(
+          duration: motion(context, 150),
+          child: Column(
+            key: ValueKey(t.localeName),
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              Text(
+                t.onboardingWelcome,
+                textAlign: TextAlign.center,
+                style: sora(30, weight: FontWeight.w700, color: s.ink),
+              ),
+              const SizedBox(height: 8),
+              Text(
+                t.onboardingChooseLanguage,
+                textAlign: TextAlign.center,
+                style: TextStyle(fontSize: 16, color: s.muted),
+              ),
+            ],
+          ),
+        ),
+      ],
+    );
+    final go = [
+      Text(
+        t.onboardingLanguageHint,
+        textAlign: TextAlign.center,
+        style: TextStyle(fontSize: 13, color: s.muted),
+      ),
+      const SizedBox(height: 14),
+      SigButton(label: t.onboardingContinue, expand: true, onTap: onContinue),
+      const SizedBox(height: 16),
+      const _Dots(page: 0),
+    ];
+    // The wheel takes what the rest leaves, up to its own height.
+    Widget wheel(double room) => LanguageWheel(
+      selected: c.locale.value.languageCode,
+      onChanged: c.setLanguage,
+      height: room.clamp(120, 340).toDouble(),
+    );
+
+    // Sideways: the welcome on the left, the wheel and Continue beside it.
+    if (sideBySide(context)) {
+      return Padding(
+        padding: const EdgeInsets.fromLTRB(24, 16, 24, 16),
+        child: Row(
+          children: [
+            Expanded(child: Center(child: welcome)),
+            const SizedBox(width: 32),
+            Expanded(
+              child: Readable(
+                width: 420,
+                child: LayoutBuilder(
+                  builder: (context, box) => Column(
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    children: [
+                      const Spacer(),
+                      wheel(box.maxHeight - 140),
+                      const Spacer(),
+                      ...go,
+                    ],
+                  ),
                 ),
-                const SizedBox(height: 8),
-                Text(
-                  t.onboardingChooseLanguage,
-                  textAlign: TextAlign.center,
-                  style: TextStyle(fontSize: 16, color: s.muted),
-                ),
-              ],
+              ),
             ),
+          ],
+        ),
+      );
+    }
+    return Readable(
+      width: 520,
+      child: Padding(
+        padding: const EdgeInsets.fromLTRB(24, 28, 24, 20),
+        child: LayoutBuilder(
+          builder: (context, box) => Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              welcome,
+              const Spacer(),
+              wheel(box.maxHeight - 330),
+              const Spacer(),
+              ...go,
+            ],
           ),
-          const Spacer(),
-          LanguageWheel(
-            selected: c.locale.value.languageCode,
-            onChanged: c.setLanguage,
-          ),
-          const Spacer(),
-          Text(
-            t.onboardingLanguageHint,
-            textAlign: TextAlign.center,
-            style: TextStyle(fontSize: 13, color: s.muted),
-          ),
-          const SizedBox(height: 14),
-          SigButton(
-            label: t.onboardingContinue,
-            expand: true,
-            onTap: onContinue,
-          ),
-          const SizedBox(height: 16),
-          const _Dots(page: 0),
-        ],
+        ),
       ),
     );
   }
@@ -217,173 +260,210 @@ class _SetUpPageState extends State<_SetUpPage> with WidgetsBindingObserver {
             onTap: () => turnOn(context, feature),
           );
 
-    return Column(
-      children: [
-        Padding(
-          padding: const EdgeInsets.fromLTRB(12, 4, 12, 0),
-          child: Row(
-            children: [
-              RoundButton(
-                icon: Ph.arrowLeft,
-                tooltip: t.onboardingBack,
-                onTap: widget.onBack,
-              ),
-            ],
+    final back = Padding(
+      padding: const EdgeInsets.fromLTRB(12, 4, 12, 0),
+      child: Row(
+        children: [
+          RoundButton(
+            icon: Ph.arrowLeft,
+            tooltip: t.onboardingBack,
+            onTap: widget.onBack,
           ),
+        ],
+      ),
+    );
+    final head = <Widget>[
+      Padding(
+        padding: const EdgeInsets.fromLTRB(8, 4, 8, 0),
+        child: Text(
+          t.onboardingSetUpTitle,
+          style: sora(30, weight: FontWeight.w700, color: s.ink),
         ),
-        Expanded(
-          child: ListView(
-            padding: const EdgeInsets.fromLTRB(16, 8, 16, 16),
-            children: [
-              Padding(
-                padding: const EdgeInsets.fromLTRB(8, 4, 8, 0),
-                child: Text(
-                  t.onboardingSetUpTitle,
-                  style: sora(30, weight: FontWeight.w700, color: s.ink),
-                ),
-              ),
-              Padding(
-                padding: const EdgeInsets.fromLTRB(8, 6, 8, 18),
-                child: Text(
-                  t.onboardingSetUpSubtitle,
-                  style: TextStyle(fontSize: 15, color: s.muted, height: 1.4),
-                ),
-              ),
-              _Group(
-                children: [
-                  _Item(
-                    icon: Ph.bellRinging,
-                    title: t.onboardingNotifications,
-                    detail: t.onboardingNotificationsDetail,
-                    trailing: allow(_granted?.notifications, 'notifications'),
-                  ),
-                  _Item(
-                    icon: Ph.videoCamera,
-                    title: t.onboardingCamera,
-                    detail: t.onboardingCameraDetail,
-                    trailing: allow(_granted?.camera, 'camera'),
-                  ),
-                  _Item(
-                    icon: Ph.chatCircleText,
-                    title: t.onboardingMessages,
-                    detail: t.onboardingMessagesDetail,
-                    trailing: turnOnRow(c.mirroring, 'notifications'),
-                  ),
-                  _Item(
-                    icon: Ph.imagesSquare,
-                    title: t.settingsGallery,
-                    detail: t.onboardingGalleryDetail,
-                    trailing: turnOnRow(c.gallery, 'gallery'),
-                  ),
-                ],
-              ),
-              const SizedBox(height: 10),
-              _Group(
-                children: [
-                  _Item(
-                    icon: Ph.globeHemisphereWest,
-                    title: t.onboardingAway,
-                    detail: t.onboardingAwayDetail,
-                    trailing: Switch(
-                      value: st?.away ?? true,
-                      onChanged: st == null
-                          ? null
-                          : (v) => c.updateSettings(st.copyWith(away: v)),
-                    ),
-                  ),
-                  _Item(
-                    icon: Ph.deviceMobile,
-                    title: t.onboardingBackground,
-                    detail: t.onboardingBackgroundDetail,
-                    trailing: Switch(
-                      value: c.stayRunning,
-                      onChanged: c.setStayRunning,
-                    ),
-                  ),
-                  _Item(
-                    icon: Ph.mapPin,
-                    title: t.onboardingLocate,
-                    detail: t.onboardingLocateDetail,
-                    trailing: Switch(
-                      value: c.locatable,
-                      onChanged: (v) => c.setLocatable(v),
-                    ),
-                  ),
-                ],
-              ),
-              const SizedBox(height: 10),
-              _Group(
-                children: [
-                  _Item(
-                    icon: Ph.folderOpen,
-                    title: t.onboardingFolder,
-                    detail: c.filesFolder == null
-                        ? t.onboardingFolderDetail
-                        : t.onboardingFolderChosen(c.filesFolder!),
-                    trailing: c.filesFolder == null
-                        ? _SmallButton(
-                            label: t.onboardingChooseFolder,
-                            onTap: c.pickFilesFolder,
-                          )
-                        : _Granted(label: t.onboardingAllowed),
-                  ),
-                  _Item(
-                    icon: Ph.images,
-                    title: t.onboardingPhotos,
-                    detail: c.photosFolder == null
-                        ? t.onboardingPhotosDetail
-                        : t.onboardingFolderChosen(c.photosFolder!),
-                    trailing: c.photosFolder == null
-                        ? _SmallButton(
-                            label: t.onboardingChooseFolder,
-                            onTap: c.pickPhotosFolder,
-                          )
-                        : _Granted(label: t.onboardingAllowed),
-                  ),
-                ],
-              ),
-              const SizedBox(height: 16),
-              Container(
-                padding: const EdgeInsets.fromLTRB(14, 12, 14, 12),
-                decoration: BoxDecoration(
-                  color: Sig.blue.withValues(alpha: 0.08),
-                  borderRadius: BorderRadius.circular(Radii.md),
-                ),
-                child: Row(
-                  children: [
-                    const Icon(Ph.gearSix, color: Sig.blue, size: 20),
-                    const SizedBox(width: 10),
-                    Expanded(
-                      child: Text(
-                        t.onboardingAnytime,
-                        style: TextStyle(
-                          fontSize: 13.5,
-                          color: s.ink,
-                          height: 1.35,
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ],
+      ),
+      Padding(
+        padding: const EdgeInsets.fromLTRB(8, 6, 8, 18),
+        child: Text(
+          t.onboardingSetUpSubtitle,
+          style: TextStyle(fontSize: 15, color: s.muted, height: 1.4),
+        ),
+      ),
+    ];
+    final items = <Widget>[
+      _Group(
+        children: [
+          _Item(
+            icon: Ph.bellRinging,
+            title: t.onboardingNotifications,
+            detail: t.onboardingNotificationsDetail,
+            trailing: allow(_granted?.notifications, 'notifications'),
           ),
-        ),
-        Padding(
-          padding: const EdgeInsets.fromLTRB(24, 4, 24, 20),
-          child: Column(
-            children: [
-              SigButton(
-                label: t.onboardingStart,
-                expand: true,
-                onTap: widget.onDone,
-              ),
-              const SizedBox(height: 16),
-              const _Dots(page: 1),
-            ],
+          _Item(
+            icon: Ph.videoCamera,
+            title: t.onboardingCamera,
+            detail: t.onboardingCameraDetail,
+            trailing: allow(_granted?.camera, 'camera'),
           ),
+          _Item(
+            icon: Ph.chatCircleText,
+            title: t.onboardingMessages,
+            detail: t.onboardingMessagesDetail,
+            trailing: turnOnRow(c.mirroring, 'notifications'),
+          ),
+          _Item(
+            icon: Ph.imagesSquare,
+            title: t.settingsGallery,
+            detail: t.onboardingGalleryDetail,
+            trailing: turnOnRow(c.gallery, 'gallery'),
+          ),
+        ],
+      ),
+      const SizedBox(height: 10),
+      _Group(
+        children: [
+          _Item(
+            icon: Ph.globeHemisphereWest,
+            title: t.onboardingAway,
+            detail: t.onboardingAwayDetail,
+            trailing: Switch(
+              value: st?.away ?? true,
+              onChanged: st == null
+                  ? null
+                  : (v) => c.updateSettings(st.copyWith(away: v)),
+            ),
+          ),
+          _Item(
+            icon: Ph.deviceMobile,
+            title: t.onboardingBackground,
+            detail: t.onboardingBackgroundDetail,
+            trailing: Switch(value: c.stayRunning, onChanged: c.setStayRunning),
+          ),
+          _Item(
+            icon: Ph.mapPin,
+            title: t.onboardingLocate,
+            detail: t.onboardingLocateDetail,
+            trailing: Switch(
+              value: c.locatable,
+              onChanged: (v) => c.setLocatable(v),
+            ),
+          ),
+        ],
+      ),
+      const SizedBox(height: 10),
+      _Group(
+        children: [
+          _Item(
+            icon: Ph.folderOpen,
+            title: t.onboardingFolder,
+            detail: c.filesFolder == null
+                ? t.onboardingFolderDetail
+                : t.onboardingFolderChosen(c.filesFolder!),
+            trailing: c.filesFolder == null
+                ? _SmallButton(
+                    label: t.onboardingChooseFolder,
+                    onTap: c.pickFilesFolder,
+                  )
+                : _Granted(label: t.onboardingAllowed),
+          ),
+          _Item(
+            icon: Ph.images,
+            title: t.onboardingPhotos,
+            detail: c.photosFolder == null
+                ? t.onboardingPhotosDetail
+                : t.onboardingFolderChosen(c.photosFolder!),
+            trailing: c.photosFolder == null
+                ? _SmallButton(
+                    label: t.onboardingChooseFolder,
+                    onTap: c.pickPhotosFolder,
+                  )
+                : _Granted(label: t.onboardingAllowed),
+          ),
+        ],
+      ),
+      const SizedBox(height: 16),
+      Container(
+        padding: const EdgeInsets.fromLTRB(14, 12, 14, 12),
+        decoration: BoxDecoration(
+          color: Sig.blue.withValues(alpha: 0.08),
+          borderRadius: BorderRadius.circular(Radii.md),
         ),
-      ],
+        child: Row(
+          children: [
+            const Icon(Ph.gearSix, color: Sig.blue, size: 20),
+            const SizedBox(width: 10),
+            Expanded(
+              child: Text(
+                t.onboardingAnytime,
+                style: TextStyle(fontSize: 13.5, color: s.ink, height: 1.35),
+              ),
+            ),
+          ],
+        ),
+      ),
+    ];
+    final start = Padding(
+      padding: const EdgeInsets.fromLTRB(24, 4, 24, 20),
+      child: Column(
+        children: [
+          SigButton(
+            label: t.onboardingStart,
+            expand: true,
+            onTap: widget.onDone,
+          ),
+          const SizedBox(height: 16),
+          const _Dots(page: 1),
+        ],
+      ),
+    );
+
+    // Sideways: what this is and Start on the left, the choices beside it.
+    if (sideBySide(context)) {
+      return Row(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                back,
+                const Spacer(),
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 16),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    children: head,
+                  ),
+                ),
+                const Spacer(),
+                start,
+              ],
+            ),
+          ),
+          Expanded(
+            child: Readable(
+              width: 560,
+              child: ListView(
+                padding: const EdgeInsets.fromLTRB(8, 16, 16, 16),
+                children: items,
+              ),
+            ),
+          ),
+        ],
+      );
+    }
+    return Readable(
+      width: 600,
+      child: Column(
+        children: [
+          back,
+          Expanded(
+            child: ListView(
+              padding: const EdgeInsets.fromLTRB(16, 8, 16, 16),
+              children: [...head, ...items],
+            ),
+          ),
+          start,
+        ],
+      ),
     );
   }
 }
