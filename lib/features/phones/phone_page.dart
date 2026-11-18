@@ -1,5 +1,3 @@
-import 'dart:math' as math;
-
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -149,32 +147,20 @@ class _PhonePageState extends State<PhonePage> {
         body: Stack(
           children: [
             if (side)
-              Row(
-                crossAxisAlignment: CrossAxisAlignment.stretch,
-                children: [
-                  SizedBox(
-                    width: math.min(MediaQuery.sizeOf(context).width * .4, 420),
-                    child: _Header(view: view, pane: true),
-                  ),
-                  Expanded(
-                    child: SafeArea(
-                      left: false,
-                      bottom: false,
-                      child: CustomScrollView(
-                        controller: _scroll,
-                        slivers: [
-                          SliverToBoxAdapter(
-                            child: Padding(
-                              padding: const EdgeInsets.only(top: 16),
-                              child: content,
-                            ),
-                          ),
-                          foot,
-                        ],
+              SidePanes(
+                pane: _Header(view: view, pane: true),
+                page: CustomScrollView(
+                  controller: _scroll,
+                  slivers: [
+                    SliverToBoxAdapter(
+                      child: Padding(
+                        padding: const EdgeInsets.only(top: 16),
+                        child: content,
                       ),
                     ),
-                  ),
-                ],
+                    foot,
+                  ],
+                ),
               )
             else
               CustomScrollView(
@@ -300,7 +286,7 @@ class _Header extends StatelessWidget {
     final d = view.device;
     return ClipRRect(
       borderRadius: pane
-          ? const BorderRadius.horizontal(right: Radius.circular(36))
+          ? BorderRadius.circular(Radii.lg)
           : const BorderRadius.vertical(bottom: Radius.circular(36)),
       child: Stack(
         fit: pane ? StackFit.expand : StackFit.loose,
@@ -311,12 +297,9 @@ class _Header extends StatelessWidget {
             bottom: false,
             right: false,
             child: Padding(
-              padding: EdgeInsets.fromLTRB(
-                12,
-                8,
-                12,
-                pane ? 32 : _overlap + 14,
-              ),
+              padding: pane
+                  ? const EdgeInsets.fromLTRB(12, 12, 12, 24)
+                  : const EdgeInsets.fromLTRB(12, 8, 12, _overlap + 14),
               child: Column(
                 children: [
                   Row(

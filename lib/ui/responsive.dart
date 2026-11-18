@@ -101,3 +101,64 @@ Future<T?> showSheet<T>({
 );
 
 bool _short(BuildContext context) => MediaQuery.sizeOf(context).height < 560;
+
+/// Wide: [pane] as a card on the left, [page] scrolling beside it. The two
+/// start at the same top, keep the page's 16 dp edges, and together are no
+/// wider than the pane and a readable column, centred.
+class SidePanes extends StatelessWidget {
+  const SidePanes({super.key, required this.pane, required this.page});
+
+  final Widget pane;
+  final Widget page;
+
+  @override
+  Widget build(BuildContext context) {
+    final size = MediaQuery.sizeOf(context);
+    final insets = MediaQuery.paddingOf(context);
+    final paneWidth = math.min(size.width * .4, 400.0);
+    final room = size.width - insets.horizontal;
+    final margin = math.max(0.0, (room - 16 - paneWidth - readableWidth) / 2);
+    return Padding(
+      padding: EdgeInsets.only(
+        left: insets.left + margin,
+        right: insets.right + margin,
+      ),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          Padding(
+            padding: EdgeInsets.fromLTRB(
+              16,
+              insets.top + 16,
+              0,
+              insets.bottom + 16,
+            ),
+            child: SizedBox(
+              width: paneWidth,
+              child: MediaQuery.removePadding(
+                context: context,
+                removeLeft: true,
+                removeTop: true,
+                removeRight: true,
+                removeBottom: true,
+                child: pane,
+              ),
+            ),
+          ),
+          Expanded(
+            child: Padding(
+              padding: EdgeInsets.only(top: insets.top),
+              child: MediaQuery.removePadding(
+                context: context,
+                removeLeft: true,
+                removeTop: true,
+                removeRight: true,
+                child: page,
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}

@@ -1,7 +1,6 @@
 import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
-import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -204,7 +203,6 @@ class _DeviceScreenState extends State<DeviceScreen> {
     );
     // Sideways or on a tablet: the picture on the left, the page beside it.
     final side = sideBySide(context);
-    final pane = math.min(MediaQuery.sizeOf(context).width * .4, 420.0);
 
     return AnnotatedRegion<SystemUiOverlayStyle>(
       value: overlayFor(side ? Theme.of(context).brightness : Brightness.dark),
@@ -212,34 +210,20 @@ class _DeviceScreenState extends State<DeviceScreen> {
         body: Stack(
           children: [
             if (side)
-              Row(
-                crossAxisAlignment: CrossAxisAlignment.stretch,
-                children: [
-                  SizedBox(
-                    width: pane,
-                    child: _Hero(view: view, pane: true),
-                  ),
-                  Expanded(
-                    child: SafeArea(
-                      left: false,
-                      bottom: false,
-                      child: CustomScrollView(
-                        controller: _scroll,
-                        slivers: [
-                          SliverToBoxAdapter(
-                            child: Readable(
-                              child: Padding(
-                                padding: const EdgeInsets.only(top: 16),
-                                child: content,
-                              ),
-                            ),
-                          ),
-                          SliverToBoxAdapter(child: bottom),
-                        ],
+              SidePanes(
+                pane: _Hero(view: view, pane: true),
+                page: CustomScrollView(
+                  controller: _scroll,
+                  slivers: [
+                    SliverToBoxAdapter(
+                      child: Padding(
+                        padding: const EdgeInsets.only(top: 16),
+                        child: content,
                       ),
                     ),
-                  ),
-                ],
+                    SliverToBoxAdapter(child: bottom),
+                  ],
+                ),
               )
             else
               CustomScrollView(
@@ -260,7 +244,7 @@ class _DeviceScreenState extends State<DeviceScreen> {
                   SliverToBoxAdapter(child: bottom),
                 ],
               ),
-            _Bar(view: view, scroll: _scroll, width: side ? pane : null),
+            if (!side) _Bar(view: view, scroll: _scroll),
             // Files on their way, from any page.
             const Align(
               alignment: Alignment.bottomCenter,
@@ -309,12 +293,17 @@ class _Hero extends StatelessWidget {
 
     final notNearby = view.presence == Presence.notNearby;
     final chipColor = presenceColor(s, view.presence, onBlue: true);
+    // In a pane, read from the left like the cards beside it.
+    final align = pane ? TextAlign.start : TextAlign.center;
     final details = Column(
       mainAxisSize: MainAxisSize.min,
+      crossAxisAlignment: pane
+          ? CrossAxisAlignment.start
+          : CrossAxisAlignment.center,
       children: [
         Text(
           d.name,
-          textAlign: TextAlign.center,
+          textAlign: align,
           maxLines: 2,
           overflow: TextOverflow.ellipsis,
           style: sora(30, weight: FontWeight.w700, color: Colors.white),
@@ -328,7 +317,7 @@ class _Hero extends StatelessWidget {
                   : context.l10n.deviceBattery(b.level),
             d.description,
           ].join(' · '),
-          textAlign: TextAlign.center,
+          textAlign: align,
           maxLines: 1,
           overflow: TextOverflow.ellipsis,
           style: const TextStyle(fontSize: 14, color: Colors.white70),
@@ -403,7 +392,7 @@ class _Hero extends StatelessWidget {
 
     return ClipRRect(
       borderRadius: pane
-          ? const BorderRadius.horizontal(right: Radius.circular(36))
+          ? BorderRadius.circular(Radii.lg)
           : const BorderRadius.vertical(bottom: Radius.circular(36)),
       child: SizedBox(
         height: pane ? null : height + MediaQuery.paddingOf(context).top,
@@ -428,12 +417,40 @@ class _Hero extends StatelessWidget {
                   : const GridBanner(),
             ),
             const HeroFade(),
-            // Back and settings are on [_Bar], over this.
+            // Back and settings: in a pane, at its top; otherwise on
+            // [_Bar], over this.
+            if (pane)
+              Positioned(
+                left: 12,
+                top: 12,
+                right: 12,
+                child: Row(
+                  children: [
+                    RoundButton(
+                      icon: Ph.arrowLeft,
+                      tooltip: context.l10n.deviceBack,
+                      onDark: true,
+                      onTap: () => Navigator.of(context).maybePop(),
+                    ),
+                    const Spacer(),
+                    RoundButton(
+                      icon: Ph.gearSix,
+                      tooltip: context.l10n.settingsTitle,
+                      onDark: true,
+                      onTap: () => Navigator.of(context).push(
+                        MaterialPageRoute<void>(
+                          builder: (_) => DeviceSettings(deviceId: d.id),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
             Positioned(
-              left: 16 + (pane ? MediaQuery.paddingOf(context).left : 0),
-              right: 16,
-              bottom: pane ? 32 + MediaQuery.paddingOf(context).bottom : 64,
-              child: Center(child: details),
+              left: pane ? 24 : 16,
+              right: pane ? 24 : 16,
+              bottom: pane ? 24 : 64,
+              child: pane ? details : Center(child: details),
             ),
           ],
         ),
@@ -445,24 +462,18 @@ class _Hero extends StatelessWidget {
 /// Back and this device's settings, always in reach: over the banner at
 /// first, then on a bar with its name once the banner has scrolled away.
 class _Bar extends StatelessWidget {
-  const _Bar({required this.view, required this.scroll, this.width});
+  const _Bar({required this.view, required this.scroll});
 
   final DeviceView view;
   final ScrollController scroll;
-
-  /// Over the picture's pane only, which never scrolls away; null: across
-  /// the page.
-  final double? width;
 
   @override
   Widget build(BuildContext context) {
     final s = Sig.of(context);
     final top = MediaQuery.paddingOf(context).top;
-    final pane = width != null;
     return Positioned(
       left: 0,
-      right: pane ? null : 0,
-      width: width,
+      right: 0,
       top: 0,
       child: AnimatedBuilder(
         animation: scroll,
@@ -470,7 +481,7 @@ class _Bar extends StatelessWidget {
           final offset = scroll.hasClients ? scroll.offset : 0.0;
           // In as the name goes under it, in the page's own color.
           return TweenAnimationBuilder<double>(
-            tween: Tween(end: !pane && offset > 190 ? 1 : 0),
+            tween: Tween(end: offset > 190 ? 1 : 0),
             duration: motion(context, 160),
             builder: (context, p, _) {
               final past = p > 0.5;
@@ -487,12 +498,7 @@ class _Bar extends StatelessWidget {
                 ),
                 child: Container(
                   color: s.bg.withValues(alpha: p),
-                  padding: EdgeInsets.fromLTRB(
-                    16 + MediaQuery.paddingOf(context).left,
-                    top + 8,
-                    16,
-                    8,
-                  ),
+                  padding: EdgeInsets.fromLTRB(16, top + 8, 16, 8),
                   child: Row(
                     children: [
                       button(
