@@ -1,3 +1,5 @@
+import 'dart:math' as math;
+
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -97,76 +99,107 @@ class _PhonePageState extends State<PhonePage> {
       if (mounted) _load(d);
     });
     final recent = c.activityFor(id).take(8).toList();
+    final content = Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 16),
+          child: _Quick(view: view),
+        ),
+        PhotosShelf(
+          library: _library,
+          allowed: c.photoAccess,
+          name: d.name,
+          onAllow: c.allowPhotos,
+        ),
+        if (d.features.contains('apps'))
+          AppsShelf(library: _library, name: d.name),
+        FilesShelf(flow: _flow),
+        if (recent.isNotEmpty) ...[
+          ShelfTitle(
+            l.phoneHistory,
+            onSeeAll: () => openHistory(context, _library, d),
+          ),
+          HistoryThread(entries: recent, device: d),
+        ],
+      ],
+    );
+    final foot = SliverToBoxAdapter(
+      child: ListenableBuilder(
+        listenable: _flow.selection,
+        builder: (context, _) => SizedBox(
+          height:
+              (_flow.selection.isEmpty ? 0 : SendBar.room) +
+              (c.liveTransfers.isEmpty ? 0 : TransferBar.room) +
+              MediaQuery.paddingOf(context).bottom,
+        ),
+      ),
+    );
+    // Sideways or on a tablet: who it is on the left, the page beside it.
+    final side = sideBySide(context);
     return ValueListenableBuilder(
       valueListenable: _past,
       builder: (context, past, page) => AnnotatedRegion<SystemUiOverlayStyle>(
         value: overlayFor(
-          past ? Theme.of(context).brightness : Brightness.dark,
+          past || side ? Theme.of(context).brightness : Brightness.dark,
         ),
         child: page!,
       ),
       child: Scaffold(
         body: Stack(
           children: [
-            CustomScrollView(
-              controller: _scroll,
-              slivers: [
-                // One sliver, moved up as one over the header's foot: a
-                // sliver takes taps only inside its own box, so a second one
-                // moved up lost the top of its first shelf (Photos' See all).
-                SliverToBoxAdapter(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.stretch,
-                    children: [
-                      _Header(view: view),
-                      Transform.translate(
-                        offset: const Offset(0, -_overlap),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.stretch,
-                          children: [
-                            Padding(
-                              padding: const EdgeInsets.symmetric(
-                                horizontal: 16,
-                              ),
-                              child: _Quick(view: view),
-                            ),
-                            PhotosShelf(
-                              library: _library,
-                              allowed: c.photoAccess,
-                              name: d.name,
-                              onAllow: c.allowPhotos,
-                            ),
-                            if (d.features.contains('apps'))
-                              AppsShelf(library: _library, name: d.name),
-                            FilesShelf(flow: _flow),
-                            if (recent.isNotEmpty) ...[
-                              ShelfTitle(
-                                l.phoneHistory,
-                                onSeeAll: () =>
-                                    openHistory(context, _library, d),
-                              ),
-                              HistoryThread(entries: recent, device: d),
-                            ],
-                          ],
-                        ),
-                      ),
-                    ],
+            if (side)
+              Row(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  SizedBox(
+                    width: math.min(MediaQuery.sizeOf(context).width * .4, 420),
+                    child: _Header(view: view, pane: true),
                   ),
-                ),
-                SliverToBoxAdapter(
-                  child: ListenableBuilder(
-                    listenable: _flow.selection,
-                    builder: (context, _) => SizedBox(
-                      height:
-                          (_flow.selection.isEmpty ? 0 : SendBar.room) +
-                          (c.liveTransfers.isEmpty ? 0 : TransferBar.room) +
-                          MediaQuery.paddingOf(context).bottom,
+                  Expanded(
+                    child: SafeArea(
+                      left: false,
+                      bottom: false,
+                      child: CustomScrollView(
+                        controller: _scroll,
+                        slivers: [
+                          SliverToBoxAdapter(
+                            child: Padding(
+                              padding: const EdgeInsets.only(top: 16),
+                              child: content,
+                            ),
+                          ),
+                          foot,
+                        ],
+                      ),
                     ),
                   ),
-                ),
-              ],
-            ),
-            _ScrolledBar(past: _past, view: view),
+                ],
+              )
+            else
+              CustomScrollView(
+                controller: _scroll,
+                slivers: [
+                  // One sliver, moved up as one over the header's foot: a
+                  // sliver takes taps only inside its own box, so a second
+                  // one moved up lost the top of its first shelf (Photos'
+                  // See all).
+                  SliverToBoxAdapter(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.stretch,
+                      children: [
+                        _Header(view: view),
+                        Transform.translate(
+                          offset: const Offset(0, -_overlap),
+                          child: content,
+                        ),
+                      ],
+                    ),
+                  ),
+                  foot,
+                ],
+              ),
+            if (!side) _ScrolledBar(past: _past, view: view),
             Align(
               alignment: Alignment.bottomCenter,
               child: SafeArea(
@@ -253,9 +286,12 @@ class _ScrolledBar extends StatelessWidget {
 
 /// Who it is, and the two phones joined.
 class _Header extends StatelessWidget {
-  const _Header({required this.view});
+  const _Header({required this.view, this.pane = false});
 
   final DeviceView view;
+
+  /// The full height of a pane at the left, beside the page.
+  final bool pane;
 
   @override
   Widget build(BuildContext context) {
@@ -263,15 +299,24 @@ class _Header extends StatelessWidget {
     final l = context.l10n;
     final d = view.device;
     return ClipRRect(
-      borderRadius: const BorderRadius.vertical(bottom: Radius.circular(36)),
+      borderRadius: pane
+          ? const BorderRadius.horizontal(right: Radius.circular(36))
+          : const BorderRadius.vertical(bottom: Radius.circular(36)),
       child: Stack(
+        fit: pane ? StackFit.expand : StackFit.loose,
         children: [
           const Positioned.fill(child: GridBanner()),
           const Positioned.fill(child: HeroFade()),
           SafeArea(
             bottom: false,
+            right: false,
             child: Padding(
-              padding: const EdgeInsets.fromLTRB(12, 8, 12, _overlap + 14),
+              padding: EdgeInsets.fromLTRB(
+                12,
+                8,
+                12,
+                pane ? 32 : _overlap + 14,
+              ),
               child: Column(
                 children: [
                   Row(
@@ -304,7 +349,7 @@ class _Header extends StatelessWidget {
                       ),
                     ],
                   ),
-                  const SizedBox(height: 18),
+                  if (pane) const Spacer() else const SizedBox(height: 18),
                   Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
@@ -355,6 +400,7 @@ class _Header extends StatelessWidget {
                         color: Color(0xDBFFFFFF),
                       ),
                     ),
+                  if (pane) const Spacer(),
                 ],
               ),
             ),

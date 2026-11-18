@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
+import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -133,121 +134,133 @@ class _DeviceScreenState extends State<DeviceScreen> {
     final recent = c.activityFor(deviceId).take(8).toList();
     final players = c.media[deviceId]?.players ?? const <MediaPlayer>[];
 
+    // Top to bottom: what to do now, what's going on now, ways to control
+    // it, what this phone does for it. Its settings are behind the gear.
+    final content = Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 16),
+          child: _Actions(view: view),
+        ),
+        // Its screen being shared from here, with Stop.
+        SharingBanners(
+          controller: c,
+          deviceId: deviceId,
+          kinds: const {SessionKind.screen, SessionKind.control},
+        ),
+        Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 16),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              // Players come and go: the page makes room.
+              AnimatedSize(
+                duration: motion(context, 220),
+                curve: Curves.easeOutCubic,
+                alignment: Alignment.topCenter,
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: [
+                    for (final p in players)
+                      Padding(
+                        padding: const EdgeInsets.only(top: 12),
+                        child: _NowPlaying(
+                          deviceId: deviceId,
+                          player: p,
+                          open: _mediaOpen,
+                          onToggle: () =>
+                              setState(() => _mediaOpen = !_mediaOpen),
+                        ),
+                      ),
+                    if (volume != null && (_mediaOpen || players.isEmpty))
+                      Padding(
+                        padding: const EdgeInsets.only(top: 10),
+                        child: _Volume(deviceId: deviceId, volume: volume),
+                      ),
+                  ],
+                ),
+              ),
+              _Control(view: view),
+              if (_isComputer(view.device)) _PhoneAs(view: view),
+            ],
+          ),
+        ),
+        if (recent.isEmpty)
+          _NoActivity(name: view.device.name)
+        else ...[
+          ShelfTitle(
+            context.l10n.phoneHistory,
+            onSeeAll: () => openThread(context, view.device),
+          ),
+          HistoryThread(entries: recent, device: view.device),
+        ],
+      ],
+    );
+    final bottom = SizedBox(
+      height:
+          (c.liveTransfers.isEmpty ? 32 : TransferBar.room) +
+          MediaQuery.paddingOf(context).bottom,
+    );
+    // Sideways or on a tablet: the picture on the left, the page beside it.
+    final side = sideBySide(context);
+    final pane = math.min(MediaQuery.sizeOf(context).width * .4, 420.0);
+
     return AnnotatedRegion<SystemUiOverlayStyle>(
-      value: overlayFor(Brightness.dark),
+      value: overlayFor(side ? Theme.of(context).brightness : Brightness.dark),
       child: Scaffold(
         body: Stack(
           children: [
-            CustomScrollView(
-              controller: _scroll,
-              slivers: [
-                // One box, so the actions paint over the hero they overlap.
-                // Top to bottom: what to do now, what's going on now, ways
-                // to control it, what this phone does for it. Its settings
-                // are behind the gear.
-                SliverToBoxAdapter(
-                  child: Column(
-                    children: [
-                      _Hero(view: view),
-                      Transform.translate(
-                        offset: const Offset(0, -34),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.stretch,
-                          children: [
-                            Padding(
-                              padding: const EdgeInsets.symmetric(
-                                horizontal: 16,
-                              ),
-                              child: _Actions(view: view),
-                            ),
-                            // Its screen being shared from here, with Stop.
-                            SharingBanners(
-                              controller: c,
-                              deviceId: deviceId,
-                              kinds: const {
-                                SessionKind.screen,
-                                SessionKind.control,
-                              },
-                            ),
-                            Padding(
-                              padding: const EdgeInsets.symmetric(
-                                horizontal: 16,
-                              ),
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.stretch,
-                                children: [
-                                  // Players come and go: the page makes room.
-                                  AnimatedSize(
-                                    duration: motion(context, 220),
-                                    curve: Curves.easeOutCubic,
-                                    alignment: Alignment.topCenter,
-                                    child: Column(
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.stretch,
-                                      children: [
-                                        for (final p in players)
-                                          Padding(
-                                            padding: const EdgeInsets.only(
-                                              top: 12,
-                                            ),
-                                            child: _NowPlaying(
-                                              deviceId: deviceId,
-                                              player: p,
-                                              open: _mediaOpen,
-                                              onToggle: () => setState(
-                                                () => _mediaOpen = !_mediaOpen,
-                                              ),
-                                            ),
-                                          ),
-                                        if (volume != null &&
-                                            (_mediaOpen || players.isEmpty))
-                                          Padding(
-                                            padding: const EdgeInsets.only(
-                                              top: 10,
-                                            ),
-                                            child: _Volume(
-                                              deviceId: deviceId,
-                                              volume: volume,
-                                            ),
-                                          ),
-                                      ],
-                                    ),
-                                  ),
-                                  _Control(view: view),
-                                  if (_isComputer(view.device))
-                                    _PhoneAs(view: view),
-                                ],
+            if (side)
+              Row(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  SizedBox(
+                    width: pane,
+                    child: _Hero(view: view, pane: true),
+                  ),
+                  Expanded(
+                    child: SafeArea(
+                      left: false,
+                      bottom: false,
+                      child: CustomScrollView(
+                        controller: _scroll,
+                        slivers: [
+                          SliverToBoxAdapter(
+                            child: Readable(
+                              child: Padding(
+                                padding: const EdgeInsets.only(top: 16),
+                                child: content,
                               ),
                             ),
-                            if (recent.isEmpty)
-                              _NoActivity(name: view.device.name)
-                            else ...[
-                              ShelfTitle(
-                                context.l10n.phoneHistory,
-                                onSeeAll: () =>
-                                    openThread(context, view.device),
-                              ),
-                              HistoryThread(
-                                entries: recent,
-                                device: view.device,
-                              ),
-                            ],
-                          ],
-                        ),
+                          ),
+                          SliverToBoxAdapter(child: bottom),
+                        ],
                       ),
-                    ],
+                    ),
                   ),
-                ),
-                SliverToBoxAdapter(
-                  child: SizedBox(
-                    height:
-                        (c.liveTransfers.isEmpty ? 32 : TransferBar.room) +
-                        MediaQuery.paddingOf(context).bottom,
+                ],
+              )
+            else
+              CustomScrollView(
+                controller: _scroll,
+                slivers: [
+                  // One box, so the actions paint over the hero they overlap.
+                  SliverToBoxAdapter(
+                    child: Column(
+                      children: [
+                        _Hero(view: view),
+                        Transform.translate(
+                          offset: const Offset(0, -34),
+                          child: content,
+                        ),
+                      ],
+                    ),
                   ),
-                ),
-              ],
-            ),
-            _Bar(view: view, scroll: _scroll),
+                  SliverToBoxAdapter(child: bottom),
+                ],
+              ),
+            _Bar(view: view, scroll: _scroll, width: side ? pane : null),
             // Files on their way, from any page.
             const Align(
               alignment: Alignment.bottomCenter,
@@ -264,9 +277,12 @@ class _DeviceScreenState extends State<DeviceScreen> {
 }
 
 class _Hero extends StatelessWidget {
-  const _Hero({required this.view});
+  const _Hero({required this.view, this.pane = false});
 
   final DeviceView view;
+
+  /// The full height of a pane at the left, beside the page.
+  final bool pane;
 
   /// Tall enough for the name and its lines, plus the 64 px the action card
   /// overlaps at the bottom.
@@ -386,9 +402,11 @@ class _Hero extends StatelessWidget {
     );
 
     return ClipRRect(
-      borderRadius: const BorderRadius.vertical(bottom: Radius.circular(36)),
+      borderRadius: pane
+          ? const BorderRadius.horizontal(right: Radius.circular(36))
+          : const BorderRadius.vertical(bottom: Radius.circular(36)),
       child: SizedBox(
-        height: height + MediaQuery.paddingOf(context).top,
+        height: pane ? null : height + MediaQuery.paddingOf(context).top,
         child: Stack(
           fit: StackFit.expand,
           children: [
@@ -412,9 +430,9 @@ class _Hero extends StatelessWidget {
             const HeroFade(),
             // Back and settings are on [_Bar], over this.
             Positioned(
-              left: 16,
+              left: 16 + (pane ? MediaQuery.paddingOf(context).left : 0),
               right: 16,
-              bottom: 64,
+              bottom: pane ? 32 + MediaQuery.paddingOf(context).bottom : 64,
               child: Center(child: details),
             ),
           ],
@@ -427,18 +445,24 @@ class _Hero extends StatelessWidget {
 /// Back and this device's settings, always in reach: over the banner at
 /// first, then on a bar with its name once the banner has scrolled away.
 class _Bar extends StatelessWidget {
-  const _Bar({required this.view, required this.scroll});
+  const _Bar({required this.view, required this.scroll, this.width});
 
   final DeviceView view;
   final ScrollController scroll;
+
+  /// Over the picture's pane only, which never scrolls away; null: across
+  /// the page.
+  final double? width;
 
   @override
   Widget build(BuildContext context) {
     final s = Sig.of(context);
     final top = MediaQuery.paddingOf(context).top;
+    final pane = width != null;
     return Positioned(
       left: 0,
-      right: 0,
+      right: pane ? null : 0,
+      width: width,
       top: 0,
       child: AnimatedBuilder(
         animation: scroll,
@@ -446,7 +470,7 @@ class _Bar extends StatelessWidget {
           final offset = scroll.hasClients ? scroll.offset : 0.0;
           // In as the name goes under it, in the page's own color.
           return TweenAnimationBuilder<double>(
-            tween: Tween(end: offset > 190 ? 1 : 0),
+            tween: Tween(end: !pane && offset > 190 ? 1 : 0),
             duration: motion(context, 160),
             builder: (context, p, _) {
               final past = p > 0.5;
@@ -463,7 +487,12 @@ class _Bar extends StatelessWidget {
                 ),
                 child: Container(
                   color: s.bg.withValues(alpha: p),
-                  padding: EdgeInsets.fromLTRB(16, top + 8, 16, 8),
+                  padding: EdgeInsets.fromLTRB(
+                    16 + MediaQuery.paddingOf(context).left,
+                    top + 8,
+                    16,
+                    8,
+                  ),
                   child: Row(
                     children: [
                       button(
