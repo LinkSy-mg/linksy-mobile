@@ -177,6 +177,8 @@ class IncomingFilesSheet extends StatelessWidget {
                 Expanded(
                   child: SigButton(
                     label: l10n.incomingAccept,
+                    // On a TV, the remote's centre button accepts.
+                    autofocus: true,
                     icon: PhBold.downloadSimple,
                     expand: true,
                     height: 56,

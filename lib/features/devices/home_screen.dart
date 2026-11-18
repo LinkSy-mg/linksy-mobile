@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 
 import '../../app/activity.dart';
 import '../../app/launch_intro.dart';
@@ -22,6 +23,23 @@ import 'island.dart';
 import '../update/update_sheet.dart';
 
 class HomeScreen extends StatelessWidget {
+  /// One home screen at a time.
+  static final _island = GlobalKey<IslandState>();
+
+  /// A remote's down from the page's last row, with nothing under it: on to
+  /// the island over the bottom of the page.
+  static KeyEventResult _downToIsland(FocusNode node, KeyEvent e) {
+    if (e is KeyUpEvent || e.logicalKey != LogicalKeyboardKey.arrowDown) {
+      return KeyEventResult.ignored;
+    }
+    final at = FocusManager.instance.primaryFocus;
+    if (at == null || at is FocusScopeNode) return KeyEventResult.ignored;
+    if (!at.focusInDirection(TraversalDirection.down)) {
+      _island.currentState?.focusFrom(at);
+    }
+    return KeyEventResult.handled;
+  }
+
   const HomeScreen({super.key});
 
   @override
@@ -38,84 +56,93 @@ class HomeScreen extends StatelessWidget {
     return Scaffold(
       body: Stack(
         children: [
-          CustomScrollView(
-            slivers: [
-              SliverAppBar(
-                pinned: true,
-                toolbarHeight: 68,
-                titleSpacing: readableSide(context) + 4,
-                backgroundColor: s.bg,
-                // The launch intro's mark lands in this logo.
-                title: Wordmark(
-                  markKey: LaunchIntro.logoKey,
-                  markShown: LaunchIntro.landed,
+          Focus(
+            canRequestFocus: false,
+            skipTraversal: true,
+            onKeyEvent: _downToIsland,
+            child: CustomScrollView(
+              slivers: [
+                SliverAppBar(
+                  pinned: true,
+                  toolbarHeight: 68,
+                  titleSpacing: readableSide(context) + 4,
+                  backgroundColor: s.bg,
+                  // The launch intro's mark lands in this logo.
+                  title: Wordmark(
+                    markKey: LaunchIntro.logoKey,
+                    markShown: LaunchIntro.landed,
+                  ),
+                  actions: [
+                    RoundButton(
+                      icon: Ph.gearSix,
+                      tooltip: context.l10n.homeSettings,
+                      onTap: () => Navigator.of(context).push(
+                        MaterialPageRoute(
+                          builder: (_) => const SettingsScreen(),
+                        ),
+                      ),
+                    ),
+                    SizedBox(width: readableSide(context)),
+                  ],
                 ),
-                actions: [
-                  RoundButton(
-                    icon: Ph.gearSix,
-                    tooltip: context.l10n.homeSettings,
-                    onTap: () => Navigator.of(context).push(
-                      MaterialPageRoute(builder: (_) => const SettingsScreen()),
-                    ),
-                  ),
-                  SizedBox(width: readableSide(context)),
-                ],
-              ),
-              ReadableSlivers(
-                slivers: [
-                  SliverToBoxAdapter(child: _Visible(controller: c)),
-                  SliverToBoxAdapter(
-                    child: ListenableBuilder(
-                      listenable: c.updates,
-                      builder: (_, _) => _Notices(controller: c),
-                    ),
-                  ),
-                  SliverToBoxAdapter(child: SharingBanners(controller: c)),
-                  if (paired.isEmpty)
-                    const SliverToBoxAdapter(child: _GetStarted())
-                  else ...[
+                ReadableSlivers(
+                  slivers: [
+                    SliverToBoxAdapter(child: _Visible(controller: c)),
                     SliverToBoxAdapter(
-                      child: _Title(
-                        context.l10n.homeYourDevices,
-                        trailing: Text(
-                          '${paired.length}',
-                          style: sora(13, color: s.muted),
+                      child: ListenableBuilder(
+                        listenable: c.updates,
+                        builder: (_, _) => _Notices(controller: c),
+                      ),
+                    ),
+                    SliverToBoxAdapter(child: SharingBanners(controller: c)),
+                    if (paired.isEmpty)
+                      const SliverToBoxAdapter(child: _GetStarted())
+                    else ...[
+                      SliverToBoxAdapter(
+                        child: _Title(
+                          context.l10n.homeYourDevices,
+                          trailing: Text(
+                            '${paired.length}',
+                            style: sora(13, color: s.muted),
+                          ),
                         ),
                       ),
-                    ),
-                    SliverList.separated(
-                      itemCount: paired.length,
-                      separatorBuilder: (_, _) => const SizedBox(height: 10),
-                      itemBuilder: (context, i) => Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 16),
-                        child: _DeviceRow(
-                          view: paired[i],
-                          controller: c,
-                          onTap: () => open(paired[i]),
+                      SliverList.separated(
+                        itemCount: paired.length,
+                        separatorBuilder: (_, _) => const SizedBox(height: 10),
+                        itemBuilder: (context, i) => Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 16),
+                          child: _DeviceRow(
+                            view: paired[i],
+                            controller: c,
+                            onTap: () => open(paired[i]),
+                          ),
                         ),
                       ),
-                    ),
-                  ],
-                  if (unpaired.isNotEmpty) ...[
-                    SliverToBoxAdapter(
-                      child: _Title(context.l10n.homeNearbyNotPaired),
-                    ),
-                    SliverList.separated(
-                      itemCount: unpaired.length,
-                      separatorBuilder: (_, _) => const SizedBox(height: 10),
-                      itemBuilder: (context, i) => Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 16),
-                        child: _NearbyRow(view: unpaired[i]),
+                    ],
+                    if (unpaired.isNotEmpty) ...[
+                      SliverToBoxAdapter(
+                        child: _Title(context.l10n.homeNearbyNotPaired),
                       ),
-                    ),
+                      SliverList.separated(
+                        itemCount: unpaired.length,
+                        separatorBuilder: (_, _) => const SizedBox(height: 10),
+                        itemBuilder: (context, i) => Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 16),
+                          child: _NearbyRow(view: unpaired[i]),
+                        ),
+                      ),
+                    ],
                   ],
-                ],
-              ),
-              _PageEnd(arrow: paired.isEmpty),
-            ],
+                ),
+                _PageEnd(arrow: paired.isEmpty),
+              ],
+            ),
           ),
           // Transfers, Send files and Add a device, growing in place.
-          Positioned.fill(child: Island(paired: paired)),
+          Positioned.fill(
+            child: Island(key: _island, paired: paired),
+          ),
         ],
       ),
     );

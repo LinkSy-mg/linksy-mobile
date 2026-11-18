@@ -4,6 +4,17 @@ All notable changes to Linksy for Android. Format: [Keep a Changelog](https://ke
 
 ## [Unreleased]
 
+### Added
+
+- **TV remotes and game pads.** Linksy can now be used without touching the screen: on Android TV (an Nvidia Shield) with its remote, and on handhelds and TVs with a game pad. The D-pad or the stick moves between controls, shown with a blue ring; the centre button or A picks; B or the remote's Back goes back; holding the centre button or A, or pressing menu, X or Y, does what holding a finger does; the shoulder buttons page through long lists. On a device row, right moves to its Send button and left back. Down from the last row reaches Send files, and an opened card or an incoming-files prompt takes the focus, so the centre button accepts. On the first screen, up and down choose the language and the centre button or A takes it and goes on; the same in Settings › Language.
+- Linksy appears on the **Android TV home screen**, with its own banner.
+
+### Fixed
+
+- No crash on devices without a file, photo or folder picker (some TVs): picking is cancelled instead, and "All files" opens the app's own settings page when Android's isn't there.
+- Plugging in or connecting a game pad no longer restarts the app.
+- No green outline around the app on the first touch on handhelds with built-in controls (a Retroid Pocket).
+
 ## [0.3.10] - 2026-11-18
 
 > [!IMPORTANT]

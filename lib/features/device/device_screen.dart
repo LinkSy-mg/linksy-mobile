@@ -1041,9 +1041,9 @@ class _NowPlayingState extends State<_NowPlaying> {
     final info = Row(
       children: [
         Expanded(
-          child: GestureDetector(
-            behavior: HitTestBehavior.opaque,
+          child: Pressable(
             onTap: widget.onToggle,
+            scale: 1,
             child: Row(
               children: [
                 ClipRRect(
