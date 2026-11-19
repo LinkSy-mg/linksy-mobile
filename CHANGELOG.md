@@ -4,6 +4,14 @@ All notable changes to Linksy for Android. Format: [Keep a Changelog](https://ke
 
 ## [Unreleased]
 
+### Added
+
+- **Middle click** on the Remote's touchpad: tap with three fingers, or use the new Middle button between Left and Right click. The deck has a Middle click tile too.
+- **Scroll strip:** slide one finger along the right edge of the touchpad to scroll, handy with one hand. A faint bar shows where it is; you can turn it off in Settings.
+- **Swipe typing and suggestions** on the Remote's keyboard. You can turn them off in Settings to send each key exactly as you press it.
+- **Write:** type a whole message on the phone with your keyboard's words and corrections, then send it where the computer's cursor is.
+- **Choose the deck's grid:** the deck editor's Theme sheet has a Grid setting. More columns give smaller tiles and room for more of them.
+
 ## [0.3.10] - 2026-11-18
 
 > [!IMPORTANT]
