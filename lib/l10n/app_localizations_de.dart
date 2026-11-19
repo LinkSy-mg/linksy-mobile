@@ -3453,4 +3453,69 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get deckStartEmpty => 'Leer beginnen';
+
+  @override
+  String get remoteMiddle => 'Mitte';
+
+  @override
+  String get remoteMiddleClick => 'Mittelklick';
+
+  @override
+  String get remoteSendText => 'Schreiben';
+
+  @override
+  String get remoteSendTextCaption =>
+      'Hier mit Wischen, Wortvorschlägen und Korrekturen deiner Tastatur schreiben, dann dorthin senden, wo der Cursor des Computers steht.';
+
+  @override
+  String get remoteSendTextHint =>
+      'Eine Nachricht, eine Suche, eine lange Zeile…';
+
+  @override
+  String get remoteSendTextGo => 'An den Computer senden';
+
+  @override
+  String get settingsEdgeScroll => 'Scrollleiste';
+
+  @override
+  String get settingsEdgeScrollCaption =>
+      'Ein Finger am rechten Rand des Touchpads scrollt, für die Bedienung mit einer Hand.';
+
+  @override
+  String get settingsKeyboardSuggestions => 'Tastaturvorschläge';
+
+  @override
+  String get settingsKeyboardSuggestionsCaption =>
+      'Wischen und Wortvorschläge auf der Tastatur der Fernbedienung. Aus, geht jede Taste beim Drücken raus.';
+
+  @override
+  String get deckGridTitle => 'Raster';
+
+  @override
+  String deckGridColumns(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count Spalten',
+      one: '1 Spalte',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String deckGridRows(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count Zeilen',
+      one: '1 Zeile',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get deckGridBigger => 'Größere Kacheln';
+
+  @override
+  String get deckGridSmaller => 'Kleinere Kacheln';
 }

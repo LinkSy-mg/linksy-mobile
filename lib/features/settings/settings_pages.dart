@@ -186,6 +186,20 @@ List<SettingsHit> settingsIndex(BuildContext context) {
       l.settingsPointerSpeed,
       [l.settingsPointerSpeedCaption],
     ),
+    SettingsHit(
+      'edge',
+      SettingsArea.computers,
+      Ph.arrowsDownUp,
+      l.settingsEdgeScroll,
+      [l.settingsEdgeScrollCaption],
+    ),
+    SettingsHit(
+      'suggest',
+      SettingsArea.computers,
+      Ph.keyboard,
+      l.settingsKeyboardSuggestions,
+      [l.settingsKeyboardSuggestionsCaption],
+    ),
     SettingsHit('locate', SettingsArea.computers, Ph.mapPin, l.settingsLocate, [
       l.settingsLocateCaption,
     ]),
@@ -918,6 +932,23 @@ class ComputersSettings extends StatelessWidget {
                   divisions: 6,
                   onChanged: c.setPointerSpeed,
                 ),
+              ),
+            ),
+            SettingRow(
+              id: 'edge',
+              icon: Ph.arrowsDownUp,
+              title: l.settingsEdgeScroll,
+              caption: l.settingsEdgeScrollCaption,
+              trailing: Switch(value: c.edgeScroll, onChanged: c.setEdgeScroll),
+            ),
+            SettingRow(
+              id: 'suggest',
+              icon: Ph.keyboard,
+              title: l.settingsKeyboardSuggestions,
+              caption: l.settingsKeyboardSuggestionsCaption,
+              trailing: Switch(
+                value: c.keyboardSuggestions,
+                onChanged: c.setKeyboardSuggestions,
               ),
             ),
             SettingRow(

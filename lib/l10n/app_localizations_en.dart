@@ -3430,4 +3430,68 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get deckStartEmpty => 'Start empty';
+
+  @override
+  String get remoteMiddle => 'Middle';
+
+  @override
+  String get remoteMiddleClick => 'Middle click';
+
+  @override
+  String get remoteSendText => 'Write';
+
+  @override
+  String get remoteSendTextCaption =>
+      'Write here with your keyboard\'s swiping, words and corrections, then send it where the computer\'s cursor is.';
+
+  @override
+  String get remoteSendTextHint => 'A message, a search, a long line…';
+
+  @override
+  String get remoteSendTextGo => 'Send to the computer';
+
+  @override
+  String get settingsEdgeScroll => 'Scroll strip';
+
+  @override
+  String get settingsEdgeScrollCaption =>
+      'One finger along the touchpad\'s right edge scrolls, for one-handed use.';
+
+  @override
+  String get settingsKeyboardSuggestions => 'Keyboard suggestions';
+
+  @override
+  String get settingsKeyboardSuggestionsCaption =>
+      'Swiping and word suggestions on the Remote\'s keyboard. Off, each key goes as you press it.';
+
+  @override
+  String get deckGridTitle => 'Grid';
+
+  @override
+  String deckGridColumns(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count columns',
+      one: '1 column',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String deckGridRows(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count rows',
+      one: '1 row',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get deckGridBigger => 'Bigger tiles';
+
+  @override
+  String get deckGridSmaller => 'Smaller tiles';
 }

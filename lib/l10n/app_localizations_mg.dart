@@ -3463,4 +3463,66 @@ class AppLocalizationsMg extends AppLocalizations {
 
   @override
   String get deckStartEmpty => 'Manomboka banga';
+
+  @override
+  String get remoteMiddle => 'Afovoany';
+
+  @override
+  String get remoteMiddleClick => 'Pitika afovoany';
+
+  @override
+  String get remoteSendText => 'Hanoratra';
+
+  @override
+  String get remoteSendTextCaption =>
+      'Soraty eto amin\'ny fikitikitihana, ny teny atolotra ary ny fanitsiana ataon\'ny fitendry, dia alefaso any amin\'izay misy ny cursor amin\'ny solosaina.';
+
+  @override
+  String get remoteSendTextHint => 'Hafatra, fikarohana, andalana lava…';
+
+  @override
+  String get remoteSendTextGo => 'Alefa any amin\'ny solosaina';
+
+  @override
+  String get settingsEdgeScroll => 'Tsipika fampidinana';
+
+  @override
+  String get settingsEdgeScrollCaption =>
+      'Rantsantanana iray manaraka ny sisiny ankavanan\'ny touchpad dia mampidina sy mampiakatra, ampiasaina amin\'ny tanana iray.';
+
+  @override
+  String get settingsKeyboardSuggestions => 'Teny atolotry ny fitendry';
+
+  @override
+  String get settingsKeyboardSuggestionsCaption =>
+      'Fanoratana amin\'ny fikitikitihana sy teny atolotra amin\'ny fitendrin\'ny Remote. Raha maty, mandeha avy hatrany ny fanalahidy tsindrianao.';
+
+  @override
+  String get deckGridTitle => 'Takelaka';
+
+  @override
+  String deckGridColumns(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'Andry $count',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String deckGridRows(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'Andalana $count',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get deckGridBigger => 'Bokotra lehibe kokoa';
+
+  @override
+  String get deckGridSmaller => 'Bokotra kely kokoa';
 }

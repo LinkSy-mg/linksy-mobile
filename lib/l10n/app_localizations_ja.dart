@@ -3358,4 +3358,66 @@ class AppLocalizationsJa extends AppLocalizations {
 
   @override
   String get deckStartEmpty => '空から始める';
+
+  @override
+  String get remoteMiddle => '中央';
+
+  @override
+  String get remoteMiddleClick => '中クリック';
+
+  @override
+  String get remoteSendText => '入力';
+
+  @override
+  String get remoteSendTextCaption =>
+      'キーボードのスワイプ入力、予測変換、修正を使ってここに書き、コンピューターのカーソルの位置に送信します。';
+
+  @override
+  String get remoteSendTextHint => 'メッセージ、検索語、長い行…';
+
+  @override
+  String get remoteSendTextGo => 'コンピューターに送信';
+
+  @override
+  String get settingsEdgeScroll => 'スクロールストリップ';
+
+  @override
+  String get settingsEdgeScrollCaption =>
+      'タッチパッドの右端を指1本でなぞるとスクロールします。片手で使うときに便利です。';
+
+  @override
+  String get settingsKeyboardSuggestions => 'キーボードの候補';
+
+  @override
+  String get settingsKeyboardSuggestionsCaption =>
+      'リモートのキーボードでスワイプ入力と予測変換を使います。オフにすると、押したキーがそのまま送られます。';
+
+  @override
+  String get deckGridTitle => 'グリッド';
+
+  @override
+  String deckGridColumns(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count 列',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String deckGridRows(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count 行',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get deckGridBigger => 'タイルを大きく';
+
+  @override
+  String get deckGridSmaller => 'タイルを小さく';
 }

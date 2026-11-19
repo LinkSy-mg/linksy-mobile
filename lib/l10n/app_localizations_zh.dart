@@ -3306,4 +3306,64 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get deckStartEmpty => '从空白开始';
+
+  @override
+  String get remoteMiddle => '中键';
+
+  @override
+  String get remoteMiddleClick => '中键单击';
+
+  @override
+  String get remoteSendText => '输入';
+
+  @override
+  String get remoteSendTextCaption => '在这里用键盘的滑行输入、联想词和纠错写好，再发送到电脑光标所在的位置。';
+
+  @override
+  String get remoteSendTextHint => '消息、搜索词、一长行文字…';
+
+  @override
+  String get remoteSendTextGo => '发送到电脑';
+
+  @override
+  String get settingsEdgeScroll => '滚动条';
+
+  @override
+  String get settingsEdgeScrollCaption => '一根手指沿触控板右边缘滑动即可滚动，方便单手操作。';
+
+  @override
+  String get settingsKeyboardSuggestions => '键盘联想';
+
+  @override
+  String get settingsKeyboardSuggestionsCaption =>
+      '遥控器键盘上的滑行输入和联想词。关闭后，每个按键按下即发送。';
+
+  @override
+  String get deckGridTitle => '网格';
+
+  @override
+  String deckGridColumns(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count 列',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String deckGridRows(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count 行',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get deckGridBigger => '更大的按钮';
+
+  @override
+  String get deckGridSmaller => '更小的按钮';
 }

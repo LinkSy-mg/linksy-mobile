@@ -937,5 +937,20 @@
   "deckWidth": "宽度",
   "deckHeight": "高度",
   "deckStartFromPortrait": "从竖屏布局开始",
-  "deckStartEmpty": "从空白开始"
+  "deckStartEmpty": "从空白开始",
+  "remoteMiddle": "中键",
+  "remoteMiddleClick": "中键单击",
+  "remoteSendText": "输入",
+  "remoteSendTextCaption": "在这里用键盘的滑行输入、联想词和纠错写好，再发送到电脑光标所在的位置。",
+  "remoteSendTextHint": "消息、搜索词、一长行文字…",
+  "remoteSendTextGo": "发送到电脑",
+  "settingsEdgeScroll": "滚动条",
+  "settingsEdgeScrollCaption": "一根手指沿触控板右边缘滑动即可滚动，方便单手操作。",
+  "settingsKeyboardSuggestions": "键盘联想",
+  "settingsKeyboardSuggestionsCaption": "遥控器键盘上的滑行输入和联想词。关闭后，每个按键按下即发送。",
+  "deckGridTitle": "网格",
+  "deckGridColumns": "{count, plural, other{{count} 列}}",
+  "deckGridRows": "{count, plural, other{{count} 行}}",
+  "deckGridBigger": "更大的按钮",
+  "deckGridSmaller": "更小的按钮"
 }

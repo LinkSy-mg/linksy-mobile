@@ -937,5 +937,20 @@
   "deckWidth": "Largeur",
   "deckHeight": "Hauteur",
   "deckStartFromPortrait": "Partir de votre deck portrait",
-  "deckStartEmpty": "Partir de zéro"
+  "deckStartEmpty": "Partir de zéro",
+  "remoteMiddle": "Milieu",
+  "remoteMiddleClick": "Clic du milieu",
+  "remoteSendText": "Écrire",
+  "remoteSendTextCaption": "Écrivez ici avec le glissement, les mots et les corrections de votre clavier, puis envoyez-le là où se trouve le curseur de l'ordinateur.",
+  "remoteSendTextHint": "Un message, une recherche, une longue ligne…",
+  "remoteSendTextGo": "Envoyer à l'ordinateur",
+  "settingsEdgeScroll": "Bande de défilement",
+  "settingsEdgeScrollCaption": "Un doigt le long du bord droit du pavé tactile fait défiler, pour l'utiliser d'une main.",
+  "settingsKeyboardSuggestions": "Suggestions du clavier",
+  "settingsKeyboardSuggestionsCaption": "Écriture par glissement et suggestions de mots sur le clavier de la télécommande. Désactivé, chaque touche part dès que vous l'appuyez.",
+  "deckGridTitle": "Grille",
+  "deckGridColumns": "{count, plural, =1{1 colonne} other{{count} colonnes}}",
+  "deckGridRows": "{count, plural, =1{1 ligne} other{{count} lignes}}",
+  "deckGridBigger": "Tuiles plus grandes",
+  "deckGridSmaller": "Tuiles plus petites"
 }

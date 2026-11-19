@@ -5741,6 +5741,96 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Start empty'**
   String get deckStartEmpty;
+
+  /// Touchpad button between Left and Right click, short
+  ///
+  /// In en, this message translates to:
+  /// **'Middle'**
+  String get remoteMiddle;
+
+  /// Deck tile: a middle mouse click
+  ///
+  /// In en, this message translates to:
+  /// **'Middle click'**
+  String get remoteMiddleClick;
+
+  /// Remote: button and sheet title to write text and send it at once
+  ///
+  /// In en, this message translates to:
+  /// **'Write'**
+  String get remoteSendText;
+
+  /// Remote: under the Write sheet title
+  ///
+  /// In en, this message translates to:
+  /// **'Write here with your keyboard\'s swiping, words and corrections, then send it where the computer\'s cursor is.'**
+  String get remoteSendTextCaption;
+
+  /// Remote: Write sheet field hint
+  ///
+  /// In en, this message translates to:
+  /// **'A message, a search, a long line…'**
+  String get remoteSendTextHint;
+
+  /// Remote: Write sheet button
+  ///
+  /// In en, this message translates to:
+  /// **'Send to the computer'**
+  String get remoteSendTextGo;
+
+  /// Setting: one finger on the touchpad's right edge scrolls
+  ///
+  /// In en, this message translates to:
+  /// **'Scroll strip'**
+  String get settingsEdgeScroll;
+
+  /// Setting caption
+  ///
+  /// In en, this message translates to:
+  /// **'One finger along the touchpad\'s right edge scrolls, for one-handed use.'**
+  String get settingsEdgeScrollCaption;
+
+  /// Setting: suggestions and swipe typing on the Remote keyboard
+  ///
+  /// In en, this message translates to:
+  /// **'Keyboard suggestions'**
+  String get settingsKeyboardSuggestions;
+
+  /// Setting caption
+  ///
+  /// In en, this message translates to:
+  /// **'Swiping and word suggestions on the Remote\'s keyboard. Off, each key goes as you press it.'**
+  String get settingsKeyboardSuggestionsCaption;
+
+  /// Deck editor theme sheet: section for the grid size
+  ///
+  /// In en, this message translates to:
+  /// **'Grid'**
+  String get deckGridTitle;
+
+  /// Deck grid: number of columns upright
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, =1{1 column} other{{count} columns}}'**
+  String deckGridColumns(int count);
+
+  /// Deck grid: number of rows sideways
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, =1{1 row} other{{count} rows}}'**
+  String deckGridRows(int count);
+
+  /// Deck grid: fewer cells, bigger tiles (minus button)
+  ///
+  /// In en, this message translates to:
+  /// **'Bigger tiles'**
+  String get deckGridBigger;
+
+  /// Deck grid: more cells, smaller tiles (plus button)
+  ///
+  /// In en, this message translates to:
+  /// **'Smaller tiles'**
+  String get deckGridSmaller;
 }
 
 class _AppLocalizationsDelegate

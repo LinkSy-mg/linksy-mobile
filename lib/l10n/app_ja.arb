@@ -937,5 +937,20 @@
   "deckWidth": "幅",
   "deckHeight": "高さ",
   "deckStartFromPortrait": "縦向きのデッキから始める",
-  "deckStartEmpty": "空から始める"
+  "deckStartEmpty": "空から始める",
+  "remoteMiddle": "中央",
+  "remoteMiddleClick": "中クリック",
+  "remoteSendText": "入力",
+  "remoteSendTextCaption": "キーボードのスワイプ入力、予測変換、修正を使ってここに書き、コンピューターのカーソルの位置に送信します。",
+  "remoteSendTextHint": "メッセージ、検索語、長い行…",
+  "remoteSendTextGo": "コンピューターに送信",
+  "settingsEdgeScroll": "スクロールストリップ",
+  "settingsEdgeScrollCaption": "タッチパッドの右端を指1本でなぞるとスクロールします。片手で使うときに便利です。",
+  "settingsKeyboardSuggestions": "キーボードの候補",
+  "settingsKeyboardSuggestionsCaption": "リモートのキーボードでスワイプ入力と予測変換を使います。オフにすると、押したキーがそのまま送られます。",
+  "deckGridTitle": "グリッド",
+  "deckGridColumns": "{count, plural, other{{count} 列}}",
+  "deckGridRows": "{count, plural, other{{count} 行}}",
+  "deckGridBigger": "タイルを大きく",
+  "deckGridSmaller": "タイルを小さく"
 }

@@ -937,5 +937,20 @@
   "deckWidth": "Ширина",
   "deckHeight": "Высота",
   "deckStartFromPortrait": "Начать с портретной панели",
-  "deckStartEmpty": "Начать с пустой"
+  "deckStartEmpty": "Начать с пустой",
+  "remoteMiddle": "Средняя",
+  "remoteMiddleClick": "Средний щелчок",
+  "remoteSendText": "Написать",
+  "remoteSendTextCaption": "Пишите здесь с непрерывным вводом, подсказками и исправлениями клавиатуры, затем отправьте туда, где курсор компьютера.",
+  "remoteSendTextHint": "Сообщение, поиск, длинная строка…",
+  "remoteSendTextGo": "Отправить на компьютер",
+  "settingsEdgeScroll": "Полоса прокрутки",
+  "settingsEdgeScrollCaption": "Один палец вдоль правого края тачпада прокручивает — удобно одной рукой.",
+  "settingsKeyboardSuggestions": "Подсказки клавиатуры",
+  "settingsKeyboardSuggestionsCaption": "Непрерывный ввод и подсказки слов на клавиатуре пульта. Если выключено, каждая клавиша отправляется сразу при нажатии.",
+  "deckGridTitle": "Сетка",
+  "deckGridColumns": "{count, plural, one{{count} столбец} few{{count} столбца} other{{count} столбцов}}",
+  "deckGridRows": "{count, plural, one{{count} строка} few{{count} строки} other{{count} строк}}",
+  "deckGridBigger": "Плитки крупнее",
+  "deckGridSmaller": "Плитки мельче"
 }

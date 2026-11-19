@@ -937,5 +937,20 @@
   "deckWidth": "Ancho",
   "deckHeight": "Alto",
   "deckStartFromPortrait": "Empezar desde tu deck vertical",
-  "deckStartEmpty": "Empezar vacío"
+  "deckStartEmpty": "Empezar vacío",
+  "remoteMiddle": "Central",
+  "remoteMiddleClick": "Clic central",
+  "remoteSendText": "Escribir",
+  "remoteSendTextCaption": "Escribe aquí con el deslizamiento, las palabras y las correcciones de tu teclado, y envíalo donde esté el cursor del ordenador.",
+  "remoteSendTextHint": "Un mensaje, una búsqueda, una línea larga…",
+  "remoteSendTextGo": "Enviar al ordenador",
+  "settingsEdgeScroll": "Franja de desplazamiento",
+  "settingsEdgeScrollCaption": "Un dedo por el borde derecho del touchpad desplaza, para usarlo con una mano.",
+  "settingsKeyboardSuggestions": "Sugerencias del teclado",
+  "settingsKeyboardSuggestionsCaption": "Escritura deslizando y sugerencias de palabras en el teclado del mando. Desactivado, cada tecla se envía al pulsarla.",
+  "deckGridTitle": "Cuadrícula",
+  "deckGridColumns": "{count, plural, =1{1 columna} other{{count} columnas}}",
+  "deckGridRows": "{count, plural, =1{1 fila} other{{count} filas}}",
+  "deckGridBigger": "Botones más grandes",
+  "deckGridSmaller": "Botones más pequeños"
 }

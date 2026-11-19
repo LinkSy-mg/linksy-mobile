@@ -3465,4 +3465,69 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String get deckStartEmpty => 'Partir de zéro';
+
+  @override
+  String get remoteMiddle => 'Milieu';
+
+  @override
+  String get remoteMiddleClick => 'Clic du milieu';
+
+  @override
+  String get remoteSendText => 'Écrire';
+
+  @override
+  String get remoteSendTextCaption =>
+      'Écrivez ici avec le glissement, les mots et les corrections de votre clavier, puis envoyez-le là où se trouve le curseur de l\'ordinateur.';
+
+  @override
+  String get remoteSendTextHint =>
+      'Un message, une recherche, une longue ligne…';
+
+  @override
+  String get remoteSendTextGo => 'Envoyer à l\'ordinateur';
+
+  @override
+  String get settingsEdgeScroll => 'Bande de défilement';
+
+  @override
+  String get settingsEdgeScrollCaption =>
+      'Un doigt le long du bord droit du pavé tactile fait défiler, pour l\'utiliser d\'une main.';
+
+  @override
+  String get settingsKeyboardSuggestions => 'Suggestions du clavier';
+
+  @override
+  String get settingsKeyboardSuggestionsCaption =>
+      'Écriture par glissement et suggestions de mots sur le clavier de la télécommande. Désactivé, chaque touche part dès que vous l\'appuyez.';
+
+  @override
+  String get deckGridTitle => 'Grille';
+
+  @override
+  String deckGridColumns(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count colonnes',
+      one: '1 colonne',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String deckGridRows(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count lignes',
+      one: '1 ligne',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get deckGridBigger => 'Tuiles plus grandes';
+
+  @override
+  String get deckGridSmaller => 'Tuiles plus petites';
 }

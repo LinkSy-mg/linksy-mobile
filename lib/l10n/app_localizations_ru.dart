@@ -3477,4 +3477,70 @@ class AppLocalizationsRu extends AppLocalizations {
 
   @override
   String get deckStartEmpty => 'Начать с пустой';
+
+  @override
+  String get remoteMiddle => 'Средняя';
+
+  @override
+  String get remoteMiddleClick => 'Средний щелчок';
+
+  @override
+  String get remoteSendText => 'Написать';
+
+  @override
+  String get remoteSendTextCaption =>
+      'Пишите здесь с непрерывным вводом, подсказками и исправлениями клавиатуры, затем отправьте туда, где курсор компьютера.';
+
+  @override
+  String get remoteSendTextHint => 'Сообщение, поиск, длинная строка…';
+
+  @override
+  String get remoteSendTextGo => 'Отправить на компьютер';
+
+  @override
+  String get settingsEdgeScroll => 'Полоса прокрутки';
+
+  @override
+  String get settingsEdgeScrollCaption =>
+      'Один палец вдоль правого края тачпада прокручивает — удобно одной рукой.';
+
+  @override
+  String get settingsKeyboardSuggestions => 'Подсказки клавиатуры';
+
+  @override
+  String get settingsKeyboardSuggestionsCaption =>
+      'Непрерывный ввод и подсказки слов на клавиатуре пульта. Если выключено, каждая клавиша отправляется сразу при нажатии.';
+
+  @override
+  String get deckGridTitle => 'Сетка';
+
+  @override
+  String deckGridColumns(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count столбцов',
+      few: '$count столбца',
+      one: '$count столбец',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String deckGridRows(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count строк',
+      few: '$count строки',
+      one: '$count строка',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get deckGridBigger => 'Плитки крупнее';
+
+  @override
+  String get deckGridSmaller => 'Плитки мельче';
 }

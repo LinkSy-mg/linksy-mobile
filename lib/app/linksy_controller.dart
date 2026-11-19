@@ -1464,6 +1464,17 @@ class LinksyController extends ChangeNotifier with WidgetsBindingObserver {
   Future<void> setScrollReversed(bool on) =>
       _setPref('scroll_reverse', on ? 'on' : null);
 
+  /// One finger along the touchpad's right edge scrolls.
+  bool get edgeScroll => prefs['edge_scroll'] != 'off';
+  Future<void> setEdgeScroll(bool on) =>
+      _setPref('edge_scroll', on ? null : 'off');
+
+  /// The phone's keyboard on the Remote with its suggestions and swipe
+  /// typing; off, every key goes as it's pressed.
+  bool get keyboardSuggestions => prefs['keyboard_suggestions'] != 'off';
+  Future<void> setKeyboardSuggestions(bool on) =>
+      _setPref('keyboard_suggestions', on ? null : 'off');
+
   /// How far the pointer goes for the same swipe on the touchpad, 0.5–2×.
   double get pointerSpeed =>
       (double.tryParse(prefs['pointer_speed'] ?? '') ?? 1).clamp(0.5, 2.0);

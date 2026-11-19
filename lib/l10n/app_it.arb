@@ -937,5 +937,20 @@
   "deckWidth": "Larghezza",
   "deckHeight": "Altezza",
   "deckStartFromPortrait": "Parti dal deck verticale",
-  "deckStartEmpty": "Inizia vuoto"
+  "deckStartEmpty": "Inizia vuoto",
+  "remoteMiddle": "Centrale",
+  "remoteMiddleClick": "Clic centrale",
+  "remoteSendText": "Scrivi",
+  "remoteSendTextCaption": "Scrivi qui con lo scorrimento, le parole e le correzioni della tua tastiera, poi invialo dove si trova il cursore del computer.",
+  "remoteSendTextHint": "Un messaggio, una ricerca, una riga lunga…",
+  "remoteSendTextGo": "Invia al computer",
+  "settingsEdgeScroll": "Striscia di scorrimento",
+  "settingsEdgeScrollCaption": "Un dito lungo il bordo destro del touchpad scorre, per usarlo con una mano.",
+  "settingsKeyboardSuggestions": "Suggerimenti della tastiera",
+  "settingsKeyboardSuggestionsCaption": "Scrittura a scorrimento e suggerimenti di parole sulla tastiera del telecomando. Disattivato, ogni tasto parte appena lo premi.",
+  "deckGridTitle": "Griglia",
+  "deckGridColumns": "{count, plural, =1{1 colonna} other{{count} colonne}}",
+  "deckGridRows": "{count, plural, =1{1 riga} other{{count} righe}}",
+  "deckGridBigger": "Riquadri più grandi",
+  "deckGridSmaller": "Riquadri più piccoli"
 }

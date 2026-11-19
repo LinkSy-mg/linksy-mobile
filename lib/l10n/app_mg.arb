@@ -937,5 +937,20 @@
   "deckWidth": "Sakany",
   "deckHeight": "Haavo",
   "deckStartFromPortrait": "Manomboka amin'ny deck mitsangana",
-  "deckStartEmpty": "Manomboka banga"
+  "deckStartEmpty": "Manomboka banga",
+  "remoteMiddle": "Afovoany",
+  "remoteMiddleClick": "Pitika afovoany",
+  "remoteSendText": "Hanoratra",
+  "remoteSendTextCaption": "Soraty eto amin'ny fikitikitihana, ny teny atolotra ary ny fanitsiana ataon'ny fitendry, dia alefaso any amin'izay misy ny cursor amin'ny solosaina.",
+  "remoteSendTextHint": "Hafatra, fikarohana, andalana lava…",
+  "remoteSendTextGo": "Alefa any amin'ny solosaina",
+  "settingsEdgeScroll": "Tsipika fampidinana",
+  "settingsEdgeScrollCaption": "Rantsantanana iray manaraka ny sisiny ankavanan'ny touchpad dia mampidina sy mampiakatra, ampiasaina amin'ny tanana iray.",
+  "settingsKeyboardSuggestions": "Teny atolotry ny fitendry",
+  "settingsKeyboardSuggestionsCaption": "Fanoratana amin'ny fikitikitihana sy teny atolotra amin'ny fitendrin'ny Remote. Raha maty, mandeha avy hatrany ny fanalahidy tsindrianao.",
+  "deckGridTitle": "Takelaka",
+  "deckGridColumns": "{count, plural, other{Andry {count}}}",
+  "deckGridRows": "{count, plural, other{Andalana {count}}}",
+  "deckGridBigger": "Bokotra lehibe kokoa",
+  "deckGridSmaller": "Bokotra kely kokoa"
 }

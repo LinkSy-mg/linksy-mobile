@@ -1479,8 +1479,11 @@ class _Tile extends StatelessWidget {
       DeckPhoneDo.clipboard => l.phoneClipboard,
       DeckPhoneDo.ping => l.devicePing,
       DeckPhoneDo.find => l.deviceFindIt,
-      DeckPhoneDo.click =>
-        t.props['button'] == 'right' ? l.remoteRightClick : l.remoteLeftClick,
+      DeckPhoneDo.click => switch (t.props['button']) {
+        'right' => l.remoteRightClick,
+        'middle' => l.remoteMiddleClick,
+        _ => l.remoteLeftClick,
+      },
       DeckPhoneDo.keyboard => l.remoteKeyboard,
       null => t.kind,
     };
@@ -1513,7 +1516,11 @@ class _Tile extends StatelessWidget {
         for (final down in [true, false])
           {
             'type': 'button',
-            'button': t.props['button'] == 'right' ? 'right' : 'left',
+            'button': switch (t.props['button']) {
+              'right' => 'right',
+              'middle' => 'middle',
+              _ => 'left',
+            },
             'pressed': down,
           },
       ]),

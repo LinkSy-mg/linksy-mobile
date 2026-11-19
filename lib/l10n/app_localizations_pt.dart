@@ -3445,4 +3445,69 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get deckStartEmpty => 'Começar vazio';
+
+  @override
+  String get remoteMiddle => 'Meio';
+
+  @override
+  String get remoteMiddleClick => 'Clique do meio';
+
+  @override
+  String get remoteSendText => 'Escrever';
+
+  @override
+  String get remoteSendTextCaption =>
+      'Escreva aqui com o deslizar, as palavras e as correções do seu teclado e envie para onde está o cursor do computador.';
+
+  @override
+  String get remoteSendTextHint =>
+      'Uma mensagem, uma pesquisa, uma linha longa…';
+
+  @override
+  String get remoteSendTextGo => 'Enviar para o computador';
+
+  @override
+  String get settingsEdgeScroll => 'Faixa de rolagem';
+
+  @override
+  String get settingsEdgeScrollCaption =>
+      'Um dedo ao longo da borda direita do touchpad rola, para usar com uma mão.';
+
+  @override
+  String get settingsKeyboardSuggestions => 'Sugestões do teclado';
+
+  @override
+  String get settingsKeyboardSuggestionsCaption =>
+      'Digitação por deslize e sugestões de palavras no teclado do controle. Desativado, cada tecla vai assim que você a pressiona.';
+
+  @override
+  String get deckGridTitle => 'Grade';
+
+  @override
+  String deckGridColumns(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count colunas',
+      one: '1 coluna',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String deckGridRows(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count linhas',
+      one: '1 linha',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get deckGridBigger => 'Blocos maiores';
+
+  @override
+  String get deckGridSmaller => 'Blocos menores';
 }

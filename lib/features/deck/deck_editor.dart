@@ -1233,6 +1233,7 @@ class _AddSheetState extends State<_AddSheet> {
         _cell('touch', l.remoteTouchpad, () => pick('touchpad')),
       for (final (button, name) in [
         ('left', l.remoteLeftClick),
+        ('middle', l.remoteMiddleClick),
         ('right', l.remoteRightClick),
       ])
         if (shows(name))

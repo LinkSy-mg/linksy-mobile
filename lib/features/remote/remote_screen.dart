@@ -394,8 +394,9 @@ class _Sliding extends StatelessWidget {
 /// stroke, until a tap lets go. The keyboard types into whatever has focus
 /// there.
 /// The touchpad itself, on the remote's page and as a deck tile: one finger
-/// moves the pointer, a tap clicks, a two-finger tap right-clicks, two
-/// fingers scroll. Double-tap and slide drags (mobile#22): the button stays
+/// moves the pointer, a tap clicks, a two-finger tap right-clicks, a
+/// three-finger tap middle-clicks, two fingers scroll, and one finger along
+/// the right edge scrolls too, as on a ThinkPad (turned off in Settings). Double-tap and slide drags (mobile#22): the button stays
 /// down when the finger lifts, so the drag goes on with the next stroke,
 /// until a tap lets go. [builder] draws it, with whether it's dragging.
 class TouchpadSurface extends StatefulWidget {
@@ -426,6 +427,15 @@ class _TouchpadSurfaceState extends State<TouchpadSurface> {
   /// The left button is held down on the computer.
   bool _dragging = false;
 
+  /// This touch began on the scroll strip at the right edge.
+  bool _edge = false;
+
+  /// The surface's width, for where the strip is.
+  double _width = 0;
+
+  /// How wide the scroll strip is.
+  static const strip = 28.0;
+
   @override
   void dispose() {
     _flush?.cancel();
@@ -442,6 +452,11 @@ class _TouchpadSurfaceState extends State<TouchpadSurface> {
       _downAt = DateTime.now();
       _travel = 0;
       _maxFingers = 0;
+      _edge =
+          !_dragging &&
+          LinksyScope.read(context).edgeScroll &&
+          _width > 4 * strip &&
+          e.localPosition.dx >= _width - strip;
       final tapped = _tappedAt;
       _armed =
           !_dragging &&
@@ -459,7 +474,18 @@ class _TouchpadSurfaceState extends State<TouchpadSurface> {
     if (!_pointers.containsKey(e.pointer)) return;
     _travel += e.delta.distance;
     _pointers[e.pointer] = e.localPosition;
-    if (_pointers.length == 1 && _maxFingers == 1) {
+    if (_edge && _pointers.length == 1 && _maxFingers == 1) {
+      // Down the strip scrolls down, as a scroll bar does.
+      final sign = LinksyScope.read(context).scrollReversed ? -1 : 1;
+      widget.send([
+        {
+          'type': 'scroll',
+          'dx': 0.0,
+          'dy': sign * e.delta.dy * 2,
+          'discrete': false,
+        },
+      ]);
+    } else if (_pointers.length == 1 && _maxFingers == 1) {
       if (_armed && !_dragging && _travel >= 12) {
         // Double-tap and slide: hold the button down, then move.
         _armed = false;
@@ -521,7 +547,11 @@ class _TouchpadSurfaceState extends State<TouchpadSurface> {
         _tappedAt = null;
         return;
       }
-      _click(_maxFingers >= 2 ? 'right' : 'left');
+      _click(switch (_maxFingers) {
+        1 => 'left',
+        2 => 'right',
+        _ => 'middle',
+      });
       _tappedAt = _maxFingers >= 2 ? null : DateTime.now();
     } else {
       _tappedAt = null;
@@ -558,7 +588,34 @@ class _TouchpadSurfaceState extends State<TouchpadSurface> {
       onPointerMove: _move,
       onPointerUp: _up,
       onPointerCancel: _up,
-      child: widget.builder(context, _dragging),
+      child: LayoutBuilder(
+        builder: (context, box) {
+          _width = box.maxWidth;
+          final edge = LinksyScope.of(context).edgeScroll && _width > 4 * strip;
+          return Stack(
+            fit: StackFit.expand,
+            children: [
+              widget.builder(context, _dragging),
+              // Where the scroll strip is: a quiet bar along the edge.
+              if (edge)
+                Positioned(
+                  right: (strip - 4) / 2,
+                  top: box.maxHeight * .3,
+                  bottom: box.maxHeight * .3,
+                  width: 4,
+                  child: const IgnorePointer(
+                    child: DecoratedBox(
+                      decoration: BoxDecoration(
+                        color: Color(0x40808080),
+                        borderRadius: BorderRadius.all(Radius.circular(2)),
+                      ),
+                    ),
+                  ),
+                ),
+            ],
+          );
+        },
+      ),
     ),
   );
 }
@@ -635,6 +692,7 @@ class _Touchpad extends StatelessWidget {
         Row(
           children: [
             Expanded(
+              flex: 2,
               child: _PadButton(
                 label: context.l10n.remoteLeftClick,
                 onTap: () => _click('left'),
@@ -642,6 +700,14 @@ class _Touchpad extends StatelessWidget {
             ),
             const SizedBox(width: 10),
             Expanded(
+              child: _PadButton(
+                label: context.l10n.remoteMiddle,
+                onTap: () => _click('middle'),
+              ),
+            ),
+            const SizedBox(width: 10),
+            Expanded(
+              flex: 2,
               child: _PadButton(
                 label: context.l10n.remoteRightClick,
                 onTap: () => _click('right'),
@@ -817,33 +883,72 @@ class _RemoteKeyboardState extends State<RemoteKeyboard> {
     }
   }
 
-  void _typed(String value) {
-    if (value.length < _placeholder.length || !value.startsWith(_placeholder)) {
-      widget.onKey(Keysym.backspace);
-    } else if (value.length > _placeholder.length) {
-      final text = value.substring(_placeholder.length);
-      if (widget.modded && text.runes.length == 1) {
-        widget.onKey(Keysym.ofChar(text));
-      } else {
-        widget.send([
-          {'type': 'text', 'text': text},
-          // Some computers (KDE's) hold Shift down to type a capital and
-          // never let go: let go of it here.
-          if (text.toLowerCase() != text || _shifted.hasMatch(text)) ...[
-            {'type': 'key', 'keysym': Keysym.shiftLeft, 'pressed': false},
-            {'type': 'key', 'keysym': Keysym.shiftRight, 'pressed': false},
-          ],
-        ]);
-      }
-    }
+  /// What the field held last, as the computer has it typed.
+  String _last = _placeholder;
+
+  void _reset() {
+    _last = _placeholder;
     _field.value = const TextEditingValue(
       text: _placeholder,
       selection: TextSelection.collapsed(offset: _placeholder.length),
     );
   }
 
+  void _typeText(String text) => widget.send([
+    {'type': 'text', 'text': text},
+    // Some computers (KDE's) hold Shift down to type a capital and
+    // never let go: let go of it here.
+    if (text.toLowerCase() != text || _shifted.hasMatch(text)) ...[
+      {'type': 'key', 'keysym': Keysym.shiftLeft, 'pressed': false},
+      {'type': 'key', 'keysym': Keysym.shiftRight, 'pressed': false},
+    ],
+  ]);
+
+  void _typed(String value) {
+    final suggestions = LinksyScope.read(context).keyboardSuggestions;
+    if (!suggestions) {
+      if (value.length < _placeholder.length ||
+          !value.startsWith(_placeholder)) {
+        widget.onKey(Keysym.backspace);
+      } else if (value.length > _placeholder.length) {
+        final text = value.substring(_placeholder.length);
+        if (widget.modded && text.runes.length == 1) {
+          widget.onKey(Keysym.ofChar(text));
+        } else {
+          _typeText(text);
+        }
+      }
+      _reset();
+      return;
+    }
+    // With suggestions and swipe typing the keyboard rewrites what it has
+    // written (a word swiped, then corrected): the computer gets the
+    // difference, Backspace for what went and the text that came.
+    final edit = keyboardEdit(_last, value);
+    if (widget.modded &&
+        edit.back == 0 &&
+        edit.text.runes.length == 1 &&
+        value.startsWith(_placeholder)) {
+      widget.onKey(Keysym.ofChar(edit.text));
+      _reset();
+      return;
+    }
+    for (var i = 0; i < edit.back; i++) {
+      widget.onKey(Keysym.backspace);
+    }
+    if (edit.text.isNotEmpty) _typeText(edit.text);
+    _last = value;
+    // Backspace past the start, or a long run: start the field over, once
+    // the keyboard has nothing half-written in it.
+    if (!value.startsWith(_placeholder) ||
+        (value.length > 400 && _field.value.composing.isCollapsed)) {
+      _reset();
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
+    final suggestions = LinksyScope.of(context).keyboardSuggestions;
     // Off screen, but focusable: it brings up the keyboard.
     final field = SizedBox(
       height: 0,
@@ -852,13 +957,15 @@ class _RemoteKeyboardState extends State<RemoteKeyboard> {
         child: TextField(
           controller: _field,
           focusNode: _focus,
-          autocorrect: false,
-          enableSuggestions: false,
+          // Suggestions on: swipe typing and the keyboard's words.
+          autocorrect: suggestions,
+          enableSuggestions: suggestions,
           keyboardType: TextInputType.text,
           textInputAction: TextInputAction.send,
           onChanged: _typed,
           onSubmitted: (_) {
             widget.onKey(Keysym.enter);
+            _reset();
             _focus.requestFocus();
           },
         ),
@@ -879,14 +986,138 @@ class _RemoteKeyboardState extends State<RemoteKeyboard> {
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
         field,
-        SigButton(
-          label: context.l10n.remoteKeyboard,
-          icon: Ph.keyboard,
-          kind: SigButtonKind.secondary,
-          expand: true,
-          onTap: _toggle,
+        LayoutBuilder(
+          builder: (context, box) {
+            void write() => sendTextSheet(context, _typeText);
+            return Row(
+              children: [
+                Expanded(
+                  child: SigButton(
+                    label: context.l10n.remoteKeyboard,
+                    icon: Ph.keyboard,
+                    kind: SigButtonKind.secondary,
+                    expand: true,
+                    onTap: _toggle,
+                  ),
+                ),
+                const SizedBox(width: 10),
+                // Write it all here, then send it in one go; just the icon
+                // where the row is narrow.
+                if (box.maxWidth >= 300)
+                  SigButton(
+                    label: context.l10n.remoteSendText,
+                    icon: Ph.textAa,
+                    kind: SigButtonKind.secondary,
+                    onTap: write,
+                  )
+                else
+                  RoundButton(
+                    icon: Ph.textAa,
+                    tooltip: context.l10n.remoteSendText,
+                    onTap: write,
+                  ),
+              ],
+            );
+          },
         ),
       ],
+    );
+  }
+}
+
+/// What a keyboard's edit did to the text: [back] characters taken off the
+/// end, then [text] written. From the text before and after, whatever the
+/// keyboard did in between (a key, a swiped word, a correction).
+({int back, String text}) keyboardEdit(String before, String after) {
+  final a = before.runes.toList(), b = after.runes.toList();
+  var same = 0;
+  while (same < a.length && same < b.length && a[same] == b[same]) {
+    same++;
+  }
+  return (back: a.length - same, text: String.fromCharCodes(b.sublist(same)));
+}
+
+/// A box to write a message in with the phone's own keyboard, words,
+/// corrections and all, then Send types it where the computer's cursor is.
+Future<void> sendTextSheet(
+  BuildContext context,
+  void Function(String text) type,
+) => showSheet<void>(
+  context: context,
+  isScrollControlled: true,
+  showDragHandle: true,
+  builder: (sheet) => _SendText(type: type),
+);
+
+class _SendText extends StatefulWidget {
+  const _SendText({required this.type});
+
+  final void Function(String text) type;
+
+  @override
+  State<_SendText> createState() => _SendTextState();
+}
+
+class _SendTextState extends State<_SendText> {
+  final _field = TextEditingController();
+
+  @override
+  void dispose() {
+    _field.dispose();
+    super.dispose();
+  }
+
+  void _send() {
+    final text = _field.text;
+    if (text.isEmpty) return;
+    HapticFeedback.selectionClick();
+    widget.type(text);
+    _field.clear();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final s = Sig.of(context);
+    final l = context.l10n;
+    return Padding(
+      padding: EdgeInsets.fromLTRB(
+        20,
+        0,
+        20,
+        16 + MediaQuery.viewInsetsOf(context).bottom,
+      ),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          Text(l.remoteSendText, style: sora(22, color: s.ink)),
+          const SizedBox(height: 4),
+          Text(
+            l.remoteSendTextCaption,
+            style: TextStyle(fontSize: 13.5, color: s.muted, height: 1.35),
+          ),
+          const SizedBox(height: 14),
+          TextField(
+            controller: _field,
+            autofocus: true,
+            minLines: 3,
+            maxLines: 8,
+            keyboardType: TextInputType.multiline,
+            textCapitalization: TextCapitalization.sentences,
+            decoration: InputDecoration(hintText: l.remoteSendTextHint),
+          ),
+          const SizedBox(height: 12),
+          ListenableBuilder(
+            listenable: _field,
+            builder: (context, _) => SigButton(
+              label: l.remoteSendTextGo,
+              icon: PhFill.paperPlaneTilt,
+              expand: true,
+              onTap: _field.text.isEmpty ? null : _send,
+            ),
+          ),
+        ],
+      ),
     );
   }
 }
