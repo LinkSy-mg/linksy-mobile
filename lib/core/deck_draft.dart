@@ -110,6 +110,37 @@ class DeckDraft {
     _setFace(face.withPages(pages));
   }
 
+  /// How many columns upright (rows sideways) the tiles of this face take,
+  /// on any page: the grid never goes below it.
+  int get usedAcross {
+    var used = 1;
+    for (final p in face.pages) {
+      for (final t in p) {
+        used = landscape
+            ? math.max(used, t.y + t.h)
+            : math.max(used, t.x + t.w);
+      }
+    }
+    return used;
+  }
+
+  /// Smaller or bigger tiles: [n] columns upright, [n] rows sideways; the
+  /// other way follows, the cells staying square. Never fewer than the tiles
+  /// take; a step to undo.
+  bool setAcross(int n) {
+    if (n < usedAcross || n == (landscape ? face.rows : face.columns)) {
+      return false;
+    }
+    _setFace(
+      DeckFace(
+        columns: landscape ? face.columns : n,
+        rows: landscape ? n : face.rows,
+        pages: face.pages,
+      ),
+    );
+    return true;
+  }
+
   /// The face's grid as this screen fits it (square cells, as many as fit):
   /// every cell the editor shows takes a tile. Not a step to undo; never
   /// fewer cells than the tiles use, which the caller sees to.

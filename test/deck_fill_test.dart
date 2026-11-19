@@ -117,4 +117,19 @@ void main() {
       );
     }
   });
+
+  test('more columns make smaller tiles, never fewer than the tiles take', () {
+    final draft = DeckDraft(
+      DeckDraft.starter('Deck', offered, portrait: (4, 9), landscape: (10, 4)),
+    );
+    expect(draft.face.columns, 4);
+    expect(draft.setAcross(5), isTrue);
+    expect(draft.face.columns, 5);
+    expect(draft.setAcross(3), isFalse, reason: 'tiles take 4 columns');
+    draft.undo();
+    expect(draft.face.columns, 4);
+    draft.landscape = true;
+    expect(draft.setAcross(5), isTrue);
+    expect(draft.face.rows, 5);
+  });
 }

@@ -1840,6 +1840,69 @@ class _ThemeSheetState extends State<_ThemeSheet> {
     widget.onChanged();
   }
 
+  void _across(int n) {
+    if (widget.draft.setAcross(n)) {
+      HapticFeedback.selectionClick();
+      setState(() {});
+      widget.onChanged();
+    }
+  }
+
+  /// Columns upright (rows sideways): from what this screen fits at the
+  /// usual size, and what the tiles take, to cells no smaller than 56.
+  Widget _grid(BuildContext context) {
+    final l = context.l10n;
+    final d = widget.draft;
+    final sideways = d.landscape;
+    final face = d.face;
+    final box = deckPageBox(
+      context,
+      sideways: sideways,
+      pages: face.pages.length,
+      full: LinksyScope.read(context).deckFullScreen,
+    );
+    final gap = deckGap(face, sideways: sideways);
+    final usual = deckGrid(
+      box,
+      DeckFace(columns: 1, rows: 1, pages: const [[]]),
+      gap,
+    );
+    final room = sideways ? box.height : box.width;
+    final most = math.max(1, ((room - gap) / (56 + gap)).floor());
+    final least = math.max(d.usedAcross, sideways ? usual.rows : usual.columns);
+    final now = sideways ? face.rows : face.columns;
+    Widget step(IconData icon, String tip, int to, bool can) => Pressable(
+      onTap: can ? () => _across(to) : null,
+      semanticLabel: tip,
+      child: Container(
+        width: 40,
+        height: 40,
+        decoration: BoxDecoration(
+          shape: BoxShape.circle,
+          border: Border.all(color: _edge),
+        ),
+        child: Icon(icon, size: 18, color: can ? _ink : _edge),
+      ),
+    );
+    return Row(
+      children: [
+        Expanded(
+          child: Text(
+            sideways ? l.deckGridRows(now) : l.deckGridColumns(now),
+            style: const TextStyle(
+              color: _ink,
+              fontSize: 15,
+              fontWeight: FontWeight.w600,
+            ),
+          ),
+        ),
+        step(PhBold.minus, l.deckGridBigger, now - 1, now > least),
+        const SizedBox(width: 10),
+        step(PhBold.plus, l.deckGridSmaller, now + 1, now < most),
+      ],
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final l = context.l10n;
@@ -1891,6 +1954,9 @@ class _ThemeSheetState extends State<_ThemeSheet> {
                   ),
               ],
             ),
+            // Smaller tiles, more of them: as a launcher's grid.
+            _label(l.deckGridTitle),
+            _grid(context),
           ],
         ),
       ),
