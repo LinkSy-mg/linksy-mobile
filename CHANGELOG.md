@@ -4,6 +4,11 @@ All notable changes to Linksy for Android. Format: [Keep a Changelog](https://ke
 
 ## [Unreleased]
 
+## [0.3.11] - 2026-11-19
+
+> [!IMPORTANT]
+> **If Play Protect stops the install,** pause **Scan apps with Play Protect** while installing (Play Store › your picture › Play Protect › the gear at the top right), then turn it back on.
+
 ### Added
 
 - **Middle click** on the Remote's touchpad: tap with three fingers, or use the new Middle button between Left and Right click. The deck has a Middle click tile too.
