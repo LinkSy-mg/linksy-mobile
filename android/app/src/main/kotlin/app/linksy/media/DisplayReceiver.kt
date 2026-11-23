@@ -4,6 +4,7 @@ import android.media.MediaCodec
 import android.media.MediaFormat
 import android.util.Log
 import io.flutter.view.TextureRegistry
+import java.util.concurrent.atomic.AtomicBoolean
 
 /// This phone as a computer's second display (docs/protocol.md §4.8, kind
 /// `display`): decodes the computer's H.264 (Annex-B, no framing) into a
@@ -15,7 +16,7 @@ class DisplayReceiver(
     private val onEnded: () -> Unit,
 ) {
     private val decoder = MediaCodec.createDecoderByType(MediaFormat.MIMETYPE_VIDEO_AVC)
-    @Volatile private var running = true
+    private val running = AtomicBoolean(true)
     private val input: Thread
     private val output: Thread
     private val idle: Thread
@@ -53,7 +54,7 @@ class DisplayReceiver(
 
     private fun readLoop() {
         try {
-            while (running) {
+            while (running.get()) {
                 val chunk = NativeSession.read(session) ?: break
                 synchronized(lock) {
                     nals.push(chunk, units::push)
@@ -61,9 +62,10 @@ class DisplayReceiver(
                 }
             }
         } catch (e: Exception) {
-            if (running) Log.w("linksy", "display stream stopped", e)
+            end("display stream stopped", e)
+            return
         }
-        if (running) onEnded()
+        end()
     }
 
     /// A picture only ends where the next one starts (its delimiter), so the last
@@ -72,20 +74,23 @@ class DisplayReceiver(
     /// for [QUIET_NS], what's buffered goes to the decoder as it is. The desktop
     /// writes whole frames, so by then it's a whole one.
     private fun idleLoop() {
-        while (running) {
-            try {
+        try {
+            while (running.get()) {
                 Thread.sleep(4)
-            } catch (_: InterruptedException) {
-                return
+                val last = lastData
+                if (last == 0L || System.nanoTime() - last < QUIET_NS) continue
+                synchronized(lock) {
+                    if (!running.get() || lastData != last) return@synchronized
+                    nals.end(units::push)
+                    units.end()
+                    lastData = 0L
+                }
             }
-            val last = lastData
-            if (last == 0L || System.nanoTime() - last < QUIET_NS) continue
-            synchronized(lock) {
-                if (lastData != last) return@synchronized
-                nals.end(units::push)
-                units.end()
-                lastData = 0L
-            }
+        } catch (_: InterruptedException) {
+            return
+        } catch (e: IllegalStateException) {
+            // A codec call can outlive stop's bounded joins, or fail during playback.
+            end("display decoder stopped during idle flush", e)
         }
     }
 
@@ -93,7 +98,7 @@ class DisplayReceiver(
     /// one timestamp: a decoder fed slice by slice never sees a full frame.
     private fun queue(unit: ByteArray, config: Boolean) {
         val flags = if (config) MediaCodec.BUFFER_FLAG_CODEC_CONFIG else 0
-        while (running) {
+        while (running.get()) {
             val index = decoder.dequeueInputBuffer(10_000)
             if (index < 0) continue
             val buffer = decoder.getInputBuffer(index) ?: return
@@ -112,7 +117,7 @@ class DisplayReceiver(
     private fun renderLoop() {
         val info = MediaCodec.BufferInfo()
         try {
-            while (running) {
+            while (running.get()) {
                 when (val index = decoder.dequeueOutputBuffer(info, 10_000)) {
                     MediaCodec.INFO_OUTPUT_FORMAT_CHANGED -> {
                         val f = decoder.outputFormat
@@ -127,12 +132,18 @@ class DisplayReceiver(
                 }
             }
         } catch (e: Exception) {
-            if (running) Log.w("linksy", "display decoder stopped", e)
+            if (running.get()) Log.w("linksy", "display decoder stopped", e)
         }
     }
 
+    private fun end(message: String = "", cause: Exception? = null) {
+        if (!running.compareAndSet(true, false)) return
+        if (cause != null) Log.w("linksy", message, cause)
+        onEnded()
+    }
+
     fun stop() {
-        running = false
+        running.set(false)
         NativeSession.finish(session)
         idle.interrupt()
         input.join(300)
