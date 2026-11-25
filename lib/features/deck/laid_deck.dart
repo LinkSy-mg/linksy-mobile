@@ -6,6 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
 import '../../app/platform.dart';
+import '../../app/linksy_controller.dart';
 import '../../app/scope.dart';
 import '../../core/deck_draft.dart';
 import '../../core/deck_layouts.dart';
@@ -49,6 +50,9 @@ class LaidDeck extends StatefulWidget {
 class _LaidDeckState extends State<LaidDeck> {
   final _pages = PageController();
   int _page = 0;
+
+  /// Kept for when the deck goes: its scope can't be read any more then.
+  late LinksyController _c;
 
   /// The pages, kept as they are when what's around them changes (the editor
   /// over the deck, the phone turned): built anew they'd start at the first,
@@ -113,7 +117,7 @@ class _LaidDeckState extends State<LaidDeck> {
 
   @override
   void dispose() {
-    if (_remoting) LinksyScope.read(context).leaveRemote(_id);
+    if (_remoting) _c.leaveRemote(_id);
     _noteTimer?.cancel();
     _chromeTimer?.cancel();
     if (_fullScreen) {
@@ -127,7 +131,7 @@ class _LaidDeckState extends State<LaidDeck> {
 
   @override
   Widget build(BuildContext context) {
-    final c = LinksyScope.of(context);
+    final c = _c = LinksyScope.of(context);
     final l = context.l10n;
     final layout = widget.layouts.shown;
     final name = widget.device.name;
