@@ -4,6 +4,19 @@ All notable changes to Linksy for Android. Format: [Keep a Changelog](https://ke
 
 ## [Unreleased]
 
+### Added
+
+- **Quick actions on Home** (mobile#24): the button on a computer's card is now More, with Send files, Clipboard, Ping, Find it, Snap, Remote, Deck, Terminal, play, previous, next and mute, without opening the computer first.
+
+### Fixed
+
+- Viewing a computer's screen no longer crashes the app when the phone's video decoder stops (mobile#26, thanks @bearyjd).
+- After editing the deck, it stays on the page you were on, and the dots match it (Discussion #79).
+
+### Security
+
+- A link in a Linksy announcement opens only over https, and Android's own web clients in the app refuse plain http. A release can no longer be built without the release key (thanks @bearyjd).
+
 ## [0.3.11] - 2026-11-19
 
 > [!IMPORTANT]
