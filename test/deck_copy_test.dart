@@ -203,6 +203,24 @@ void main() {
       expect(c.deckLayouts(node.pc.id)!.version, 3);
     });
 
+    test('one nobody saved is Dot Matrix, and stays so after going back; a '
+        'saved one keeps its theme', () async {
+      final first = deck([t('x', 'clock', 0, 0, 2, 1)], theme: 'stock');
+      await open(first);
+      String theme() => c.deckLayouts(node.pc.id)!.shown!.theme.id;
+      expect(theme(), 'dots');
+      await c.saveDeckHere(node.pc.id, wild());
+      await tick();
+      await open(node.saves.single.$2.copyWith(version: 1));
+      await c.dropDeckHere(node.pc.id);
+      expect(theme(), 'dots');
+      await open(first.copyWith(version: 5));
+      await open(
+        deck([t('y', 'clock', 0, 0, 1, 1)], theme: 'eink', version: 6),
+      );
+      expect(theme(), 'eink');
+    });
+
     test('a deck made here goes once, and its answer sends nothing', () async {
       await open(made);
       await c.saveDeckHere(node.pc.id, wild());

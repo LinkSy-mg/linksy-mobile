@@ -3300,14 +3300,15 @@ class LinksyController extends ChangeNotifier with WidgetsBindingObserver {
   /// it sent, kept on the phone; none until it sends some.
   DeckLayouts? deckLayouts(String id) {
     if (_deckHere(id) case final here?) return here;
-    if (_laid.containsKey(id)) return _laid[id];
-    String? saved;
-    try {
-      saved = _deckFile(id)?.readAsStringSync();
-    } on FileSystemException {
-      saved = null;
-    }
-    return _laid[id] = DeckLayouts.decode(saved);
+    final made = _madeThere(id);
+    // One nobody saved (version 0: the computer's own first one) is a new
+    // deck, and a new deck is Dot Matrix.
+    if (made == null || made.version > 0) return made;
+    return made.copyWith(
+      layouts: [
+        for (final l in made.layouts) l.copyWith(theme: DeckTheme.dots),
+      ],
+    );
   }
 
   File? _deckFile(String id) =>
@@ -3326,7 +3327,7 @@ class LinksyController extends ChangeNotifier with WidgetsBindingObserver {
     deckDrafts.remove(id);
     final made = _madeThere(id);
     _laid[id] = made != null && _copiesOf(id).contains(content)
-        ? made.copyWith(version: layouts.version, themes: layouts.themes)
+        ? made.copyWith(themes: layouts.themes)
         : layouts;
     notifyListeners();
     _write(_deckFile(id), jsonEncode(_laid[id]!.toJson()));
