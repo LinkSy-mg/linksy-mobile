@@ -43,6 +43,14 @@ abstract class LinksyNode implements RustOpaqueInterface {
   /// Connect over the internet now (away from home).
   Future<void> connectAway({required String id});
 
+  /// The layouts this phone made, for a computer that keeps them (§4.26): `layouts_json`
+  /// as the protocol has them, edited on its version `base_version`.
+  Future<void> deckLayoutSave({
+    required String id,
+    required PlatformInt64 baseVersion,
+    required String layoutsJson,
+  });
+
   /// This phone's deck for that computer shows (`open`) or stopped (§4.19).
   Future<void> deckOpen({required String id, required bool open});
 

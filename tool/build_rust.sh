@@ -5,7 +5,7 @@
 #
 # Needs: rustup with aarch64/armv7/x86_64-linux-android targets, cargo-ndk,
 # flutter_rust_bridge_codegen 2.13.0, the Android NDK, and SSH access to
-# LinkSy-mg/linksy-desktop (linksy-core is a git dependency).
+# LinkSy-mg/linksy-desktop (tool/core.sh gets linksy-core).
 set -euo pipefail
 cd "$(dirname "$0")/.."
 
@@ -13,6 +13,7 @@ export PATH="/opt/homebrew/opt/rustup/bin:$HOME/.cargo/bin:$PATH"
 SDK=${ANDROID_HOME:-/opt/homebrew/share/android-commandlinetools}
 export ANDROID_NDK_HOME=${ANDROID_NDK_HOME:-$SDK/ndk/28.2.13676358}
 
+tool/core.sh
 flutter_rust_bridge_codegen generate
 (cd rust && cargo ndk -t arm64-v8a -t armeabi-v7a -t x86_64 -P 24 \
   -o ../android/app/src/main/jniLibs build --release)

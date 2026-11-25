@@ -52,4 +52,5 @@ app.*.map.json
 
 # Rust bridge: built by tool/build_rust.sh
 /rust/target/
+/rust/core/
 /android/app/src/main/jniLibs/

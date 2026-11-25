@@ -571,6 +571,15 @@ impl LinksyNode {
         run(async move { node.deck_run(&id, &action, value).await }).await
     }
 
+    /// The layouts this phone made, for a computer that keeps them (§4.26): `layouts_json`
+    /// as the protocol has them, edited on its version `base_version`.
+    pub async fn deck_layout_save(&self, id: String, base_version: i64, layouts_json: String) -> Result<(), String> {
+        let id = fingerprint(&id)?;
+        let layouts = serde_json::from_str(&layouts_json).map_err(|e| format!("other:{e}"))?;
+        let node = self.node.clone();
+        run(async move { node.deck_layout_save(&id, base_version.max(0) as u64, &layouts).await }).await
+    }
+
     /// Photo auto-import: offers files into the computer's picture library.
     pub async fn import_files(&self, id: String, paths: Vec<String>) -> Result<String, String> {
         let id = fingerprint(&id)?;
