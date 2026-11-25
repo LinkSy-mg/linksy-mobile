@@ -3369,4 +3369,34 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get homeQuickMore => '更多';
+
+  @override
+  String get deckGauges => '电脑现状';
+
+  @override
+  String get deckStatCpu => 'CPU';
+
+  @override
+  String get deckStatRam => '内存';
+
+  @override
+  String get deckStatSwap => '交换空间';
+
+  @override
+  String get deckStatDisk => '磁盘';
+
+  @override
+  String get deckStatBattery => '电池';
+
+  @override
+  String get deckStatTemp => '温度';
+
+  @override
+  String get deckStatDown => '下载';
+
+  @override
+  String get deckStatUp => '上传';
+
+  @override
+  String get deckStatUptime => '运行时间';
 }

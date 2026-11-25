@@ -3423,4 +3423,34 @@ class AppLocalizationsJa extends AppLocalizations {
 
   @override
   String get homeQuickMore => 'その他';
+
+  @override
+  String get deckGauges => '現在のコンピューター';
+
+  @override
+  String get deckStatCpu => 'CPU';
+
+  @override
+  String get deckStatRam => 'メモリ';
+
+  @override
+  String get deckStatSwap => 'スワップ';
+
+  @override
+  String get deckStatDisk => 'ディスク';
+
+  @override
+  String get deckStatBattery => 'バッテリー';
+
+  @override
+  String get deckStatTemp => '温度';
+
+  @override
+  String get deckStatDown => '下り';
+
+  @override
+  String get deckStatUp => '上り';
+
+  @override
+  String get deckStatUptime => '稼働時間';
 }

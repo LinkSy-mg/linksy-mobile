@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
 import '../../app/scope.dart';
+import '../../core/deck_copy.dart' show deckMetrics;
 import '../../core/deck_draft.dart';
 import '../../core/deck_layouts.dart';
 import '../../core/deck_phone.dart';
@@ -152,6 +153,7 @@ class _DeckEditorState extends State<DeckEditor> {
       constraints: const BoxConstraints(maxWidth: sheetWidth),
       builder: (_) => _AddSheet(
         offered: _offered,
+        gauges: widget.device.features.contains('deck_stats'),
         placed: {for (final t in _d.tiles) ?t.action},
       ),
     );
@@ -165,10 +167,16 @@ class _DeckEditorState extends State<DeckEditor> {
       [final d, final b] when phone => (d, b),
       _ => (action, null),
     };
+    // A gauge says which in its props.
+    final gauge = kind == 'stat';
     DeckTile? put() => _d.add(
       kind,
-      action: phone ? null : action,
-      props: phone ? {'do': does!, 'button': ?button} : const {},
+      action: phone || gauge ? null : action,
+      props: phone
+          ? {'do': does!, 'button': ?button}
+          : gauge
+          ? {'metric': action!}
+          : const {},
       x: x,
       y: y,
     );
@@ -251,7 +259,11 @@ class _DeckEditorState extends State<DeckEditor> {
       constraints: const BoxConstraints(maxWidth: sheetWidth),
       barrierColor: Colors.black26,
       isScrollControlled: true,
-      builder: (_) => _ThemeSheet(draft: _d, onChanged: () => setState(() {})),
+      builder: (_) => _ThemeSheet(
+        draft: _d,
+        themes: LinksyScope.read(context).deckThemes(_id),
+        onChanged: () => setState(() {}),
+      ),
     );
   }
 
@@ -280,7 +292,11 @@ class _DeckEditorState extends State<DeckEditor> {
     ),
   );
 
-  DeckLook get _look => DeckLook.of(_d.layout.theme.id, _d.layout.theme.accent);
+  DeckLook get _look => DeckLook.of(
+    _d.layout.theme.id,
+    _d.layout.theme.accent,
+    LinksyScope.read(context).deckThemes(_id),
+  );
 
   Widget _tileView(DeckTile t, _Cells g) {
     final c = LinksyScope.read(context);
@@ -1154,7 +1170,14 @@ Widget _label(String t) => Padding(
 /// Everything that can go on the deck: what it shows live, what the computer
 /// offers. A tap picks it.
 class _AddSheet extends StatefulWidget {
-  const _AddSheet({required this.offered, required this.placed});
+  const _AddSheet({
+    required this.offered,
+    required this.placed,
+    required this.gauges,
+  });
+
+  /// The computer sends gauges (§4.28).
+  final bool gauges;
 
   final List<DeckAction> offered;
   final Set<String> placed;
@@ -1247,6 +1270,16 @@ class _AddSheetState extends State<_AddSheet> {
         if (shows(a.name)) _cell('volume', a.name, () => pick('volume', a.id)),
       if (shows(l.deckClock)) _cell('clock', l.deckClock, () => pick('clock')),
     ];
+    final gauges = [
+      if (widget.gauges)
+        for (final m in deckMetrics)
+          if (shows(deckMetricName(l, m)))
+            _cell(
+              deckMetricIcon(m),
+              deckMetricName(l, m),
+              () => pick('stat', m),
+            ),
+    ];
     final buttons = [
       for (final a in widget.offered)
         if (a.kind != DeckKind.slider && shows(a.name)) a,
@@ -1260,7 +1293,7 @@ class _AddSheetState extends State<_AddSheet> {
       (groups[a.group] ??= []).add(a);
     }
     Widget action(DeckAction a) => _cell(
-      deckIconName(a.id, playing: false),
+      deckCommandIcon(a.icon) ?? deckIconName(a.id, playing: false),
       a.name,
       () => pick('button', a.id),
     );
@@ -1302,6 +1335,10 @@ class _AddSheetState extends State<_AddSheet> {
                   padding: const EdgeInsets.only(bottom: 16),
                   children: [
                     if (live.isNotEmpty) ...[_label(l.deckLive), _grid(live)],
+                    if (gauges.isNotEmpty) ...[
+                      _label(l.deckGauges),
+                      _grid(gauges),
+                    ],
                     if (own.isNotEmpty) ...[
                       _label(l.deckFromPhone),
                       _grid(own),
@@ -1351,7 +1388,10 @@ class _TileSheetState extends State<_TileSheet> {
   static const _icons = [
     'lock', 'mic', 'volume', 'terminal', 'moon', 'wifi', //
     'power', 'restart', 'leaf', 'gauge', 'music', 'bluetooth', //
-    'keys', 'type', 'link', 'clipboard', 'bell', 'find',
+    'keys', 'type', 'link', 'clipboard', 'bell', 'find', //
+    'star', 'heart', 'sun', 'house', 'lightning', 'code', //
+    'rocket', 'game', 'camera', 'coffee', 'monitor', 'broadcast', //
+    'flag', 'folder', 'globe', 'cloud', 'timer', 'play',
   ];
 
   late final _name = TextEditingController(
@@ -1825,7 +1865,14 @@ class _Stepper extends StatelessWidget {
 
 /// The look, tried on the deck behind it.
 class _ThemeSheet extends StatefulWidget {
-  const _ThemeSheet({required this.draft, required this.onChanged});
+  const _ThemeSheet({
+    required this.draft,
+    required this.themes,
+    required this.onChanged,
+  });
+
+  /// The custom ones made on the computer.
+  final List<DeckThemeDef> themes;
 
   final DeckDraft draft;
   final VoidCallback onChanged;
@@ -1921,7 +1968,10 @@ class _ThemeSheetState extends State<_ThemeSheet> {
               child: ListView(
                 scrollDirection: Axis.horizontal,
                 children: [
-                  for (final id in DeckLook.computers)
+                  for (final id in [
+                    ...DeckLook.computers,
+                    for (final t in widget.themes) t.id,
+                  ])
                     Padding(
                       padding: const EdgeInsets.only(right: 8),
                       child: _swatch(context, id, theme),
@@ -1964,9 +2014,9 @@ class _ThemeSheetState extends State<_ThemeSheet> {
   }
 
   Widget _swatch(BuildContext context, String id, DeckTheme theme) {
-    final look = DeckLook.of(id, theme.accent);
+    final look = DeckLook.of(id, theme.accent, widget.themes);
     final on = theme.id == id;
-    final name = DeckLook.name(context, id);
+    final name = DeckLook.name(context, id, widget.themes);
     return Pressable(
       onTap: () => _set(DeckTheme(id: id, accent: theme.accent)),
       semanticLabel: name,

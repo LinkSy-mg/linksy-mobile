@@ -5837,6 +5837,66 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'More'**
   String get homeQuickMore;
+
+  /// Deck: the computer's gauges
+  ///
+  /// In en, this message translates to:
+  /// **'The computer now'**
+  String get deckGauges;
+
+  /// Deck: the computer's gauges
+  ///
+  /// In en, this message translates to:
+  /// **'CPU'**
+  String get deckStatCpu;
+
+  /// Deck: the computer's gauges
+  ///
+  /// In en, this message translates to:
+  /// **'Memory'**
+  String get deckStatRam;
+
+  /// Deck: the computer's gauges
+  ///
+  /// In en, this message translates to:
+  /// **'Swap'**
+  String get deckStatSwap;
+
+  /// Deck: the computer's gauges
+  ///
+  /// In en, this message translates to:
+  /// **'Disk'**
+  String get deckStatDisk;
+
+  /// Deck: the computer's gauges
+  ///
+  /// In en, this message translates to:
+  /// **'Battery'**
+  String get deckStatBattery;
+
+  /// Deck: the computer's gauges
+  ///
+  /// In en, this message translates to:
+  /// **'Temperature'**
+  String get deckStatTemp;
+
+  /// Deck: the computer's gauges
+  ///
+  /// In en, this message translates to:
+  /// **'Download'**
+  String get deckStatDown;
+
+  /// Deck: the computer's gauges
+  ///
+  /// In en, this message translates to:
+  /// **'Upload'**
+  String get deckStatUp;
+
+  /// Deck: the computer's gauges
+  ///
+  /// In en, this message translates to:
+  /// **'Uptime'**
+  String get deckStatUptime;
 }
 
 class _AppLocalizationsDelegate

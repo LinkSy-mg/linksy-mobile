@@ -50,7 +50,57 @@ const _icons = {
   'gauge': 'M4 18a8 8 0 1 1 16 0M12 18l4-6M12 8v1M7 11l.7.7M17 11l-.7.7',
   'auto': 'M12 3a9 9 0 1 0 0 18a9 9 0 1 0 0-18zM8.5 16l3.5-9 3.5 9M9.7 13h4.6',
   'terminal': 'M4 5h16v14H4zM7 9l3 3-3 3M12 15h5',
+  'star': 'M12 3l2.7 5.8 6.3.8-4.6 4.4 1.2 6.3L12 17.2 6.4 20.3l1.2-6.3L3 9.6l6.3-.8z',
+  'sun': 'M12 8a4 4 0 1 0 0 8a4 4 0 1 0 0-8zM12 2v2.5M12 19.5V22M2 12h2.5M19.5 12H22M5 5l1.8 1.8M17.2 17.2L19 19M5 19l1.8-1.8M17.2 6.8L19 5',
+  'house': 'M4 11l8-7 8 7M6 10v10h12V10M10 20v-6h4v6',
+  'lightning': 'M13 3L5 14h6l-1 7 8-11h-6z',
+  'code': 'M8 7l-5 5 5 5M16 7l5 5-5 5M14 5l-4 14',
+  'rocket': 'M12 3c4 3 5 7 4 12H8C7 10 8 6 12 3zM8 13l-3 4h3M16 13l3 4h-3M10 18l2 3 2-3M12 8v.5',
+  'game': 'M7 8h10a5 5 0 0 1 5 5v2a3 3 0 0 1-5.5 1.7L15 15H9l-1.5 1.7A3 3 0 0 1 2 15v-2a5 5 0 0 1 5-5zM7 10.5v3M5.5 12h3M16 11v.5M18 13v.5',
+  'camera': 'M4 7h3.5L9 5h6l1.5 2H20v12H4zM12 9.5a3.5 3.5 0 1 0 0 7a3.5 3.5 0 1 0 0-7z',
+  'heart': 'M12 20C6 16 3 13 3 9a4.5 4.5 0 0 1 9-1.5A4.5 4.5 0 0 1 21 9c0 4-3 7-9 11z',
+  'coffee': 'M5 9h11v6a4 4 0 0 1-4 4H9a4 4 0 0 1-4-4zM16 10h2a2.5 2.5 0 0 1 0 5h-2M8 3v3M12 3v3',
+  'monitor': 'M3 5h18v11H3zM12 16v4M8 20h8',
+  'broadcast': 'M12 10.5a1.5 1.5 0 1 0 0 3a1.5 1.5 0 1 0 0-3zM8 8a5.5 5.5 0 0 0 0 8M16 8a5.5 5.5 0 0 1 0 8M5 5a10 10 0 0 0 0 14M19 5a10 10 0 0 1 0 14',
+  'flag': 'M6 21V4M6 4h12l-2.5 4L18 12H6',
+  'folder': 'M3 6h6l2 2.5h10V19H3z',
+  'globe': 'M12 3a9 9 0 1 0 0 18a9 9 0 1 0 0-18zM3 12h18M12 3c-5 5-5 13 0 18M12 3c5 5 5 13 0 18',
+  'cloud': 'M7 18a4 4 0 0 1-.5-8A6 6 0 0 1 18 9.5a4.3 4.3 0 0 1 0 8.5z',
+  'timer': 'M12 6a7.5 7.5 0 1 0 0 15a7.5 7.5 0 1 0 0-15zM12 13.5l3-3M10 3h4',
+  'chip': 'M7 7h10v10H7zM10 7V3.5M14 7V3.5M10 20.5V17M14 20.5V17M7 10H3.5M7 14H3.5M20.5 10H17M20.5 14H17',
+  'memory': 'M3 8h18v8H3zM7 8v4M11 8v4M15 8v4M6 16v3M10 16v3M14 16v3M18 16v3',
+  'disk': 'M4 5h16v14H4zM4 14h16M16.5 16.5v.5',
+  'battery': 'M3 8h16v8H3zM21.5 11v2M6 10.5v3M9.5 10.5v3',
+  'heat': 'M10 14V5a2 2 0 0 1 4 0v9a4 4 0 1 1-4 0zM12 9v7',
   'app': 'M4 4h7v7H4zM13 4h7v7h-7zM4 13h7v7H4zM13 13h7v7h-7z',
+};
+
+/// The icon the computer names for a command (§4.26), as this phone calls
+/// it; null for one it doesn't have.
+String? deckCommandIcon(String? name) {
+  final own = switch (name) {
+    null => null,
+    'play_pause' => 'play',
+    'previous' => 'prev',
+    'speaker' => 'volume',
+    'speaker_off' => 'mute',
+    'microphone' || 'microphone_off' => 'mic',
+    _ => name,
+  };
+  return _icons.containsKey(own) ? own : null;
+}
+
+/// A gauge's icon.
+String deckMetricIcon(String? metric) => switch (metric) {
+  'cpu' => 'chip',
+  'ram' || 'swap' => 'memory',
+  'disk' => 'disk',
+  'battery' => 'battery',
+  'temp' => 'heat',
+  'net_down' => 'down',
+  'net_up' => 'up',
+  'uptime' => 'timer',
+  _ => 'gauge',
 };
 
 /// A deck action's icon (the desktop's `icon_for`).
@@ -866,7 +916,7 @@ class DeckBackdropPainter extends CustomPainter {
       case DeckBackdrop.plain:
         break;
       case DeckBackdrop.dotGrid:
-        final dot = Paint()..color = Colors.white.withValues(alpha: 0.07);
+        final dot = Paint()..color = look.screenInk.withValues(alpha: 0.07);
         for (var y = 3.0; y < size.height; y += 6) {
           for (var x = 3.0; x < size.width; x += 6) {
             canvas.drawCircle(Offset(x, y), 1, dot);

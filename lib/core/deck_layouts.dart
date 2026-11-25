@@ -16,7 +16,11 @@ class DeckLayouts {
     required this.version,
     required this.active,
     required this.layouts,
+    this.themes = const [],
   });
+
+  /// The custom themes made on the computer (§4.26).
+  final List<DeckThemeDef> themes;
 
   /// One more on every save there.
   final int version;
@@ -29,16 +33,19 @@ class DeckLayouts {
     int? version,
     String? active,
     List<DeckLayout>? layouts,
+    List<DeckThemeDef>? themes,
   }) => DeckLayouts(
     version: version ?? this.version,
     active: active ?? this.active,
     layouts: layouts ?? this.layouts,
+    themes: themes ?? this.themes,
   );
 
   Map<String, Object?> toJson() => {
     'version': version,
     'active': active,
     'layouts': [for (final l in layouts) l.toJson()],
+    if (themes.isNotEmpty) 'themes': [for (final t in themes) t.json],
   };
 
   /// The layout to show: the active one, else the first.
@@ -56,6 +63,10 @@ class DeckLayouts {
           for (final l
               in (j['layouts'] as List? ?? const []).whereType<_Json>())
             DeckLayout._parse(l),
+        ],
+        themes: [
+          for (final t in (j['themes'] as List? ?? const []))
+            ?DeckThemeDef.parse(t),
         ],
       );
     } on Object {
@@ -172,8 +183,9 @@ class DeckFace {
     if (j is! _Json) return DeckFace(columns: columns, rows: rows, pages: [[]]);
     final grid = (j['grid'] as List?)?.whereType<num>().toList();
     if (grid != null && grid.length == 2) {
-      columns = grid[0].toInt().clamp(1, 12);
-      rows = grid[1].toInt().clamp(1, 12);
+      // The computer keeps to 12; a phone's own grid can be finer.
+      columns = grid[0].toInt().clamp(1, 40);
+      rows = grid[1].toInt().clamp(1, 40);
     }
     final pages = [
       for (final p in (j['pages'] as List? ?? const []).whereType<List>())
@@ -204,7 +216,11 @@ class DeckTile {
     this.color,
     this.action,
     this.props = const {},
+    this.icon = '',
   });
+
+  /// The phone's icon for it, as the computer keeps it (§4.26).
+  final String icon;
 
   final String id;
   final String kind;
@@ -246,6 +262,7 @@ class DeckTile {
     color: noColor ? null : color ?? this.color,
     action: action ?? this.action,
     props: props ?? this.props,
+    icon: icon,
   );
 
   Map<String, Object?> toJson() => {
@@ -259,6 +276,7 @@ class DeckTile {
     if (color case final c?) 'color': deckHex(c),
     'action': ?action,
     if (props.isNotEmpty) 'props': props,
+    if (icon.isNotEmpty) 'icon': icon,
   };
 
   /// Kept inside the grid, whatever came.
@@ -276,6 +294,7 @@ class DeckTile {
       label: j['label'] as String? ?? '',
       color: deckColor(j['color'] as String?),
       action: j['action'] as String?,
+      icon: j['icon'] as String? ?? '',
       props: {
         for (final MapEntry(:key, :value)
             in (j['props'] as _Json? ?? const {}).entries)
@@ -294,4 +313,61 @@ Color? deckColor(String? hex) {
   if (hex == null || hex.length != 7 || !hex.startsWith('#')) return null;
   final v = int.tryParse(hex.substring(1), radix: 16);
   return v == null ? null : Color(0xFF000000 | v);
+}
+
+/// A theme made on the computer (§4.26): the art of one of the five looks
+/// ([base]) with its own colours, shape and type.
+class DeckThemeDef {
+  const DeckThemeDef._(this.json);
+
+  /// As it came, and as it's kept.
+  final Map<String, Object?> json;
+
+  /// Null unless it has an id, a base and its five colours.
+  static DeckThemeDef? parse(Object? j) {
+    if (j is! _Json) return null;
+    final def = DeckThemeDef._(j);
+    final ok =
+        def.id.startsWith('t:') &&
+        bases.contains(j['base']) &&
+        [
+          'screen',
+          'ink',
+          'tile',
+          'on',
+          'on_ink',
+        ].every((k) => def._color(k) != null);
+    return ok ? def : null;
+  }
+
+  static const bases = ['stock', 'dots', 'eink', 'term', 'pixel'];
+
+  Color? _color(String key) =>
+      json[key] is String ? deckColor(json[key] as String) : null;
+  String _word(String key) => json[key] is String ? json[key] as String : '';
+
+  String get id => _word('id');
+  String get name => _word('name');
+  String get base => _word('base');
+  Color get screen => _color('screen')!;
+  Color get ink => _color('ink')!;
+  Color get tile => _color('tile')!;
+  Color get on => _color('on')!;
+  Color get onInk => _color('on_ink')!;
+  Color? get edge => _color('edge');
+  double get radius => (json['radius'] is num ? json['radius']! as num : 0)
+      .toDouble()
+      .clamp(0, 28);
+
+  /// `none`, `line`, `thick` or `bevel`.
+  String get border => _word('border');
+
+  /// `plain`, `dots` or `scan`.
+  String get texture => _word('texture');
+
+  /// `base`, `none`, `fill` or `icon`.
+  String get tint => _word('tint');
+  bool get mono => _word('font') == 'mono';
+  bool get caps => json['caps'] == true;
+  bool get glow => json['glow'] == true;
 }

@@ -64,6 +64,8 @@ class DemoNode implements LinksyNode {
           'microphone',
           'terminal',
           'deck',
+          'deck_stats',
+          'deck_layout_save',
         ],
       ),
       trusted: true,
@@ -564,7 +566,29 @@ class DemoNode implements LinksyNode {
     _setConnected(id, true);
     _emit(DeckActionsReceived(from: from, actions: _deck));
     _emit(DeckStateReceived(from: from, states: _deckState.values.toList()));
+    _emit(
+      DeckStatsReceived(
+        from: from,
+        stats: const [
+          DeckState(id: 'stat.cpu', value: 0.23, text: '23%'),
+          DeckState(id: 'stat.ram', value: 0.61, text: '9.8 GB / 16.0 GB'),
+          DeckState(id: 'stat.disk', value: 0.45, text: '212.0 GB / 476.0 GB'),
+          DeckState(id: 'stat.battery', value: 0.82, text: '82% \u26a1'),
+          DeckState(id: 'stat.temp', value: 0.54, text: '54 °C'),
+          DeckState(id: 'stat.net_down', text: '1.4 MB/s'),
+          DeckState(id: 'stat.net_up', text: '42 KB/s'),
+          DeckState(id: 'stat.uptime', text: '2d 4h'),
+        ],
+      ),
+    );
   }
+
+  @override
+  Future<void> deckLayoutSave(
+    String id,
+    int base,
+    Map<String, Object?> layouts,
+  ) async {}
 
   @override
   Future<void> deckRun(String id, String action, {double? value}) async {

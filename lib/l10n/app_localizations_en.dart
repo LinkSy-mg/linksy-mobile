@@ -3497,4 +3497,34 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get homeQuickMore => 'More';
+
+  @override
+  String get deckGauges => 'The computer now';
+
+  @override
+  String get deckStatCpu => 'CPU';
+
+  @override
+  String get deckStatRam => 'Memory';
+
+  @override
+  String get deckStatSwap => 'Swap';
+
+  @override
+  String get deckStatDisk => 'Disk';
+
+  @override
+  String get deckStatBattery => 'Battery';
+
+  @override
+  String get deckStatTemp => 'Temperature';
+
+  @override
+  String get deckStatDown => 'Download';
+
+  @override
+  String get deckStatUp => 'Upload';
+
+  @override
+  String get deckStatUptime => 'Uptime';
 }

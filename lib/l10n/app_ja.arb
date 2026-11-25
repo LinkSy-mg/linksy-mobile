@@ -953,5 +953,15 @@
   "deckGridRows": "{count, plural, other{{count} 行}}",
   "deckGridBigger": "タイルを大きく",
   "deckGridSmaller": "タイルを小さく",
-  "homeQuickMore": "その他"
+  "homeQuickMore": "その他",
+  "deckGauges": "現在のコンピューター",
+  "deckStatCpu": "CPU",
+  "deckStatRam": "メモリ",
+  "deckStatSwap": "スワップ",
+  "deckStatDisk": "ディスク",
+  "deckStatBattery": "バッテリー",
+  "deckStatTemp": "温度",
+  "deckStatDown": "下り",
+  "deckStatUp": "上り",
+  "deckStatUptime": "稼働時間"
 }

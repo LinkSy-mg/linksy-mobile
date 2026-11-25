@@ -309,20 +309,26 @@ LinksyEvent? eventFromJson(Json j) {
             kind: DeckKind.parse(a['kind'] as String?),
             group: a['group'] as String? ?? '',
             confirm: a['confirm'] as String?,
+            icon: a['icon'] as String?,
           ),
       ],
     ),
     'deck_state' => DeckStateReceived(
       from: device('from'),
-      states: [
-        for (final d in (j['states'] as List? ?? const []).cast<Json>())
-          DeckState(
-            id: d['id'] as String,
-            on: d['on'] as bool?,
-            value: (d['value'] as num?)?.toDouble(),
-            text: d['text'] as String?,
-          ),
-      ],
+      states: _deckStates(j['states']),
+    ),
+    'deck_stats' => DeckStatsReceived(
+      from: device('from'),
+      stats: _deckStates(j['stats']),
+    ),
+    'deck_layout_refused' => DeckLayoutRefused(
+      from: device('from'),
+      code: j['code'] as String? ?? '',
+      reason: j['reason'] as String? ?? '',
+    ),
+    'deck_theme_draft' => DeckThemeDraft(
+      from: device('from'),
+      theme: j['theme'] as Json?,
     ),
     'deck_layout' => DeckLayoutReceived(
       from: device('from'),
@@ -331,3 +337,13 @@ LinksyEvent? eventFromJson(Json j) {
     _ => null,
   };
 }
+
+List<DeckState> _deckStates(Object? list) => [
+  for (final d in (list as List? ?? const []).cast<Json>())
+    DeckState(
+      id: d['id'] as String,
+      on: d['on'] as bool?,
+      value: (d['value'] as num?)?.toDouble(),
+      text: d['text'] as String?,
+    ),
+];

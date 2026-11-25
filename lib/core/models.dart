@@ -645,9 +645,13 @@ class DeckAction {
     required this.kind,
     this.group = '',
     this.confirm,
+    this.icon,
   });
   final String id;
   final String name;
+
+  /// Picked on the computer for one of its user's commands (§4.26).
+  final String? icon;
   final DeckKind kind;
   final String group;
 
@@ -701,6 +705,35 @@ class DeckLayoutReceived extends LinksyEvent {
   const DeckLayoutReceived({required this.from, required this.layouts});
   final DeviceInfo from;
   final Map<String, Object?> layouts;
+}
+
+/// The gauges its deck's tiles show, every two seconds while it's open
+/// (§4.28): all of them each time.
+class DeckStatsReceived extends LinksyEvent {
+  const DeckStatsReceived({required this.from, required this.stats});
+  final DeviceInfo from;
+  final List<DeckState> stats;
+}
+
+/// A computer didn't keep the layouts sent (§4.26): [code] is `stale`,
+/// `invalid` or `too_big`.
+class DeckLayoutRefused extends LinksyEvent {
+  const DeckLayoutRefused({
+    required this.from,
+    required this.code,
+    required this.reason,
+  });
+  final DeviceInfo from;
+  final String code;
+  final String reason;
+}
+
+/// A theme being made on a computer, to show on the deck now and keep
+/// nothing of; null: back to the layout's (§4.26).
+class DeckThemeDraft extends LinksyEvent {
+  const DeckThemeDraft({required this.from, required this.theme});
+  final DeviceInfo from;
+  final Map<String, Object?>? theme;
 }
 
 /// A computer answers one of this phone's notifications it shows (§4.5):

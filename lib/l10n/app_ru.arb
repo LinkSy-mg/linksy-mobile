@@ -953,5 +953,15 @@
   "deckGridRows": "{count, plural, one{{count} строка} few{{count} строки} other{{count} строк}}",
   "deckGridBigger": "Плитки крупнее",
   "deckGridSmaller": "Плитки мельче",
-  "homeQuickMore": "Ещё"
+  "homeQuickMore": "Ещё",
+  "deckGauges": "Компьютер сейчас",
+  "deckStatCpu": "Процессор",
+  "deckStatRam": "Память",
+  "deckStatSwap": "Подкачка",
+  "deckStatDisk": "Диск",
+  "deckStatBattery": "Батарея",
+  "deckStatTemp": "Температура",
+  "deckStatDown": "Загрузка",
+  "deckStatUp": "Отдача",
+  "deckStatUptime": "Работает"
 }

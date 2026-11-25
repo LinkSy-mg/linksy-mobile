@@ -3533,4 +3533,34 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String get homeQuickMore => 'Plus';
+
+  @override
+  String get deckGauges => 'L\'ordinateur maintenant';
+
+  @override
+  String get deckStatCpu => 'Processeur';
+
+  @override
+  String get deckStatRam => 'Mémoire';
+
+  @override
+  String get deckStatSwap => 'Swap';
+
+  @override
+  String get deckStatDisk => 'Disque';
+
+  @override
+  String get deckStatBattery => 'Batterie';
+
+  @override
+  String get deckStatTemp => 'Température';
+
+  @override
+  String get deckStatDown => 'Réception';
+
+  @override
+  String get deckStatUp => 'Envoi';
+
+  @override
+  String get deckStatUptime => 'Allumé depuis';
 }

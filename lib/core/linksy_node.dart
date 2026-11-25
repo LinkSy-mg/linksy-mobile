@@ -171,6 +171,14 @@ abstract interface class LinksyNode {
   /// Runs one of [id]'s deck actions: a tap, or a slider's [value] (0 to 1).
   Future<void> deckRun(String id, String action, {double? value});
 
+  /// The deck's [layouts] for a computer that keeps them (§4.26), made on its
+  /// version [base]: answered by its `deck_layout`, or a refusal.
+  Future<void> deckLayoutSave(
+    String id,
+    int base,
+    Map<String, Object?> layouts,
+  );
+
   /// A step of a direct link this phone hosts, to [id] (docs/protocol.md
   /// §4.17): `{'type': 'invite', 'address': ...}`, `connecting`, `up` with
   /// `ip` and `port`, or `end` with a `reason`.

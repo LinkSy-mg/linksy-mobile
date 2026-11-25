@@ -3521,4 +3521,34 @@ class AppLocalizationsEs extends AppLocalizations {
 
   @override
   String get homeQuickMore => 'Más';
+
+  @override
+  String get deckGauges => 'El ordenador ahora';
+
+  @override
+  String get deckStatCpu => 'CPU';
+
+  @override
+  String get deckStatRam => 'Memoria';
+
+  @override
+  String get deckStatSwap => 'Swap';
+
+  @override
+  String get deckStatDisk => 'Disco';
+
+  @override
+  String get deckStatBattery => 'Batería';
+
+  @override
+  String get deckStatTemp => 'Temperatura';
+
+  @override
+  String get deckStatDown => 'Bajada';
+
+  @override
+  String get deckStatUp => 'Subida';
+
+  @override
+  String get deckStatUptime => 'Encendido';
 }

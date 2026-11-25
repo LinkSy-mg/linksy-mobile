@@ -10,6 +10,7 @@ import 'package:flutter/widgets.dart';
 import 'package:flutter/services.dart';
 
 import '../core/deck.dart';
+import '../core/deck_copy.dart';
 import '../core/deck_layouts.dart';
 import '../core/linksy_node.dart';
 import 'app_log.dart';
@@ -2547,6 +2548,11 @@ class LinksyController extends ChangeNotifier with WidgetsBindingObserver {
       case Disconnected(:final id):
         media.remove(id);
         volume.remove(id);
+        deckStats.remove(id);
+        deckDrafts.remove(id);
+        _deckVersion.remove(id);
+        _deckTried.remove(id);
+        _deckStrict.remove(id);
         _showMediaNotice();
         _toldPicture.remove(id);
         _clipWatching.remove(id);
@@ -2705,6 +2711,7 @@ class LinksyController extends ChangeNotifier with WidgetsBindingObserver {
       case DeckActionsReceived(:final from, :final actions):
         deckActions[from.id] = actions;
         _deckFirstLayout(from.id, actions);
+        _syncDeck(from.id);
         notifyListeners();
       case DeckStateReceived(:final from, :final states):
         final now = deckStates.putIfAbsent(from.id, () => {});
@@ -2714,6 +2721,14 @@ class LinksyController extends ChangeNotifier with WidgetsBindingObserver {
         notifyListeners();
       case DeckLayoutReceived(:final from, :final layouts):
         _onDeckLayouts(from.id, layouts);
+      case DeckStatsReceived(:final from, :final stats):
+        deckStats[from.id] = {for (final st in stats) st.id: st};
+        notifyListeners();
+      case DeckLayoutRefused(:final from, :final code, :final reason):
+        _onDeckRefused(from, code, reason);
+      case DeckThemeDraft(:final from, :final theme):
+        deckDrafts[from.id] = DeckThemeDef.parse(theme);
+        notifyListeners();
       // Turned off here since: nothing to answer.
       case NotificationReplyRequested() ||
           NotificationActionRequested() ||
@@ -3262,6 +3277,7 @@ class LinksyController extends ChangeNotifier with WidgetsBindingObserver {
   Future<void> saveDeckHere(String id, DeckLayouts layouts) async {
     _laidHere[id] = layouts;
     notifyListeners();
+    _syncDeck(id);
     final file = _deckHereFile(id);
     if (file == null) return;
     try {
@@ -3276,6 +3292,7 @@ class LinksyController extends ChangeNotifier with WidgetsBindingObserver {
   Future<void> dropDeckHere(String id) async {
     _laidHere[id] = null;
     notifyListeners();
+    _syncDeck(id);
     await _deckHereFile(id)?.delete().catchError((Object _) => File(''));
   }
 
@@ -3296,21 +3313,133 @@ class LinksyController extends ChangeNotifier with WidgetsBindingObserver {
   File? _deckFile(String id) =>
       _decks == null ? null : File('${_decks.path}/$id.json');
 
-  /// Each set the computer sends is its current one: shown, and kept.
+  /// Each set the computer sends is its current one: shown, and kept. But
+  /// this phone's own copy coming back (see [_syncDeck]) only brings its
+  /// version and the computer's themes: what the computer had made stays, to
+  /// go back to.
   void _onDeckLayouts(String id, Map<String, Object?> json) {
     final layouts = DeckLayouts.parse(json);
     if (layouts == null) return;
-    _laid[id] = layouts;
+    _deckVersion[id] = layouts.version;
+    final content = deckContent(layouts);
+    _deckThere[id] = content;
+    deckDrafts.remove(id);
+    final made = _madeThere(id);
+    _laid[id] = made != null && _copiesOf(id).contains(content)
+        ? made.copyWith(version: layouts.version, themes: layouts.themes)
+        : layouts;
     notifyListeners();
-    final file = _deckFile(id);
+    _write(_deckFile(id), jsonEncode(_laid[id]!.toJson()));
+    _syncDeck(id);
+  }
+
+  /// What the computer had made, kept from before.
+  DeckLayouts? _madeThere(String id) {
+    if (!_laid.containsKey(id)) {
+      _laid[id] = DeckLayouts.decode(_read(_deckFile(id)));
+    }
+    return _laid[id];
+  }
+
+  String? _read(File? file) {
+    try {
+      return file?.readAsStringSync();
+    } on FileSystemException {
+      return null;
+    }
+  }
+
+  Future<void> _write(File? file, String text) async {
     if (file == null) return;
-    file.parent
-        .create(recursive: true)
-        .then((_) => file.writeAsString(jsonEncode(json)))
-        .catchError((Object e) {
-          log.add('Deck layouts not kept: $e');
-          return file;
-        });
+    try {
+      await file.parent.create(recursive: true);
+      await file.writeAsString(text);
+    } on FileSystemException catch (e) {
+      log.add('Deck not kept: $e');
+    }
+  }
+
+  // The phone's deck on the computer (§4.26).
+
+  /// The gauges each computer's deck shows, by `stat.<metric>` (§4.28).
+  final deckStats = <String, Map<String, DeckState>>{};
+
+  /// A theme a computer shows on the deck while it's being made.
+  final deckDrafts = <String, DeckThemeDef?>{};
+
+  /// The custom themes [id] has.
+  List<DeckThemeDef> deckThemes(String id) =>
+      _madeThere(id)?.themes ?? const [];
+
+  /// What the computer has now: its version, and its content.
+  final _deckVersion = <String, int>{};
+  final _deckThere = <String, String>{};
+
+  /// The copy last sent, until it's answered: never the same one twice on a
+  /// version.
+  final _deckTried = <String, (int, String)>{};
+
+  /// Computers that refused tiles of actions they don't offer this phone.
+  final _deckStrict = <String>{};
+
+  /// The last copies sent from this phone, kept between runs: one of them
+  /// coming back is this phone's, not something made on the computer.
+  final _deckCopies = <String, List<String>>{};
+
+  File? _deckCopyFile(String id) =>
+      _decks == null ? null : File('${_decks.path}/$id.copy.json');
+
+  List<String> _copiesOf(String id) => _deckCopies[id] ??= [
+    for (final line in (_read(_deckCopyFile(id)) ?? '').split('\n'))
+      if (line.isNotEmpty) line,
+  ];
+
+  /// Gives a computer that keeps decks a copy of the one laid out here, as
+  /// far as it takes it, once its own version is known. Back to what the
+  /// computer had made: that again.
+  void _syncDeck(String id) {
+    final version = _deckVersion[id];
+    final actions = deckActions[id];
+    if (version == null || actions == null) return;
+    if (!(device(id)?.device.features.contains('deck_layout_save') ?? false)) {
+      return;
+    }
+    final here = _deckHere(id);
+    final deck = here ?? (_copiesOf(id).isEmpty ? null : _madeThere(id));
+    if (deck == null) return;
+    final copy = deckForComputer(
+      deck,
+      actions: _deckStrict.contains(id)
+          ? {for (final a in actions) a.id}
+          : null,
+      themes: {for (final t in deckThemes(id)) t.id},
+    ).copyWith(version: version);
+    final content = deckContent(copy);
+    if (content == _deckThere[id]) {
+      // Back as the computer made it: no longer this phone's.
+      if (here == null) {
+        _deckCopies[id] = [];
+        _deckCopyFile(id)?.delete().catchError((Object _) => File(''));
+      }
+      return;
+    }
+    if (_deckTried[id] == (version, content)) return;
+    _deckTried[id] = (version, content);
+    final copies = _deckCopies[id] = [
+      content,
+      ..._copiesOf(id).where((c) => c != content).take(2),
+    ];
+    _write(_deckCopyFile(id), copies.join('\n'));
+    node.deckLayoutSave(id, version, copy.toJson()).catchError((Object e) {
+      _deckTried.remove(id);
+      log.add('Deck not sent to ${_who(id)}: $e');
+    });
+  }
+
+  void _onDeckRefused(DeviceInfo from, String code, String reason) {
+    log.add('Deck not kept by ${from.name}: $code $reason');
+    // Stale: its current deck follows, and the copy goes again on that.
+    if (code == 'invalid' && _deckStrict.add(from.id)) _syncDeck(from.id);
   }
 
   /// The theme picked on the phone for [layout] on [id], drawn instead of
@@ -3324,6 +3453,11 @@ class LinksyController extends ChangeNotifier with WidgetsBindingObserver {
   Future<void> _forgetDeck(String id) async {
     _laid.remove(id);
     _laidHere.remove(id);
+    _deckCopies.remove(id);
+    _deckVersion.remove(id);
+    _deckThere.remove(id);
+    _deckTried.remove(id);
+    await _deckCopyFile(id)?.delete().catchError((Object _) => File(''));
     await _deckHereFile(id)?.delete().catchError((Object _) => File(''));
     _phoneDecks.remove(id);
     await _deckFile(id)?.delete().catchError((Object _) => File(''));
@@ -3346,8 +3480,11 @@ class LinksyController extends ChangeNotifier with WidgetsBindingObserver {
   }
 
   /// …and stopped: it stops sending.
-  Future<void> closeDeck(String id) =>
-      node.deckOpen(id, open: false).catchError((Object _) {});
+  Future<void> closeDeck(String id) {
+    deckStats.remove(id);
+    deckDrafts.remove(id);
+    return node.deckOpen(id, open: false).catchError((Object _) {});
+  }
 
   final _slid = <String, double>{};
   final _sliding = <String, Timer>{};

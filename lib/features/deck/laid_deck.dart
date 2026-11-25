@@ -133,7 +133,15 @@ class _LaidDeckState extends State<LaidDeck> {
     final name = widget.device.name;
     final own = layout == null ? null : c.deckTheme(_id, layout.id);
     final accent = layout?.theme.accent ?? DeckTheme.stock.accent;
-    final look = DeckLook.of(own ?? layout?.theme.id ?? 'stock', accent);
+    // A theme being made on the computer shows here as it goes (§4.26).
+    final draft = c.deckDrafts[_id];
+    final look = draft != null
+        ? DeckLook.custom(draft, accent)
+        : DeckLook.of(
+            own ?? layout?.theme.id ?? 'stock',
+            accent,
+            c.deckThemes(_id),
+          );
 
     final landscape =
         MediaQuery.orientationOf(context) == Orientation.landscape;
@@ -179,6 +187,7 @@ class _LaidDeckState extends State<LaidDeck> {
       live: widget.live,
       actions: c.deckActions[_id] == null ? null : actions,
       states: c.deckStates[_id] ?? const {},
+      stats: widget.live ? c.deckStats[_id] : null,
       player: widget.live ? player : null,
       players: widget.live ? players : const [],
       say: _say,
@@ -446,8 +455,12 @@ class _LaidDeckState extends State<LaidDeck> {
       context: context,
       isScrollControlled: true,
       showDragHandle: true,
-      builder: (_) =>
-          _ThemeSheet(computer: widget.device.name, layout: layout, own: own),
+      builder: (_) => _ThemeSheet(
+        computer: widget.device.name,
+        themes: c.deckThemes(_id),
+        layout: layout,
+        own: own,
+      ),
     );
     if (picked == null) return;
     await c.setDeckTheme(_id, layout.id, picked.$1);
@@ -583,9 +596,13 @@ class _Scope {
     required this.players,
     required this.say,
     required this.hold,
+    this.stats,
     this.hideBlocked = false,
     this.preview = false,
   });
+
+  /// The computer's gauges now; null until it sent some.
+  final Map<String, DeckState>? stats;
 
   final String deviceId;
   final String deviceName;
@@ -1155,7 +1172,14 @@ class _Tile extends StatelessWidget {
     if (scope.hideBlocked && scope.live && runs && !known) {
       return const SizedBox.shrink();
     }
-    final dimmed = t.kind != 'clock' && (!scope.live || runs && !known);
+    // A gauge this computer hasn't got (a battery, a sensor).
+    final noGauge =
+        t.kind == 'stat' &&
+        scope.stats != null &&
+        !scope.stats!.containsKey('stat.${t.props['metric']}') &&
+        !_StatFace.late.contains(t.props['metric']);
+    final dimmed =
+        t.kind != 'clock' && (!scope.live || runs && !known || noGauge);
     final one = t.w == 1 && t.h == 1 && t.kind != 'clock';
     final pad = (one ? 5.0 : 9.0) * scale;
     final paint = look.paint(
@@ -1291,6 +1315,16 @@ class _Tile extends StatelessWidget {
     switch (t.kind) {
       case 'clock':
         built = shell(_ClockFace(tile: t, pen: pen, width: inner));
+      case 'stat':
+        built = shell(
+          _StatFace(
+            tile: t,
+            scope: scope,
+            pen: pen,
+            width: inner,
+            iconColor: paint.icon,
+          ),
+        );
       case 'music':
         built = shell(
           _MusicFace(
@@ -1315,7 +1349,9 @@ class _Tile extends StatelessWidget {
       case 'button':
         final playing = scope.player?.playing ?? false;
         built = press(
-          t.props['icon'] ?? deckIconName(action, playing: playing),
+          t.props['icon'] ??
+              deckCommandIcon(offered?.icon) ??
+              deckIconName(action, playing: playing),
           state?.text ?? label,
           state?.text == null ? label : '$label, ${state!.text}',
           () {
@@ -2384,12 +2420,16 @@ class _VolumeTileState extends State<_VolumeTile> {
 /// its five, or one of the phone's own; kept here, for this layout.
 class _ThemeSheet extends StatelessWidget {
   const _ThemeSheet({
+    required this.themes,
     required this.computer,
     required this.layout,
     required this.own,
   });
 
   final String computer;
+
+  /// The custom ones made on it.
+  final List<DeckThemeDef> themes;
   final DeckLayout layout;
 
   /// The phone's pick now; none: the layout's own.
@@ -2427,7 +2467,10 @@ class _ThemeSheet extends StatelessWidget {
             ),
             child: ClipRRect(
               borderRadius: BorderRadius.circular(Radii.lg),
-              child: _Preview(look: DeckLook.of(id, accent), accent: accent),
+              child: _Preview(
+                look: DeckLook.of(id, accent, themes),
+                accent: accent,
+              ),
             ),
           ),
           const SizedBox(height: 6),
@@ -2492,7 +2535,7 @@ class _ThemeSheet extends StatelessWidget {
             option(
               layout.theme.id,
               l.deckThemeAsMade(computer),
-              caption: DeckLook.name(context, layout.theme.id),
+              caption: DeckLook.name(context, layout.theme.id, themes),
               picked: own == null,
               result: (null,),
             ),
@@ -2500,10 +2543,13 @@ class _ThemeSheet extends StatelessWidget {
           const SizedBox(height: 18),
           SectionLabel(l.deckThemesShared),
           grid([
-            for (final id in DeckLook.computers)
+            for (final id in [
+              ...DeckLook.computers,
+              for (final t in themes) t.id,
+            ])
               option(
                 id,
-                DeckLook.name(context, id),
+                DeckLook.name(context, id, themes),
                 picked: own == id,
                 result: (id,),
               ),
@@ -2614,3 +2660,174 @@ class _Preview extends StatelessWidget {
     );
   }
 }
+
+/// One of the computer's gauges (§4.28): what it is, how much, a bar for it
+/// where it has an end, and the figures where there's room.
+class _StatFace extends StatelessWidget {
+  const _StatFace({
+    required this.tile,
+    required this.scope,
+    required this.pen,
+    required this.width,
+    required this.iconColor,
+  });
+
+  final DeckTile tile;
+  final _Scope scope;
+  final _Pen pen;
+  final double width;
+  final Color iconColor;
+
+  /// A difference since the last reading: not in the first message.
+  static const late = {'cpu', 'net_down', 'net_up'};
+
+  @override
+  Widget build(BuildContext context) {
+    final metric = tile.props['metric'];
+    final stat = scope.stats?['stat.$metric'];
+    final look = scope.look;
+    final scale = pen.scale;
+    // The bolt it adds while charging is drawn, not written.
+    final raw = stat?.text ?? '';
+    final charging = metric == 'battery' && raw.contains('\u26a1');
+    final text = raw.replaceAll('\u26a1', '').trim();
+    final value = stat?.value;
+    final share = value == null ? null : '${(value * 100).round()}%';
+    // Two figures ("9.8 GB / 16.0 GB") are the small print of their share.
+    final parted = text.contains(' / ');
+    final main = stat == null ? '–' : (parted ? share ?? text : text);
+    final name = tile.label.isNotEmpty
+        ? tile.label
+        : deckMetricName(context.l10n, metric);
+    final small = tile.w == 1 && tile.h == 1;
+    final roomy = tile.h > 1;
+    final spoken = '$name $text';
+
+    final bar = value == null
+        ? null
+        : TweenAnimationBuilder<double>(
+            tween: Tween(end: value),
+            duration: motion(context, 600),
+            curve: Curves.easeOutCubic,
+            builder: (context, v, _) => DeckBar(value: v, look: look),
+          );
+    final icon = DeckIcon(
+      charging ? 'lightning' : deckMetricIcon(metric),
+      size: (look.icons == DeckStroke.pixel
+          ? 12.0 * math.max(1, (scale * 1.1).round())
+          : (small ? 14 : 18) * scale),
+      color: iconColor,
+      stroke: look.icons,
+    );
+    Widget number(double px, double room) => SizedBox(
+      width: room,
+      height: px * 1.25 * scale,
+      child: FittedBox(
+        fit: BoxFit.scaleDown,
+        alignment: Alignment.centerLeft,
+        child: pen.number(main, px: px, width: room),
+      ),
+    );
+    final title = pen.words(
+      name,
+      size: 11,
+      width: math.max(1, width - 26 * scale),
+      pitches: const [1.1, 0.9],
+      opacity: 0.75,
+    );
+    final List<Widget> rows;
+    if (small) {
+      rows = [
+        icon,
+        SizedBox(height: 2 * scale),
+        // Its unit under it, when both don't fit.
+        pen.words(
+          metric == 'net_down' || metric == 'net_up'
+              ? look.letters == DeckLetters.font
+                    ? main.replaceFirst(' ', '\n')
+                    : main
+              : main,
+          size: 12,
+          width: width,
+          lines: main.contains(' ') ? 2 : 1,
+          center: true,
+          pitches: const [1.5, 1.2, 1],
+        ),
+        if (bar != null) ...[SizedBox(height: 3 * scale), bar],
+      ];
+    } else if (!roomy) {
+      // One row: what it is, how much at its end, the bar under both.
+      rows = [
+        Row(
+          children: [
+            icon,
+            SizedBox(width: 6 * scale),
+            Expanded(child: title),
+          ],
+        ),
+        const Spacer(),
+        if (bar == null)
+          number(17, width)
+        else
+          Row(
+            children: [
+              number(14, math.min(width * 0.36, 60 * scale)),
+              SizedBox(width: 6 * scale),
+              Expanded(child: bar),
+            ],
+          ),
+      ];
+    } else {
+      rows = [
+        Row(
+          children: [
+            icon,
+            SizedBox(width: 6 * scale),
+            Expanded(child: title),
+          ],
+        ),
+        const Spacer(),
+        number(28, width),
+        if (parted) ...[
+          SizedBox(height: 4 * scale),
+          FittedBox(
+            fit: BoxFit.scaleDown,
+            child: pen.words(
+              text,
+              size: 11,
+              width: width,
+              pitches: const [1.1, 0.9],
+              opacity: 0.7,
+            ),
+          ),
+        ],
+        if (bar != null) ...[SizedBox(height: 5 * scale), bar],
+      ];
+    }
+    return Semantics(
+      label: spoken,
+      excludeSemantics: true,
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        crossAxisAlignment: small
+            ? CrossAxisAlignment.center
+            : CrossAxisAlignment.start,
+        children: rows,
+      ),
+    );
+  }
+}
+
+/// A gauge's name.
+String deckMetricName(AppLocalizations l, String? metric) => switch (metric) {
+  'cpu' => l.deckStatCpu,
+  'ram' => l.deckStatRam,
+  'swap' => l.deckStatSwap,
+  'disk' => l.deckStatDisk,
+  'battery' => l.deckStatBattery,
+  'temp' => l.deckStatTemp,
+  'net_down' => l.deckStatDown,
+  'net_up' => l.deckStatUp,
+  'uptime' => l.deckStatUptime,
+  _ => metric ?? '',
+};

@@ -953,5 +953,15 @@
   "deckGridRows": "{count, plural, other{{count} 行}}",
   "deckGridBigger": "更大的按钮",
   "deckGridSmaller": "更小的按钮",
-  "homeQuickMore": "更多"
+  "homeQuickMore": "更多",
+  "deckGauges": "电脑现状",
+  "deckStatCpu": "CPU",
+  "deckStatRam": "内存",
+  "deckStatSwap": "交换空间",
+  "deckStatDisk": "磁盘",
+  "deckStatBattery": "电池",
+  "deckStatTemp": "温度",
+  "deckStatDown": "下载",
+  "deckStatUp": "上传",
+  "deckStatUptime": "运行时间"
 }

@@ -45,6 +45,8 @@ const _features = [
   'picture',
   'locate',
   'deck_layout',
+  'deck_stats',
+  'deck_themes',
   'turn_on',
   'phone_controls',
   'preflight',

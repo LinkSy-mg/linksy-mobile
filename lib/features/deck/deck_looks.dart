@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '../../core/deck_layouts.dart';
 import '../../ui/l10n.dart';
 
 /// How a look writes: in a font, or in 5×7 glyphs of dots or squares.
@@ -127,7 +128,14 @@ class DeckLook {
   static const computers = ['stock', 'dots', 'eink', 'term', 'pixel'];
   static const phones = ['signal', 'glass', 'midnight'];
 
-  static String name(BuildContext context, String id) {
+  static String name(
+    BuildContext context,
+    String id, [
+    List<DeckThemeDef> themes = const [],
+  ]) {
+    for (final t in themes) {
+      if (t.id == id) return t.name;
+    }
     final l = context.l10n;
     return switch (id) {
       'dots' => l.deckThemeDots,
@@ -141,8 +149,78 @@ class DeckLook {
     };
   }
 
-  /// The look [id] in [accent]; one this phone doesn't know is Stock.
-  static DeckLook of(String id, Color accent) => switch (id) {
+  /// The look [id] in [accent], one of [themes] among them; one this phone
+  /// doesn't know is Stock.
+  static DeckLook of(
+    String id,
+    Color accent, [
+    List<DeckThemeDef> themes = const [],
+  ]) {
+    for (final t in themes) {
+      if (t.id == id) return custom(t, accent);
+    }
+    return _built(id, accent);
+  }
+
+  /// A theme made on the computer, by the rules of §4.26: its base's art, in
+  /// its own colours, shape and type.
+  static DeckLook custom(DeckThemeDef t, Color accent) {
+    final b = _built(t.base, accent);
+    final line = t.border == 'line' || t.border == 'thick';
+    final edge = line ? t.edge ?? t.ink.withValues(alpha: 0.2) : null;
+    return DeckLook(
+      id: t.id,
+      brightness: ThemeData.estimateBrightnessForColor(t.screen),
+      background: t.screen,
+      backdrop: switch (t.texture) {
+        'dots' => DeckBackdrop.dotGrid,
+        'scan' => DeckBackdrop.scanlines,
+        _ => DeckBackdrop.plain,
+      },
+      screenInk: t.ink,
+      tile: t.tile,
+      stroke: edge,
+      strokeWidth: t.border == 'thick' ? 2 : 1,
+      radius: t.radius,
+      tint: switch (t.tint) {
+        'none' => DeckTint.none,
+        'fill' => DeckTint.fill,
+        'icon' => DeckTint.icon,
+        _ => b.tint,
+      },
+      ink: t.ink,
+      on: t.on,
+      onInk: t.onInk,
+      onStroke: edge == null ? null : t.onInk,
+      font: t.mono ? 'monospace' : 'Inter',
+      weight: b.weight,
+      upper: t.caps,
+      spacing: b.spacing,
+      letters: b.letters,
+      prefix: b.prefix,
+      glow: t.glow
+          ? [Shadow(color: t.ink.withValues(alpha: 0.55), blurRadius: 6)]
+          : null,
+      icons: b.icons,
+      bars: b.bars,
+      track: t.ink.withValues(alpha: 0.18),
+      fill: accent,
+      barRadius: b.barRadius,
+      thickRadius: b.thickRadius,
+      play: t.ink,
+      playInk: t.screen,
+      playRadius: b.playRadius,
+      playShadow: t.border == 'bevel',
+      dot: t.ink.withValues(alpha: 0.28),
+      dotOn: accent,
+      squareDots: b.squareDots,
+      cover: b.cover,
+      coverRadius: b.coverRadius,
+      bevel: t.border == 'bevel',
+    );
+  }
+
+  static DeckLook _built(String id, Color accent) => switch (id) {
     'dots' => _dots(accent),
     'eink' => _eink,
     'term' => _term,
@@ -468,6 +546,7 @@ Color deckDefaultColor(String kind, String? action) {
   return switch ((kind, group)) {
     ('music', _) => const Color(0xFF3B2A63),
     ('clock', _) => const Color(0xFF0F766E),
+    ('stat', _) => const Color(0xFF1F3A5F),
     ('volume', _) => const Color(0xFF1D4FD8),
     (_, 'media') => const Color(0xFF24345C),
     (_, 'sound') => const Color(0xFF2B3550),

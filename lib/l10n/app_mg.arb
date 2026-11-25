@@ -953,5 +953,15 @@
   "deckGridRows": "{count, plural, other{Andalana {count}}}",
   "deckGridBigger": "Bokotra lehibe kokoa",
   "deckGridSmaller": "Bokotra kely kokoa",
-  "homeQuickMore": "Bebe kokoa"
+  "homeQuickMore": "Bebe kokoa",
+  "deckGauges": "Ny solosaina izao",
+  "deckStatCpu": "CPU",
+  "deckStatRam": "Fitadidiana",
+  "deckStatSwap": "Swap",
+  "deckStatDisk": "Kapila",
+  "deckStatBattery": "Batery",
+  "deckStatTemp": "Hafanana",
+  "deckStatDown": "Midina",
+  "deckStatUp": "Miakatra",
+  "deckStatUptime": "Nandeha hatramin'ny"
 }

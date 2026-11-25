@@ -953,5 +953,15 @@
   "deckGridRows": "{count, plural, =1{1 riga} other{{count} righe}}",
   "deckGridBigger": "Riquadri più grandi",
   "deckGridSmaller": "Riquadri più piccoli",
-  "homeQuickMore": "Altro"
+  "homeQuickMore": "Altro",
+  "deckGauges": "Il computer ora",
+  "deckStatCpu": "CPU",
+  "deckStatRam": "Memoria",
+  "deckStatSwap": "Swap",
+  "deckStatDisk": "Disco",
+  "deckStatBattery": "Batteria",
+  "deckStatTemp": "Temperatura",
+  "deckStatDown": "Download",
+  "deckStatUp": "Upload",
+  "deckStatUptime": "Acceso da"
 }

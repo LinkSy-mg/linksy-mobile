@@ -30,6 +30,7 @@ class DeckDraft {
     'volume' => const [(4, 1), (2, 1), (1, 3)],
     'music' => const [(4, 2), (4, 1), (2, 2)],
     'clock' => const [(2, 1), (2, 2), (1, 1)],
+    'stat' => const [(2, 1), (1, 1)],
     _ => const [],
   };
 

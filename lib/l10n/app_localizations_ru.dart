@@ -3546,4 +3546,34 @@ class AppLocalizationsRu extends AppLocalizations {
 
   @override
   String get homeQuickMore => 'Ещё';
+
+  @override
+  String get deckGauges => 'Компьютер сейчас';
+
+  @override
+  String get deckStatCpu => 'Процессор';
+
+  @override
+  String get deckStatRam => 'Память';
+
+  @override
+  String get deckStatSwap => 'Подкачка';
+
+  @override
+  String get deckStatDisk => 'Диск';
+
+  @override
+  String get deckStatBattery => 'Батарея';
+
+  @override
+  String get deckStatTemp => 'Температура';
+
+  @override
+  String get deckStatDown => 'Загрузка';
+
+  @override
+  String get deckStatUp => 'Отдача';
+
+  @override
+  String get deckStatUptime => 'Работает';
 }

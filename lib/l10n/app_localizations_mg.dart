@@ -3528,4 +3528,34 @@ class AppLocalizationsMg extends AppLocalizations {
 
   @override
   String get homeQuickMore => 'Bebe kokoa';
+
+  @override
+  String get deckGauges => 'Ny solosaina izao';
+
+  @override
+  String get deckStatCpu => 'CPU';
+
+  @override
+  String get deckStatRam => 'Fitadidiana';
+
+  @override
+  String get deckStatSwap => 'Swap';
+
+  @override
+  String get deckStatDisk => 'Kapila';
+
+  @override
+  String get deckStatBattery => 'Batery';
+
+  @override
+  String get deckStatTemp => 'Hafanana';
+
+  @override
+  String get deckStatDown => 'Midina';
+
+  @override
+  String get deckStatUp => 'Miakatra';
+
+  @override
+  String get deckStatUptime => 'Nandeha hatramin\'ny';
 }

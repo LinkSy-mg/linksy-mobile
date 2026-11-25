@@ -460,6 +460,20 @@ class RustNode implements LinksyNode {
   );
 
   @override
+  Future<void> deckLayoutSave(
+    String id,
+    int base,
+    Map<String, Object?> layouts,
+  ) => _guard(
+    () => _node.deckLayoutSave(
+      id: id,
+      baseVersion: base,
+      layoutsJson: jsonEncode(layouts),
+    ),
+    name: _nameOf(id),
+  );
+
+  @override
   Future<String> importFiles(String id, List<String> paths) => _guard(
     () => _node.importFiles(id: id, paths: paths),
     name: _nameOf(id),
