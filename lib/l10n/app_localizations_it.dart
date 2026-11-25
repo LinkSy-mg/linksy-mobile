@@ -3519,4 +3519,7 @@ class AppLocalizationsIt extends AppLocalizations {
 
   @override
   String get deckGridSmaller => 'Riquadri più piccoli';
+
+  @override
+  String get homeQuickMore => 'Altro';
 }

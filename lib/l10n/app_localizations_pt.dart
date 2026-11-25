@@ -3510,4 +3510,7 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get deckGridSmaller => 'Blocos menores';
+
+  @override
+  String get homeQuickMore => 'Mais';
 }

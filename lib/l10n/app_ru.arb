@@ -952,5 +952,6 @@
   "deckGridColumns": "{count, plural, one{{count} столбец} few{{count} столбца} other{{count} столбцов}}",
   "deckGridRows": "{count, plural, one{{count} строка} few{{count} строки} other{{count} строк}}",
   "deckGridBigger": "Плитки крупнее",
-  "deckGridSmaller": "Плитки мельче"
+  "deckGridSmaller": "Плитки мельче",
+  "homeQuickMore": "Ещё"
 }

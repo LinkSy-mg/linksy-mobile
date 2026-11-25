@@ -3366,4 +3366,7 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get deckGridSmaller => '更小的按钮';
+
+  @override
+  String get homeQuickMore => '更多';
 }

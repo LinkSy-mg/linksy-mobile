@@ -3525,4 +3525,7 @@ class AppLocalizationsMg extends AppLocalizations {
 
   @override
   String get deckGridSmaller => 'Bokotra kely kokoa';
+
+  @override
+  String get homeQuickMore => 'Bebe kokoa';
 }

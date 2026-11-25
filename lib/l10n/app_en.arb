@@ -4366,5 +4366,7 @@
   "deckGridBigger": "Bigger tiles",
   "@deckGridBigger": {"description": "Deck grid: fewer cells, bigger tiles (minus button)"},
   "deckGridSmaller": "Smaller tiles",
-  "@deckGridSmaller": {"description": "Deck grid: more cells, smaller tiles (plus button)"}
+  "@deckGridSmaller": {"description": "Deck grid: more cells, smaller tiles (plus button)"},
+  "homeQuickMore": "More",
+  "@homeQuickMore": {"description": "Home: a computer card, opens the rest of its quick actions"}
 }

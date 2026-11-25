@@ -952,5 +952,6 @@
   "deckGridColumns": "{count, plural, =1{1 colonna} other{{count} colonne}}",
   "deckGridRows": "{count, plural, =1{1 riga} other{{count} righe}}",
   "deckGridBigger": "Riquadri più grandi",
-  "deckGridSmaller": "Riquadri più piccoli"
+  "deckGridSmaller": "Riquadri più piccoli",
+  "homeQuickMore": "Altro"
 }

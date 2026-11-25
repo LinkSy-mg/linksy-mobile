@@ -952,5 +952,6 @@
   "deckGridColumns": "{count, plural, other{Andry {count}}}",
   "deckGridRows": "{count, plural, other{Andalana {count}}}",
   "deckGridBigger": "Bokotra lehibe kokoa",
-  "deckGridSmaller": "Bokotra kely kokoa"
+  "deckGridSmaller": "Bokotra kely kokoa",
+  "homeQuickMore": "Bebe kokoa"
 }

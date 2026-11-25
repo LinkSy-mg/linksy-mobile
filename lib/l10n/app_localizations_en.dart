@@ -3494,4 +3494,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get deckGridSmaller => 'Smaller tiles';
+
+  @override
+  String get homeQuickMore => 'More';
 }

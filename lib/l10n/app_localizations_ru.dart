@@ -3543,4 +3543,7 @@ class AppLocalizationsRu extends AppLocalizations {
 
   @override
   String get deckGridSmaller => 'Плитки мельче';
+
+  @override
+  String get homeQuickMore => 'Ещё';
 }

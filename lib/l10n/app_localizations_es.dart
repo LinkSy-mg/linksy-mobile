@@ -3518,4 +3518,7 @@ class AppLocalizationsEs extends AppLocalizations {
 
   @override
   String get deckGridSmaller => 'Botones más pequeños';
+
+  @override
+  String get homeQuickMore => 'Más';
 }

@@ -952,5 +952,6 @@
   "deckGridColumns": "{count, plural, =1{1 columna} other{{count} columnas}}",
   "deckGridRows": "{count, plural, =1{1 fila} other{{count} filas}}",
   "deckGridBigger": "Botones más grandes",
-  "deckGridSmaller": "Botones más pequeños"
+  "deckGridSmaller": "Botones más pequeños",
+  "homeQuickMore": "Más"
 }

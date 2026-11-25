@@ -952,5 +952,6 @@
   "deckGridColumns": "{count, plural, other{{count} 列}}",
   "deckGridRows": "{count, plural, other{{count} 行}}",
   "deckGridBigger": "更大的按钮",
-  "deckGridSmaller": "更小的按钮"
+  "deckGridSmaller": "更小的按钮",
+  "homeQuickMore": "更多"
 }

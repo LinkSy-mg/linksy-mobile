@@ -3420,4 +3420,7 @@ class AppLocalizationsJa extends AppLocalizations {
 
   @override
   String get deckGridSmaller => 'タイルを小さく';
+
+  @override
+  String get homeQuickMore => 'その他';
 }

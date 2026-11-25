@@ -5831,6 +5831,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Smaller tiles'**
   String get deckGridSmaller;
+
+  /// Home: a computer card, opens the rest of its quick actions
+  ///
+  /// In en, this message translates to:
+  /// **'More'**
+  String get homeQuickMore;
 }
 
 class _AppLocalizationsDelegate

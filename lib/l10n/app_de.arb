@@ -952,5 +952,6 @@
   "deckGridColumns": "{count, plural, =1{1 Spalte} other{{count} Spalten}}",
   "deckGridRows": "{count, plural, =1{1 Zeile} other{{count} Zeilen}}",
   "deckGridBigger": "Größere Kacheln",
-  "deckGridSmaller": "Kleinere Kacheln"
+  "deckGridSmaller": "Kleinere Kacheln",
+  "homeQuickMore": "Mehr"
 }

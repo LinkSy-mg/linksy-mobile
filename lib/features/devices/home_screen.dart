@@ -19,6 +19,7 @@ import '../sharing/sharing.dart';
 import '../settings/settings_screen.dart';
 import '../settings/turn_on.dart';
 import 'island.dart';
+import 'quick_actions.dart';
 import '../update/update_sheet.dart';
 
 class HomeScreen extends StatelessWidget {
@@ -342,6 +343,8 @@ class _DeviceRow extends StatelessWidget {
   Widget build(BuildContext context) {
     final s = Sig.of(context);
     final d = view.device;
+    final computer =
+        d.kind == DeviceKind.desktop || d.kind == DeviceKind.laptop;
     final last = controller.lastActivity(d.id);
     // Only transfers have progress; a live screen or camera share shows as
     // the banner at the top instead.
@@ -351,7 +354,7 @@ class _DeviceRow extends StatelessWidget {
 
     return SigCard(
       onTap: onTap,
-      padding: const EdgeInsets.fromLTRB(14, 14, 14, 14),
+      padding: const EdgeInsets.all(14),
       child: Row(
         children: [
           Orb(
@@ -373,43 +376,54 @@ class _DeviceRow extends StatelessWidget {
                   overflow: TextOverflow.ellipsis,
                 ),
                 const SizedBox(height: 3),
-                Row(
-                  children: [
-                    AnimatedContainer(
-                      duration: motion(context),
-                      width: 6,
-                      height: 6,
-                      margin: const EdgeInsets.only(right: 6),
-                      decoration: BoxDecoration(
-                        color: away
-                            ? s.line
-                            : view.connected
-                            ? Sig.cyan
-                            : Sig.blue,
-                        shape: BoxShape.circle,
+                LayoutBuilder(
+                  builder: (context, box) => Row(
+                    children: [
+                      AnimatedContainer(
+                        duration: motion(context),
+                        width: 6,
+                        height: 6,
+                        margin: const EdgeInsets.only(right: 6),
+                        decoration: BoxDecoration(
+                          color: away
+                              ? s.line
+                              : view.connected
+                              ? Sig.cyan
+                              : Sig.blue,
+                          shape: BoxShape.circle,
+                        ),
                       ),
-                    ),
-                    Text(
-                      linkWords(view),
-                      style: TextStyle(
-                        fontSize: 13,
-                        color: away ? s.faint : s.muted,
+                      // All of it but on a narrow screen; what follows gives
+                      // way first.
+                      ConstrainedBox(
+                        constraints: BoxConstraints(
+                          maxWidth: math.max(0, box.maxWidth - 12),
+                        ),
+                        child: Text(
+                          linkWords(view),
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                          style: TextStyle(
+                            fontSize: 13,
+                            color: away ? s.faint : s.muted,
+                          ),
+                        ),
                       ),
-                    ),
-                    Expanded(
-                      child: Text(
-                        [
-                          if (view.battery case final b? when !away)
-                            '${b.level}%',
-                          if (last != null && !transferring)
-                            activityTitle(last),
-                        ].map((p) => '  ·  $p').join(),
-                        style: TextStyle(fontSize: 13, color: s.muted),
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
+                      Expanded(
+                        child: Text(
+                          [
+                            if (view.battery case final b? when !away)
+                              '${b.level}%',
+                            if (last != null && !transferring)
+                              activityTitle(last),
+                          ].map((p) => '  ·  $p').join(),
+                          style: TextStyle(fontSize: 13, color: s.muted),
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                        ),
                       ),
-                    ),
-                  ],
+                    ],
+                  ),
                 ),
                 AnimatedSize(
                   duration: motion(context),
@@ -452,12 +466,37 @@ class _DeviceRow extends StatelessWidget {
                     color: s.faint,
                     size: 18,
                   )
+                : computer
+                ? _More(key: const ValueKey(false), deviceId: d.id)
                 : _QuickSend(key: const ValueKey(false), deviceId: d.id),
           ),
         ],
       ),
     );
   }
+}
+
+/// What a computer can do, Send files first, without opening it (mobile#24).
+class _More extends StatelessWidget {
+  const _More({super.key, required this.deviceId});
+
+  final String deviceId;
+
+  @override
+  Widget build(BuildContext context) => Pressable(
+    onTap: () => showQuickActions(context, deviceId),
+    scale: 0.88,
+    semanticLabel: context.l10n.homeQuickMore,
+    child: Container(
+      width: 44,
+      height: 44,
+      decoration: BoxDecoration(
+        shape: BoxShape.circle,
+        color: Sig.blue.withValues(alpha: 0.12),
+      ),
+      child: const Icon(Ph.dotsThree, color: Sig.blue, size: 24),
+    ),
+  );
 }
 
 /// Send files without opening the device first.

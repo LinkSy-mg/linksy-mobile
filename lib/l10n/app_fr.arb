@@ -952,5 +952,6 @@
   "deckGridColumns": "{count, plural, =1{1 colonne} other{{count} colonnes}}",
   "deckGridRows": "{count, plural, =1{1 ligne} other{{count} lignes}}",
   "deckGridBigger": "Tuiles plus grandes",
-  "deckGridSmaller": "Tuiles plus petites"
+  "deckGridSmaller": "Tuiles plus petites",
+  "homeQuickMore": "Plus"
 }

@@ -3530,4 +3530,7 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String get deckGridSmaller => 'Tuiles plus petites';
+
+  @override
+  String get homeQuickMore => 'Plus';
 }
