@@ -4,6 +4,11 @@ All notable changes to Linksy for Android. Format: [Keep a Changelog](https://ke
 
 ## [Unreleased]
 
+## [0.3.12] - 2026-11-25
+
+> [!IMPORTANT]
+> **If Play Protect stops the install,** pause **Scan apps with Play Protect** while installing (Play Store › your picture › Play Protect › the gear at the top right), then turn it back on.
+
 ### Added
 
 - **Gauges on the deck** (needs Linksy for Linux 0.18): the computer's CPU, memory, swap, disk, battery, temperature, download, upload and uptime, under The computer now in Add.
@@ -15,6 +20,7 @@ All notable changes to Linksy for Android. Format: [Keep a Changelog](https://ke
 
 ### Fixed
 
+- A new deck is always Dot Matrix; one the computer made itself came in Stock.
 - Leaving the deck from its Remote page ends Remote Input and gives the status bar back, as from any other page.
 - A deck with more than 12 rows or columns is no longer squeezed into 12 when the app restarts.
 - Viewing a computer's screen no longer crashes the app when the phone's video decoder stops (mobile#26, thanks @bearyjd).
