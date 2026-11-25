@@ -5897,6 +5897,24 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Uptime'**
   String get deckStatUptime;
+
+  /// Deck look
+  ///
+  /// In en, this message translates to:
+  /// **'Fluoro'**
+  String get deckThemeFluoro;
+
+  /// Deck look
+  ///
+  /// In en, this message translates to:
+  /// **'Pads'**
+  String get deckThemePads;
+
+  /// Deck look
+  ///
+  /// In en, this message translates to:
+  /// **'Crystal'**
+  String get deckThemeCrystal;
 }
 
 class _AppLocalizationsDelegate

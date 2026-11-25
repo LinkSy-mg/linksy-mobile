@@ -963,5 +963,8 @@
   "deckStatTemp": "Hafanana",
   "deckStatDown": "Midina",
   "deckStatUp": "Miakatra",
-  "deckStatUptime": "Nandeha hatramin'ny"
+  "deckStatUptime": "Nandeha hatramin'ny",
+  "deckThemeFluoro": "Fluoro",
+  "deckThemePads": "Pads",
+  "deckThemeCrystal": "Kristaly"
 }

@@ -5,6 +5,7 @@ import 'dart:ui' as ui;
 import 'package:flutter/material.dart';
 
 import 'deck_looks.dart';
+import 'deck_materials.dart';
 
 /// What the deck's tiles draw themselves, in each look, as the computer's
 /// editor does (the desktop's deck/art.rs): icons as lines, dots, pixels or
@@ -294,6 +295,16 @@ class _IconPainter extends CustomPainter {
             ..maskFilter = const MaskFilter.blur(BlurStyle.normal, 2.5),
         );
       }
+      if (stroke == DeckStroke.heavy) {
+        line.strokeWidth = 2.6;
+        // Dark lines fall on the glass; the glass's own colour doesn't.
+        if (color.computeLuminance() < 0.2) {
+          canvas.drawPath(
+            path.shift(const Offset(1.6, 2.3)),
+            line..color = deckCastOf(color),
+          );
+        }
+      }
       canvas.drawPath(path, line..color = color);
     }
     canvas.restore();
@@ -545,6 +556,9 @@ class DeckBar extends StatelessWidget {
 
   /// How thick it is across, in this look.
   double get across => switch ((thick, look.bars)) {
+    (true, _) when look.material != DeckMaterial.flat => 44,
+    (false, _) when look.material == DeckMaterial.tube => 7,
+    (false, _) when look.material == DeckMaterial.glass => 8,
     (true, DeckBars.blocks) => 22,
     (true, _) => 26,
     (false, DeckBars.blocks) => 8,
@@ -571,6 +585,10 @@ class _BarPainter extends CustomPainter {
 
   @override
   void paint(Canvas canvas, Size size) {
+    if (look.material != DeckMaterial.flat) {
+      paintDeckBar(canvas, size, look, value, vertical: vertical, thick: thick);
+      return;
+    }
     final w = size.width, h = size.height;
     final whole = Offset.zero & size;
     final full = vertical
@@ -684,7 +702,10 @@ class DeckCover extends StatelessWidget {
     required this.size,
     this.art,
     this.real = false,
+    this.playing = false,
   });
+
+  final bool playing;
 
   final DeckLook look;
   final double size;
@@ -698,6 +719,22 @@ class DeckCover extends StatelessWidget {
     final art = this.art;
     final square = Size.square(size);
     final themed = !(real && art != null);
+    if (themed && look.cover == DeckCovers.material) {
+      final n = MaterialCover.cells(look, size);
+      Widget cover(List<Color>? pixels) => MaterialCover(
+        look: look,
+        size: size,
+        playing: playing,
+        pixels: pixels,
+        n: n,
+      );
+      return art == null
+          ? cover(null)
+          : FutureBuilder(
+              future: _shrink(art, n),
+              builder: (context, snap) => cover(snap.data),
+            );
+    }
     if (themed &&
         (look.cover == DeckCovers.dots || look.cover == DeckCovers.pixel)) {
       final n = look.cover == DeckCovers.pixel ? 12 : (size / 6).floor();
@@ -822,7 +859,10 @@ class _CoverPainter extends CustomPainter {
             }
           }
         }
-      case DeckCovers.colour || DeckCovers.grey || DeckCovers.green:
+      case DeckCovers.colour ||
+          DeckCovers.grey ||
+          DeckCovers.green ||
+          DeckCovers.material:
         final stops = switch (look.cover) {
           DeckCovers.grey => const [
             Color(0xFFAAAAAA),
@@ -926,6 +966,24 @@ class DeckBackdropPainter extends CustomPainter {
         final line = Paint()..color = Colors.black.withValues(alpha: 0.18);
         for (var y = 0.0; y < size.height; y += 4) {
           canvas.drawRect(Rect.fromLTWH(0, y, size.width, 2), line);
+        }
+      case DeckBackdrop.mesh:
+        final wire = Paint()
+          ..strokeWidth = 1
+          ..color = look.screenInk.withValues(alpha: 0.035);
+        final slope = size.height / math.tan(math.pi / 3);
+        for (var x = -slope; x < size.width + slope; x += 6) {
+          canvas
+            ..drawLine(Offset(x, 0), Offset(x + slope, size.height), wire)
+            ..drawLine(Offset(x, 0), Offset(x - slope, size.height), wire);
+        }
+      case DeckBackdrop.pixels:
+        final line = Paint()..color = Colors.black.withValues(alpha: 0.028);
+        for (var y = 0.0; y < size.height; y += 3) {
+          canvas.drawRect(Rect.fromLTWH(0, y, size.width, 1), line);
+        }
+        for (var x = 0.0; x < size.width; x += 3) {
+          canvas.drawRect(Rect.fromLTWH(x, 0, 1, size.height), line);
         }
       case DeckBackdrop.aurora:
         void glow(Alignment at, double r, Color c) {

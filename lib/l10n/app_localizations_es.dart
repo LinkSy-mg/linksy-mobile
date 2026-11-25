@@ -3551,4 +3551,13 @@ class AppLocalizationsEs extends AppLocalizations {
 
   @override
   String get deckStatUptime => 'Encendido';
+
+  @override
+  String get deckThemeFluoro => 'Fluoro';
+
+  @override
+  String get deckThemePads => 'Pads';
+
+  @override
+  String get deckThemeCrystal => 'Cristal';
 }

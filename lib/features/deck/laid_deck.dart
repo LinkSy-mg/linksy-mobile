@@ -21,6 +21,7 @@ import '../remote/remote_screen.dart';
 import 'deck_art.dart';
 import 'deck_editor.dart';
 import 'deck_looks.dart';
+import 'deck_materials.dart';
 import '../../ui/responsive.dart';
 
 /// The deck as a computer laid it out (docs/protocol.md §4.20): its active
@@ -1048,8 +1049,10 @@ class _Pen {
     bool label = false,
   }) {
     if (label && look.prefix.isNotEmpty) s = '${look.prefix}$s';
+    // Sora's capitals are wide.
+    if (look.letters == DeckLetters.segments) size *= 0.88;
     final ink = color.withValues(alpha: color.a * opacity);
-    if (look.letters != DeckLetters.font && hasGlyphs(s)) {
+    if (look.glyphs && hasGlyphs(s)) {
       final square = look.letters == DeckLetters.squares;
       final scaled = [
         for (final p in pitches)
@@ -1108,7 +1111,52 @@ class _Pen {
 
   /// Numbers [px] high (the glyphs' height in the looks that draw them).
   Widget number(String s, {required double px, required double width}) {
-    if (look.letters != DeckLetters.font) {
+    if (look.letters == DeckLetters.segments) {
+      // The figures in segments, their unit beside them.
+      final lines = s.split('\n');
+      final parts = RegExp(r'^([\d:.–-]+)(?:\s*([^\d\s]+))?$');
+      if (lines.every(parts.hasMatch)) {
+        return SizedBox(
+          width: width,
+          child: FittedBox(
+            fit: BoxFit.scaleDown,
+            alignment: Alignment.centerLeft,
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                for (final (i, line) in lines.indexed) ...[
+                  if (i > 0) SizedBox(height: px * 0.16 * scale),
+                  Row(
+                    mainAxisSize: MainAxisSize.min,
+                    crossAxisAlignment: CrossAxisAlignment.end,
+                    children: [
+                      SegmentText(
+                        parts.firstMatch(line)!.group(1)!,
+                        height: px * 0.92 * scale,
+                        color: color,
+                        look: look,
+                      ),
+                      if (parts.firstMatch(line)!.group(2) case final unit?)
+                        Padding(
+                          padding: EdgeInsets.only(left: px * 0.14 * scale),
+                          child: Text(
+                            unit,
+                            style: look
+                                .text(px * 0.44 * scale, color: color)
+                                .copyWith(height: 1),
+                          ),
+                        ),
+                    ],
+                  ),
+                ],
+              ],
+            ),
+          ),
+        );
+      }
+    }
+    if (look.glyphs) {
       final pitch = px / 7;
       return words(
         s.replaceAll('\n', ' '),
@@ -1186,10 +1234,21 @@ class _Tile extends StatelessWidget {
         t.kind != 'clock' && (!scope.live || runs && !known || noGauge);
     final one = t.w == 1 && t.h == 1 && t.kind != 'clock';
     final pad = (one ? 5.0 : 9.0) * scale;
-    final paint = look.paint(
+    final lit = on && t.kind == 'button';
+    var paint = look.paint(
       t.color ?? deckDefaultColor(t.kind, action),
-      on: on && t.kind == 'button',
+      on: lit,
     );
+    // A pad of its own colour.
+    if (look.material == DeckMaterial.rubber && !lit) {
+      if (t.color case final own?
+          when t.kind == 'button' || t.kind == 'phone') {
+        final ink = own.computeLuminance() > 0.3
+            ? const Color(0xFF17181B)
+            : Colors.white;
+        paint = (fill: own, ink: ink, icon: ink, stroke: null);
+      }
+    }
     final label = t.label.isNotEmpty
         ? t.label
         : offered?.name ?? _named(action) ?? t.kind;
@@ -1209,6 +1268,19 @@ class _Tile extends StatelessWidget {
     Widget shell(Widget child, {bool down = false}) {
       final fill = down ? Color.lerp(paint.fill, paint.ink, 0.14)! : paint.fill;
       final content = Padding(padding: EdgeInsets.all(pad), child: child);
+      if (look.material != DeckMaterial.flat) {
+        return CustomPaint(
+          painter: DeckBoxPainter(
+            look: look,
+            kind: t.kind,
+            fill: paint.fill,
+            ink: paint.ink,
+            on: lit,
+            down: down,
+          ),
+          child: content,
+        );
+      }
       if (look.bevel) {
         return CustomPaint(painter: PixelBoxPainter(fill), child: content);
       }
@@ -1694,8 +1766,14 @@ class _ClockFaceState extends State<_ClockFace> {
     return LayoutBuilder(
       builder: (context, box) {
         final h = box.maxHeight.isFinite ? box.maxHeight : w;
+        // Segments and a font's digits are narrower than glyphs.
+        final narrow = switch (pen.look) {
+          DeckLook(letters: DeckLetters.segments) => 0.64,
+          DeckLook(material: DeckMaterial.rubber) => 0.68,
+          _ => 1.0,
+        };
         double high(double share, int chars) =>
-            math.min(h * share, w * 7 / (6 * chars)) / scale;
+            math.min(h * share, w * 7 / (6 * chars * narrow)) / scale;
         Widget dateLine(double px) {
           final pitch = math.max(1.0, px * 0.34 / 7);
           final long = longDate(now);
@@ -2005,6 +2083,7 @@ class _MusicFaceState extends State<_MusicFace> {
                   look: look,
                   size: side,
                   art: _coverOf(p),
+                  playing: playing,
                   real: c.deckRealCovers,
                 ),
                 SizedBox(width: 8 * s),
@@ -2066,6 +2145,7 @@ class _MusicFaceState extends State<_MusicFace> {
                 look: look,
                 size: h,
                 art: _coverOf(p),
+                playing: playing,
                 real: c.deckRealCovers,
               ),
               SizedBox(width: 9 * s),
@@ -2609,6 +2689,19 @@ class _Preview extends StatelessWidget {
           stroke: look.icons,
         ),
       );
+      if (look.material != DeckMaterial.flat) {
+        return CustomPaint(
+          painter: DeckBoxPainter(
+            look: look,
+            kind: 'button',
+            fill: p.fill,
+            ink: p.ink,
+            on: on,
+            down: false,
+          ),
+          child: child,
+        );
+      }
       if (look.bevel) {
         return CustomPaint(painter: PixelBoxPainter(p.fill), child: child);
       }
@@ -2707,6 +2800,80 @@ class _StatFace extends StatelessWidget {
     final roomy = tile.h > 1;
     final spoken = '$name $text';
 
+    // A dial, in the looks that have them.
+    if (value != null &&
+        roomy &&
+        tile.w > 1 &&
+        (look.material == DeckMaterial.tube ||
+            look.material == DeckMaterial.rubber)) {
+      return Semantics(
+        label: spoken,
+        excludeSemantics: true,
+        child: LayoutBuilder(
+          builder: (context, box) {
+            final words = 15.0 * scale;
+            final side = math.min(box.maxWidth, box.maxHeight - words * 0.6);
+            final tube = look.material == DeckMaterial.tube;
+            final small = parted ? text.split(' / ').first : '';
+            return Stack(
+              alignment: Alignment.topCenter,
+              children: [
+                TweenAnimationBuilder<double>(
+                  tween: Tween(end: value),
+                  duration: motion(context, 600),
+                  curve: Curves.easeOutCubic,
+                  builder: (context, v, _) => CustomPaint(
+                    size: Size.square(side),
+                    painter: DeckDialPainter(look, v, look.on),
+                  ),
+                ),
+                SizedBox(
+                  width: side,
+                  height: side,
+                  child: Center(
+                    child: SizedBox(
+                      width: side * (tube ? 0.62 : 0.36),
+                      height: side * 0.3,
+                      child: FittedBox(
+                        child: tube
+                            ? SegmentText(
+                                main.replaceAll(RegExp(r'[^\d.]'), ''),
+                                height: 40,
+                                color: pen.color,
+                                look: look,
+                              )
+                            : Text(main, style: look.text(40)),
+                      ),
+                    ),
+                  ),
+                ),
+                Positioned(
+                  left: 0,
+                  right: 0,
+                  bottom: 0,
+                  child: FittedBox(
+                    fit: BoxFit.scaleDown,
+                    child: Row(
+                      children: [
+                        pen.words(name, size: 10.5, width: width),
+                        if (small.isNotEmpty) ...[
+                          SizedBox(width: 6 * scale),
+                          Text(
+                            small,
+                            style: look.text(10.5 * scale, color: look.on),
+                          ),
+                        ],
+                      ],
+                    ),
+                  ),
+                ),
+              ],
+            );
+          },
+        ),
+      );
+    }
+
     final bar = value == null
         ? null
         : TweenAnimationBuilder<double>(
@@ -2747,7 +2914,7 @@ class _StatFace extends StatelessWidget {
         // Its unit under it, when both don't fit.
         pen.words(
           metric == 'net_down' || metric == 'net_up'
-              ? look.letters == DeckLetters.font
+              ? !look.glyphs
                     ? main.replaceFirst(' ', '\n')
                     : main
               : main,
@@ -2766,7 +2933,7 @@ class _StatFace extends StatelessWidget {
           children: [
             icon,
             SizedBox(width: 6 * scale),
-            Expanded(child: title),
+            if (tile.w > 1) Expanded(child: title),
           ],
         ),
         const Spacer(),
@@ -2775,7 +2942,10 @@ class _StatFace extends StatelessWidget {
         else
           Row(
             children: [
-              number(14, math.min(width * 0.36, 60 * scale)),
+              number(
+                look.letters == DeckLetters.segments ? 19 : 14,
+                math.min(width * 0.36, 60 * scale),
+              ),
               SizedBox(width: 6 * scale),
               Expanded(child: bar),
             ],
@@ -2787,11 +2957,11 @@ class _StatFace extends StatelessWidget {
           children: [
             icon,
             SizedBox(width: 6 * scale),
-            Expanded(child: title),
+            if (tile.w > 1) Expanded(child: title),
           ],
         ),
         const Spacer(),
-        number(28, width),
+        number(look.material == DeckMaterial.glass ? 46 : 28, width),
         if (parted) ...[
           SizedBox(height: 4 * scale),
           FittedBox(

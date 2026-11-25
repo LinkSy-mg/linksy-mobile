@@ -963,5 +963,8 @@
   "deckStatTemp": "Température",
   "deckStatDown": "Réception",
   "deckStatUp": "Envoi",
-  "deckStatUptime": "Allumé depuis"
+  "deckStatUptime": "Allumé depuis",
+  "deckThemeFluoro": "Fluo",
+  "deckThemePads": "Pads",
+  "deckThemeCrystal": "Cristal"
 }

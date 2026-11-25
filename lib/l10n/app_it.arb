@@ -963,5 +963,8 @@
   "deckStatTemp": "Temperatura",
   "deckStatDown": "Download",
   "deckStatUp": "Upload",
-  "deckStatUptime": "Acceso da"
+  "deckStatUptime": "Acceso da",
+  "deckThemeFluoro": "Fluoro",
+  "deckThemePads": "Pad",
+  "deckThemeCrystal": "Cristallo"
 }

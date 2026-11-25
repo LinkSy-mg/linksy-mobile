@@ -963,5 +963,8 @@
   "deckStatTemp": "温度",
   "deckStatDown": "下载",
   "deckStatUp": "上传",
-  "deckStatUptime": "运行时间"
+  "deckStatUptime": "运行时间",
+  "deckThemeFluoro": "荧光管",
+  "deckThemePads": "打击垫",
+  "deckThemeCrystal": "液晶"
 }

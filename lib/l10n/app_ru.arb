@@ -963,5 +963,8 @@
   "deckStatTemp": "Температура",
   "deckStatDown": "Загрузка",
   "deckStatUp": "Отдача",
-  "deckStatUptime": "Работает"
+  "deckStatUptime": "Работает",
+  "deckThemeFluoro": "Флуоро",
+  "deckThemePads": "Пэды",
+  "deckThemeCrystal": "Кристалл"
 }

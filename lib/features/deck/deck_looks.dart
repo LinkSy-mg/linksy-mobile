@@ -1,26 +1,34 @@
+import 'dart:math' as math;
+
 import 'package:flutter/material.dart';
 
 import '../../core/deck_layouts.dart';
 import '../../ui/l10n.dart';
 
-/// How a look writes: in a font, or in 5×7 glyphs of dots or squares.
-enum DeckLetters { font, dots, squares }
+/// How a look writes: in a font, in 5×7 glyphs of dots or squares, or its
+/// numbers in seven segments.
+enum DeckLetters { font, dots, squares, segments }
+
+/// What a look's tiles are made of, when it isn't just colour
+/// (deck_materials.dart): tubes, a crystal over glass, rubber pads.
+enum DeckMaterial { flat, tube, glass, rubber }
 
 /// How it draws icons: a line, a line of dots, pixels, or a glowing line.
-enum DeckStroke { line, dotted, pixel, glow }
+/// A heavy line falls on the glass behind it.
+enum DeckStroke { line, dotted, pixel, glow, heavy }
 
 /// How it draws bars: flat, rows of dots, or blocks.
 enum DeckBars { flat, dots, blocks }
 
 /// What's behind the tiles besides its colour.
-enum DeckBackdrop { plain, dotGrid, scanlines, aurora }
+enum DeckBackdrop { plain, dotGrid, scanlines, aurora, mesh, pixels }
 
 /// Where a tile's own colour goes: nowhere, its fill, its fill in the
 /// 16-colour palette, or its icon.
 enum DeckTint { none, fill, pico, icon }
 
 /// The music's cover when there's none, or how one is drawn.
-enum DeckCovers { colour, grey, green, dots, pixel }
+enum DeckCovers { colour, grey, green, dots, pixel, material }
 
 /// A tile's colours, as a look draws it.
 typedef DeckPaint = ({Color fill, Color ink, Color icon, Color? stroke});
@@ -70,7 +78,18 @@ class DeckLook {
     this.cover = DeckCovers.colour,
     this.coverRadius = 8,
     this.bevel = false,
+    this.material = DeckMaterial.flat,
+    this.ghost = Colors.transparent,
   });
+
+  final DeckMaterial material;
+
+  /// A segment or cell that isn't lit.
+  final Color ghost;
+
+  /// Writes words in 5×7 glyphs.
+  bool get glyphs =>
+      letters == DeckLetters.dots || letters == DeckLetters.squares;
 
   final String id;
 
@@ -126,7 +145,14 @@ class DeckLook {
 
   /// The computer's five, then the phone's own.
   static const computers = ['stock', 'dots', 'eink', 'term', 'pixel'];
-  static const phones = ['signal', 'glass', 'midnight'];
+  static const phones = [
+    'fluoro',
+    'pads',
+    'crystal',
+    'signal',
+    'glass',
+    'midnight',
+  ];
 
   static String name(
     BuildContext context,
@@ -145,6 +171,9 @@ class DeckLook {
       'signal' => l.deckThemeSignal,
       'glass' => l.deckThemeGlass,
       'midnight' => l.deckThemeMidnight,
+      'fluoro' => l.deckThemeFluoro,
+      'pads' => l.deckThemePads,
+      'crystal' => l.deckThemeCrystal,
       _ => l.deckThemeStock,
     };
   }
@@ -228,6 +257,9 @@ class DeckLook {
     'signal' => _signal(accent),
     'glass' => _glass(accent),
     'midnight' => _midnight(accent),
+    'fluoro' => _fluoro(accent),
+    'pads' => _pads(accent),
+    'crystal' => _crystal(accent),
     _ => _stock(accent),
   };
 
@@ -270,7 +302,11 @@ class DeckLook {
     color: (color ?? ink).withValues(alpha: (color ?? ink).a * opacity),
     height: 1.2,
     // Terminal's glow, but under dark text on what's on.
-    shadows: color == null || color == ink ? glow : null,
+    shadows: color == null || color == ink
+        ? glow
+        : material == DeckMaterial.tube && color == onInk
+        ? [Shadow(color: onInk.withValues(alpha: 0.7), blurRadius: 8)]
+        : null,
     fontFeatures: const [FontFeature.tabularFigures()],
   );
 
@@ -281,6 +317,124 @@ class DeckLook {
         .withLightness(hsl.lightness < 0.62 ? 0.62 : hsl.lightness)
         .withSaturation(hsl.saturation < 0.55 ? 0.55 : hsl.saturation)
         .toColor();
+  }
+
+  /// [a] as picked; one nobody picked (a deck's first accent) is [own].
+  static Color _picked(Color a, Color own) =>
+      a == DeckTheme.stock.accent || a == DeckTheme.dots.accent ? own : a;
+
+  /// A hi-fi's tube display: segments that glow, the others just visible,
+  /// amber for what's on.
+  static DeckLook _fluoro(Color a) {
+    final glow = _picked(a, const Color(0xFF7FF5E0));
+    final warm = HSLColor.fromColor(glow).hue < 70;
+    final on = warm ? const Color(0xFF7FF5E0) : const Color(0xFFFFB14A);
+    return DeckLook(
+      id: 'fluoro',
+      brightness: Brightness.dark,
+      background: const Color(0xFF050807),
+      backdrop: DeckBackdrop.mesh,
+      screenInk: glow,
+      tile: Colors.transparent,
+      radius: 6,
+      ink: glow,
+      on: on,
+      onInk: on,
+      font: 'Sora',
+      weight: FontWeight.w500,
+      upper: true,
+      spacing: 0.02,
+      letters: DeckLetters.segments,
+      glow: [Shadow(color: glow.withValues(alpha: 0.66), blurRadius: 8)],
+      icons: DeckStroke.glow,
+      track: Color.lerp(const Color(0xFF050807), glow, 0.13)!,
+      ghost: Color.lerp(const Color(0xFF050807), glow, 0.13)!,
+      fill: glow,
+      play: Colors.transparent,
+      playInk: on,
+      dot: Color.lerp(const Color(0xFF050807), glow, 0.3)!,
+      dotOn: on,
+      cover: DeckCovers.material,
+      coverRadius: 0,
+      material: DeckMaterial.tube,
+    );
+  }
+
+  /// A pocket computer's screen: dark segments that fall on the glass.
+  static DeckLook _crystal(Color a) {
+    final picked = _picked(a, const Color(0xFFB9C4A3));
+    // Any accent as a tint of the glass, light enough for its ink.
+    final hsl = HSLColor.fromColor(picked);
+    final glass = hsl
+        .withSaturation(math.min(hsl.saturation, 0.42))
+        .withLightness(0.72)
+        .toColor();
+    const ink = Color(0xFF1C2416);
+    return DeckLook(
+      id: 'crystal',
+      brightness: Brightness.light,
+      background: glass,
+      backdrop: DeckBackdrop.pixels,
+      screenInk: ink,
+      tile: Colors.transparent,
+      stroke: ink,
+      radius: 8,
+      ink: ink,
+      on: ink,
+      onInk: glass,
+      font: 'Sora',
+      upper: true,
+      letters: DeckLetters.segments,
+      glow: [
+        Shadow(
+          color: ink.withValues(alpha: 0.17),
+          offset: const Offset(1.5, 2),
+        ),
+      ],
+      icons: DeckStroke.heavy,
+      track: ink.withValues(alpha: 0.09),
+      ghost: ink.withValues(alpha: 0.07),
+      fill: ink,
+      play: ink,
+      playInk: glass,
+      playRadius: 8,
+      dot: ink.withValues(alpha: 0.25),
+      dotOn: ink,
+      squareDots: true,
+      cover: DeckCovers.material,
+      coverRadius: 0,
+      material: DeckMaterial.glass,
+    );
+  }
+
+  /// Studio gear: rubber pads lit from behind, wells, knobs and a fader.
+  static DeckLook _pads(Color a) {
+    final lit = _picked(a, const Color(0xFFFF5C2B));
+    final dark = lit.computeLuminance() > 0.22
+        ? const Color(0xFF1A0D05)
+        : Colors.white;
+    return DeckLook(
+      id: 'pads',
+      brightness: Brightness.dark,
+      background: const Color(0xFF17181B),
+      screenInk: const Color(0xFFE9E7E2),
+      tile: const Color(0xFF2B2D32),
+      radius: 14,
+      ink: const Color(0xFFE9E7E2),
+      on: lit,
+      onInk: dark,
+      font: 'Inter',
+      track: const Color(0xFF2A2B2F),
+      fill: lit,
+      play: lit,
+      playInk: dark,
+      playRadius: 12,
+      dot: const Color(0xFF3A3C41),
+      dotOn: lit,
+      cover: DeckCovers.material,
+      coverRadius: 4,
+      material: DeckMaterial.rubber,
+    );
   }
 
   static DeckLook _stock(Color a) => DeckLook(

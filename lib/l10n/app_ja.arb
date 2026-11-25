@@ -963,5 +963,8 @@
   "deckStatTemp": "温度",
   "deckStatDown": "下り",
   "deckStatUp": "上り",
-  "deckStatUptime": "稼働時間"
+  "deckStatUptime": "稼働時間",
+  "deckThemeFluoro": "蛍光管",
+  "deckThemePads": "パッド",
+  "deckThemeCrystal": "液晶"
 }

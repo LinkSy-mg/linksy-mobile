@@ -4388,5 +4388,11 @@
   "deckStatUp": "Upload",
   "@deckStatUp": {"description": "Deck: the computer's gauges"},
   "deckStatUptime": "Uptime",
-  "@deckStatUptime": {"description": "Deck: the computer's gauges"}
+  "@deckStatUptime": {"description": "Deck: the computer's gauges"},
+  "deckThemeFluoro": "Fluoro",
+  "@deckThemeFluoro": {"description": "Deck look"},
+  "deckThemePads": "Pads",
+  "@deckThemePads": {"description": "Deck look"},
+  "deckThemeCrystal": "Crystal",
+  "@deckThemeCrystal": {"description": "Deck look"}
 }

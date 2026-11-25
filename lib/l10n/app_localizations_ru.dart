@@ -3576,4 +3576,13 @@ class AppLocalizationsRu extends AppLocalizations {
 
   @override
   String get deckStatUptime => 'Работает';
+
+  @override
+  String get deckThemeFluoro => 'Флуоро';
+
+  @override
+  String get deckThemePads => 'Пэды';
+
+  @override
+  String get deckThemeCrystal => 'Кристалл';
 }

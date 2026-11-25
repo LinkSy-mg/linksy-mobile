@@ -3453,4 +3453,13 @@ class AppLocalizationsJa extends AppLocalizations {
 
   @override
   String get deckStatUptime => '稼働時間';
+
+  @override
+  String get deckThemeFluoro => '蛍光管';
+
+  @override
+  String get deckThemePads => 'パッド';
+
+  @override
+  String get deckThemeCrystal => '液晶';
 }

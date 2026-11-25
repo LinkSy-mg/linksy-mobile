@@ -3399,4 +3399,13 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get deckStatUptime => '运行时间';
+
+  @override
+  String get deckThemeFluoro => '荧光管';
+
+  @override
+  String get deckThemePads => '打击垫';
+
+  @override
+  String get deckThemeCrystal => '液晶';
 }

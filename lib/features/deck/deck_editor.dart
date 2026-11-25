@@ -1969,7 +1969,12 @@ class _ThemeSheetState extends State<_ThemeSheet> {
                 scrollDirection: Axis.horizontal,
                 children: [
                   for (final id in [
-                    ...DeckLook.computers,
+                    'dots',
+                    'fluoro',
+                    'pads',
+                    'crystal',
+                    for (final id in DeckLook.computers)
+                      if (id != 'dots') id,
                     for (final t in widget.themes) t.id,
                   ])
                     Padding(

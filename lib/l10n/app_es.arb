@@ -963,5 +963,8 @@
   "deckStatTemp": "Temperatura",
   "deckStatDown": "Bajada",
   "deckStatUp": "Subida",
-  "deckStatUptime": "Encendido"
+  "deckStatUptime": "Encendido",
+  "deckThemeFluoro": "Fluoro",
+  "deckThemePads": "Pads",
+  "deckThemeCrystal": "Cristal"
 }

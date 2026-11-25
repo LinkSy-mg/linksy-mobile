@@ -3558,4 +3558,13 @@ class AppLocalizationsMg extends AppLocalizations {
 
   @override
   String get deckStatUptime => 'Nandeha hatramin\'ny';
+
+  @override
+  String get deckThemeFluoro => 'Fluoro';
+
+  @override
+  String get deckThemePads => 'Pads';
+
+  @override
+  String get deckThemeCrystal => 'Kristaly';
 }
