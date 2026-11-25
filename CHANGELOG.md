@@ -7,6 +7,7 @@ All notable changes to Linksy for Android. Format: [Keep a Changelog](https://ke
 ### Added
 
 - **Gauges on the deck** (needs Linksy for Linux 0.18): the computer's CPU, memory, swap, disk, battery, temperature, download, upload and uptime, under The computer now in Add.
+- **Three new deck looks:** Fluoro, a glowing tube display; Pads, rubber pads lit from behind with a real fader and knobs; and Crystal, a light pocket computer screen. The accent picks the glow, the light or the tint of the glass.
 - **Custom deck themes** made on the computer show in the deck's themes, and one being made there shows on the deck as it goes.
 - Your own commands show the icon picked for them on the computer.
 - The computer keeps a copy of the deck laid out on the phone, as far as it takes one. Shortcuts, the touchpad, free sizes and the phone's own themes stay on the phone.
@@ -14,6 +15,7 @@ All notable changes to Linksy for Android. Format: [Keep a Changelog](https://ke
 
 ### Fixed
 
+- Leaving the deck from its Remote page ends Remote Input and gives the status bar back, as from any other page.
 - A deck with more than 12 rows or columns is no longer squeezed into 12 when the app restarts.
 - Viewing a computer's screen no longer crashes the app when the phone's video decoder stops (mobile#26, thanks @bearyjd).
 - After editing the deck, it stays on the page you were on, and the dots match it (Discussion #79).
