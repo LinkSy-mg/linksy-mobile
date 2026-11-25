@@ -50,6 +50,11 @@ class _LaidDeckState extends State<LaidDeck> {
   final _pages = PageController();
   int _page = 0;
 
+  /// The pages, kept as they are when what's around them changes (the editor
+  /// over the deck, the phone turned): built anew they'd start at the first,
+  /// the dots still at [_page] (Discussion #79).
+  final _pagesKey = GlobalKey();
+
   /// A word on what a tap couldn't do, for a moment.
   String? _note;
   Timer? _noteTimer;
@@ -195,6 +200,7 @@ class _LaidDeckState extends State<LaidDeck> {
       );
     } else {
       body = PageView.builder(
+        key: _pagesKey,
         controller: _pages,
         itemCount: pages.length,
         onPageChanged: (i) => setState(() => _page = i),
