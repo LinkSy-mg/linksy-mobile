@@ -2027,12 +2027,31 @@ class LinksyController extends ChangeNotifier with WidgetsBindingObserver {
   Future<String?> startRemote(String id) async {
     _remoteGrace.remove(id)?.cancel();
     if (remotes.containsKey(id)) return null;
-    return _run(() async {
+    final pending = _remoteStarts[id];
+    if (pending != null) {
+      pending.wanted = true;
+      return pending.result;
+    }
+    final start = _RemoteStart();
+    _remoteStarts[id] = start;
+    start.result = _run(() async {
       final session = await node.startInput(id);
+      if (!start.wanted) {
+        _remoteStarts.remove(id);
+        await node.endSession(session);
+        return;
+      }
       remotes[id] = session;
       notifyListeners();
     });
+    try {
+      return await start.result;
+    } finally {
+      if (identical(_remoteStarts[id], start)) _remoteStarts.remove(id);
+    }
   }
+
+  final Map<String, _RemoteStart> _remoteStarts = {};
 
   /// A deck shortcut or snippet ([messages], as Remote Input sends them):
   /// through Remote Input, asked for when it isn't open (the computer allows
@@ -2073,6 +2092,7 @@ class LinksyController extends ChangeNotifier with WidgetsBindingObserver {
 
   /// The remote's page went away: ends it after [remoteGrace].
   void leaveRemote(String id) {
+    _remoteStarts[id]?.wanted = false;
     if (!remotes.containsKey(id)) return;
     _remoteGrace.remove(id)?.cancel();
     _remoteGrace[id] = Timer(remoteGrace, () {
@@ -2105,6 +2125,7 @@ class LinksyController extends ChangeNotifier with WidgetsBindingObserver {
   }
 
   Future<void> stopRemote(String id) async {
+    _remoteStarts[id]?.wanted = false;
     _remoteGrace.remove(id)?.cancel();
     final session = remotes.remove(id);
     notifyListeners();
@@ -2678,8 +2699,8 @@ class LinksyController extends ChangeNotifier with WidgetsBindingObserver {
         displays[session] = e;
         LinksyPlatform.keepScreenOn(session, on: true);
         _addSession(e);
-      case SessionStarted(:final session, :final peer, kind: SessionKind.input):
-        remotes[peer.id] = session;
+      case SessionStarted(kind: SessionKind.input):
+        // startRemote owns the live session. This event can arrive after Stop.
         _addSession(e);
       case BatteryReported():
         // Also in the device list; read it again to show it.
@@ -3744,6 +3765,9 @@ class LinksyController extends ChangeNotifier with WidgetsBindingObserver {
     for (final t in _remoteGrace.values) {
       t.cancel();
     }
+    for (final start in _remoteStarts.values) {
+      start.wanted = false;
+    }
     _sub?.cancel();
     _batterySub?.cancel();
     _callSub?.cancel();
@@ -3774,6 +3798,11 @@ class LinksyController extends ChangeNotifier with WidgetsBindingObserver {
     _prompts.close();
     super.dispose();
   }
+}
+
+class _RemoteStart {
+  bool wanted = true;
+  late final Future<String?> result;
 }
 
 sealed class UsbNews {

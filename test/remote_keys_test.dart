@@ -151,6 +151,16 @@ void main() {
     await finish(tester, c);
   });
 
+  testWidgets('Stop ends remote control immediately', (tester) async {
+    final (c, _) = await pump(tester);
+    expect(c.remotes, isNotEmpty);
+    await tester.tap(find.text('Stop'));
+    await tester.pump();
+    expect(c.remotes, isEmpty);
+    expect(find.text('The remote stopped'), findsOneWidget);
+    await finish(tester, c);
+  });
+
   testWidgets('the switcher swaps pages and keeps the remote open', (
     tester,
   ) async {
