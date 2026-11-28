@@ -78,6 +78,7 @@ class _RemoteScreenState extends State<RemoteScreen> {
   _Mode _mode = _Mode.touchpad;
   String? _error;
   bool _asking = true;
+  bool _stoppedHere = false;
   StreamSubscription<bool>? _volume;
 
   /// Modifiers tapped on the key row: held for the next key, then let go.
@@ -93,8 +94,10 @@ class _RemoteScreenState extends State<RemoteScreen> {
   }
 
   Future<void> _connect() async {
+    if (!mounted) return;
     setState(() {
       _asking = true;
+      _stoppedHere = false;
       _error = null;
     });
     final error = await _c.startRemote(_id);
@@ -205,6 +208,16 @@ class _RemoteScreenState extends State<RemoteScreen> {
                       SizedBox(width: 420, child: modes),
                       const SizedBox(width: 16),
                     ],
+                    if (live) ...[
+                      TextButton(
+                        onPressed: () {
+                          setState(() => _stoppedHere = true);
+                          _c.stopRemote(_id);
+                        },
+                        child: Text(context.l10n.activityStop),
+                      ),
+                      const SizedBox(width: 4),
+                    ],
                     PageSwitchButton(deviceId: _id, current: DevicePage.remote),
                   ],
                 ),
@@ -218,7 +231,7 @@ class _RemoteScreenState extends State<RemoteScreen> {
                             name: name,
                             asking: _asking,
                             error: _error,
-                            ended: !_asking && _error == null,
+                            stoppedHere: _stoppedHere,
                             onRetry: _connect,
                           )
                         : Column(
@@ -270,14 +283,14 @@ class _Waiting extends StatelessWidget {
     required this.name,
     required this.asking,
     required this.error,
-    required this.ended,
+    required this.stoppedHere,
     required this.onRetry,
   });
 
   final String name;
   final bool asking;
   final String? error;
-  final bool ended;
+  final bool stoppedHere;
   final VoidCallback onRetry;
 
   @override
@@ -287,7 +300,10 @@ class _Waiting extends StatelessWidget {
         ? (context.l10n.remoteAllowOn(name), context.l10n.remoteAsks(name))
         : error != null
         ? (context.l10n.remoteFailed, error!)
-        : (context.l10n.remoteStopped, context.l10n.remoteEndedBy(name));
+        : (
+            context.l10n.remoteStopped,
+            stoppedHere ? null : context.l10n.remoteEndedBy(name),
+          );
     return Column(
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
@@ -298,12 +314,14 @@ class _Waiting extends StatelessWidget {
           textAlign: TextAlign.center,
           style: sora(20, color: s.ink),
         ),
-        const SizedBox(height: 8),
-        Text(
-          detail,
-          textAlign: TextAlign.center,
-          style: TextStyle(color: s.muted, height: 1.4),
-        ),
+        if (detail != null) ...[
+          const SizedBox(height: 8),
+          Text(
+            detail,
+            textAlign: TextAlign.center,
+            style: TextStyle(color: s.muted, height: 1.4),
+          ),
+        ],
         if (!asking) ...[
           const SizedBox(height: 22),
           SigButton(label: context.l10n.remoteTryAgain, onTap: onRetry),

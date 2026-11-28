@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -9,11 +11,13 @@ class _Node extends DemoNode {
   _Node() : super(name: 'Test Phone', downloadDir: '/downloads');
 
   int asked = 0;
+  Completer<void>? approval;
   final ended = <String>[];
 
   @override
-  Future<String> startInput(String id) {
+  Future<String> startInput(String id) async {
     asked++;
+    await approval?.future;
     return super.startInput(id);
   }
 
@@ -34,6 +38,7 @@ void main() {
     final c = LinksyController(node, ActivityStore(null));
     await c.start();
     await c.refresh();
+    await tester.pump();
     final id = c.devices.firstWhere((v) => v.trusted).device.id;
     return (c, node, id);
   }
@@ -58,6 +63,37 @@ void main() {
     await tester.pump(const Duration(seconds: 20));
     expect(c.remotes[id], session);
     expect(node.ended, isEmpty);
+    await done(tester, c);
+  });
+
+  testWidgets('approval arriving after Back closes the session', (
+    tester,
+  ) async {
+    final (c, node, id) = await start(tester);
+    final approval = node.approval = Completer<void>();
+    final starting = c.startRemote(id);
+    c.leaveRemote(id);
+    approval.complete();
+    await starting;
+    expect(c.remotes, isEmpty);
+    expect(node.ended, hasLength(1));
+    await done(tester, c);
+  });
+
+  testWidgets('returning during approval reuses the pending request', (
+    tester,
+  ) async {
+    final (c, node, id) = await start(tester);
+    final approval = node.approval = Completer<void>();
+    final starting = c.startRemote(id);
+    c.leaveRemote(id);
+    final returning = c.startRemote(id);
+    approval.complete();
+    expect(await starting, isNull);
+    expect(await returning, isNull);
+    expect(node.asked, 1);
+    expect(node.ended, isEmpty);
+    expect(c.remotes.containsKey(id), isTrue);
     await done(tester, c);
   });
 
